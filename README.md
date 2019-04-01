@@ -1,7 +1,7 @@
 # Clive Barker's Undying - Renewal
 The goal for this mod is to finish multiplayer and to balance the game.
 
-Demo video: <https://github.com/joemccann/dillinger/tree/master/plugins/medium/README.md>
+Demo video: <https://youtu.be/5VtpuGM3oHI>
 
 # Game Changes
   - Health can overcharge over 100, will drain slowly
