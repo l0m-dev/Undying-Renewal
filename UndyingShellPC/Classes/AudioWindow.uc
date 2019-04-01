@@ -221,6 +221,7 @@ function Created()
 	SoundVolumeSlider.Template = NewRegion(0,0,32,32);
 	SoundVolumeSlider.bStretch = true;
 	SoundVolumeSlider.Style = 5;
+	SoundVolumeSlider.Manager = Self;
 
 
 // Voice Volume Slider
@@ -230,6 +231,7 @@ function Created()
 	VoiceVolumeSlider.Template = NewRegion(0,0,32,32);
 	VoiceVolumeSlider.bStretch = true;
 	VoiceVolumeSlider.Style = 5;
+	VoiceVolumeSlider.Manager = Self;
 
 // Background Volume 
 	BackgroundVolumeSlider = ShellBitmap(CreateWindow(class'ShellBitmap', 60*RootScaleX,224*RootScaleY,32*RootScaleX,32*RootScaleY));
@@ -238,6 +240,7 @@ function Created()
 	BackgroundVolumeSlider.Template = NewRegion(0,0,32,32);
 	BackgroundVolumeSlider.bStretch = true;
 	BackgroundVolumeSlider.Style = 5;
+	BackgroundVolumeSlider.Manager = Self;
 
 	
 // Sound Volume Up button	
