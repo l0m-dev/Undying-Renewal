@@ -283,7 +283,7 @@ defaultproperties
      InventoryGroup=4
      PickupMessage="You picked up a Tibetan War Cannon"
      ItemName="Tibetan War Cannon"
-     PlayerViewOffset=(X=3.8,Y=-8.4,Z=-10)
+     PlayerViewOffset=(X=6.0,Y=-8.4,Z=-10)
      PlayerViewMesh=SkelMesh'Aeons.Meshes.TibetianWarCannon1st_m'
      PlayerViewScale=0.125
      PickupViewMesh=SkelMesh'Aeons.Meshes.Cannon3rd_m'
