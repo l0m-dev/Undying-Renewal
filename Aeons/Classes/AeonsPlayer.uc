@@ -4867,7 +4867,7 @@ function GiveStartupWeapons()
 		}
 	}
 	
-	ConsoleCommand("SetupInv");
+	//ConsoleCommand("SetupInv");
 }
 
 exec function movViewOffsetX (float value)

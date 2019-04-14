@@ -332,6 +332,7 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 	
 	// default Defense/Misc Spell
+	/*
 	newSpell = Spawn(class'Aeons.ShalasVortex');
 	if( newSpell != None )
 	{
@@ -340,7 +341,8 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newSpell.Instigator = PlayerPawn;
 		PlayerPawn.DefSpell = newSpell;
 	}
-
+	*/
+	
  	// example default spell
 	newSpell = Spawn(class'Aeons.Spell');
 	if( newSpell != None )

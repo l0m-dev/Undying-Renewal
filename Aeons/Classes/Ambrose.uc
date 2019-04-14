@@ -1100,7 +1100,7 @@ defaultproperties
      MeleeInfo(2)=(Damage=60,Method=RipSlice)
      WeaponJoint=L_Wrist
      WeaponAccuracy=10
-     DamageRadius=100
+     DamageRadius=90
      SK_PlayerOffset=(X=150)
      bHasSpecialKill=True
      HearingEffectorThreshold=0.4
@@ -1109,7 +1109,7 @@ defaultproperties
      PhysicalScalar1
      FireScalar=1
      bNoBloodPool=True
-     MeleeRange=85
+     MeleeRange=80
      AirSpeed=2000
      AccelRate=1500
      Alertness=10
