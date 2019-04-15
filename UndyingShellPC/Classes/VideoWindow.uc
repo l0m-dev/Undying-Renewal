@@ -508,7 +508,7 @@ function SetColorDepth( int NewColorDepth )
 		OriginalRes = GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth");
 
 
-		if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" && DriverLabel.Text != "3DFX")
+		if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" )
 		{
 			ColorDepth = 16;
 			BitDepth_16.UpTexture = texture'Video_resol_dn';
@@ -651,7 +651,7 @@ function GetCurrentSettings()
 	// link up shell components with variables
 	BrightnessSlider.SetValue(OrigBrightness*10);
 
-	if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" && GetPlayerOwner().ConsoleCommand("GetCurrentDriver") != "3DFX")
+	if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" )
 	{
 		ColorDepth = 16;
 		BitDepth_16.UpTexture = texture'Video_resol_dn';

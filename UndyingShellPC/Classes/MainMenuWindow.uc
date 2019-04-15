@@ -457,13 +457,8 @@ function CreditsPressed()
 */
 
 	PlayNewScreenSound(); //PlayExitSound();
-	
-	if ( Credits == None )
-		Credits = ManagerWindow(Root.CreateWindow(class'CreditsWindow', 100, 100, 200, 200, Root, True));
-	else
-		Credits.ShowWindow();
 
-	//ShowConfirm(Credits);
+	ShowConfirm(Credits);
 }
 
 function ShowConfirm(UwindowWindow W)
