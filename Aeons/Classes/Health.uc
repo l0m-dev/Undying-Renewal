@@ -110,7 +110,7 @@ auto state Pickup
 				    (Level.Game.Difficulty == 2 && HealthPacks < 5)) {
 					bContinue = true;
 				} else {
-					Pawn(Other).ClientMessage("You cannot carry any more Health Packs", 'Pickup');
+					Pawn(Other).ClientMessage("You cannot carry any more Health", 'Pickup');
 				}
 					
 				//Other.ConsoleCommand("say " $ HealthPacks);
