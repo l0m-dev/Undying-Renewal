@@ -27,11 +27,8 @@ class MultiplayerWindow expands ShellWindow;
 #exec Texture Import File=create_game_dn.bmp	Mips=Off Flags=2
 
 var UWindowWindow PlayerSetupWindow;
-var UBrowserMainWindow UTBrowserMainWindow;
-var UWindowWindow FindGameWindow;
+//var UWindowWindow FindGameWindow;
 var UWindowWindow CreateGameWindow;
-
-var config string UBrowserClassName;
 
 var ShellButton FindGame, CreateGame, PlayerSetup, Back;
 
@@ -295,7 +292,33 @@ function BackPressed()
 
 function Resized()
 {
+	local int W, H, XMod, YMod, i;
+	local AeonsRootWindow AeonsRoot;
+	local float RootScaleX, RootScaleY;
+
 	Super.Resized();
+
+	AeonsRoot = AeonsRootWindow(Root);
+
+	if (AeonsRoot != None)
+	{
+		RootScaleX = AeonsRoot.ScaleX;
+		RootScaleY = AeonsRoot.ScaleY;
+	}
+		
+	if ( AeonsRootWindow(Root).FindMenu != None )
+		AeonsRootWindow(Root).FindMenu.Resized();
+		
+	if ( CreateGameWindow != None )
+		CreateGameWindow.Resized();
+		
+	if ( PlayerSetupWindow != None )
+		PlayerSetupWindow.Resized();
+		
+	FindGame.ManagerResized(RootScaleX, RootScaleY);
+	CreateGame.ManagerResized(RootScaleX, RootScaleY);
+	PlayerSetup.ManagerResized(RootScaleX, RootScaleY);
+	Back.ManagerResized(RootScaleX, RootScaleY);
 }
 
 
@@ -319,5 +342,4 @@ defaultproperties
      BackNames(3)="UndyingShellPC.Multiplayer_3"
      BackNames(4)="UndyingShellPC.Multiplayer_4"
      BackNames(5)="UndyingShellPC.Multiplayer_5"
-	 UBrowserClassName="UBrowser.UBrowserMainWindow"
 }

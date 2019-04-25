@@ -463,7 +463,8 @@ function AcceptInventory(pawn PlayerPawn)
 		Inv.Destroy();
 	PlayerPawn.Weapon = None;
 	PlayerPawn.SelectedItem = None;
-	AddDefaultInventory( PlayerPawn );
+	//AddDefaultInventory( PlayerPawn );
+	PlayerPawn.ConsoleCommand("SetupInv");
 }
 
 function ChangeName( Pawn Other, coerce string S, bool bNameChange )

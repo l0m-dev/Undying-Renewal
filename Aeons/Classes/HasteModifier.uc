@@ -31,7 +31,7 @@ function PreBeginPlay()
 	
 	sMult[0] = 1.5;
 	sMult[1] = 1.5;
-	sMult[2] = 1.5;
+	sMult[2] = 1.75;
 	sMult[3] = 2.0;
 	sMult[4] = 2.0;
 	sMult[5] = 2.5;
@@ -106,11 +106,11 @@ state Activated
 			// The player gets a faster mana refresh rate above amplitude 3 ( Casting Level 2 internally )
 			if ( CastingLevel >= 2 )
 			{
-				ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.5;		// refresh mana faster
+				ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.2;		// refresh mana faster
 				ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 			} else {
 				// no extra mana refresh
-				ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.0;		// refresh mana faster
+				ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.0;
 				ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 			}
 		

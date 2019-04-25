@@ -5,26 +5,28 @@ class AdvCreateGameWindow expands ShellWindow;
 
 #exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
-#exec Texture Import File=AdvControls_0.bmp Mips=Off
-#exec Texture Import File=AdvControls_1.bmp Mips=Off
-#exec Texture Import File=AdvControls_2.bmp Mips=Off
-#exec Texture Import File=AdvControls_3.bmp Mips=Off
-#exec Texture Import File=AdvControls_4.bmp Mips=Off
-#exec Texture Import File=AdvControls_5.bmp Mips=Off
-
+#exec Texture Import File=AdvCreateGame_0.bmp Mips=Off
+#exec Texture Import File=AdvCreateGame_1.bmp Mips=Off
+#exec Texture Import File=AdvVideo_2.bmp Mips=Off
+#exec Texture Import File=AdvCreateGame_3.bmp Mips=Off
+#exec Texture Import File=AdvCreateGame_4.bmp Mips=Off
+#exec Texture Import File=AdvVideo_5.bmp Mips=Off
 
 var ShellButton OK;
 var ShellButton Cancel;
+var ShellCheckbox	CheckBoxes[8];
 
-var ShellCheckbox	CheckBoxes[6];
-var int OriginalValues[6];
-
-
-var() sound ChangeSound;
 var() sound CheckboxSound;
 
 var bool bInitialized;
 var bool bSaveChanges;
+
+var() globalconfig bool bCoopWeaponMode;
+var() globalconfig bool bMegaSpeed;
+var() globalconfig bool bNoCheating;
+var() globalconfig bool bHardCoreMode;
+var() globalconfig bool bNoMonsters;
+var() globalconfig bool bChangeLevels;
 
 var int		SmokingWindows[2];
 var float	SmokingTimers[2];
@@ -52,8 +54,6 @@ function Created()
 		RootScaleY = AeonsRoot.ScaleY;
 	}
 
-//--
-
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -62,7 +62,7 @@ function Created()
 	SmokingWindows[1] = -1;
 
 	// CheckBoxes for Shadows and Decals
-	for ( i = 0; i < ArrayCount(CheckBoxes); i++ )
+	for ( i = 0; i < 8; i++ )
 	{
 		CheckBoxes[i] = ShellCheckbox(CreateWindow(class'ShellCheckBox', 1,1,1,1));
 		
@@ -75,40 +75,44 @@ function Created()
 		CheckBoxes[i].DisabledTexture = None;
 	}
 
-	CheckBoxes[0].Template = NewRegion(202,222,34,34);
-	CheckBoxes[1].Template = NewRegion(206,298,34,34);
-	CheckBoxes[2].Template = NewRegion(207,371,34,34);
-	CheckBoxes[3].Template = NewRegion(480,228,34,34);
-	CheckBoxes[4].Template = NewRegion(484,306,34,34);
-	CheckBoxes[5].Template = NewRegion(487,378,34,34);
-
-
-
+	CheckBoxes[0].Template = NewRegion(240,182,39,37);
+	CheckBoxes[1].Template = NewRegion(240,242,39,37);
+	CheckBoxes[2].Template = NewRegion(240,302,39,37);
+	CheckBoxes[3].Template = NewRegion(240,362,39,37);
+	CheckBoxes[4].Template = NewRegion(440,182,39,37);
+	CheckBoxes[5].Template = NewRegion(440,242,39,37);
+	CheckBoxes[6].Template = NewRegion(686,192,39,37);
+	CheckBoxes[7].Template = NewRegion(686,285,39,37);
 
 // OK Button
 	OK = ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
 
-	OK.TexCoords = NewRegion(0,0,160,64);
-	OK.Template = NewRegion(10,392,160,64);
+	OK.TexCoords.X = 0;
+	OK.TexCoords.Y = 0;
+	OK.TexCoords.W = 160;
+	OK.TexCoords.H = 60;
+
+	// position and size in designed resolution of 800x600
+	OK.Template = NewRegion(30,475,160,60);
 
 	OK.Manager = Self;
-	OK.Style = 5;
+	Ok.Style = 5;
 
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'cntrl_ok_up';
-	OK.DownTexture = texture'cntrl_ok_dn';
-	OK.OverTexture = texture'cntrl_ok_ov';
+	OK.UpTexture =   texture'Cntrl_ok_up';
+	OK.DownTexture = texture'Cntrl_ok_dn';
+	OK.OverTexture = texture'Cntrl_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
-	Cancel = ShellButton(CreateWindow(class'ShellButton', 30*RootScaleX, 500*RootScaleY, 138*RootScaleX, 60*RootScaleY));
+	Cancel = ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
 
-	Cancel.TexCoords = NewRegion(0,0,160,64);
+	Cancel.TexCoords = NewRegion(0,0,160,60);
 
 	// position and size in designed resolution of 800x600
-	Cancel.Template = NewRegion(20,507,138,60);
+	Cancel.Template = NewRegion(30,535,160,60);
 
 	Cancel.Manager = Self;
 	Cancel.Style = 5;
@@ -116,14 +120,11 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'cntrl_cancl_up';
-	Cancel.DownTexture = texture'cntrl_cancl_dn';
-	Cancel.OverTexture = texture'cntrl_cancl_ov';
+	Cancel.UpTexture =   texture'Cntrl_cancl_up';
+	Cancel.DownTexture = texture'Cntrl_cancl_dn';
+	Cancel.OverTexture = texture'Cntrl_cancl_ov';
 	Cancel.DisabledTexture = None;
 
-
-
-//--
 	Root.Console.bBlackout = True;
 	Resized();
 
@@ -133,77 +134,18 @@ function Created()
 
 function GetCurrentSettings()
 {
-	local bool value;
 	local int i;
-	
-	CheckBoxes[0].bChecked = GetPlayerOwner().bAlwaysMouselook;
-	CheckBoxes[1].bChecked = GetPlayerOwner().bLookUpStairs;
-	CheckBoxes[2].bChecked = !GetPlayerOwner().bNeverAutoSwitch;
-	CheckBoxes[3].bChecked = GetPlayerOwner().bSnapToLevel;
-	CheckBoxes[4].bChecked = GetPlayerOwner().bMouseDecel;
-	CheckBoxes[5].bChecked = GetPlayerOwner().bMouseSmoothing;
-
-	for ( i=0; i<ArrayCount(CheckBoxes); i++ )
-	{
-		OriginalValues[i] = int(CheckBoxes[i].bChecked);
-	}
+	CheckBoxes[0].bChecked = GetPlayerOwner().Level.Game.bCoopWeaponMode;
+	//CheckBoxes[1].bChecked = GetPlayerOwner().Level.Game.bMegaSpeed;
+	CheckBoxes[2].bChecked = GetPlayerOwner().Level.Game.bNoCheating;
+	//CheckBoxes[3].bChecked = GetPlayerOwner().Level.Game.bHardCoreMode;
+	CheckBoxes[4].bChecked = GetPlayerOwner().Level.Game.bNoMonsters;
+	//CheckBoxes[5].bChecked = GetPlayerOwner().Level.Game.bChangeLevels;
+	CheckBoxes[6].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager ActorShadows"));
+	CheckBoxes[7].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager Decals"));
 
 	// default will be to save changes--only discard changes if cancel is clicked
 	bSaveChanges = True;
-}
-
-function LookSpringChecked()
-{
-	GetPlayerOwner().bSnapToLevel = CheckBoxes[3].bChecked;
-
-	if ( GetPlayerOwner().bSnapToLevel ) 
-	{
-		// if LookSpring enabled, disable mouselook
-		CheckBoxes[0].bChecked = false;
-		GetPlayerOwner().bAlwaysMouseLook = false;
-	}
-}
-
-function MouselookChecked()
-{
-	GetPlayerOwner().bAlwaysMouseLook =CheckBoxes[0].bChecked;
-
-	if ( GetPlayerOwner().bAlwaysMouseLook ) 
-	{
-		// if MouseLook enabled, disable AutoSlope and LookSpring 
-		GetPlayerOwner().ChangeStairLook(false);
-		CheckBoxes[1].bChecked = false; 
-
-		CheckBoxes[3].bChecked = false;
-		GetPlayerOwner().bSnapToLevel = false;
-	}
-
-}
-
-function AutoSlopeChecked()
-{
-	GetPlayerOwner().ChangeStairLook(CheckBoxes[1].bChecked);
-	CheckBoxes[0].bChecked = GetPlayerOwner().bAlwaysMouseLook; 
-	
-	if ( GetPlayerOwner().bLookUpStairs )
-		GetPlayerOwner().bKeyboardLook = false;
-
-	//GetPlayerOwner().bLookUpStairs = CheckBoxes[1].bChecked;
-}
-
-function AutoSwitchChecked()
-{
-	GetPlayerOwner().bNeverAutoSwitch = !CheckBoxes[2].bChecked;
-}
-
-function MouseSmoothChecked()
-{
-	GetPlayerOwner().bMouseSmoothing = CheckBoxes[5].bChecked;
-}
-
-function MouseDecelChecked()
-{
-	GetPlayerOwner().bMouseDecel = CheckBoxes[4].bChecked;
 }
 
 function Message(UWindowWindow B, byte E)
@@ -229,34 +171,7 @@ function Message(UWindowWindow B, byte E)
 			break;
 
 		case DE_Change:
-			switch (B)
-			{
-				case CheckBoxes[0]:
-					MouselookChecked();
-					break;
-
-				case CheckBoxes[1]:
-					AutoSlopeChecked();
-					break;
-
-				case CheckBoxes[2]:
-					AutoSwitchChecked();
-					break;
-
-				case CheckBoxes[3]:
-					LookSpringChecked();
-					break;
-
-				case CheckBoxes[4]:
-					MouseDecelChecked();
-					break;
-
-				case CheckBoxes[5]:
-					MouseSmoothChecked();
-					break;
-
-
-			}
+			Changed();
 			break;
 
 		case DE_MouseEnter:
@@ -289,20 +204,23 @@ function Paint(Canvas C, float X, float Y)
 	Super.PaintSmoke(C, Cancel, SmokingWindows[1], SmokingTimers[1]);
 }
 
-function SaveConfigs()
+function Changed()
 {
-	GetPlayerOwner().SaveConfig();
-	Super.SaveConfigs();
+	if ( (CheckboxSound != none) && bInitialized )
+		GetPlayerOwner().PlaySound( CheckboxSound,, 0.25, [Flags]482 );
 }
 
-function UndoChanges()
+function SaveChanges()
 {
-	GetPlayerOwner().bAlwaysMouselook	= bool(OriginalValues[0]);
-	GetPlayerOwner().bLookUpStairs		= bool(OriginalValues[1]);
-	GetPlayerOwner().bNeverAutoSwitch	= !bool(OriginalValues[2]);
-	GetPlayerOwner().bSnapToLevel		= bool(OriginalValues[3]);
-	GetPlayerOwner().bMouseDecel		= bool(OriginalValues[4]);
-	GetPlayerOwner().bMouseSmoothing	= bool(OriginalValues[5]);
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager ActorShadows " $ Checkboxes[6].bChecked );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Decals " $ Checkboxes[7].bChecked );
+	
+	GetPlayerOwner().Level.Game.bCoopWeaponMode = CheckBoxes[0].bChecked;
+	//GetPlayerOwner().Level.Game.bMegaSpeed = CheckBoxes[1].bChecked;
+	GetPlayerOwner().Level.Game.bNoCheating = CheckBoxes[2].bChecked;
+	//GetPlayerOwner().Level.Game.bHardCoreMode = CheckBoxes[3].bChecked;
+	GetPlayerOwner().Level.Game.bNoMonsters = CheckBoxes[4].bChecked;
+	//GetPlayerOwner().Level.Game.bChangeLevels = CheckBoxes[5].bChecked;
 }
 
 function Resized()
@@ -326,7 +244,7 @@ function Resized()
 		RootScaleY = 1.0;
 	}
 
-	for ( i = 0; i < ArrayCount(CheckBoxes); i++ )
+	for ( i = 0; i < 8; i++ )
 		if ( Checkboxes[i] != None )
 			Checkboxes[i].ManagerResized(RootScaleX, RootScaleY);
 
@@ -340,8 +258,8 @@ function Resized()
 
 function Close(optional bool bByParent)
 {
-	if ( !bSaveChanges ) 
-		UndoChanges();
+	if ( bSaveChanges ) 
+		SaveChanges();
 
 	bSaveChanges = false;
 
@@ -364,12 +282,11 @@ function ShowWindow()
 
 defaultproperties
 {
-     ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      CheckboxSound=Sound'Shell_HUD.Shell.SHELL_CheckBox'
-     BackNames(0)="UndyingShellPC.AdvControls_0"
-     BackNames(1)="UndyingShellPC.AdvControls_1"
-     BackNames(2)="UndyingShellPC.AdvControls_2"
-     BackNames(3)="UndyingShellPC.AdvControls_3"
-     BackNames(4)="UndyingShellPC.AdvControls_4"
-     BackNames(5)="UndyingShellPC.AdvControls_5"
+     BackNames(0)="UndyingShellPC.AdvCreateGame_0"
+     BackNames(1)="UndyingShellPC.AdvCreateGame_1"
+     BackNames(2)="UndyingShellPC.AdvVideo_2"
+     BackNames(3)="UndyingShellPC.AdvCreateGame_3"
+     BackNames(4)="UndyingShellPC.AdvCreateGame_4"
+     BackNames(5)="UndyingShellPC.AdvVideo_5"
 }
