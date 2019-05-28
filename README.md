@@ -22,4 +22,9 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Nerfed shield health
   - Nerfed haste
   - Added a nice animation for deploying the stone
-  - Added ps2 item list
+  - Added PS2 item list
+  - Increased bird damage and melee range
+  - Increased accuracy of the monk archer
+  - Buffed flickerting stalkers (small floating heads)
+  - Increased Monto speed (big blue floating things)
+  - Improved molotov
