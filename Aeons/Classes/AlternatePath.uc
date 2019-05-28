@@ -1,9 +1,13 @@
 //=============================================================================
-// AttackInhabitant.
+// AlternatePath.
 //=============================================================================
-class AttackInhabitant expands Inhabitant;
+class AlternatePath extends NavigationPoint;
+
+var() byte Team;
+var() float SelectionWeight;
+var() bool bReturnOnly;
 
 defaultproperties
 {
-     AttitudeToPlayer=ATTITUDE_Hate
+     SelectionWeight=1.000000
 }

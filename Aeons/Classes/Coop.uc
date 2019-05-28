@@ -1,7 +1,7 @@
 //=============================================================================
-// DeathMatchGame.
+// Coop.
 //=============================================================================
-class DeathMatchGame expands AeonsGameInfo;
+class Coop expands AeonsGameInfo;
 
 var() config bool	bMultiWeaponStay;
 var() config bool	bForceRespawn;
@@ -22,17 +22,17 @@ var	  int RemainingTime;
 var   int			NumBots;
 var	  int			RemainingBots;
 var() globalconfig int	InitialBots;
-var		ChallengeBotInfo		BotConfig;
+//var		BotInfo		BotConfig;
 var localized string GlobalNameChange;
 var localized string NoNameChange;
-var class<ChallengeBotInfo> BotConfigType;
+//var class<BotInfo> BotConfigType;
 
 function PostBeginPlay()
 {
 	local string NextPlayerClass;
 	local int i;
 
-	BotConfig = spawn(BotConfigType);
+	//BotConfig = spawn(BotConfigType);
 	RemainingTime = 60 * TimeLimit;
 	if ( (Level.NetMode == NM_Standalone) || bMultiPlayerBots )
 		RemainingBots = InitialBots;
@@ -64,13 +64,6 @@ function bool IsRelevant(actor Other)
 		Pawn(Other).WaterSpeed *= 1.5;
 		Pawn(Other).AirSpeed *= 1.5;
 		Pawn(Other).Acceleration *= 1.5;
-	} 
-	else
-	{
-		Pawn(Other).GroundSpeed = Pawn(Other).default.GroundSpeed;
-		Pawn(Other).WaterSpeed = Pawn(Other).default.WaterSpeed;
-		Pawn(Other).AirSpeed = Pawn(Other).default.AirSpeed;
-		Pawn(Other).Acceleration = Pawn(Other).default.Acceleration;
 	}
 	return Super.IsRelevant(Other);
 }
@@ -178,7 +171,7 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 		Damage *= 1.5;
 
 	//skill level modification
-	if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bot') && injured.IsA('PlayerPawn') )
+	if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bots') && injured.IsA('PlayerPawn') )
 		Damage = Damage * (0.7 + 0.15 * instigatedBy.skill);
 
 	return (Damage * instigatedBy.DamageScaling);
@@ -252,58 +245,50 @@ event playerpawn Login
 
 	return NewPlayer;
 }
-
-exec function bot_add() {
-	AddBot();
-}
-
+/*
 function bool AddBot()
 {
 	local NavigationPoint StartSpot;
-	local bot NewBot;
+	local bots NewBot;
 	local int BotN;
 
-	Difficulty = BotConfig.Difficulty;
-	BotN = BotConfig.ChooseBotInfo();
+	//Difficulty = BotConfig.Difficulty;
+	//BotN = BotConfig.ChooseBotInfo();
 	
 	// Find a start spot.
 	StartSpot = FindPlayerStart(None, 255);
 	if( StartSpot == None )
 	{
-		ServerSay("Could not find starting spot for Bot");
+		log("Could not find starting spot for Bot");
 		return false;
 	}
 
 	// Try to spawn the player.
-	NewBot = Spawn(class'Bot',,,StartSpot.Location,StartSpot.Rotation);
-	
-	if ( NewBot == None ) {
-		ServerSay("NewBot is none");
+	//NewBot = Spawn(BotConfig.GetBotClass(BotN),,,StartSpot.Location,StartSpot.Rotation);
+
+	if ( NewBot == None )
 		return false;
-	}
 
 	if ( (bHumansOnly || Level.bHumansOnly) && !NewBot.bIsHuman )
 	{
 		NewBot.Destroy();
-		ServerSay("Failed to spawn bot (not human)");
+		log("Failed to spawn bot");
 		return false;
 	}
 
 	StartSpot.PlayTeleportEffect(NewBot, true);
 
 	// Init player's information.
-	BotConfig.CHIndividualize(NewBot, BotN, NumBots);
+	//BotConfig.Individualize(NewBot, BotN, NumBots);
 	NewBot.ViewRotation = StartSpot.Rotation;
 
 	// broadcast a welcome message.
-	ServerSay( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage );
+	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
-	//AddDefaultInventory( NewBot );
-	AcceptInventory(NewBot);
+	AddDefaultInventory( NewBot );
 	NumBots++;
 
 	NewBot.PlayerReplicationInfo.bIsABot = True;
-	NewBot.PlayerReplicationInfo.Team = BotConfig.GetBotTeam(BotN);
 
 	// Set the player's ID.
 	NewBot.PlayerReplicationInfo.PlayerID = CurrentID++;
@@ -313,31 +298,14 @@ function bool AddBot()
 		LocalLog.LogPlayerConnect(NewBot);
 	if (WorldLog != None)
 		WorldLog.LogPlayerConnect(NewBot);
-		
-		/*
-		if ( bRequireReady && (CountDown > 0) )
-			NewBot.GotoState('Dying', 'WaitingForStart');
 
-		if ( (Level.NetMode != NM_Standalone) && (bNetReady || bRequireReady) )
-		{
-			// replicate skins
-			for ( P=Level.PawnList; P!=None; P=P.NextPawn )
-				if ( P.bIsPlayer && (P.PlayerReplicationInfo != None) && P.PlayerReplicationInfo.bWaitingPlayer && P.IsA('PlayerPawn') )
-				{
-					if ( NewBot.bIsMultiSkinned )
-						PlayerPawn(P).ClientReplicateSkins(NewBot.MultiSkins[0], NewBot.MultiSkins[1], NewBot.MultiSkins[2], NewBot.MultiSkins[3]);
-					else
-						PlayerPawn(P).ClientReplicateSkins(NewBot.Skin);	
-				}						
-		}
-		*/
 	return true;
 }
-
+*/
 function Logout(pawn Exiting)
 {
 	Super.Logout(Exiting);
-	if ( Exiting.IsA('Bot') )
+	if ( Exiting.IsA('Bots') )
     	NumBots--;
 }
 	
@@ -345,8 +313,8 @@ function Timer()
 {
 	Super.Timer();
 
-	if ( (RemainingBots > 0) && AddBot() )
-		RemainingBots--;
+	//if ( (RemainingBots > 0) && AddBot() )
+		//RemainingBots--;
 
 	if ( bGameEnded )
 	{
@@ -410,9 +378,6 @@ function Timer()
 returns the 'best' player start for this player to start from.
 Re-implement for each game type
 */
-
-
-
 function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
 {
 	local PlayerStart Dest, Candidate[4], Best;
@@ -498,10 +463,6 @@ applicable weapon/item as current).
 */
 function AcceptInventory(pawn PlayerPawn)
 {
-	//deathmatch accepts no inventory
-	local inventory Inv;
-	for( Inv=PlayerPawn.Inventory; Inv!=None; Inv=Inv.Inventory )
-		Inv.Destroy();
 	PlayerPawn.Weapon = None;
 	PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
@@ -546,24 +507,9 @@ function bool CanSpectate( pawn Viewer, actor ViewTarget )
 	return ( (Level.NetMode == NM_Standalone) || (Spectator(Viewer) != None) );
 }
 
-// Monitor killed messages for fraglimit
-function Killed(pawn killer, pawn Other, name damageType)
+function Killed(pawn Killer,pawn Other,name DamageType)
 {
-	Super.Killed(killer, Other, damageType);
-	if ( (killer == None) || (Other == None) )
-		return;
-	if ( !bTeamGame && (FragLimit > 0) && (killer.PlayerReplicationInfo.Score >= FragLimit) )
-		EndGame("fraglimit");
-
-	/*
-	if ( BotConfig.bAdjustSkill && (killer.IsA('PlayerPawn') || Other.IsA('PlayerPawn')) )
-	{
-		if ( killer.IsA('Bot') )
-			Bot(killer).AdjustSkill(true);
-		if ( Other.IsA('Bot') )
-			Bot(Other).AdjustSkill(false);
-	}
-	*/
+    Super.Killed(Killer,Other,DamageType);
 }	
 
 function EndGame( string Reason )
@@ -581,14 +527,14 @@ function EndGame( string Reason )
 defaultproperties
 {
      bMultiWeaponStay=True
-     FragLimit=20
+     FragLimit=0
      GlobalNameChange=" changed name to "
      NoNameChange=" is already in use"
-     bRestartLevel=True
+     bRestartLevel=False
 	 bSinglePlayer=False
-     bDeathMatch=True
+     bDeathMatch=False
      ScoreBoardType=Class'Aeons.UndyingScoreboard'
-     MapPrefix="DM"
-     BeaconName="DM"
-     GameName="Undying Deathmatch"
+     MapPrefix="CO"
+     BeaconName="CO"
+     GameName="Undying Coop"
 }

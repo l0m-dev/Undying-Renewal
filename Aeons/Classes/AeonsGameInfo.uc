@@ -49,6 +49,19 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 	return (Damage * instigatedBy.DamageScaling);
 }
 
+exec function message (string Msg) {
+	ServerSay(Msg);
+}
+
+function ServerSay (string Msg) {
+	local Patrick P;
+
+	ForEach AllActors (class 'Patrick', P)
+	{
+		P.ScreenMessage(Msg, 3.0);
+	}
+}
+
 function float PlaySpawnEffect(inventory Inv)
 {
 	//spawn( class 'ReSpawn',,, Inv.Location );

@@ -27,12 +27,12 @@ simulated event RenderOverlays( canvas Canvas )
 
 	if (DisplayedMessage != "")
 	{
-		Canvas.DrawColor.R = 255;
+		Canvas.DrawColor.R = 125;
 		Canvas.DrawColor.G = 255;
-		Canvas.DrawColor.B = 255;
+		Canvas.DrawColor.B = 125;
 		Canvas.Font = Canvas.MedFont;
 		Canvas.TextSize( DisplayedMessage, x, y );
-		Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.75 );
+		Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.15 );
 		Canvas.DrawText( DisplayedMessage, false );
 	}
 }

@@ -7573,7 +7573,7 @@ exec function QuickSave()
 	{
 		//dynamic ConsoleCommand("SaveShot ..\\save\\0\\save.bmp");
 
-		ClientMessage(QuickSaveString);
+		//ScreenMessage(QuickSaveString, 3.0);
 		ConsoleCommand("SaveGame 0");
 	}
 }

@@ -67,6 +67,7 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	Super.PostBeginPlay();
+	ServerReStartPlayer();
 	
 	WindowConsole(Player.Console).bShellPauses = false;
 	Level.bDontAllowSavegame = false;
@@ -623,22 +624,10 @@ state Dying
 			HasteMod.GotoState('Deactivated');
 		Level.bDontAllowSavegame = true;
 		WindowConsole(Player.Console).bShellPauses = true;
-		bHidden = true;
+		//SpawnCarcass();
 		AttSpell.OwnerDead();
 		DefSpell.OwnerDead();
-		ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
-		BaseEyeheight = Default.BaseEyeHeight;
-		EyeHeight = BaseEyeHeight;
-//		if ( Carcass(ViewTarget) == None )
-	//		bBehindView = true;
-		bFrozen = true;
-		bPressedJump = false;
-		bJustFired = false;
-		// FindGoodView();
-		if ( (Role == ROLE_Authority) && !bHidden )
-			Super.Timer(); 
-		SetTimer(1.0, false);
-
+		
 		// clean out saved moves
 		while ( SavedMoves != None )
 		{
@@ -650,6 +639,25 @@ state Dying
 			PendingMove.Destroy();
 			PendingMove = None;
 		}
+		
+		//if singleplayer
+		if (!Level.Game.IsA('DeathMatchGame') && !Level.Game.IsA('Coop')) {
+			ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
+			bHidden = true;
+		} else {
+			PlayAnim( 'death_gun_back' );
+		}
+		BaseEyeheight = Default.BaseEyeHeight;
+		EyeHeight = BaseEyeHeight;
+		if ( Carcass(ViewTarget) == None )
+			bBehindView = true;
+		bFrozen = true;
+		bPressedJump = false;
+		bJustFired = false;
+		// FindGoodView();
+		if ( (Role == ROLE_Authority) && !bHidden )
+			Super.Timer(); 
+		SetTimer(1.0, false);
 	}
 	
 	function EndState()

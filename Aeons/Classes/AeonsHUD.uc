@@ -196,7 +196,7 @@ simulated function PreBeginPlay()
 	Arrow = spawn(class 'DebugArrow');
 	Arrow.bHidden = true;
 }
-
+	
 simulated function AddSubtitle( string NewSubtitle, optional string SoundName )
 {
 	local int i, timelen;
@@ -252,6 +252,10 @@ simulated function UpdateSubtitles(Float DeltaTime)
 		}
 		AddSubtitle (NewText);
 	}
+}
+
+exec function test() {
+	AddSubtitle("FUCK");
 }
 
 simulated function DrawSubtitles(Canvas canvas)
@@ -3395,8 +3399,12 @@ simulated function Tick(float DeltaTime)
 	IdentifyFadeTime -= DeltaTime;
 	if (IdentifyFadeTime < 0.0)
 		IdentifyFadeTime = 0.0;
-
-	MOTDFadeOutTime -= DeltaTime * 45;
+	
+	if (MOTDFadeOutTime > 200)
+		MOTDFadeOutTime -= DeltaTime * 15;
+	else
+		MOTDFadeOutTime -= DeltaTime * 45;
+		
 	if (MOTDFadeOutTime < 0.0)
 		MOTDFadeOutTime = 0.0;
 
@@ -3694,7 +3702,7 @@ simulated function DrawMOTD(Canvas Canvas)
 
 	if(Owner == None) return;
 
-	Canvas.Font = Canvas.SmallFont;//Font'WhiteFont';
+	Canvas.Font = Canvas.MedFont;//Font'WhiteFont';
 	Canvas.Style = 3;
 
 	Canvas.DrawColor.R = MOTDFadeOutTime;
@@ -3721,9 +3729,11 @@ simulated function DrawMOTD(Canvas Canvas)
 			Canvas.SetPos(0.0, 32 + YL);
 			Canvas.DrawText("Game Type: "$GRI.GameName, true);
 			Canvas.SetPos(0.0, 32 + 2*YL);
-			Canvas.DrawText("Map Title: "$Level.Title, true);
+			if (Level.Title != "Untitled")
+				Canvas.DrawText("Map Title: "$Level.Title, true);
 			Canvas.SetPos(0.0, 32 + 3*YL);
-			Canvas.DrawText("Author: "$Level.Author, true);
+			if (Level.Author != "")
+				Canvas.DrawText("Author: "$Level.Author, true);
 			Canvas.SetPos(0.0, 32 + 4*YL);
 			if (Level.IdealPlayerCount != "")
 				Canvas.DrawText("Ideal Player Load:"$Level.IdealPlayerCount, true);
