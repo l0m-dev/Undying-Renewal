@@ -336,7 +336,6 @@ var() bool bDrawDebugHUD;		// Draw debug items in the hud
 var float NoManaFlashTime;
 
 var globalconfig bool bAllowSelectionHUD;
-var bool bAllowSpellSelectionHUD;
 var enum ESelectMode
 {
     SM_None,
@@ -416,11 +415,12 @@ replication
 {
 	// Variables the server should send to the client.
 	reliable if( Role==ROLE_Authority && bNetOwner)
-		ManaWellsFound, ManaWhorlsFound, crossHairScale,
+		ManaWellsFound, ManaWhorlsFound, crossHairScale, bDoubleShotgun,
         FavAttSpell1, FavAttSpell2, FavAttSpellToggle,
         FavDefSpell1, FavDefSpell2, FavDefSpellToggle, ScryeMod, 
-		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive, 
-		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye;
+		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
+		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
+		speedMultiplier, bWeaponSound, bMagicSound, OSMMod;
 
 	reliable if ( Role==ROLE_Authority )
 		SendClientFire, RealWeapon;
@@ -462,7 +462,6 @@ event PreBeginPlay()
 
 	//EMod = spawn(class 'EnvironmentModifier',self,,Location);
 	//EMod.setBase(self);
-	bAllowSpellSelectionHUD = true;
 }
 
 event HeadZoneChange(ZoneInfo newHeadZone)
@@ -530,7 +529,8 @@ function PlayerTick( float DeltaTime )
 
 function ScreenMessage(string Message, float HoldTime)
 {
-	OSMMod.NewMessage(Message, HoldTime);
+	if (OSMMod != none)
+		OSMMod.NewMessage(Message, HoldTime);
 }
 
 simulated event RenderOverlays( canvas Canvas )
@@ -1114,7 +1114,7 @@ exec function SelectWeapon( optional float F )
 
 exec function SelectAttSpell( optional float F )
 {
-	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || !bAllowSpellSelectionHUD || bShowMenu  || (Level.Pauser!="") )
+	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || bShowMenu  || (Level.Pauser!="") )
 		return;
 
 //	Log("Select AttSpell called");

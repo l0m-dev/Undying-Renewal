@@ -354,7 +354,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newSpell.Instigator = PlayerPawn;
 		PlayerPawn.DefSpell = newSpell;
 	}
-	*/
 	
  	// example default spell
 	newSpell = Spawn(class'Aeons.Spell');
@@ -365,7 +364,7 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newSpell.Instigator = PlayerPawn;
 		// force assign it to player's AttSpell or DefSpell vars?
 	}
-	
+	*/
 }
 
 /* NEEDAEONS -Need to add these properties

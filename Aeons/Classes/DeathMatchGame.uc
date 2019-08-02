@@ -64,7 +64,7 @@ function bool IsRelevant(actor Other)
 		Pawn(Other).WaterSpeed *= 1.5;
 		Pawn(Other).AirSpeed *= 1.5;
 		Pawn(Other).Acceleration *= 1.5;
-	} 
+	}
 	else
 	{
 		Pawn(Other).GroundSpeed = Pawn(Other).default.GroundSpeed;
@@ -178,7 +178,7 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 		Damage *= 1.5;
 
 	//skill level modification
-	if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bot') && injured.IsA('PlayerPawn') )
+	if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bots') && injured.IsA('PlayerPawn') )
 		Damage = Damage * (0.7 + 0.15 * instigatedBy.skill);
 
 	return (Damage * instigatedBy.DamageScaling);
@@ -337,7 +337,7 @@ function bool AddBot()
 function Logout(pawn Exiting)
 {
 	Super.Logout(Exiting);
-	if ( Exiting.IsA('Bot') )
+	if ( Exiting.IsA('Bots') )
     	NumBots--;
 }
 	
@@ -410,9 +410,6 @@ function Timer()
 returns the 'best' player start for this player to start from.
 Re-implement for each game type
 */
-
-
-
 function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
 {
 	local PlayerStart Dest, Candidate[4], Best;
@@ -558,9 +555,9 @@ function Killed(pawn killer, pawn Other, name damageType)
 	/*
 	if ( BotConfig.bAdjustSkill && (killer.IsA('PlayerPawn') || Other.IsA('PlayerPawn')) )
 	{
-		if ( killer.IsA('Bot') )
+		if ( killer.IsA('Bots') )
 			Bot(killer).AdjustSkill(true);
-		if ( Other.IsA('Bot') )
+		if ( Other.IsA('Bots') )
 			Bot(Other).AdjustSkill(false);
 	}
 	*/
@@ -580,6 +577,8 @@ function EndGame( string Reason )
 
 defaultproperties
 {
+	 BotConfigType=Class'Aeons.ChallengeBotInfo'
+	 InitialBots=4
      bMultiWeaponStay=True
      FragLimit=20
      GlobalNameChange=" changed name to "

@@ -24,6 +24,7 @@ var MeshActor Model;
 
 var ShellButton Back;
 var ShellButton FaceButton;
+var ShellTextBox TextBox;
 
 var localized string FaceText, BodyText;
 
@@ -86,10 +87,10 @@ function Created()
 	Back.DownTexture = texture'sload_cancel_dn';
 	Back.OverTexture = texture'sload_cancel_ov';
 	
-	FaceButton = ShellButton(CreateWindow(class'ShellButton', 130*RootScaleX, 350*RootScaleY, 140*RootScaleX, 40*RootScaleY));
+	FaceButton = ShellButton(CreateWindow(class'ShellButton', 60*RootScaleX, 350*RootScaleY, 160*RootScaleX, 40*RootScaleY));
 	
-	FaceButton.TexCoords = NewRegion(0,0,140,40);
-	FaceButton.Template = NewRegion(130,350,140,40);
+	FaceButton.TexCoords = NewRegion(0,0,160,40);
+	FaceButton.Template = NewRegion(60,350,160,40);
 	
 	FaceButton.Manager = Self;
 	FaceButton.Style = 5;
@@ -106,6 +107,16 @@ function Created()
 	FaceButton.DownTexture =		texture'Video_resol_up';
 	FaceButton.OverTexture =		texture'Video_resol_ov';
 	FaceButton.DisabledTexture =	None;
+	
+	TextBox = ShellTextBox(CreateWindow(class'ShellTextBox', 48*RootScaleX, 130*RootScaleY, 160*RootScaleX, 128*RootScaleY));
+
+	//TextBox.TexCoords = NewRegion(0,0,160,128);
+	TextBox.Template = NewRegion(48,130,160,128);
+	TextBox.Font = 2;
+	TextBox.Value = GetPlayerOwner().PlayerReplicationInfo.PlayerName;
+	TextBox.CaretOffset = Len(TextBox.Value);
+
+	TextBox.Manager = Self;
 	
 	//Root.Console.bBlackout = True;
 
@@ -140,7 +151,13 @@ function Resized()
 		RootScaleX = 1.0;
 		RootScaleY = 1.0;
 	}
-
+	
+	if ( FaceButton != None )
+		FaceButton.ManagerResized(RootScaleX, RootScaleY);
+		
+	if ( TextBox != None )
+		TextBox.ManagerResized(RootScaleX, RootScaleY);
+		
 	if ( Back != None )
 		Back.ManagerResized(RootScaleX, RootScaleY);
 }
@@ -187,6 +204,8 @@ function OverEffect(ShellButton B)
 function Close(optional bool bByParent)
 {
 	SoundEmitter.SoundRadius = 0;
+	
+	GetPlayerOwner().ConsoleCommand("name " $ TextBox.Value);
 
 	HideWindow();
 }
@@ -314,7 +333,7 @@ function AnimEnd(MeshActor MyMesh)
 	switch( CurrentMesh )
 	{
 		case 0: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.AaronBoss_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.AaronGhost_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
@@ -349,7 +368,7 @@ function AnimEnd(MeshActor MyMesh)
 			break;
 
 		case 7: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Butler_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Drinen_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
@@ -369,7 +388,7 @@ function AnimEnd(MeshActor MyMesh)
 			break;
 
 		case 11: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Patrick_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Evelyn_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
@@ -390,12 +409,12 @@ defaultproperties
 {
      NumMeshes=12
      ViewRotator=(Yaw=32768)
+     FaceText="Face"
+     BodyText="Body"
      BackNames(0)="UndyingShellPC.PSetup_0"
      BackNames(1)="UndyingShellPC.PSetup_1"
      BackNames(2)="UndyingShellPC.PSetup_2"
      BackNames(3)="UndyingShellPC.PSetup_3"
      BackNames(4)="UndyingShellPC.PSetup_4"
      BackNames(5)="UndyingShellPC.PSetup_5"
-	 FaceText="Face"
-     BodyText="Body"
 }

@@ -6,7 +6,7 @@ class CreateGameWindow expands ShellWindow;
 
 #exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
-#exec Texture Import File=Video_0.bmp Mips=Off
+#exec Texture Import File=CreateGame_0.bmp Mips=Off
 #exec Texture Import File=CreateGame_1.bmp Mips=Off
 #exec Texture Import File=CreateGame_2.bmp Mips=Off
 #exec Texture Import File=Video_3.bmp Mips=Off
@@ -46,13 +46,13 @@ var UWindowWindow AdvCreateGame;
 
 var ShellButton Advanced;
 var ShellButton Maps[5]; // Maps currently displayed in the scrollable list
-var string MapList[112]; // complete list of available Maps
+var string MapList[24]; // complete list of available Maps
 var int CurrentRow; // current row in scrollable resolution list
 var ShellButton OK;
 var ShellButton Cancel;
 var ShellButton Down;
 var ShellButton Up;
-var ShellButton SinglePlayer, Multiplayer;
+var ShellButton Coop, Multiplayer;
 var ShellButton ChangeDedicated;
 
 var ShellLabel LocalIPLabel;
@@ -69,7 +69,7 @@ var localized string DedicatedText, ListenText;
 
 var sound ChangeSound;
 var bool bInitialized;
-var bool bSinglePlayer;
+var bool bCoop;
 var bool bDedicated;
 
 var int		SmokingWindows[3];
@@ -89,7 +89,7 @@ function Created()
 	local float RootScaleX, RootScaleY;
 	
 	if(!bInitialized) {
-		bSinglePlayer = true;
+		bCoop = true;
 		bDedicated = false;
 	}
 
@@ -111,7 +111,7 @@ function Created()
 
 	Advanced = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
-	Advanced.Template = NewRegion(35,108,160,64);
+	Advanced.Template = NewRegion(578,480,160,64);
 
 	Advanced.TexCoords.X = 0;
 	Advanced.TexCoords.Y = 0;
@@ -178,118 +178,30 @@ function Created()
 		Maps[i].Font = 4;
 	}
 
-MapList[ 0] = "SmokeTest";	
-MapList[ 1] = "Playground";
-MapList[ 2] = "Catacombs_Cisterns";
-MapList[ 3] = "Catacombs_Cliffs";
-MapList[ 4] = "Catacombs_Entrance";
-MapList[ 5] = "Catacombs_Exit";
-MapList[ 6] = "Catacombs_Exit_After";
-MapList[ 7] = "Catacombs_LairOfLizbeth";
-MapList[ 8] = "Catacombs_LairOfLizbethPostCU";
-MapList[ 9] = "Catacombs_LowerLevel";
-MapList[10] = "Catacombs_SaintsHall";
-MapList[11] = "Catacombs_Tunnels";
-MapList[12] = "Catacombs_WellRoom";
-MapList[13] = "Catacombs_WindChamber";
-MapList[14] = "EternalAutumn_FinalFight_Arch";
-MapList[15] = "EternalAutumn_FinalFight_Arena";
-MapList[16] = "EternalAutumn_FinalFight_ArenaBattle";
-MapList[17] = "EternalAutumn_FinalFight_Ruins";
-MapList[18] = "EternalAutumn_Ravines_Airie_Interior";
-MapList[19] = "EternalAutumn_Ravines_Bridge";
-MapList[20] = "EternalAutumn_Ravines_Chase";
-MapList[21] = "EternalAutumn_Ravines_Chieftain";
-MapList[22] = "EternalAutumn_Ravines_Forest";
-MapList[23] = "EternalAutumn_Transition";
-MapList[24] = "EternalAutumn_Waterfall_Dwellings_Lower";
-MapList[25] = "EternalAutumn_Waterfall_Dwellings_Upper";
-MapList[26] = "EternalAutumn_Waterfall_Gauntlet";
-MapList[27] = "Grounds_Cottage";
-MapList[28] = "grounds_dock_night";
-MapList[29] = "Grounds_Lighthouse";
-MapList[30] = "Grounds_Mausoleum_Approach";
-MapList[31] = "Grounds_Mausoleum_Entrance";
-MapList[32] = "Grounds_Mausoleum_Tunnels";
-MapList[33] = "Grounds_OldCemetery";
-MapList[34] = "Manor_CentralLower";
-MapList[35] = "Manor_CentralLower_After";
-MapList[36] = "Manor_CentralLower_night";
-MapList[37] = "Manor_CentralLower_storm";
-MapList[38] = "Manor_CentralUpper";
-MapList[39] = "Manor_CentralUpper_After";
-MapList[40] = "Manor_CentralUpper_PostOneiros";
-MapList[41] = "Manor_CentralUpper_storm";
-MapList[42] = "Manor_Chapel";
-MapList[43] = "Manor_Chapel_night";
-MapList[44] = "Manor_Crypt";
-MapList[45] = "Manor_EastWingLower";
-MapList[46] = "Manor_EastWingLower_After";
-MapList[47] = "Manor_EastWingLower_night";
-MapList[48] = "Manor_EastWingUpper";
-MapList[49] = "Manor_EastWingUpper_After";
-MapList[50] = "Manor_EastWingUpper_night";
-MapList[51] = "Manor_EntranceHall";
-MapList[52] = "Manor_EntranceHall_FromKitch";
-MapList[53] = "Manor_EntranceHall_Intro";
-MapList[54] = "Manor_EntranceHall_Night";
-MapList[55] = "Manor_EntranceHall_night_ReturnfromCove";
-MapList[56] = "Manor_EntranceHall_Storm";
-MapList[57] = "Manor_EntranceHall_ToKitch";
-MapList[58] = "Manor_FrontGate";
-MapList[59] = "Manor_FrontGate_night";
-MapList[60] = "Manor_FrontGate_Night_Return";
-MapList[61] = "Manor_Gardens";
-MapList[62] = "Manor_Gardens_night";
-MapList[63] = "Manor_Gardens_storm";
-MapList[64] = "Manor_GreatHall_night";
-MapList[65] = "Manor_GreatHall_Storm";
-MapList[66] = "Manor_InnerCourtyard";
-MapList[67] = "Manor_InnerCourtyard_Storm";
-MapList[68] = "Manor_NorthWingLower";
-MapList[69] = "Manor_NorthWingLower_After";
-MapList[70] = "Manor_NorthWingLower_night";
-MapList[71] = "Manor_NorthWingLower_storm";
-MapList[72] = "Manor_NorthWingUpper";
-MapList[73] = "Manor_NorthWingUpper_night";
-MapList[74] = "Manor_NorthWingUpper_PostOneiros";
-MapList[75] = "Manor_NorthWingUpper_storm";
-MapList[76] = "Manor_PatricksRoom";
-MapList[77] = "Manor_TowerRun_night";
-MapList[78] = "Manor_TowerRun_storm";
-MapList[79] = "Manor_WestWing";
-MapList[80] = "Manor_WestWing_Hall1";
-MapList[81] = "Manor_WestWing_Night";
-MapList[82] = "Manor_WidowsWatch_storm";
-MapList[83] = "Monastery_Past_Church";
-MapList[84] = "Monastery_Past_Exterior";
-MapList[85] = "Monastery_Past_Interior";
-MapList[86] = "Monastery_Past_LivingQuarters";
-MapList[87] = "Monastery_Present_Church";
-MapList[88] = "Monastery_Present_Cove";
-MapList[89] = "Monastery_Present_Entrance";
-MapList[90] = "Monastery_Present_InnerSanctum";
-MapList[91] = "Monastery_Present_Tunnels";
-MapList[92] = "Oneiros_Amphitheater";
-MapList[93] = "Oneiros_City1";
-MapList[94] = "Oneiros_City2";
-MapList[95] = "Oneiros_HowlingWell";
-MapList[96] = "Oneiros_Intro";
-MapList[97] = "Oneiros_Oracle";
-MapList[98] = "Oneiros_RetreatBath";
-MapList[99] = "Oneiros_RetreatExterior";
-MapList[100] = "Oneiros_RetreatSecondFloor";
-MapList[101] = "Oneiros_RetreatStudio";
-MapList[102] = "Oneiros_ZigguratInterior";
-MapList[103] = "Oneiros_ZigguratLower";
-MapList[104] = "Oneiros_ZigguratUpper";
-MapList[105] = "PiratesCove_Barracks";
-MapList[106] = "PiratesCove_Exterior";
-MapList[107] = "PiratesCove_Pier";
-MapList[108] = "PiratesCove_Pool";
-MapList[109] = "PiratesCove_TreasureRoom";
-MapList[110] = "StandingStones_FirstVisit";
-MapList[111] = "StandingStones_KingFight";
+	MapList[ 0] = "SmokeTest";	
+	MapList[ 1] = "Playground";
+	MapList[ 2] = "Catacombs_Cisterns";
+	MapList[ 3] = "Catacombs_Entrance";
+	MapList[ 4] = "Catacombs_LairOfLizbeth";
+	MapList[ 5] = "EternalAutumn_FinalFight_Arch";
+	MapList[ 6] = "EternalAutumn_Waterfall_Gauntlet";
+	MapList[ 7] = "Grounds_Dock_Night";
+	MapList[ 8] = "Grounds_Lighthouse";
+	MapList[ 9] = "Grounds_Mausoleum_Approach";
+	MapList[10] = "Manor_CentralLower_night";
+	MapList[11] = "Manor_Chapel_night";
+	MapList[12] = "Manor_FrontGate_Night_Return";
+	MapList[13] = "Manor_Gardens_storm";
+	MapList[14] = "Manor_WidowsWatch_storm";
+	MapList[15] = "Monastery_Past_Church";
+	MapList[16] = "Monastery_Present_Church";
+	MapList[17] = "Monastery_Present_Entrance";
+	MapList[18] = "Oneiros_Amphitheater";
+	MapList[19] = "Oneiros_ZigguratInterior";
+	MapList[20] = "PiratesCove_Barracks";
+	MapList[21] = "PiratesCove_TreasureRoom";
+	MapList[22] = "StandingStones_FirstVisit";
+	MapList[23] = "StandingStones_KingFight";
 	
 	map = "SmokeTest";
 	URL = "SmokeTest";
@@ -327,30 +239,30 @@ MapList[111] = "StandingStones_KingFight";
 	Down.DisabledTexture = texture'Cntrl_dnbut_ds';
 
 
-// SinglePlayer Button
-	SinglePlayer = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+// Coop Button
+	Coop = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
-	//SinglePlayer.TexCoords.X = NewRegion(0,0,82,36);
+	//Coop.TexCoords.X = NewRegion(0,0,82,36);
 	
 	// position and size in designed resolution of 800x600
-	SinglePlayer.Template = NewRegion(550,311,82,36);
+	Coop.Template = NewRegion(550,311,82,36);
 
-	SinglePlayer.Manager = Self;
-	SinglePlayer.Style = 5;
-	SinglePlayer.Text = "Singleplayer";
+	Coop.Manager = Self;
+	Coop.Style = 5;
+	Coop.Text = "Coop";
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	SinglePlayer.SetTextColor(TextColor);
-	SinglePlayer.Align = TA_Center;
-	SinglePlayer.Font = 4;
+	Coop.SetTextColor(TextColor);
+	Coop.Align = TA_Center;
+	Coop.Font = 4;
 
 
-	SinglePlayer.TexCoords = NewRegion(0,0,204,54);
-	SinglePlayer.UpTexture =   None;//texture'Video_SinglePlayer_up';
-	SinglePlayer.DownTexture = None;//texture'Video_SinglePlayer_dn';
-	SinglePlayer.OverTexture = None;//texture'Video_SinglePlayer_ov';
-	SinglePlayer.DisabledTexture = None;
+	Coop.TexCoords = NewRegion(0,0,204,54);
+	Coop.UpTexture =   None;//texture'Video_Coop_up';
+	Coop.DownTexture = None;//texture'Video_Coop_dn';
+	Coop.OverTexture = None;//texture'Video_Coop_ov';
+	Coop.DisabledTexture = None;
 
 
 	
@@ -477,7 +389,7 @@ MapList[111] = "StandingStones_KingFight";
 	ScreenShot = ShellBitmap(CreateWindow(class'ShellBitmap', 10,10,10,10));
 	ScreenShot.T = Texture(DynamicLoadObject("Screens.Generic", class'texture'));//Dynamic texture'Black';//Screenshot3';
 	ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
-	ScreenShot.Template = NewRegion(40,280,116,88);
+	ScreenShot.Template = NewRegion(34,184,116,88);
 	ScreenShot.bStretch = true;
 	ScreenShot.Style = 5;
 	ScreenShot.Manager = Self;
@@ -513,8 +425,8 @@ function Message(UWindowWindow B, byte E)
 				case OK:
 					URL = map $ "?Listen?nosave?-nointro?Difficulty=2" $ "?MaxPlayers=" $ MaxPlayers;
 					
-					if (bSinglePlayer)
-						URL = URL $ "?Game=Aeons.SinglePlayer";
+					if (bCoop)
+						URL = URL $ "?Game=Aeons.Coop";
 					else
 						URL = URL $ "?Game=Aeons.DeathMatchGame";
 					
@@ -565,7 +477,7 @@ function Message(UWindowWindow B, byte E)
 					ScrolledDown();
 					break;
 
-				case SinglePlayer:
+				case Coop:
 					SetSingleplayer(true);
 					break;
 
@@ -677,13 +589,13 @@ function OverEffect(ShellButton B)
 
 function SetSingleplayer( bool SP )
 {
-		bSinglePlayer = SP;
+		bCoop = SP;
 
-		if ( bSinglePlayer )
+		if ( bCoop )
 		{
-			SinglePlayer.UpTexture = texture'Video_resol_dn';
-			SinglePlayer.OverTexture = texture'Video_resol_dn';
-			SinglePlayer.DownTexture = texture'Video_resol_dn';
+			Coop.UpTexture = texture'Video_resol_dn';
+			Coop.OverTexture = texture'Video_resol_dn';
+			Coop.DownTexture = texture'Video_resol_dn';
 
 			Multiplayer.UpTexture = texture'Video_resol_up';
 			Multiplayer.OverTexture = texture'Video_resol_ov';
@@ -695,9 +607,9 @@ function SetSingleplayer( bool SP )
 			Multiplayer.OverTexture = texture'Video_resol_dn';
 			Multiplayer.DownTexture = texture'Video_resol_dn';
 
-			SinglePlayer.UpTexture = texture'Video_resol_up';
-			SinglePlayer.OverTexture = texture'Video_resol_ov';
-			SinglePlayer.DownTexture = texture'Video_resol_up';
+			Coop.UpTexture = texture'Video_resol_up';
+			Coop.OverTexture = texture'Video_resol_ov';
+			Coop.DownTexture = texture'Video_resol_up';
 		}
 }
 
@@ -780,11 +692,11 @@ function MaxPlayersChanged()
 
 function GetCurrentSettings()
 {
-	if ( bSinglePlayer )
+	if ( bCoop )
 	{
-		SinglePlayer.UpTexture = texture'Video_resol_dn';
-		SinglePlayer.OverTexture = texture'Video_resol_dn';
-		SinglePlayer.DownTexture = texture'Video_resol_dn';
+		Coop.UpTexture = texture'Video_resol_dn';
+		Coop.OverTexture = texture'Video_resol_dn';
+		Coop.DownTexture = texture'Video_resol_dn';
 
 		Multiplayer.UpTexture = texture'Video_resol_up';
 		Multiplayer.OverTexture = texture'Video_resol_ov';
@@ -796,9 +708,9 @@ function GetCurrentSettings()
 		Multiplayer.OverTexture = texture'Video_resol_dn';
 		Multiplayer.DownTexture = texture'Video_resol_dn';
 
-		SinglePlayer.UpTexture = texture'Video_resol_up';
-		SinglePlayer.OverTexture = texture'Video_resol_ov';
-		SinglePlayer.DownTexture = texture'Video_resol_up';
+		Coop.UpTexture = texture'Video_resol_up';
+		Coop.OverTexture = texture'Video_resol_ov';
+		Coop.DownTexture = texture'Video_resol_up';
 	}
 }
 
@@ -848,7 +760,7 @@ function Resized()
 	if ( Down != None ) 
 		Down.ManagerResized(RootScaleX, RootScaleY);
 
-	SinglePlayer.ManagerResized(RootScaleX, RootScaleY);
+	Coop.ManagerResized(RootScaleX, RootScaleY);
 	Multiplayer.ManagerResized(RootScaleX, RootScaleY);
 	LocalIPLabel.ManagerResized(RootScaleX, RootScaleY);
 	IpLabel.ManagerResized(RootScaleX, RootScaleY);
@@ -927,13 +839,13 @@ function HideWindow()
 
 defaultproperties
 {
+     DedicatedText="Dedicated Server"
+     ListenText="Listen Server"
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
-     BackNames(0)="UndyingShellPC.Video_0"
+     BackNames(0)="UndyingShellPC.CreateGame_0"
      BackNames(1)="UndyingShellPC.CreateGame_1"
      BackNames(2)="UndyingShellPC.CreateGame_2"
      BackNames(3)="UndyingShellPC.Video_3"
      BackNames(4)="UndyingShellPC.Video_4"
      BackNames(5)="UndyingShellPC.CreateGame_5"
-	 DedicatedText="Dedicated Server"
-     ListenText="Listen Server"
 }

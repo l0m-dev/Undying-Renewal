@@ -321,11 +321,11 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 
 	ecto.ectoTrail.AlphaStart.Base = currentAlpha;
 */
-	local Vector X,Y,Z, Start; //, HitLocation;
+	local Vector X,Y,Z, Start, HitLocation, HitNormal;
 	local rotator Dir;
 	local Ectoplasm_proj ecto;
 	local PlayerPawn Player;
-
+	local int HitJoint;
 	Player = PlayerPawn(Owner);
 	AeonsPlayer(Owner).MakePlayerNoise(1.0);
 
@@ -335,10 +335,11 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 		GetAxes(AutoAimDir,X,Y,Z);
 	else
 		GetAxes(Pawn(owner).ViewRotation,X,Y,Z);
-
+		
 	Start = Owner.Location + CalcDrawOffset() + FireOffset.X * X + FireOffset.Y * Y + FireOffset.Z * Z;
-
-	Dir = Rotator(Normal(Player.EyeTraceLoc - Start));
+	
+	PlayerPawn(Owner).EyeTrace(HitLocation, HitNormal, HitJoint, 8192, true);
+	Dir = Rotator(Normal(HitLocation - Start));
 
 	ecto = Spawn(class 'Ectoplasm_proj', PlayerPawn(Owner),, Start, Dir);
 	

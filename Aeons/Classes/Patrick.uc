@@ -69,7 +69,8 @@ function PostBeginPlay()
 	Super.PostBeginPlay();
 	ServerReStartPlayer();
 	
-	WindowConsole(Player.Console).bShellPauses = false;
+	if (Player != None)
+		WindowConsole(Player.Console).bShellPauses = false;
 	Level.bDontAllowSavegame = false;
 }
 
@@ -713,7 +714,8 @@ state DialogScene expands PlayerWalking
 
 		Velocity.X = 0.0;
 		Velocity.Y = 0.0;
-		WindowConsole(Player.Console).bShellPauses = true;
+		if (WindowConsole(Player.Console) != None)
+			WindowConsole(Player.Console).bShellPauses = true;
 		Level.bDontAllowSavegame = true;
 		bAckClickThrough = false;
 		SetTimer( 1.5, false );		// delay until Fire() will cause click-though
@@ -722,7 +724,8 @@ state DialogScene expands PlayerWalking
 	function EndState()
 	{
 		UnFreeze();
-		WindowConsole(Player.Console).bShellPauses = false;
+		if (WindowConsole(Player.Console) != None)
+			WindowConsole(Player.Console).bShellPauses = false;
 		Level.bDontAllowSavegame = false;
 		bFire = 0;
 		bFireAttSpell = 0;
@@ -1300,4 +1303,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
+	 bClientAnim=True
 }

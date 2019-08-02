@@ -15,18 +15,12 @@ class AdvCreateGameWindow expands ShellWindow;
 var ShellButton OK;
 var ShellButton Cancel;
 var ShellCheckbox	CheckBoxes[8];
+var ShellTextBox TextBox;
 
 var() sound CheckboxSound;
 
 var bool bInitialized;
 var bool bSaveChanges;
-
-var() globalconfig bool bCoopWeaponMode;
-var() globalconfig bool bMegaSpeed;
-var() globalconfig bool bNoCheating;
-var() globalconfig bool bHardCoreMode;
-var() globalconfig bool bNoMonsters;
-var() globalconfig bool bChangeLevels;
 
 var int		SmokingWindows[2];
 var float	SmokingTimers[2];
@@ -124,6 +118,16 @@ function Created()
 	Cancel.DownTexture = texture'Cntrl_cancl_dn';
 	Cancel.OverTexture = texture'Cntrl_cancl_ov';
 	Cancel.DisabledTexture = None;
+	
+	TextBox = ShellTextBox(CreateWindow(class'ShellTextBox', 48*RootScaleX, 130*RootScaleY, 500*RootScaleX, 128*RootScaleY));
+
+	//TextBox.TexCoords = NewRegion(0,0,500,128);
+	TextBox.Template = NewRegion(48,130,500,128);
+	TextBox.Font = 2;
+	TextBox.Value = GetPlayerOwner().PlayerReplicationInfo.PlayerName;
+	TextBox.CaretOffset = Len(TextBox.Value);
+
+	TextBox.Manager = Self;
 
 	Root.Console.bBlackout = True;
 	Resized();
@@ -135,14 +139,16 @@ function Created()
 function GetCurrentSettings()
 {
 	local int i;
+
 	CheckBoxes[0].bChecked = GetPlayerOwner().Level.Game.bCoopWeaponMode;
-	//CheckBoxes[1].bChecked = GetPlayerOwner().Level.Game.bMegaSpeed;
+	CheckBoxes[1].bChecked = DeathMatchGame(GetPlayerOwner().Level.Game).bMegaSpeed;
 	CheckBoxes[2].bChecked = GetPlayerOwner().Level.Game.bNoCheating;
-	//CheckBoxes[3].bChecked = GetPlayerOwner().Level.Game.bHardCoreMode;
+	CheckBoxes[3].bChecked = DeathMatchGame(GetPlayerOwner().Level.Game).bHardCoreMode;
 	CheckBoxes[4].bChecked = GetPlayerOwner().Level.Game.bNoMonsters;
-	//CheckBoxes[5].bChecked = GetPlayerOwner().Level.Game.bChangeLevels;
+	CheckBoxes[5].bChecked = DeathMatchGame(GetPlayerOwner().Level.Game).bChangeLevels;
 	CheckBoxes[6].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager ActorShadows"));
 	CheckBoxes[7].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager Decals"));
+	TextBox.Value = GetPlayerOwner().Level.Game.GameReplicationInfo.ServerName;
 
 	// default will be to save changes--only discard changes if cancel is clicked
 	bSaveChanges = True;
@@ -216,11 +222,16 @@ function SaveChanges()
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Decals " $ Checkboxes[7].bChecked );
 	
 	GetPlayerOwner().Level.Game.bCoopWeaponMode = CheckBoxes[0].bChecked;
-	//GetPlayerOwner().Level.Game.bMegaSpeed = CheckBoxes[1].bChecked;
+	DeathMatchGame(GetPlayerOwner().Level.Game).bMegaSpeed = CheckBoxes[1].bChecked;
 	GetPlayerOwner().Level.Game.bNoCheating = CheckBoxes[2].bChecked;
-	//GetPlayerOwner().Level.Game.bHardCoreMode = CheckBoxes[3].bChecked;
+	DeathMatchGame(GetPlayerOwner().Level.Game).bHardCoreMode = CheckBoxes[3].bChecked;
 	GetPlayerOwner().Level.Game.bNoMonsters = CheckBoxes[4].bChecked;
-	//GetPlayerOwner().Level.Game.bChangeLevels = CheckBoxes[5].bChecked;
+	DeathMatchGame(GetPlayerOwner().Level.Game).bChangeLevels = CheckBoxes[5].bChecked;
+	GetPlayerOwner().Level.Game.GameReplicationInfo.ServerName = TextBox.Value;
+	
+	GetPlayerOwner().Level.Game.SaveConfig(); 
+	DeathMatchGame(GetPlayerOwner().Level.Game).SaveConfig();
+	GetPlayerOwner().Level.Game.GameReplicationInfo.SaveConfig();
 }
 
 function Resized()
@@ -253,6 +264,9 @@ function Resized()
 
 	if ( Cancel != None ) 
 		Cancel.ManagerResized(RootScaleX, RootScaleY);
+		
+	if ( TextBox != None )
+		TextBox.ManagerResized(RootScaleX, RootScaleY);
 }
 
 

@@ -4,11 +4,14 @@
 class OnScreenMessageModifier expands PlayerModifier;
 
 var string DisplayedMessage;
+var bool ServerMessage;
 
-function NewMessage(string Message, float HoldTime)
+function NewMessage(string Message, float HoldTime, optional bool FromServer)
 {
 	DisplayedMessage = Message;
 	SetTimer(HoldTime, false);
+	
+	ServerMessage = FromServer;
 }
 
 function Timer()
@@ -27,12 +30,21 @@ simulated event RenderOverlays( canvas Canvas )
 
 	if (DisplayedMessage != "")
 	{
-		Canvas.DrawColor.R = 125;
-		Canvas.DrawColor.G = 255;
-		Canvas.DrawColor.B = 125;
+		if (ServerMessage)
+		{
+			Canvas.DrawColor.R = 125;
+			Canvas.DrawColor.G = 255;
+			Canvas.DrawColor.B = 125;
+			Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.15 );
+		} else {
+			Canvas.DrawColor.R = 255;
+			Canvas.DrawColor.G = 255;
+			Canvas.DrawColor.B = 255;
+			Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.75 );
+		}
+		
 		Canvas.Font = Canvas.MedFont;
 		Canvas.TextSize( DisplayedMessage, x, y );
-		Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.15 );
 		Canvas.DrawText( DisplayedMessage, false );
 	}
 }

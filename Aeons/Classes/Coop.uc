@@ -18,34 +18,14 @@ var		bool	bGameEnded;
 var		bool	bAlreadyChanged;
 var	  int RemainingTime;
 
-// Bot related info
-var   int			NumBots;
-var	  int			RemainingBots;
-var() globalconfig int	InitialBots;
-//var		BotInfo		BotConfig;
 var localized string GlobalNameChange;
 var localized string NoNameChange;
-//var class<BotInfo> BotConfigType;
 
 function PostBeginPlay()
 {
-	local string NextPlayerClass;
-	local int i;
-
-	//BotConfig = spawn(BotConfigType);
-	RemainingTime = 60 * TimeLimit;
-	if ( (Level.NetMode == NM_Standalone) || bMultiPlayerBots )
-		RemainingBots = InitialBots;
 	Super.PostBeginPlay();
-
-	// load all player classes
-	NextPlayerClass = GetNextInt("AeonsPlayer", 0); 
-	while ( NextPlayerClass != "" )
-	{
-		DynamicLoadObject(NextPlayerClass, class'Class');
-		i++;
-		NextPlayerClass = GetNextInt("AeonsPlayer", i); 
-	}
+	
+	bClassicDeathMessages = True;
 }
 
 function int GetIntOption( string Options, string ParseString, int CurrentValue)
@@ -56,14 +36,14 @@ function int GetIntOption( string Options, string ParseString, int CurrentValue)
 	return Super.GetIntOption(Options, ParseString, CurrentValue);
 }
 
-function bool IsRelevant(actor Other) 
+function bool IsRelevant(actor Other)
 {
-	if ( bMegaSpeed && Other.IsA('Pawn') && Pawn(Other).bIsPlayer )
+	// hide all playerpawns
+
+	if ( Other.IsA('PlayerPawn') && !Other.IsA('AeonsSpectator') )
 	{
-		Pawn(Other).GroundSpeed *= 1.5;
-		Pawn(Other).WaterSpeed *= 1.5;
-		Pawn(Other).AirSpeed *= 1.5;
-		Pawn(Other).Acceleration *= 1.5;
+		Other.SetCollision(false,false,false);
+		Other.bHidden = true;
 	}
 	return Super.IsRelevant(Other);
 }
@@ -179,8 +159,13 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 
 function float PlaySpawnEffect(inventory Inv)
 {
-	//spawn( class 'ReSpawn',,, Inv.Location );
-	return 0.3;
+	//Playsound(sound'RespawnSound');
+	if ( !bCoopWeaponMode || !Inv.IsA('Weapon') )
+	{
+		//spawn( class 'ReSpawn',,, Inv.Location );
+		return 0.3;
+	}
+	return 0.0;
 }
 
 exec function restart()
@@ -229,7 +214,7 @@ event playerpawn Login
 	class<playerpawn> SpawnClass
 )
 {
-	local playerpawn NewPlayer;
+	local PlayerPawn NewPlayer;
 	Log("DeathMatchGame - Login");
 	NewPlayer = Super.Login(Portal, Options, Error, SpawnClass );
 	if ( NewPlayer != None )
@@ -237,6 +222,12 @@ event playerpawn Login
 		if ( Left(NewPlayer.PlayerReplicationInfo.PlayerName, 6) == DefaultPlayerName )
 			ChangeName( NewPlayer, (DefaultPlayerName$NumPlayers), false );
 		NewPlayer.bAutoActivate = true;
+		
+		if ( !NewPlayer.IsA('AeonsSpectator') )
+		{
+			NewPlayer.bHidden = false;
+			NewPlayer.SetCollision(true,true,true);
+		}
 	}
 	else
 	{
@@ -305,8 +296,6 @@ function bool AddBot()
 function Logout(pawn Exiting)
 {
 	Super.Logout(Exiting);
-	if ( Exiting.IsA('Bots') )
-    	NumBots--;
 }
 	
 function Timer()
@@ -380,36 +369,17 @@ Re-implement for each game type
 */
 function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
 {
-	local PlayerStart Dest, Candidate[4], Best;
-	local float Score[4], BestScore, NextDist;
+	local PlayerStart Dest, Candidate[8], Best;
+	local float Score[8], BestScore, NextDist;
 	local pawn OtherPlayer;
 	local int i, num;
 	local Teleporter Tel;
-	local NavigationPoint N;
-
-	if( incomingName!="" )
-		foreach AllActors( class 'Teleporter', Tel )
-			if( string(Tel.Tag)~=incomingName )
-				return Tel;
 
 	num = 0;
 	//choose candidates	
-	N = Level.NavigationPointList;
-	While ( N != None )
+	foreach AllActors( class 'PlayerStart', Dest )
 	{
-		if ( N.IsA('PlayerStart') && !N.Region.Zone.bWaterZone )
-		{
-			if (num<4)
-				Candidate[num] = PlayerStart(N);
-			else if (Rand(num) < 4)
-				Candidate[Rand(4)] = PlayerStart(N);
-			num++;
-		}
-		N = N.nextNavigationPoint;
-	}
-
-	if (num == 0 )
-		foreach AllActors( class 'PlayerStart', Dest )
+		if ( (Dest.bSinglePlayerStart || Dest.bCoopStart) && !Dest.Region.Zone.bWaterZone )
 		{
 			if (num<4)
 				Candidate[num] = Dest;
@@ -417,7 +387,8 @@ function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, opt
 				Candidate[Rand(4)] = Dest;
 			num++;
 		}
-
+	}
+	
 	if (num>4) num = 4;
 	else if (num == 0)
 		return None;
@@ -426,27 +397,31 @@ function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, opt
 	for (i=0;i<num;i++)
 		Score[i] = 4000 * FRand(); //randomize
 		
-	for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
-		if ( OtherPlayer.bIsPlayer && (OtherPlayer.Health > 0) )
+	foreach AllActors( class 'Pawn', OtherPlayer )
+	{
+		if (OtherPlayer.bIsPlayer)
+		{
 			for (i=0;i<num;i++)
-				if ( OtherPlayer.Region.Zone == Candidate[i].Region.Zone )
-				{
-					NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
-					if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
-						Score[i] -= 1000000.0;
-					else if ( (NextDist < 2000) && OtherPlayer.LineOfSightTo(Candidate[i]) )
-						Score[i] -= 10000.0;
-				}
+			{
+				NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
+				Score[i] += NextDist;
+				if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
+					Score[i] -= 1000000.0;
+			}
+		}
+	}
 	
 	BestScore = Score[0];
 	Best = Candidate[0];
 	for (i=1;i<num;i++)
+	{
 		if (Score[i] > BestScore)
 		{
 			BestScore = Score[i];
 			Best = Candidate[i];
 		}
-
+	}			
+				
 	return Best;
 }
 
@@ -530,6 +505,7 @@ defaultproperties
      FragLimit=0
      GlobalNameChange=" changed name to "
      NoNameChange=" is already in use"
+	 bCoopWeaponMode=True
      bRestartLevel=False
 	 bSinglePlayer=False
      bDeathMatch=False

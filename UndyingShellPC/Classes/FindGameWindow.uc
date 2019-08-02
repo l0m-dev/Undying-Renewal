@@ -2,3 +2,7 @@
 // FindGameWindow.
 //=============================================================================
 class FindGameWindow expands ShellWindow;
+
+defaultproperties
+{
+}
