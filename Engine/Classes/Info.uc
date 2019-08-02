@@ -8,4 +8,5 @@ class Info extends Invisible
 defaultproperties
 {
      bHidden=True
+	 NetUpdateFrequency=4
 }

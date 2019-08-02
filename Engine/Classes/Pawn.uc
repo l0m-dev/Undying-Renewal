@@ -3185,7 +3185,7 @@ defaultproperties
      JumpZ=325
      MaxStepHeight=25
      AirControl=0.05
-     LookJoint='
+     LookJoint=''
      Visibility=128
      SightRadius=2500
      HearingThreshold=1

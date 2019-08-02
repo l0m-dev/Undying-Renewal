@@ -21,10 +21,10 @@ function string GetNextMap()
 
 	if ( CurrentMap != "" )
 	{
-		if ( Right(CurrentMap,4) ~= ".moh" )
+		if ( Right(CurrentMap,4) ~= ".sac" )
 			CurrentMap = CurrentMap;
 		else
-			CurrentMap = CurrentMap$".moh";
+			CurrentMap = CurrentMap$".sac";
 
 		for ( i=0; i<ArrayCount(Maps); i++ )
 		{
@@ -36,7 +36,7 @@ function string GetNextMap()
 		}
 	}
 
-	// search vs. w/ or w/out .unr extension
+	// search vs. w/ or w/out .sac extension
 
 	MapNum++;
 	if ( MapNum > ArrayCount(Maps) - 1 )

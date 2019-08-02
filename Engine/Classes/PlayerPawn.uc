@@ -3291,22 +3291,6 @@ Event PlayerTick( float DeltaTime );
 //
 event PreBeginPlay()
 {
-	local PlayerPawn P;
-	local Actor A;
-
-	ForEach AllActors(class 'PlayerPawn', P)
-	{
-		if ( P != self )
-		{
-			ForEach AllActors (class 'Actor', A)
-			{
-				if (A.Owner == P)
-					A.Destroy();
-			}
-			P.Destroy();
-		}
-	}
-
 	bIsPlayer = true;
 	bRenderSelf = true;
 	bAllowMove = true;

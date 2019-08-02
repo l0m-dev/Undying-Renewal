@@ -1604,7 +1604,6 @@ simulated function LogTimeActorState( string message )
 defaultproperties
 {
      bSpawned=True
-     Priority=10
      Role=ROLE_Authority
      RemoteRole=ROLE_DumbProxy
      LODBias=1

@@ -105,7 +105,6 @@ simulated function bool Accept( actor Incoming, Actor Source )
 	local float mag;
 	local vector oldDir;
 	local pawn P;
-	local Actor A;
 
 	// Move the actor here.
 	Disable('Touch');
@@ -183,18 +182,6 @@ simulated function bool Accept( actor Incoming, Actor Source )
 
 	// Play teleport-in effect.
 
-	if (Event != 'none')
-	{
-		ForEach AllActors (class 'Actor', A, Event)
-		{	
-			if ( A.IsA('Trigger') )
-			{
-				if ( Trigger(A).bPassThru )
-					Trigger(A).PassThru(P);
-			}
-			A.Trigger(none, P);
-		}
-	}
 	return true;
 }
 	
@@ -213,26 +200,12 @@ function PlayTeleportEffect(actor Incoming, bool bOut)
 function Trigger( actor Other, pawn EventInstigator )
 {
 	local int i;
-	local PlayerPawn P;
 
-	if ( bForcePlayerTouch )
-	{
-		// force a player touch when triggered
-		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			break;
-		}
-
-		if (P != none)
-			Touch(P);
-	} else {
-	
-		bEnabled = !bEnabled;
-		if ( bEnabled ) //teleport any pawns already in my radius
-			for (i=0;i<8;i++)
-				if ( Touching[i] != None )
-					Touch(Touching[i]);
-	}
+	bEnabled = !bEnabled;
+	if ( bEnabled ) //teleport any pawns already in my radius
+		for (i=0;i<4;i++)
+			if ( Touching[i] != None )
+				Touch(Touching[i]);
 }
 
 // Teleporter was touched by an actor.
@@ -285,8 +258,7 @@ simulated function Touch( actor Other )
 				if ( EntrySound != none )
 					Player.PlaySound(EntrySound);
 				
-				//Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
-				Level.ServerTravel(NewURL, true);
+				Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
 			}
 		}
 		else
