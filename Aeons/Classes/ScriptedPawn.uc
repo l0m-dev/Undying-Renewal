@@ -12021,7 +12021,7 @@ state AIRunScript
 		local pawn	P;
 
 		P = FindPlayer();
-		if ( P.IsA('PlayerPawn') && !PlayerPawn(P).bAllowMove )
+		if ( P != None && P.IsA('PlayerPawn') && !PlayerPawn(P).bAllowMove )
 		{
 			SetCollision( false, false, false );
 		}
