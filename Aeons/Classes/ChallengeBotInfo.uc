@@ -126,6 +126,7 @@ function CHIndividualize(bot NewBot, int n, int NumBots)
 	ConfigUsed[n] = 1;
 
 	// adjust bot skill
+	/*
 	NewBot.InitializeSkill(Difficulty + BotSkills[n]);
 
 	NewBot.Accuracy = BotAccuracy[n];
@@ -134,7 +135,8 @@ function CHIndividualize(bot NewBot, int n, int NumBots)
 	NewBot.CampingRate = Camping[n];
 	NewBot.bJumpy = ( BotJumpy[n] != 0 );
 	NewBot.StrafingAbility = StrafingAbility[n];
-
+	*/
+	
 	if ( VoiceType[n] != "" && VoiceType[n] != "None" )
 		NewBot.PlayerReplicationInfo.VoiceType = class<VoicePack>(DynamicLoadObject(VoiceType[n], class'Class'));
 	
