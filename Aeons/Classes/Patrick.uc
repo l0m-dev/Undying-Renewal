@@ -62,6 +62,8 @@ function PreBeginPlay()
 	EnableLog('GameState');
 	EnableLog('GameEvents');
 	EnableLog('Pickups');
+	
+	ClientAdjustGlow( 0.0, vect(1,0,0) );
 }
 
 function PostBeginPlay()
@@ -392,8 +394,8 @@ state Dying
 			return;
 		if( Level.Game.RestartPlayer(self) )
 		{
-			ServerTimeStamp = 0;
-			TimeMargin = 0;
+			//ServerTimeStamp = 0;
+			//TimeMargin = 0;
 			Enemy = None;
 			Level.Game.StartPlayer(self);
 			if ( Mesh != None )
@@ -891,8 +893,8 @@ state FallingDeath expands Dying
 		Health = 0;
 		sleep(2);
 		SetPhysics(PHYS_None);
+		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -942,8 +944,8 @@ state FadingDeath expands Dying
 		ClientAdjustGlow(-1.0,vect(0,0,0));
 		sleep(2);
 		SetPhysics(PHYS_None);
+		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -990,8 +992,8 @@ state InstantFadingDeath expands Dying
 		ClientAdjustGlow(-1000.0,vect(0,0,0));
 		sleep(0);
 		SetPhysics(PHYS_None);
+		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 exec function KillNPC()

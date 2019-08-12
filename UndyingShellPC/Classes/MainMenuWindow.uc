@@ -21,6 +21,10 @@ class MainMenuWindow expands ShellWindow;
 #exec Texture Import File=Main_Back_ov.bmp		Mips=Off
 #exec Texture Import File=Main_Back_dn.bmp		Mips=Off
 
+#exec Texture Import File=Main_Disconnect_up.bmp		Mips=Off
+#exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
+#exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
+
 #exec Texture Import File=Main_audio_up.bmp		Mips=Off
 #exec Texture Import File=Main_audio_ov.bmp		Mips=Off
 #exec Texture Import File=Main_audio_dn.bmp		Mips=Off
@@ -57,6 +61,7 @@ class MainMenuWindow expands ShellWindow;
 
 var ShellButton Buttons[8];
 var ShellButton BackToGame;
+var ShellButton Disconnect;
 
 var UWindowWindow Single;
 var UWindowWindow Audio;
@@ -74,8 +79,8 @@ var UWindowWindow Confirm;
 //var UWindowMessageBox ConfirmJoin;
 //var() sound NewScreenSound;
 //var sound ExitSound;
-var int		SmokingWindows[9];
-var float	SmokingTimers[9];
+var int		SmokingWindows[10];
+var float	SmokingTimers[10];
 
 var int AmbientSoundID;
 
@@ -179,7 +184,7 @@ function Created()
 
 	BackToGame.TexCoords = NewRegion(0,0,160,64);
 
-	BackToGame.Template = NewRegion( 616, 492, 160, 64);
+	BackToGame.Template = NewRegion( 616, 500, 160, 64);
 
 	BackToGame.Manager = Self;
 	BackToGame.Style=5;
@@ -190,6 +195,23 @@ function Created()
 
 	BackToGame.bBurnable = true;
 	BackToGame.OverSound=sound'Aeons.Shell_Blacken01';
+	
+// disconnect button
+	Disconnect = ShellButton(CreateWindow(class'ShellButton', 620*RootScaleX, 430*RootScaleY, 160*RootScaleX, 64*RootScaleY));
+
+	Disconnect.TexCoords = NewRegion(0,0,160,64);
+
+	Disconnect.Template = NewRegion( 620, 430, 160, 64);
+
+	Disconnect.Manager = Self;
+	Disconnect.Style=5;
+
+	Disconnect.UpTexture   = texture'Main_Disconnect_Up';
+	Disconnect.DownTexture = texture'Main_Disconnect_Dn';
+	Disconnect.OverTexture = texture'Main_Disconnect_Ov';
+
+	Disconnect.bBurnable = true;
+	Disconnect.OverSound=sound'Aeons.Shell_Blacken01';
 
 //	ExitSound = Sound(DynamicLoadObject("Aeons.Shell_Select01", class'Sound'));
 
@@ -265,6 +287,9 @@ function Message(UWindowWindow B, byte E)
 				case BackToGame:
 					BackPressed();
 					break;
+				case Disconnect:
+					DisconnectPressed();
+					break;
 			}
 			break;
 
@@ -327,6 +352,11 @@ function OverEffect(ShellButton B)
 		case BackToGame:
 			SmokingWindows[8] = 1;
 			SmokingTimers[8] = 90;
+			break;
+			
+		case Disconnect:
+			SmokingWindows[9] = 1;
+			SmokingTimers[9] = 90;
 			break;
 	}
 }
@@ -511,6 +541,14 @@ function BackPressed()
 	Close(); 
 }
 
+function DisconnectPressed()
+{
+	SmokingTimers[9] = 0;
+	GetPlayerOwner().ClientTravel("start?nosave", TRAVEL_Absolute, false);
+	PlayNewScreenSound(); //PlayExitSound();
+	//Close(); 
+}
+
 //----------------------------------------------------------------------------
 
 function StopShellAmbient()
@@ -568,11 +606,13 @@ function Paint(Canvas C, float X, float Y)
 	if ( GetPlayerOwner().Level.bLoadBootShellPSX2 )
 	{
 		BackToGame.HideWindow();
+		Disconnect.HideWindow();
 	}
-	else 
+	else
+	{
 		BackToGame.ShowWindow();
-
-
+		Disconnect.ShowWindow();
+	}
 
 	Root.Console.bLocked =  True;
 
@@ -590,6 +630,7 @@ function Paint(Canvas C, float X, float Y)
 	}
 
 	Super.PaintSmoke(C, BackToGame, SmokingWindows[8], SmokingTimers[8]);
+	Super.PaintSmoke(C, Disconnect, SmokingWindows[9], SmokingTimers[9]);
 	for ( i=0; i<8; i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
 
@@ -695,12 +736,14 @@ function Resized()
 
 	if ( BackToGame != None )
 		BackToGame.ManagerResized(RootScaleX, RootScaleY);
+		
+	if ( Disconnect != None )
+		Disconnect.ManagerResized(RootScaleX, RootScaleY);
 
 	for ( i=0; i<8; i++ )
 	{
 		Buttons[i].ManagerResized(RootScaleX, RootScaleY);
 	}
-
 }
 
 //----------------------------------------------------------------------------

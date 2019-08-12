@@ -415,12 +415,13 @@ replication
 {
 	// Variables the server should send to the client.
 	reliable if( Role==ROLE_Authority && bNetOwner)
-		ManaWellsFound, ManaWhorlsFound, crossHairScale, bDoubleShotgun,
+		ManaWellsFound, ManaWhorlsFound, crossHairScale,
         FavAttSpell1, FavAttSpell2, FavAttSpellToggle,
         FavDefSpell1, FavDefSpell2, FavDefSpellToggle, ScryeMod, 
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
-		speedMultiplier, bWeaponSound, bMagicSound, OSMMod;
+		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
+		bDoubleShotgun, AddAll;
 
 	reliable if ( Role==ROLE_Authority )
 		SendClientFire, RealWeapon;

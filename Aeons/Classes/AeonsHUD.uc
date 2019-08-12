@@ -5,6 +5,8 @@ class AeonsHUD expands HUD;
 
 // BURT - All exec imports were ripped since it is just an update
 
+#exec Texture Import File=Revolver_Icon_Yellow.bmp		Mips=Off
+
 #exec OBJ LOAD FILE=\Textures\fxB2.utx PACKAGE=fxB2
 #exec OBJ LOAD FILE=\Textures\fxB.utx PACKAGE=fxB
 #exec OBJ LOAD FILE=\textures\FX.utx PACKAGE=FX
@@ -85,6 +87,8 @@ var() bool showFrameRate;
 var bool bShowTex;
 
 var float Scale;
+var float ScaleX;
+var float ScaleY;
 
 var int CanvasWidth;
 var int CanvasHeight;
@@ -786,6 +790,8 @@ simulated function PostRender( canvas Canvas )
 
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
 	Scale = Canvas.ClipY / 600.0;
+	ScaleX = Canvas.ClipX / 800.0;
+	ScaleY = Canvas.ClipY / 600.0;
 
 	HUDSetup(canvas);
 
@@ -932,8 +938,8 @@ simulated function PostRender( canvas Canvas )
 		// this next line always draws a stationary cross hair - for debugging mindshatter
 		// DrawCrossHair(Canvas, (0.5 * Canvas.ClipX - 8), (0.5 * Canvas.ClipY - 8),1);
 	
-		if (AeonsPlayer(Owner).bDrawStealth || AeonsPlayer(Owner).bDrawDebugHUD )
-			DrawStealth(Canvas);
+		//if (AeonsPlayer(Owner).bDrawStealth || AeonsPlayer(Owner).bDrawDebugHUD )
+		//	DrawStealth(Canvas);
 	
 		if ( AeonsPlayer(Owner).bDrawDebugHUD )
 		{
@@ -941,14 +947,14 @@ simulated function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		DrawHealth(Canvas, 265*Scale, 536*Scale);
-		DrawMana(Canvas, 484*Scale, 536*Scale);
+		DrawHealth(Canvas, 265*ScaleX, 536*ScaleY);
+		DrawMana(Canvas, 484*ScaleX, 536*ScaleY);
 	
 		if (Level.bDebugMessaging)
 			DrawManaInfo(Canvas);		// mana maintenence values
 	
 		// Stealth Icons have been cut from the game 11/19/2000
-		DrawStealthIcons(Canvas);
+		//DrawStealthIcons(Canvas);
 	
 		DrawFlightMana(Canvas);
 		DrawCenterPiece(Canvas);
@@ -2988,19 +2994,19 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.Style = ERenderStyle.STY_Masked;
 	
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 317*Scale, 536*Scale); 
+	Canvas.SetPos( 317*ScaleX, 536*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Health', 64*Scale, 64*Scale, 0, 0, 64, 64);
 
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
 		Canvas.Style = ERenderStyle.STY_Translucent;
-		Canvas.SetPos( 426*Scale, 538*Scale); 
+		Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
 		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*Scale, 64*Scale, 0, 0, 64, 64);
 	}
 
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 426*Scale, 538*Scale); 
+	Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*Scale, 64*Scale, 0, 0, 64, 64);
 }
 
@@ -3049,8 +3055,8 @@ simulated function DrawFlightMana( canvas Canvas )
 	Height = 30 * FuelRatio;
   
 	Canvas.Style = ERenderStyle.STY_Masked;
-	Canvas.SetPos( 381*Scale, Canvas.ClipY - (Height+21)*Scale); 
-	Canvas.DrawTileClipped( Texture'FlightBar_Icon', 40*Scale, (Height+6)*Scale, 0, 32-Height, 32, Height);
+	Canvas.SetPos( 381*ScaleX, Canvas.ClipY - (Height+21)*ScaleY); 
+	Canvas.DrawTileClipped( Texture'FlightBar_Icon', 40*ScaleX, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
 
 	Canvas.DrawColor.r = 192;
 	Canvas.DrawColor.g = 192;
@@ -3059,8 +3065,8 @@ simulated function DrawFlightMana( canvas Canvas )
 
 	Canvas.Style = 5;
 
-	Canvas.SetPos( 329*Scale, Canvas.ClipY - 75.0*Scale); 
-	Canvas.DrawTileClipped( Texture'Flight_Icon', 150*Scale, 64*Scale, 0, 0, 150, 64);
+	Canvas.SetPos( 329*ScaleX, Canvas.ClipY - 75.0*ScaleY); 
+	Canvas.DrawTileClipped( Texture'Flight_Icon', 150*ScaleX, 64*ScaleY, 0, 0, 150, 64);
 }
 
 simulated function DrawMana(Canvas Canvas, int X, int Y)
@@ -3079,7 +3085,7 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 		Canvas.Style = ERenderStyle.STY_Masked;
 
 		Canvas.CurX = 0;
-		Canvas.CurY = Canvas.ClipY - 72*Scale;
+		Canvas.CurY = Canvas.ClipY - 72*ScaleY;
 /*
 		else
 		{
@@ -4687,7 +4693,7 @@ defaultproperties
      CrossHairs(22)=Texture'Aeons.Icons.CrossHair22'
      CrossHairs(23)=Texture'Aeons.Icons.CrossHair23'
      Icons(0)=Texture'Aeons.Icons.null_Icon'
-     Icons(1)=Texture'Aeons.Icons.Revolver_Icon'
+     Icons(1)=Texture'Aeons.Icons.Revolver_Icon_Yellow'
      Icons(2)=Texture'Aeons.Icons.Ghelz_Icon'
      Icons(3)=Texture'Aeons.Icons.Scythe_Icon'
      Icons(4)=Texture'Aeons.Icons.Cannon_Icon'

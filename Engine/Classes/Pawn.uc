@@ -2555,7 +2555,8 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 				// Not Gibbed
 
 				// Special Kill?
-				if ( ( InstigatedBy != none ) &&
+				if ( Level.NetMode==NM_Standalone &&
+					 ( InstigatedBy != none ) &&
 					 InstigatedBy.CanPerformSK(self) &&
 					 ( PlayerPawn(self) != none ) )		// MJG: only PlayerPawns can do this
 				{
