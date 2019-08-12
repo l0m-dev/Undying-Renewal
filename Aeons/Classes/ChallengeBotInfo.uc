@@ -34,6 +34,7 @@ function PostBeginPlay()
 	Super.PostBeginPlay();
 }
 
+/*
 function AdjustSkill(Bot B, bool bWinner)
 {
 	local float BotSkill;
@@ -90,6 +91,7 @@ function AdjustSkill(Bot B, bool bWinner)
 		SaveConfig();
 	}
 }
+*/
 
 function SetBotName( coerce string NewName, int n )
 {
