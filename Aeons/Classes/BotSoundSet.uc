@@ -1,7 +1,7 @@
 //=============================================================================
-// TrsantiBotSoundSet.
+// BotSoundSet.
 //=============================================================================
-class TrsantiBotSoundSet expands SharedHumanSoundSet;
+class BotSoundSet expands SharedHumanSoundSet;
 
 var(Sounds) CreatureSoundGroup	SwordWhsh;
 var(Sounds) CreatureSoundGroup	SpKill;

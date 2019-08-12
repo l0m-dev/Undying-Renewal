@@ -1,7 +1,7 @@
 //=============================================================================
-// Trsanti.
+// Bot.
 //=============================================================================
-class TrsantiBot expands ScriptedBiped;
+class Bot expands ScriptedBiped;
 
 #exec MESH IMPORT MESH=Trsanti_Dead_Hanging_m SKELFILE=Poses\Dead_Hanging.ngf
 #exec MESH IMPORT MESH=Trsanti_Dead_Floating_m SKELFILE=Poses\Dead_Floating.ngf
