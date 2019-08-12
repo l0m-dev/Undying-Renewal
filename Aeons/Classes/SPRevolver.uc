@@ -17,7 +17,7 @@ defaultproperties
      ReloadTime=2
      ReloadCount=6
      SpoolUpTime=0.1
-     Accuracy=0.5
+     Accuracy=1.0
      AimAnim=attack_revolver_idle
      RecoilAnim=attack_revolver_cycle
      FireSoundRadius=5000
