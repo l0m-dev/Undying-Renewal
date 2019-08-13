@@ -972,7 +972,7 @@ exec function FireAttSpell( optional float F )
 			bJustFiredAttSpell = true;
 			AttSpell.FireAttSpell(F);
 		}
-
+		
 	}
 }
 
@@ -4401,6 +4401,17 @@ exec function AddAll()
 			newSpell.CastingLevel = 4;
 		}
 	}
+	
+	if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Pyro');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
 
 	/* Lantern is cut
 	// give the player the Lantern
@@ -4764,7 +4775,15 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
-		
+		case 'pyro':
+			if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
+			{
+				newSpell = Spawn(class'Aeons.Pyro');
+				NewSpell.CastingLevel = Clamp(Amplitude, 0, 4);
+				if( newSpell != None )
+					newSpell.GiveTo(self);
+			}
+			break;
 		default:
 			if (FRand() > 0.5)
 				bring('donkey');

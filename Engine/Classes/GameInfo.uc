@@ -16,7 +16,7 @@ var() config bool   		  bNoMonsters;				// Whether monsters are allowed in this 
 var() globalconfig bool		  bMuteSpectators;			// Whether spectators are allowed to speak.
 var() config bool			  bHumansOnly;				// Whether non human player models are allowed.
 var() bool				      bRestartLevel;	
-var() bool				      bPauseable;				// Whether the level is pauseable.
+var() config bool			  bPauseable;		// Whether the level is pauseable.
 var() config bool			  bCoopWeaponMode;			// Whether or not weapons stay when picked up.
 var() config bool			  bClassicDeathmessages;	// Weapon deathmessages if false.
 var   globalconfig bool	      bLowGore;					// Whether or not to reduce gore.

@@ -31,6 +31,7 @@ class AeonsSpell extends Spell
 #exec MESH NOTIFY SEQ=PowerWord TIME=0.0100 FUNCTION=FireSpell
 #exec MESH NOTIFY SEQ=PowerWord TIME=0.071 FUNCTION=StartParticles
 #exec MESH NOTIFY SEQ=PowerWord TIME=0.943 FUNCTION=StopParticles
+#exec MESH NOTIFY SEQ=Firecantrip TIME=0.350 FUNCTION=FireSpell
 #exec MESH NOTIFY SEQ=Scrye TIME=0.250 FUNCTION=FireSpell
 #exec MESH NOTIFY SEQ=Invoke TIME=0.684 FUNCTION=FireSpell
 #exec MESH NOTIFY SEQ=ShalaVortex TIME=0.001 FUNCTION=FireSpell

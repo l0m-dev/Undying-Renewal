@@ -4645,7 +4645,7 @@ defaultproperties
      Def_InvGroup(4)=25
      Def_InvGroup(5)=27
      Def_InvGroup(6)=21
-     Def_InvGroup(7)=28
+     Def_InvGroup(7)=20
      Off_X(1)=133
      Off_X(2)=188
      Off_X(3)=133
@@ -4709,6 +4709,7 @@ defaultproperties
      Icons(16)=Texture'Aeons.Icons.Scrye_Icon'
      Icons(17)=Texture'Aeons.Icons.Shield_Icon'
      Icons(18)=Texture'Aeons.Icons.Invoke_Icon'
+     Icons(20)=Texture'Aeons.Icons.PowerWord_Icon'
      Icons(21)=Texture'Aeons.Icons.PowerWord_Icon'
      Icons(22)=Texture'Aeons.Icons.Phase_Icon'
      Icons(23)=Texture'Aeons.Icons.Silence_Icon'
