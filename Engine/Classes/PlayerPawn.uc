@@ -274,7 +274,7 @@ replication
 
 	// Things the client should send to the server
 	reliable if ( Role<ROLE_Authority )
-		Password, bReadyToPlay;
+		Password, bReadyToPlay, bNeverAutoSwitch;
 
 	// Functions client can call.
 	unreliable if( Role<ROLE_Authority )

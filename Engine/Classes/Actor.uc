@@ -768,7 +768,7 @@ replication
 	unreliable if( DrawType==DT_Sprite && !bHidden && (!bOnlyOwnerSee || bNetOwner) && Role==ROLE_Authority)
 		Sprite;
 	unreliable if( DrawType==DT_Mesh && Role==ROLE_Authority )
-		Mesh, PrePivot, bMeshEnviroMap, Skin, Fatness, AmbientGlow, ScaleGlow, bUnlit;
+		Mesh, PrePivot, bMeshEnviroMap, Skin, Fatness, AmbientGlow, ScaleGlow, bUnlit, bScryeOnly;
 	unreliable if( DrawType==DT_Brush && Role==ROLE_Authority )
 		Brush;
 
