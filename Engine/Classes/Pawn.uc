@@ -2427,7 +2427,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		return;
 	}
 
-	if ( (bAcceptDamage && !DInfo.bMagical) || (bAcceptMagicDamage && DInfo.bMagical) )
+	if ( !Region.Zone.bNeutralZone && ((bAcceptDamage && !DInfo.bMagical) || (bAcceptMagicDamage && DInfo.bMagical)) )
 	{
 		//log(self@"take damage in state"@GetStateName());	
 		bAlreadyDead = (Health <= 0);

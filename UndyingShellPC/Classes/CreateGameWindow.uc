@@ -438,7 +438,7 @@ function Message(UWindowWindow B, byte E)
 	
 						GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
 
-						GetPlayerOwner().Level.bLoadBootShellPSX2 = true;
+						//GetPlayerOwner().Level.bLoadBootShellPSX2 = true;
 					}
 
 					PlayNewScreenSound();

@@ -492,7 +492,7 @@ function DoEyeTrace()
 {
 	local float Range;
 	
-	Range = 2048;
+	Range = 8192;
 	EyeTraceActor = none;
 
 	EyeTraceActor = EyeTrace(EyeTraceLoc, EyeTraceNormal, EyeTraceJoint, Range, true);
@@ -2109,7 +2109,7 @@ exec function ActivateItem()
 {
 	if( bShowMenu || Level.Pauser!="" )
 		return;
-	if (SelectedItem!=None) 
+	if (SelectedItem!=None && !(Region.Zone.bNeutralZone && SelectedItem.ItemName == "Dynamite")) 
 		SelectedItem.Activate();
 }
 
@@ -2118,6 +2118,9 @@ exec function StopCutScene();
 // The player wants to fire.
 exec function Fire( optional float F )
 {
+	if ( Region.Zone.bNeutralZone )
+		return;
+	
 	bJustFired = true;
 	if( bShowMenu || (Level.Pauser!="") || (Role < ROLE_Authority) )
 	{
@@ -3347,16 +3350,15 @@ event PostBeginPlay()
 
 	if (Level.LevelEnterText != "" )
 		ClientMessage(Level.LevelEnterText);
-	if ( Level.NetMode != NM_Client )
-	{
+
 		HUDType = Level.Game.HUDType;
 		ScoringType = Level.Game.ScoreboardType;
 		MyAutoAim = FMax(MyAutoAim, Level.Game.AutoAim);
-	}
+	
 	bIsPlayer = true;
 	DesiredFOV = DefaultFOV;
 	EyeHeight = BaseEyeHeight;
-	if ( Level.Game.IsA('SinglePlayerInfo') && (Level.NetMode == NM_Standalone) )
+	if ( Level.Game.IsA('SinglePlayer') && (Level.NetMode == NM_Standalone) )
 		FlashScale = vect(0,0,0);
 
 	// set up the actuator (PSX2)
