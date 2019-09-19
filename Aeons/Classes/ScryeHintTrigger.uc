@@ -39,8 +39,13 @@ function Timer()
 function UnTouch(Actor Other)
 {
 	if ( Other.IsA('AeonsPlayer') )
+	{
 		if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 			GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = false;
+			
+		if ( AeonsPlayer(Other).ScryeMod.bActive )
+			AeonsPlayer(Other).bShowScryeHint = false;
+	}
 }
 
 function Touch( actor Other )
@@ -57,6 +62,12 @@ function Touch( actor Other )
 	{
 		if ( Other.IsA('AeonsPlayer') )
 		{
+			if ( AeonsPlayer(Other).bShowScryeHint )
+				AeonsPlayer(Other).ScreenMessage("Use Scrye to reveal the past when you hear whispering", 5.0);
+			
+			if ( AeonsPlayer(Other).ScryeMod.bActive )
+				AeonsPlayer(Other).bShowScryeHint = false;
+		
 			NumTimesTriggered ++;
 
 			if ( bDisableAfterPlayerScrye && AeonsPlayer(Other).ScryeMod.bActive ){
@@ -107,7 +118,7 @@ defaultproperties
      ScryeHintSounds(0)=Sound'Shell_HUD.HUD.Scrye_Look'
      ScryeHintSounds(1)=Sound'Shell_HUD.HUD.Scrye_LookAround'
      ScryeHintSounds(2)=Sound'Shell_HUD.HUD.Scrye_Scrye'
-     ScryeHintSounds(3)=Sound'Shell_HUD.HUD.Scrye_Look'
+     ScryeHintSounds(3)=Sound'Shell_HUD.HUD.Scrye_ScryeNow'
      ScryeHintSounds(4)=Sound'Shell_HUD.HUD.Scrye_See'
      bDisableAfterPlayerScrye=True
      Vol1=0.33

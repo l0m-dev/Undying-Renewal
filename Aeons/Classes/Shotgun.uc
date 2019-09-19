@@ -405,8 +405,11 @@ state NewClip
 
 			if ( AeonsPlayer(Owner).bWeaponSound )
 				AeonsPlayer(Owner).MakePlayerNoise(0.5, 640);
-
-			sndID = PlaySound(LoadShellSound);
+			
+			if ( bAltAmmo )
+				sndID = PlaySound(LoadAltShellSound);
+			else
+				sndID = PlaySound(LoadShellSound);
 
 			sleep(0.5 * (1/RefireMult));
 			//FinishSound(sndID);

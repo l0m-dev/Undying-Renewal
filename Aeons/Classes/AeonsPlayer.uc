@@ -411,6 +411,8 @@ var wind wind;
 var travel byte			Objectives[100];
 var localized string	ObjectivesText[100];
 
+var savable travel bool bShowScryeHint;
+
 replication
 {
 	// Variables the server should send to the client.
@@ -425,7 +427,7 @@ replication
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
-		ClientPlayTakeHit, bRenderWeapon;
+		ClientPlayTakeHit, bRenderWeapon, bShowScryeHint;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
@@ -451,6 +453,8 @@ event PreBeginPlay()
 	// bDrawInvList = true;		// Draw the inventory list
 	
 	bRenderWeapon = true;
+	
+	bShowScryeHint = true;
 
 	wind = spawn(class 'PlayerWind',self,,Location);
 	wind.setBase(self);
@@ -525,10 +529,10 @@ function PlayerTick( float DeltaTime )
 	}
 }
 
-function ScreenMessage(string Message, float HoldTime)
+function ScreenMessage(string Message, float HoldTime, optional bool bFromServer)
 {
 	if (OSMMod != none)
-		OSMMod.NewMessage(Message, HoldTime);
+		OSMMod.NewMessage(Message, HoldTime, bFromServer);
 }
 
 simulated event RenderOverlays( canvas Canvas )

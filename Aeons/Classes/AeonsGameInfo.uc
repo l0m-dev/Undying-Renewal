@@ -58,7 +58,7 @@ function ServerSay (string Msg) {
 
 	ForEach AllActors (class 'Patrick', P)
 	{
-		P.ScreenMessage(Msg, 3.0);
+		P.ScreenMessage(Msg, 3.0, True);
 	}
 }
 

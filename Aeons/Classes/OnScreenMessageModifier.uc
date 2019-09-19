@@ -4,14 +4,14 @@
 class OnScreenMessageModifier expands PlayerModifier;
 
 var string DisplayedMessage;
-var bool ServerMessage;
+var bool bServerMessage;
 
-function NewMessage(string Message, float HoldTime, optional bool FromServer)
+function NewMessage(string Message, float HoldTime, optional bool bFromServer)
 {
 	DisplayedMessage = Message;
 	SetTimer(HoldTime, false);
 	
-	ServerMessage = FromServer;
+	bServerMessage = bFromServer;
 }
 
 function Timer()
@@ -29,8 +29,10 @@ simulated event RenderOverlays( canvas Canvas )
 	local float x, y;
 
 	if (DisplayedMessage != "")
-	{
-		if (ServerMessage)
+	{	
+		Canvas.Font = Canvas.MedFont;
+		Canvas.TextSize( DisplayedMessage, x, y );
+		if ( bServerMessage )
 		{
 			Canvas.DrawColor.R = 125;
 			Canvas.DrawColor.G = 255;
@@ -42,9 +44,6 @@ simulated event RenderOverlays( canvas Canvas )
 			Canvas.DrawColor.B = 255;
 			Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.75 );
 		}
-		
-		Canvas.Font = Canvas.MedFont;
-		Canvas.TextSize( DisplayedMessage, x, y );
 		Canvas.DrawText( DisplayedMessage, false );
 	}
 }
