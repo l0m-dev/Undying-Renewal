@@ -47,6 +47,7 @@ function PreBeginPlay()
 	
 	// bBloodyFootprints = true;
 	
+	/*
 	EnableLog('Spell');
 	EnableLog('Weapon');
 	EnableLog('Trigger');
@@ -62,11 +63,12 @@ function PreBeginPlay()
 	EnableLog('GameState');
 	EnableLog('GameEvents');
 	EnableLog('Pickups');
+	*/
 	
 	ClientAdjustGlow( 0.0, vect(1,0,0) );
 }
-
-function PostBeginPlay()
+	
+simulated function PostBeginPlay()
 {
 	Super.PostBeginPlay();
 	ServerReStartPlayer();
@@ -74,6 +76,8 @@ function PostBeginPlay()
 	if (Player != None)
 		WindowConsole(Player.Console).bShellPauses = false;
 	Level.bDontAllowSavegame = false;
+	
+	ReplicateAnimations();
 }
 
 function bool IsAlert()
@@ -381,8 +385,6 @@ function C_TurnStepRight()
 {
 }
 
-
-
 state Dying
 {
 	ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneChange, ZoneChange, SwitchWeapon, Falling, PainTimer, FireAttSpell, FireDefSpell, QuickSave; //SaveGameToMemoryCard, SaveGame;;
@@ -394,13 +396,10 @@ state Dying
 			return;
 		if( Level.Game.RestartPlayer(self) )
 		{
-			//ServerTimeStamp = 0;
-			//TimeMargin = 0;
+			ServerTimeStamp = 0;
+			TimeMargin = 0;
 			Enemy = None;
 			Level.Game.StartPlayer(self);
-			if ( Mesh != None )
-				PlayLocomotion( vect(0,0,0) );	//PlayWaiting();
-			ClientReStart();
 		}
 		else
 			log("Restartplayer failed");
@@ -419,19 +418,10 @@ state Dying
 
 	exec function Fire( optional float F )
 	{
-		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
+		if ( (Level.NetMode == NM_Standalone) || (Level.Game.IsA('Coop') && !Coop(Level.Game).bForceRespawn) )
 		{
-			//E3 hack.. should go back to shell, to load menu? 
-			ServerRestartPlayer();
-				return;
-
-			if ( bFrozen )
-				return;
-
-			ShowLoadMenu();
-		}
-		else if ( !bFrozen )
 			ServerReStartPlayer();
+		}
 	}
 
 	
@@ -644,7 +634,7 @@ state Dying
 		}
 		
 		//if singleplayer
-		if (!Level.Game.IsA('DeathMatchGame') && !Level.Game.IsA('Coop')) {
+		if (Level.NetMode == NM_Standalone) {
 			ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
 			bHidden = true;
 		} else {
@@ -658,7 +648,7 @@ state Dying
 		bPressedJump = false;
 		bJustFired = false;
 		// FindGoodView();
-		if ( (Role == ROLE_Authority) && !bHidden )
+		if ( (Role == ROLE_Authority) && bHidden )
 			Super.Timer(); 
 		SetTimer(1.0, false);
 	}
@@ -814,18 +804,7 @@ state FallingDeath expands Dying
 
 	function EndSpecialKill()
 	{
-		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
-		{
-			//E3 hack.. should go back to shell, to load menu? 
-			ServerRestartPlayer();
-				return;
-
-			if ( bFrozen )
-				return;
-			ShowLoadMenu();
-		}
-		else if ( !bFrozen || (FRand() < 0.2) )
-			ServerReStartPlayer();
+		ServerRestartPlayer();
 	}
 	
 	function PressedEnter()
@@ -942,7 +921,7 @@ state FadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1.0,vect(0,0,0));
-		sleep(2);
+		sleep(4);
 		SetPhysics(PHYS_None);
 		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
@@ -990,7 +969,7 @@ state InstantFadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1000.0,vect(0,0,0));
-		sleep(0);
+		sleep(1);
 		SetPhysics(PHYS_None);
 		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
@@ -1025,7 +1004,24 @@ exec function SetLocTag(name NewTag)
 	}
 }
 
+simulated function ReplicateAnimations()
+{	
+	if ( Role == ROLE_Authority || Level.NetMode == NM_DedicatedServer )
+		return;
+	
+	SetTimer( 1.0/60, true );
+}
 
+simulated function Timer()
+{
+	local Actor A;
+	
+	ForEach AllActors(class 'Actor', A)
+	{
+		A.bClientAnim = true;
+		A.PlayAnim(A.AnimSequence);
+	}
+}
 
 /*
 exec function CS()
@@ -1300,10 +1296,10 @@ defaultproperties
      bRunMode=True
      BaseEyeHeight=55
      FootSoundClass=Class'Aeons.DefaultFootSoundSet'
+     bClientAnim=True
      Physics=PHYS_Walking
      LODBias=5
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
-	 bClientAnim=True
 }

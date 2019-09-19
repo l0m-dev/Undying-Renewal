@@ -3,14 +3,11 @@
 //=============================================================================
 class HealthVial expands Health;
 
-var Health H;
-
 function PreBeginPlay()
 {
 	Super.PreBeginPlay();
-	H = Spawn(class 'Health',,,Location);
-	H.BecomeHealthVial();
-	Destroy();
+	
+	BecomeHealthVial();
 }
 
 defaultproperties

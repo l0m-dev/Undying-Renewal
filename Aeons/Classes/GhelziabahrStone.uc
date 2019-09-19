@@ -63,6 +63,14 @@ function PlayHoundAnim()
 
 state HoundAnim
 {
+	function bool PutDown()
+	{
+		LogStack();
+		GotoState('DownWeapon');
+		
+		return True;
+	}
+	
 	Begin:
 		Owner.PlaySound(SpawnHoundSound);
 		PlayAnim('Hound',RefireMult);

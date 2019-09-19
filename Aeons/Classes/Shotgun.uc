@@ -448,7 +448,7 @@ state Idle
 		goto 'Begin';
 
 	Begin:
-		if ( Pawn(Owner).bFire != 0 )
+		if ( Pawn(Owner).bFire != 0 && !Region.Zone.bNeutralZone )
 			Global.Fire(0);
 		enable('Tick');
 		setTimer(8 + FRand()*5,true);

@@ -13,7 +13,6 @@ var() int HealingAmount;
 var AeonsPlayer AP;
 var bool bHealthVial;
 var bool bHealingRoot;
-var float inc;
 var vector InitialLocation;
 var ParticleFX pfx;
 
@@ -71,10 +70,6 @@ function Tick(float DeltaTime)
 			r.yaw += (4096 * deltaTime);
 
 			SetRotation(r);
-
-			inc += DeltaTime;
-			
-			PrePivot.z = cos(inc) * 4;
 		}
 	}
 }

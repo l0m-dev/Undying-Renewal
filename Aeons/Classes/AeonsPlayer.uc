@@ -421,10 +421,7 @@ replication
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, AddAll;
-
-	reliable if ( Role==ROLE_Authority )
-		SendClientFire, RealWeapon;
+		bDoubleShotgun, AddAll, bDrawInvList;
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
@@ -940,7 +937,7 @@ exec function FireAttSpell( optional float F )
 	Log("");
 	Log("AeonsPlayer: FireAttSpell");
 */
-	if ( bShowMenu || (Level.Pauser!="") || (AttSpell == None) )
+	if ( bShowMenu || (Level.Pauser!="") || (AttSpell == None) || Region.Zone.bNeutralZone )
 		return;
 	
 	//Log("AeonsPlayer: FireAttSpell: AttSpell is valid");
@@ -982,7 +979,7 @@ exec function FireAttSpell( optional float F )
 // The player wants to fire a defense spell
 exec function FireDefSpell( optional float F ) 
 {
-	if ( bShowMenu || (Level.Pauser!="") || (DefSpell == None) )
+	if ( bShowMenu || (Level.Pauser!="") || (DefSpell == None) || Region.Zone.bNeutralZone )
 		return;
 
 	//bJustFiredDefSpell = true;
@@ -2991,8 +2988,9 @@ state PlayerCutScene
 		bSelectWeapon = 0;
 		bSelectAttSpell = 0;
 		bSelectDefSpell = 0;
-
-		WindowConsole(Player.Console).bShellPauses = true;
+	
+		if ( Player != None && Player.Console != None )
+			WindowConsole(Player.Console).bShellPauses = true;
 		Level.bDontAllowSavegame = true;
 		NoDetect(true);
 	}
@@ -3002,13 +3000,16 @@ state PlayerCutScene
 		log("PlayerCutscene BeginState() ... "$Level.TimeSeconds, 'Misc');
 		NoDetect(false);
 		UnLock();
-		WindowConsole(Player.Console).bShellPauses = false;
+		if ( Player != None && Player.Console != None )
+			WindowConsole(Player.Console).bShellPauses = false;
 		Level.bDontAllowSavegame = false;
 		bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
-		Weapon.GotoState('Idle');
-		AttSpell.GotoState('Idle');
+		if ( Weapon != None )
+			Weapon.GotoState('Idle');
+		if ( AttSpell != None )
+			AttSpell.GotoState('Idle');
 	}
 
 	exec function StopCutScene()

@@ -479,7 +479,13 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-
+	
+	if ( Level.NetMode == NM_DedicatedServer )
+	{
+		FadeOutDelay = 0.01;
+		FadeOutTime = 0.01;
+	}
+	
 	// Check and initialize team.
 	if ( TeamTag != '' )
 		InitializeTeam();
