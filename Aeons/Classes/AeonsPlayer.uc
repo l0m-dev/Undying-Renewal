@@ -423,11 +423,11 @@ replication
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, AddAll, bDrawInvList;
+		bDoubleShotgun, AddAll, bDrawInvList, bShowScryeHint;
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
-		ClientPlayTakeHit, bRenderWeapon, bShowScryeHint;
+		ClientPlayTakeHit, bRenderWeapon;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
@@ -7662,4 +7662,5 @@ defaultproperties
      Sprite=Texture'Engine.S_Pawn'
      CollisionRadius=32
      CollisionHeight=64
+	 bShowScryeHint=True
 }

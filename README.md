@@ -1,5 +1,5 @@
 # Clive Barker's Undying - Renewal
-The goal for this mod is to finish multiplayer and to balance the game.
+The goal for this mod is to finish multiplayer, add cut features and to balance the game.
 
 Demo video: <https://youtu.be/5VtpuGM3oHI>
 
@@ -28,3 +28,8 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Buffed flickerting stalkers (small floating heads)
   - Increased Monto speed (big blue floating things)
   - Improved molotov
+  - Correct HUD scaling at all resolutions
+  - Yellow Revolver icon from the BETA
+  - Added unused Scrye and Shotgun sounds
+  - Increased crosshair range
+  - Added a scrye hint feature
