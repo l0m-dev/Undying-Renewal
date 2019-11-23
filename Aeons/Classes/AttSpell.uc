@@ -158,6 +158,8 @@ function FireAttSpell( float Value )
 	local int cost;
 
 	// LogTime("AttSpell: FireAttSpell");
+	if ( Self.IsA('Pyro') && AeonsPlayer(Owner).Weapon.ItemName == "Molotov" )
+		return;
 
 	if ( !bFiring )
 	{

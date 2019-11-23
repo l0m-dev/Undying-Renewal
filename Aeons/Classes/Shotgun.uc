@@ -3,20 +3,6 @@
 //=============================================================================
 class Shotgun expands AeonsWeapon;
 
-// 1st person player view mesh
-#exec MESH IMPORT MESH=Shotgun1st_m SKELFILE=Shotgun1st\Shotgun1st_m.ngf MOVERELATIVE=0
-#exec MESH ORIGIN MESH=Shotgun1st_m YAW=64
-
-// Notifys
-#exec MESH NOTIFY SEQ=Fire TIME=0.01 FUNCTION=FireWeapon
-#exec MESH NOTIFY SEQ=ReloadStart TIME=0.371 FUNCTION=PlayOpenSound
-#exec MESH NOTIFY SEQ=ReloadEnd TIME=0.333 FUNCTION=PlayCloseSound
-
-// 3rd person player view mesh
-#exec MESH IMPORT MESH=Shotgun3rd_m SKELFILE=Shotgun3rd\Shotgun3rd.ngf
-
-// =============================================================================
-
 var int  click;
 var int		sndID;
 var bool bChangeToFire;
@@ -120,6 +106,7 @@ simulated function PlayFiring()
 {
 	log("PlayFiring Called within the Shotgun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+	Patrick(Owner).DetachJoint();
 //new	if ( Role == ROLE_Authority )
 //		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	

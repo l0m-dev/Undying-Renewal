@@ -3,26 +3,6 @@
 //=============================================================================
 class GhelziabahrStone expands AeonsWeapon;
 
-//-----------------------------------------------------------------------------
-// 1st Person View Mesh
-#exec MESH IMPORT MESH=GhelziabahrStone1st_m SKELFILE=GhelziabahrStone1st\GhelziabahrStone1st.ngf MOVERELATIVE=0
-#exec MESH ORIGIN MESH=GhelziabahrStone1st_m YAW=64
-
-//-----------------------------------------------------------------------------
-// Sounds
-#exec AUDIO IMPORT FILE="E_Wpn_GhelFire01.wav" NAME="E_Wpn_GhelFire01" GROUP="Weapons"
-
-//-----------------------------------------------------------------------------
-
-// Notifys
-#exec MESH NOTIFY SEQ=Fire TIME=0.100 FUNCTION=FireWeapon
-
-#exec MESH IMPORT MESH=GhelzStonePickup_m SKELFILE=GhelziabahrStone3rd\GhelzStone.ngf
-
-#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
-
-//-----------------------------------------------------------------------------
-
 var savable travel float useMeter;		// Use Meter for the ghelzibahar Stone
 var int chargeCount;
 var int Damage;

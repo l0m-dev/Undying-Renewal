@@ -165,24 +165,35 @@ exec function MakeWet(bool bWet)
 }
 */
 
-exec function DetachJoint()
+exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 {
-	local vector start, end, eyeOffset, HitLocation, HitNormal;
+	local vector start, end, eyeOffset, HitLocation, HitNormal, x, y, z;
 	local int HitJoint;
 	local Actor A, B;
-	
+
 	eyeOffset.z = eyeHeight;
-	
+
+	if (Distance == 0)
+		Distance = 65536;
+
 	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
-	end = start + (Vector(ViewRotation) * 65536);
-	
+	end = start + (Vector(ViewRotation) * Distance);
+
 	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
 
-	if ( A != none )
+	GetAxes(ViewRotation, x, y, z);
+
+	if ( A != none && Pawn(A).Health <= 0 )
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
-		B.Velocity = vect(0,0,456);
+		B.Velocity = (y + vect(0,0,0.25)) * 256;
 		B.DesiredRotation = RotRand();
+		B.bBounce = true;
+		B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+
+		Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Normal(B.Velocity));
+		if (PawnImpactSound != None)
+			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
 	}
 }
 

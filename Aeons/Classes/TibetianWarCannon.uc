@@ -3,11 +3,6 @@
 //=============================================================================
 class TibetianWarCannon expands AeonsWeapon;
 
-#exec MESH IMPORT MESH=TibetianWarCannon1st_m SKELFILE=TibetianWarCannon1st\TibetianWarCannon1st.ngf MOVERELATIVE=0
-#exec MESH ORIGIN MESH=TibetianWarCannon1st_m YAW=128
-
-#exec MESH IMPORT MESH=Cannon3rd_m SKELFILE=TibetianWarCannon3rd\CannonPat.ngf MOVERELATIVE=0
-
 // User vars
 var() 	float 		PawnSpeedMultiplier[5];
 var() 	float 		ProjectileSpeedMultiplier[5];

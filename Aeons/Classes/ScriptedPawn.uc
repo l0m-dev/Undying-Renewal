@@ -1296,7 +1296,7 @@ function TakeDamage( pawn Instigator, vector HitLocation, vector Momentum, Damag
 		 ( DInfo.Damage < ( InitHealth * DamageAcknowledge ) ) ||
 		 HandleSpecialDamage( Instigator, HitLocation, Momentum, DInfo ) )
 		return;
-
+	
 //	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " from " $ Instigator.name $ " at joint " $ DInfo.JointName );
 	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " at joint " $ DInfo.JointName );
 	super.TakeDamage( Instigator, HitLocation, Momentum, DInfo );
@@ -1704,6 +1704,9 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
+		
+	if (damageType == 'pellet' || damageType == 'Fire')
+		Patrick(Killer).DetachJoint();
 
 	// Remove all non-persistent effectors.
 	KillEffectorList();
@@ -12833,7 +12836,7 @@ defaultproperties
      ConcussiveScalar=1
      FallDamageScalar=0.5
      ReactToDamageThreshold=4
-     FadeOutDelay=9.5
+     FadeOutDelay=100
      FadeOutTime=5
      DrawScaleVariance=0.05
      DiffuseColorVariance=100
