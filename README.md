@@ -18,7 +18,7 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Speargun reloads and shoots faster
   - Reduced ammo and max ammo for the revolver and the shotgun
   - Increased lightning spell projectile speed and range
-  - Added command "skip" to skip cutscenes (experimental)
+  - Made some cutscenes skippable
   - Nerfed shield health
   - Nerfed haste
   - Added a nice animation for deploying the stone
@@ -33,3 +33,5 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Added unused Scrye and Shotgun sounds
   - Increased crosshair range
   - Added a scrye hint feature
+  - Increased the time dead bodies stay on the ground
+  - New gibs system!
