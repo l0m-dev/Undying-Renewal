@@ -1,26 +1,35 @@
 //=============================================================================
-// PhoenixExplosion0.
+// PhoenixExplosion4.
 //=============================================================================
-class PhoenixExplosion0 expands PhoenixExplosions;
+class PhoenixExplosion4 expands PhoenixExplosions;
+
+// notes:
+// add molotov effect explosion here and higher amplitudes.
+
 
 function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
-	HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo() );
+
+	// Damage
+	if (bCausesDamage)
+		HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo(DamageType) );
+
+	// Visual Effects
 	spawn (class 'HotExplosionFX'    ,,,Location);
 	spawn (class 'SmokyExplosionFX'  ,,,Location);
-	spawn (class 'ParticleExplosion' ,,,Location);
-	if (!bTriggered)
-		Destroy();
-	else if (!bTriggerMultiple)
-		Destroy();
 
+	// Wind
+	Spawn(class 'ExplosionWind',,,Location);
+
+	// Sound
+	PlayEffectSound();
 }
 
 defaultproperties
 {
      DamageRadius=512
-     Damage=100
+     Damage=250
      MomentumTransfer=500
      Sounds(0)=Sound'Aeons.Weapons.E_Wpn_DynaExpl01'
      Sounds(1)=Sound'Aeons.Weapons.E_Wpn_DynaExpl02'

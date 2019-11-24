@@ -119,32 +119,7 @@ simulated function Destroyed()
 			break;
 		
 		case 'Release':
-			switch ( CastingLevel )
-			{
-				case 0:
-					spawn(class 'PhoenixExplosion0', Owner,,Location);
-					break;
-		
-				case 1:
-					spawn(class 'PhoenixExplosion1', Owner,,Location);
-					break;
-		
-				case 2:
-					spawn(class 'PhoenixExplosion2', Owner,,Location);
-					break;
-		
-				case 3:
-					spawn(class 'PhoenixExplosion3', Owner,,Location);
-					break;
-		
-				case 4:
-					spawn(class 'PhoenixExplosion4', Owner,,Location);
-					break;
-			
-				case 5:
-					spawn(class 'PhoenixExplosion5', Owner,,Location);
-					break;
-			}	
+			spawn(class 'PhoenixExplosion', Owner,,Location);
 			break;
 	}
 	
@@ -663,7 +638,9 @@ state Release
 		DInfo = getDamageInfo();
 		DInfo.Damage = AltDamagePerLevel[castingLevel];
 		
-		HurtRadius(384, 'exploded', MomentumTransfer, Location, DInfo);
+		HurtRadius(384, MyDamageType, MomentumTransfer, Location, DInfo);
+		GibRadius(384, Location, DInfo);
+
 		MakeNoise(5.0, 2580);
 		spawn (class 'DefaultParticleExplosionFX',,,Location);
 

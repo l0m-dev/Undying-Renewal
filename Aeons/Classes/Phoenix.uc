@@ -110,7 +110,7 @@ function FireWeapon()
 	PlayFiring();
 	GuidedShell = Phoenix_Proj(ProjectileFire(class 'Phoenix_Proj', ProjectileSpeed, bWarnTarget, true));
 	GuidedShell.SetOwner(Owner);
-	GuidedShell.CastingLevel = 5;
+	GuidedShell.CastingLevel = 3;
 	PlayerPawn(Owner).ViewTarget = GuidedShell;
 	GuidedShell.Guider = PlayerPawn(Owner);
 	ClientAltFire(0);
