@@ -320,7 +320,6 @@ var() config class<VoicePack> VoiceType;
 
 var float CrossHairOffsetX, CrossHairOffsetY, crossHairScale;	// offsets for the crosshair
 var bool bDrawCrosshair;
-var bool bForceSkip;
 
 // book item
 var savable travel BookJournalBase Book;
@@ -3033,7 +3032,7 @@ state PlayerCutScene
 			GotoState('Dying');
 			return;
 		}
-		if ( MasterCamPoint == none && !bForceSkip)
+		if ( MasterCamPoint == none )
 		{
 			GotoState('PlayerWalking');
 			return;
@@ -3053,7 +3052,7 @@ state PlayerCutScene
 
 	exec function Fire( optional float F )
 	{
-		if ( (MasterCamPoint != none && MasterCamPoint.bEscapable) /*|| bForceSkip == true*/)
+		if ( MasterCamPoint != none && (MasterCamPoint.bEscapable || MasterCamPoint.URL != "") )
 		{
 			log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
 			MasterCamPoint.CompleteCutscene(self);
