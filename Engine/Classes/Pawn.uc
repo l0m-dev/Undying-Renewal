@@ -615,11 +615,17 @@ function PlayEffectAtJoint(name JointName, name JointType)
 					break;
 			}
 		} else {
-			PlayFootSound( 3, HitTexture, 0, HitLocation, VolumeMultiplier );
+			if ( !IsA('PlayerPawn') || (IsA('PlayerPawn') && !bIsWalking) )
+				PlayFootSound( 3, HitTexture, 0, HitLocation, VolumeMultiplier );
 		}
 		
 		if ( IsA('PlayerPawn') )
-			MakeNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
+		{
+			if (bIsWalking)
+				MakeNoise(0.5 * VolumeMultiplier, (0.5 * 1280) * VolumeMultiplier);
+			else
+				MakeNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
+		}
 		
 		Dust(HitLocation, HitNormal, HitTexture, 0.65);
 

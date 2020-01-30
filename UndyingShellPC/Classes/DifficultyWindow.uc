@@ -201,7 +201,7 @@ function StartGame( int Difficulty )
 
 	Root.Console.CloseUWindow();
 	
-	GetPlayerOwner().ConsoleCommand("deletesavelevels");
+	//GetPlayerOwner().ConsoleCommand("deletesavelevels");
 	GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
 
 	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;
