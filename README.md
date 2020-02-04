@@ -35,3 +35,5 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Added a scrye hint feature
   - Increased the time dead bodies stay on the ground
   - New gibs system!
+  - Saves are no longer deleted on new game
+  - Walking and crouching makes no noise
