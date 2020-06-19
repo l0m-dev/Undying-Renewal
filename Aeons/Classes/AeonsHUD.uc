@@ -905,9 +905,10 @@ simulated function PostRender( canvas Canvas )
 				}
 			}
 			
-			if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) )
+			if ( (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) )
 			{
-				PlayerOwner.Weapon.PostRender(Canvas);
+				if ( !PlayerOwner.bBehindView )
+					PlayerOwner.Weapon.PostRender(Canvas);
 				if ( !PlayerOwner.Weapon.bOwnsCrossHair && !AeonsPlayer(PlayerOwner).bSelectObject )
 					DrawCrossHair(Canvas, (0.5 * Canvas.ClipX) + AeonsPlayer(Owner).crossHairOffsetX, (0.5 * Canvas.ClipY) + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
 			}

@@ -25,7 +25,7 @@ struct ImpactSoundParams
 };
 
 // General flags.
-var bool		bBehindView;    // Outside-the-player view.
+var savable travel bool bBehindView;    // Outside-the-player view.
 var bool        bIsPlayer;      // Pawn is a player or a player-bot.
 var bool		bJustLanded;	// used by eyeheight adjustment
 var bool		bUpAndOut;		// used by swimming 
@@ -151,8 +151,8 @@ var travel Weapon       Weapon;        // The pawn's current weapon.
 var Weapon				PendingWeapon;	// Will become weapon once current weapon is put down
 var travel Inventory	SelectedItem;	// currently selected inventory item
 
-var bool 				bAcceptDamage;		// accept conventional attack damage
-var bool 				bAcceptMagicDamage; // accept magical attack damage
+var savable travel bool bAcceptDamage;		// accept conventional attack damage
+var savable travel bool bAcceptMagicDamage; // accept magical attack damage
 var bool				bWetFeet;			// My feet are wet
 
 var savable travel Spell AttSpell; //currently selected attack spell
@@ -1121,7 +1121,12 @@ event FellOutOfWorld()
 	Died(None, 'Fell', Location, DInfo);
 }
 
-function PlayRecoil(float Rate);
+function PlayRecoil(float Rate) {
+	if (self.IsA('PlayerPawn'))
+	{
+		PlayAnim('StillSmFr', Rate);//StillFRRP
+	}
+}
 
 function SpecialFire();
 

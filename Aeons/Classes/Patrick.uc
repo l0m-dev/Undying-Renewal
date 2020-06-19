@@ -183,7 +183,7 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 
 	GetAxes(ViewRotation, x, y, z);
 
-	if ( A != none && Pawn(A).Health <= 0 )
+	if ( A != none && A.IsA('ScriptedPawn') && Pawn(A).Health <= 0 )
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
 		B.Velocity = (y + vect(0,0,0.25)) * 256;
@@ -1313,4 +1313,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
+     AirControl=0.8
 }

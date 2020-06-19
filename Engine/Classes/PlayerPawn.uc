@@ -3583,7 +3583,10 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 	CameraLocation = Location;
 
 	if( bBehindView ) //up and behind
-		CalcBehindView(CameraLocation, CameraRotation, CollisionHeight * 2.5);
+	{
+		CameraLocation.Z += EyeHeight;
+		CalcBehindView(CameraLocation, CameraRotation, CollisionHeight * 5.0);
+	}
 	else
 	{
 		// First-person view.
