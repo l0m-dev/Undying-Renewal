@@ -3,7 +3,7 @@ The goal for this mod is to finish multiplayer, add cut features and to balance 
 
 Demo video: <https://youtu.be/5VtpuGM3oHI>
 
-# Game Changes
+## Game Changes
   - Health can overcharge over 100, will drain slowly
   - Maximum health pickups - 5/10/15 - depending on the difficulty
   - Howlers attack faster after a missed attack
@@ -37,3 +37,16 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - New gibs system!
   - Saves are no longer deleted on new game
   - Walking and crouching makes no noise
+
+## Building
+  - Create a folder called UndyingScripts on the C: drive.
+  - Download and extract all the files from this repository in that folder.
+  - Move all files files from the 'unused' folders to the 'Classes' folder, one directory back.
+  - Open System.ini from the game's 'System' folder and change `SourceDir=\DWIUnreal` to `SourceDir=C:\UndyingScripts`
+  - Edit System.ini with packages you want to build. If you get an error you might need to add other packages that are also required for that specific package. E.g.
+    ```
+    EditPackages=Engine
+    EditPackages=Aeons
+    ```
+  - In the 'System' folder of the game type 'cmd' in the file path bar.
+  - Type `ucc make` in the command prompt that opens.
