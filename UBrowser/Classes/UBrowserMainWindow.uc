@@ -33,10 +33,11 @@ function Created()
 {
 	bSizable = False;
 	bStatusBar = True;
-
+	bMovable = False;
+	
 	Super.Created();
 
-	MinWinWidth = WinWidth;
+	//MinWinWidth = WinWidth;
 
 	//SetSizePos();
 	
@@ -59,6 +60,13 @@ function Close(optional bool bByParent)
 		Root.Console.CloseUWindow();
 	else
 		Super.Close(bByParent);
+}
+
+function Resized()
+{
+	Super.Resized();
+	
+	SetSizePos();
 }
 
 function ResolutionChanged(float W, float H)

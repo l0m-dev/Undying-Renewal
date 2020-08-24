@@ -9,7 +9,7 @@ class Projectile extends Visible
 	native
 	transient;
 
-#exec Texture Import File=Textures\S_Camera.pcx Name=S_Camera Mips=On Flags=2
+//#exec Texture Import File=Textures\S_Camera.pcx Name=S_Camera Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Projectile variables.

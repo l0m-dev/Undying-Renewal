@@ -1,41 +1,41 @@
 class UMenuMetalLookAndFeel extends UWindowLookAndFeel;
 
-#exec TEXTURE IMPORT NAME=MetalActiveFrame FILE=Textures\M_ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalInactiveFrame FILE=Textures\M_InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalActiveFrameS FILE=Textures\M_ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalInactiveFrameS FILE=Textures\M_InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalActiveFrame FILE=Textures\M_ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalInactiveFrame FILE=Textures\M_InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalActiveFrameS FILE=Textures\M_ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalInactiveFrameS FILE=Textures\M_InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalMisc FILE=Textures\M_Misc.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalButton FILE=Textures\M_SmallButton.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMisc FILE=Textures\M_Misc.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalButton FILE=Textures\M_SmallButton.pcx GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalMenuArea FILE=Textures\M_MenuArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalClientArea FILE=Textures\M_ClientArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuTL FILE=Textures\M_MenuTL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuT FILE=Textures\M_MenuT.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuTR FILE=Textures\M_MenuTR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuL FILE=Textures\M_MenuL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuR FILE=Textures\M_MenuR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuBL FILE=Textures\M_MenuBL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuB FILE=Textures\M_MenuB.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuBR FILE=Textures\M_MenuBR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHL FILE=Textures\M_MenuHL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHM FILE=Textures\M_MenuHM.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHR FILE=Textures\M_MenuHR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuLine FILE=Textures\M_MenuLine.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuArea FILE=Textures\M_MenuArea.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalClientArea FILE=Textures\M_ClientArea.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuTL FILE=Textures\M_MenuTL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuT FILE=Textures\M_MenuT.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuTR FILE=Textures\M_MenuTR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuL FILE=Textures\M_MenuL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuR FILE=Textures\M_MenuR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuBL FILE=Textures\M_MenuBL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuB FILE=Textures\M_MenuB.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuBR FILE=Textures\M_MenuBR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuHL FILE=Textures\M_MenuHL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuHM FILE=Textures\M_MenuHM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuHR FILE=Textures\M_MenuHR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalMenuLine FILE=Textures\M_MenuLine.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalBarL FILE=Textures\M_BarL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarTile FILE=Textures\M_BarTile.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarMax FILE=Textures\M_BarMax.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarWin FILE=Textures\M_BarWin.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarL FILE=Textures\M_BarL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarTile FILE=Textures\M_BarTile.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarMax FILE=Textures\M_BarMax.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarWin FILE=Textures\M_BarWin.bmp GROUP="Icons" MIPS=OFF
 
 
-#exec TEXTURE IMPORT NAME=MetalBarInL FILE=Textures\M_BarInL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarInR FILE=Textures\M_BarInR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarInM FILE=Textures\M_BarInM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarInL FILE=Textures\M_BarInL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarInR FILE=Textures\M_BarInR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarInM FILE=Textures\M_BarInM.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalBarOutL FILE=Textures\M_BarOutL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarOutR FILE=Textures\M_BarOutR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarOutM FILE=Textures\M_BarOutM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarOutL FILE=Textures\M_BarOutL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarOutR FILE=Textures\M_BarOutR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalBarOutM FILE=Textures\M_BarOutM.bmp GROUP="Icons" MIPS=OFF
 
 var() Region	SBUpUp;
 var() Region	SBUpDown;

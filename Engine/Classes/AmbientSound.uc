@@ -5,7 +5,7 @@
 class AmbientSound extends Keypoint;
 
 // Import the sprite.
-#exec Texture Import File=Textures\Ambient.pcx Name=S_Ambient Mips=On Flags=2
+//#exec Texture Import File=Textures\Ambient.pcx Name=S_Ambient Mips=On Flags=2
 
 var Sound StoredSound;
 var() bool bInitiallyOn;

@@ -3,7 +3,7 @@
 //=============================================================================
 class UWindowClientWindow extends UWindowWindow;
 
-#exec TEXTURE IMPORT NAME=Background FILE=Textures\Background.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=Background FILE=Textures\Background.pcx GROUP="Icons" MIPS=OFF
 
 
 function Close(optional bool bByParent)

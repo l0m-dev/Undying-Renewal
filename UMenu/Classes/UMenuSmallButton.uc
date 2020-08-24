@@ -1,8 +1,8 @@
 class UMenuSmallButton extends UWindowButton;
 
-#exec TEXTURE IMPORT NAME=SmallButtonDisabled FILE=Textures\SmallButtonDisabled.pcx GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=SmallButtonDown FILE=Textures\SmallButtonDown.pcx GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=SmallButtonUp FILE=Textures\SmallButtonUp.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=SmallButtonDisabled FILE=Textures\SmallButtonDisabled.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=SmallButtonDown FILE=Textures\SmallButtonDown.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=SmallButtonUp FILE=Textures\SmallButtonUp.pcx GROUP="Icons" MIPS=OFF
 
 function Created()
 {

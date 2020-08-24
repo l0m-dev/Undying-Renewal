@@ -4,7 +4,7 @@
 //=============================================================================
 class SpecialEvent extends Triggers;
 
-#exec Texture Import File=Textures\TrigSpcl.pcx Name=S_SpecialEvent Mips=On Flags=2
+//#exec Texture Import File=Textures\TrigSpcl.pcx Name=S_SpecialEvent Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Variables.

@@ -1,8 +1,8 @@
 class UMenuOKButton extends UWindowButton;
 
-#exec TEXTURE IMPORT NAME=OKDown FILE=Textures\OKDown.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=OKOver FILE=Textures\OKOver.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=OKUp FILE=Textures\OKUp.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=OKDown FILE=Textures\OKDown.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=OKOver FILE=Textures\OKOver.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=OKUp FILE=Textures\OKUp.bmp GROUP="Icons" MIPS=OFF
 
 
 var UWindowWindow	CloseWindow;

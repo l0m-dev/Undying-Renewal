@@ -3,11 +3,11 @@
 //=============================================================================
 class Health expands Items;
 
-#exec MESH IMPORT MESH=health_m SKELFILE=health.ngf
+//#exec MESH IMPORT MESH=health_m SKELFILE=health.ngf
 
 // pickup sound
-#exec AUDIO IMPORT  FILE="I_HealthPU01.wav" NAME="I_HealthPU01" GROUP="Inventory"
-#exec AUDIO IMPORT  FILE="P_Heal_Breath01.WAV" NAME="P_Heal_Breath01" GROUP="Inventory"
+//#exec AUDIO IMPORT  FILE="I_HealthPU01.wav" NAME="I_HealthPU01" GROUP="Inventory"
+//#exec AUDIO IMPORT  FILE="P_Heal_Breath01.WAV" NAME="P_Heal_Breath01" GROUP="Inventory"
 
 var() int HealingAmount;
 var AeonsPlayer AP;

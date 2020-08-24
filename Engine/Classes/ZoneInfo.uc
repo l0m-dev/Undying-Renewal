@@ -9,7 +9,7 @@ class ZoneInfo extends Info
 	native
 	nativereplication;
 
-#exec Texture Import File=Textures\ZoneInfo.pcx Name=S_ZoneInfo Mips=On Flags=2
+//#exec Texture Import File=Textures\ZoneInfo.pcx Name=S_ZoneInfo Mips=On Flags=2
 
 var(ZoneWeather) float WeatherStrength;
 var(ZoneWeather) enum EWeather

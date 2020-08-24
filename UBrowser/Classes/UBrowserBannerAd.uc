@@ -3,7 +3,7 @@
 //=============================================================================
 class UBrowserBannerAd extends UWindowWindow;
 
-#exec TEXTURE IMPORT NAME=BannerAd FILE=Textures\logo3.pcx GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BannerAd FILE=Textures\logo3.pcx GROUP="Icons" FLAGS=2 MIPS=OFF
 
 var string URL;
 

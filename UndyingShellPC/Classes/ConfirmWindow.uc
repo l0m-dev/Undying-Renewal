@@ -3,16 +3,16 @@
 //=============================================================================
 class ConfirmWindow expands ShellWindow;
 
-#exec Texture Import File=Confirm_L.bmp Mips=Off
-#exec Texture Import File=Confirm_R.bmp Mips=Off
+//#exec Texture Import File=Confirm_L.bmp Mips=Off
+//#exec Texture Import File=Confirm_R.bmp Mips=Off
 
-#exec Texture Import File=Confirm_yes_up.bmp Mips=Off
-#exec Texture Import File=Confirm_yes_ov.bmp Mips=Off
-#exec Texture Import File=Confirm_yes_dn.bmp Mips=Off
+//#exec Texture Import File=Confirm_yes_up.bmp Mips=Off
+//#exec Texture Import File=Confirm_yes_ov.bmp Mips=Off
+//#exec Texture Import File=Confirm_yes_dn.bmp Mips=Off
 
-#exec Texture Import File=Confirm_no_up.bmp Mips=Off
-#exec Texture Import File=Confirm_no_ov.bmp Mips=Off
-#exec Texture Import File=Confirm_no_dn.bmp Mips=Off
+//#exec Texture Import File=Confirm_no_up.bmp Mips=Off
+//#exec Texture Import File=Confirm_no_ov.bmp Mips=Off
+//#exec Texture Import File=Confirm_no_dn.bmp Mips=Off
 
 //----------------------------------------------------------------------------
 

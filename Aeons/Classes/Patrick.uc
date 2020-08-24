@@ -3,18 +3,18 @@
 //=============================================================================
 class Patrick expands AeonsSinglePlayer;
 
-#exec MESH IMPORT MESH=BaseBiped_m SKELFILE=..\ScriptedBiped\BaseBiped.ngf
-#exec MESH JOINTNAME Head=Hair Neck=Head
+//#exec MESH IMPORT MESH=BaseBiped_m SKELFILE=..\ScriptedBiped\BaseBiped.ngf
+//#exec MESH JOINTNAME Head=Hair Neck=Head
 
-#exec MESH IMPORT MESH=PlayerBase_m SKELFILE=..\ScriptedBiped\PlayerBase\PlayerBase.ngf INHERIT=BaseBiped_m
-#exec MESH JOINTNAME Head=Hair Neck=Head
+//#exec MESH IMPORT MESH=PlayerBase_m SKELFILE=..\ScriptedBiped\PlayerBase\PlayerBase.ngf INHERIT=BaseBiped_m
+//#exec MESH JOINTNAME Head=Hair Neck=Head
 
-#exec MESH IMPORT MESH=Patrick_m SKELFILE=Patrick.ngf INHERIT=PlayerBase_m
-#exec MESH JOINTNAME Head=Hair Neck=Head 
-#exec MESH MODIFIERS Hair:PatrickHair
-#exec MESH NOTIFY SEQ=scarrow_death TIME=0.890 FUNCTION=TurnOffShadow					//
+//#exec MESH IMPORT MESH=Patrick_m SKELFILE=Patrick.ngf INHERIT=PlayerBase_m
+//#exec MESH JOINTNAME Head=Hair Neck=Head 
+//#exec MESH MODIFIERS Hair:PatrickHair
+//#exec MESH NOTIFY SEQ=scarrow_death TIME=0.890 FUNCTION=TurnOffShadow					//
 
-#exec MESH IMPORT MESH=PatrickHead_m SKELFILE=PatrickHead\PatrickHead.ngf
+//#exec MESH IMPORT MESH=PatrickHead_m SKELFILE=PatrickHead\PatrickHead.ngf
 
 var int i;
 var bool bOnFire;
@@ -1313,5 +1313,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
-     AirControl=0.8
+     AirControl=0.4
 }

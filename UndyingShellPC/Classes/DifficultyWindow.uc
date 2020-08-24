@@ -3,28 +3,28 @@
 //=============================================================================
 class DifficultyWindow expands ShellWindow;
 
-#exec Texture Import File=Difficulty_0.bmp Mips=Off
-#exec Texture Import File=Difficulty_1.bmp Mips=Off
-#exec Texture Import File=Difficulty_2.bmp Mips=Off
-#exec Texture Import File=Difficulty_3.bmp Mips=Off
-#exec Texture Import File=Difficulty_4.bmp Mips=Off
-#exec Texture Import File=Difficulty_5.bmp Mips=Off
+//#exec Texture Import File=Difficulty_0.bmp Mips=Off
+//#exec Texture Import File=Difficulty_1.bmp Mips=Off
+//#exec Texture Import File=Difficulty_2.bmp Mips=Off
+//#exec Texture Import File=Difficulty_3.bmp Mips=Off
+//#exec Texture Import File=Difficulty_4.bmp Mips=Off
+//#exec Texture Import File=Difficulty_5.bmp Mips=Off
 
-#exec Texture Import File=dfclt_mediu_up.bmp	Mips=Off
-#exec Texture Import File=dfclt_mediu_ov.bmp	Mips=Off
-#exec Texture Import File=dfclt_mediu_dn.bmp	Mips=Off
+//#exec Texture Import File=dfclt_mediu_up.bmp	Mips=Off
+//#exec Texture Import File=dfclt_mediu_ov.bmp	Mips=Off
+//#exec Texture Import File=dfclt_mediu_dn.bmp	Mips=Off
 
-#exec Texture Import File=dfclt_cancl_up.bmp	Mips=Off
-#exec Texture Import File=dfclt_cancl_ov.bmp	Mips=Off
-#exec Texture Import File=dfclt_cancl_dn.bmp	Mips=Off
+//#exec Texture Import File=dfclt_cancl_up.bmp	Mips=Off
+//#exec Texture Import File=dfclt_cancl_ov.bmp	Mips=Off
+//#exec Texture Import File=dfclt_cancl_dn.bmp	Mips=Off
 
-#exec Texture Import File=dfclt_easy_up.bmp		Mips=Off
-#exec Texture Import File=dfclt_easy_ov.bmp		Mips=Off
-#exec Texture Import File=dfclt_easy_dn.bmp		Mips=Off
+//#exec Texture Import File=dfclt_easy_up.bmp		Mips=Off
+//#exec Texture Import File=dfclt_easy_ov.bmp		Mips=Off
+//#exec Texture Import File=dfclt_easy_dn.bmp		Mips=Off
 
-#exec Texture Import File=dfclt_nightm_up.bmp	Mips=Off
-#exec Texture Import File=dfclt_nightm_ov.bmp	Mips=Off
-#exec Texture Import File=dfclt_nightm_dn.bmp	Mips=Off
+//#exec Texture Import File=dfclt_nightm_up.bmp	Mips=Off
+//#exec Texture Import File=dfclt_nightm_ov.bmp	Mips=Off
+//#exec Texture Import File=dfclt_nightm_dn.bmp	Mips=Off
 
 var localized string StartMap;
 

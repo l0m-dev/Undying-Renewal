@@ -3,9 +3,9 @@
 //=============================================================================
 class Explosion expands Effects;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
-#exec TEXTURE IMPORT NAME=Explosion FILE=Explosion.pcx GROUP=System Mips=Off Flags=2
+//#exec TEXTURE IMPORT NAME=Explosion FILE=Explosion.pcx GROUP=System Mips=Off Flags=2
 
 // This class works via two different methods
 

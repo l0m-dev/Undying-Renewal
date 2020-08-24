@@ -41,7 +41,6 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
 ## Building
   - Create a folder called UndyingScripts on the C: drive.
   - Download and extract all the files from this repository in that folder.
-  - Move all files files from the 'unused' folders to the 'Classes' folder, one directory back.
   - Open System.ini from the game's 'System' folder and change `SourceDir=\DWIUnreal` to `SourceDir=C:\UndyingScripts`
   - Edit System.ini with packages you want to build. If you get an error you might need to add other packages that are also required for that specific package. E.g.
     ```

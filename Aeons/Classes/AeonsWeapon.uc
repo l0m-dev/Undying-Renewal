@@ -6,10 +6,10 @@ class AeonsWeapon extends Weapon;
 //////////////////////////////////////////////////////////////////////////////
 //	Import
 //////////////////////////////////////////////////////////////////////////////
-#exec AUDIO IMPORT  FILE="E_Wpn_GenPck01.wav" NAME="E_Wpn_GenPck01" GROUP="Weapons"
+//#exec AUDIO IMPORT  FILE="E_Wpn_GenPck01.wav" NAME="E_Wpn_GenPck01" GROUP="Weapons"
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //////////////////////////////////////////////////////////////////////////////
 //	Variables

@@ -3,7 +3,7 @@
 //=============================================================================
 class UBrowserServerGrid extends UWindowGrid;
 
-#exec TEXTURE IMPORT NAME=Highlight FILE=Textures\Highlight.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=Highlight FILE=Textures\Highlight.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
 var UBrowserRightClickMenu Menu;
 var UWindowGridColumn Server, Ping, MapName, Players, SortByColumn;

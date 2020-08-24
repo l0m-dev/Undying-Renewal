@@ -6,51 +6,51 @@ class BookWindow expands ShellWindow;
 //----------------------------------------------------------------------------
 
 /* 3D Book Implementation */
-#exec Texture Import File=Book_0.bmp Mips=Off
-#exec Texture Import File=Book_1.bmp Mips=Off
-#exec Texture Import File=Book_2.bmp Mips=Off
-#exec Texture Import File=Book_3.bmp Mips=Off
-#exec Texture Import File=Book_4.bmp Mips=Off
-#exec Texture Import File=Book_5.bmp Mips=Off
+//#exec Texture Import File=Book_0.bmp Mips=Off
+//#exec Texture Import File=Book_1.bmp Mips=Off
+//#exec Texture Import File=Book_2.bmp Mips=Off
+//#exec Texture Import File=Book_3.bmp Mips=Off
+//#exec Texture Import File=Book_4.bmp Mips=Off
+//#exec Texture Import File=Book_5.bmp Mips=Off
 
 //#exec Texture Import File=Book_Icon.bmp Flags=2 Mips=Off
-#exec Texture Import File=Book01_Icon.bmp Flags=2 Mips=Off
-#exec Texture Import File=Book02_Icon.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Book01_Icon.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Book02_Icon.bmp Flags=2 Mips=Off
 
 //Up button
-#exec Texture Import File=Book_Up_Up.bmp Mips=Off
-#exec Texture Import File=Book_Up_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Up_Dn.bmp Mips=Off
-#exec Texture Import File=Book_Up_Ds.bmp Mips=Off
+//#exec Texture Import File=Book_Up_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Up_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Up_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Up_Ds.bmp Mips=Off
 
 //Down button
-#exec Texture Import File=Book_Down_Up.bmp Mips=Off
-#exec Texture Import File=Book_Down_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Down_Dn.bmp Mips=Off
-#exec Texture Import File=Book_Down_Ds.bmp Mips=Off
+//#exec Texture Import File=Book_Down_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Down_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Down_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Down_Ds.bmp Mips=Off
 
 //Left button
-#exec Texture Import File=Book_Left_Up.bmp Mips=Off
-#exec Texture Import File=Book_Left_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Left_Dn.bmp Mips=Off
-#exec Texture Import File=Book_Left_Ds.bmp Mips=Off
+//#exec Texture Import File=Book_Left_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Left_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Left_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Left_Ds.bmp Mips=Off
 
 //Right button
-#exec Texture Import File=Book_Right_Up.bmp Mips=Off
-#exec Texture Import File=Book_Right_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Right_Dn.bmp Mips=Off
-#exec Texture Import File=Book_Right_Ds.bmp Mips=Off
+//#exec Texture Import File=Book_Right_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Right_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Right_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Right_Ds.bmp Mips=Off
 
 //Back button
-#exec Texture Import File=Book_Back_Up.bmp Mips=Off
-#exec Texture Import File=Book_Back_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Back_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Back_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Back_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Back_Dn.bmp Mips=Off
 
 //Obj button
-#exec Texture Import File=Book_Obj_Up.bmp Mips=Off
-#exec Texture Import File=Book_Obj_Ov.bmp Mips=Off
-#exec Texture Import File=Book_Obj_Dn.bmp Mips=Off
-#exec Texture Import File=Book_Obj_Ds.bmp Mips=Off
+//#exec Texture Import File=Book_Obj_Up.bmp Mips=Off
+//#exec Texture Import File=Book_Obj_Ov.bmp Mips=Off
+//#exec Texture Import File=Book_Obj_Dn.bmp Mips=Off
+//#exec Texture Import File=Book_Obj_Ds.bmp Mips=Off
 
 //----------------------------------------------------------------------------
 

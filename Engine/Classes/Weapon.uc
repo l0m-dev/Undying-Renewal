@@ -6,7 +6,7 @@ class Weapon extends Inventory
 	native
 	nativereplication;
 
-#exec Texture Import File=Textures\Weapon.pcx Name=S_Weapon Mips=On Flags=2
+//#exec Texture Import File=Textures\Weapon.pcx Name=S_Weapon Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Weapon ammo/firing information:

@@ -5,7 +5,7 @@ class Camera extends PlayerPawn
 	native;
 
 // Sprite.
-#exec Texture Import File=Textures\S_Camera.pcx Name=S_Camera Mips=On Flags=2
+//#exec Texture Import File=Textures\S_Camera.pcx Name=S_Camera Mips=On Flags=2
 
 defaultproperties
 {

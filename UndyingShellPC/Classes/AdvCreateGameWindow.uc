@@ -3,14 +3,14 @@
 //=============================================================================
 class AdvCreateGameWindow expands ShellWindow;
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
 #exec Texture Import File=AdvCreateGame_0.bmp Mips=Off
 #exec Texture Import File=AdvCreateGame_1.bmp Mips=Off
-#exec Texture Import File=AdvVideo_2.bmp Mips=Off
+//#exec Texture Import File=AdvVideo_2.bmp Mips=Off
 #exec Texture Import File=AdvCreateGame_3.bmp Mips=Off
 #exec Texture Import File=AdvCreateGame_4.bmp Mips=Off
-#exec Texture Import File=AdvVideo_5.bmp Mips=Off
+//#exec Texture Import File=AdvVideo_5.bmp Mips=Off
 
 var ShellButton OK;
 var ShellButton Cancel;

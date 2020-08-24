@@ -4,7 +4,7 @@
 class Phoenix_proj expands SpellProjectile;
 
 // #exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix_proj_m.ngf
-#exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix.ngf INHERIT=DarkBat_m
+//#exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix.ngf INHERIT=DarkBat_m
 
 var Pawn Guider;
 var rotator OldGuiderRotation, GuidedRotation;

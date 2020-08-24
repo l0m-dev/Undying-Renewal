@@ -3,7 +3,7 @@
 //=============================================================================
 class OnScreenMessage expands Info;
 
-#exec TEXTURE IMPORT FILE=osm.pcx GROUP=System Mips=Off Flags=2
+//#exec TEXTURE IMPORT FILE=osm.pcx GROUP=System Mips=Off Flags=2
 
 var AeonsPlayer Player;
 var int i;

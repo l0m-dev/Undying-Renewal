@@ -1,50 +1,50 @@
 class UMenuGoldLookAndFeel extends UWindowLookAndFeel;
 
-#exec TEXTURE IMPORT NAME=GoldActiveFrame FILE=Textures\ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=GoldInactiveFrame FILE=Textures\InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=GoldActiveFrameS FILE=Textures\ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=GoldInactiveFrameS FILE=Textures\InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=GoldActiveFrame FILE=Textures\ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=GoldInactiveFrame FILE=Textures\InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=GoldActiveFrameS FILE=Textures\ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=GoldInactiveFrameS FILE=Textures\InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=Misc FILE=Textures\Misc.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=Misc FILE=Textures\Misc.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=ChkChecked FILE=Textures\ChkChecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkUnchecked FILE=Textures\ChkUnchecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkCheckedDisabled FILE=Textures\ChkCheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkUncheckedDisabled FILE=Textures\ChkUncheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkChecked FILE=Textures\ChkChecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkUnchecked FILE=Textures\ChkUnchecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkCheckedDisabled FILE=Textures\ChkCheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkUncheckedDisabled FILE=Textures\ChkUncheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=GoldButton FILE=Textures\SmallButton.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=GoldButton FILE=Textures\SmallButton.pcx GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=BMenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHL FILE=Textures\MenuHL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHM FILE=Textures\MenuHM.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHR FILE=Textures\MenuHR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuLine FILE=Textures\MenuLine.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHL FILE=Textures\MenuHL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHM FILE=Textures\MenuHM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHR FILE=Textures\MenuHR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuLine FILE=Textures\MenuLine.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=BarL FILE=Textures\BarL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarTile FILE=Textures\BarTile.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarMax FILE=Textures\BarMax.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarWin FILE=Textures\BarWin.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarL FILE=Textures\BarL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarTile FILE=Textures\BarTile.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarMax FILE=Textures\BarMax.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarWin FILE=Textures\BarWin.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=BarInL FILE=Textures\BarInL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarInR FILE=Textures\BarInR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarInM FILE=Textures\BarInM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarInL FILE=Textures\BarInL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarInR FILE=Textures\BarInR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarInM FILE=Textures\BarInM.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=BarOutL FILE=Textures\BarOutL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarOutR FILE=Textures\BarOutR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BarOutM FILE=Textures\BarOutM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarOutL FILE=Textures\BarOutL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarOutR FILE=Textures\BarOutR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BarOutM FILE=Textures\BarOutM.bmp GROUP="Icons" MIPS=OFF
 
-#exec AUDIO IMPORT FILE="Sounds\bigselect.wav" NAME=BigSelect
-#exec AUDIO IMPORT FILE="Sounds\littleselect.wav" NAME=LittleSelect
-#exec AUDIO IMPORT FILE="Sounds\windowopen.wav" NAME=WindowOpen
-#exec AUDIO IMPORT FILE="Sounds\windowclose.wav" NAME=WindowClose
+//#exec AUDIO IMPORT FILE="Sounds\bigselect.wav" NAME=BigSelect
+//#exec AUDIO IMPORT FILE="Sounds\littleselect.wav" NAME=LittleSelect
+//#exec AUDIO IMPORT FILE="Sounds\windowopen.wav" NAME=WindowOpen
+//#exec AUDIO IMPORT FILE="Sounds\windowclose.wav" NAME=WindowClose
 
 var() Region	SBUpUp;
 var() Region	SBUpDown;

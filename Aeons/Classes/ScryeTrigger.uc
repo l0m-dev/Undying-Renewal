@@ -3,7 +3,7 @@
 //=============================================================================
 class ScryeTrigger expands Trigger;
 
-#exec TEXTURE IMPORT NAME=TrigScrye FILE=TrigScrye.pcx GROUP=System Mips=Off Flags=2
+//#exec TEXTURE IMPORT NAME=TrigScrye FILE=TrigScrye.pcx GROUP=System Mips=Off Flags=2
 
 /*
 

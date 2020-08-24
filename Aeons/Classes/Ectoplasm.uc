@@ -4,13 +4,13 @@
 class Ectoplasm expands AttSpell;
 
 // Sounds
-#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn01.wav" NAME="E_Spl_EctoSpawn01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn02.wav" NAME="E_Spl_EctoSpawn02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn03.wav" NAME="E_Spl_EctoSpawn03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn01.wav" NAME="E_Spl_EctoSpawn01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn02.wav" NAME="E_Spl_EctoSpawn02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoSpawn03.wav" NAME="E_Spl_EctoSpawn03" GROUP="Spells"
 
-#exec AUDIO IMPORT FILE="E_Spl_EctoThruWall01.wav" NAME="E_Spl_EctoThruWall01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_EctoHitFlesh01.wav" NAME="E_Spl_EctoHitFlesh01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_EctoHitGen01.wav" NAME="E_Spl_EctoHitGen01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoThruWall01.wav" NAME="E_Spl_EctoThruWall01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoHitFlesh01.wav" NAME="E_Spl_EctoHitFlesh01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_EctoHitGen01.wav" NAME="E_Spl_EctoHitGen01" GROUP="Spells"
 
 /////////////////////////////////////////////////////////////////////////////////////
 var()	float		ParticleAlpha[3];

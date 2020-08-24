@@ -5,7 +5,7 @@
 class Trigger extends Triggers
 	native;
 
-#exec Texture Import File=Textures\Trigger.pcx Name=S_Trigger Mips=On Flags=2
+//#exec Texture Import File=Textures\Trigger.pcx Name=S_Trigger Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Trigger variables.

@@ -5,7 +5,7 @@ class Carcass extends Decoration
 	native;
 
 // Sprite.
-#exec Texture Import File=Textures\Corpse.pcx Name=S_Corpse Mips=On Flags=2
+//#exec Texture Import File=Textures\Corpse.pcx Name=S_Corpse Mips=On Flags=2
 
 // Variables.
 var bool bPlayerCarcass;

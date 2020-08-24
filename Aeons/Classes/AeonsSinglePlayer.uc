@@ -4,7 +4,7 @@
 class AeonsSinglePlayer expands AeonsPlayer
 	abstract;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
 
 function MakePlayerNoise(float Loudness, optional float Radius)
 {

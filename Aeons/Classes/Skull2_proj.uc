@@ -4,9 +4,9 @@
 class Skull2_proj expands SpellProjectile
 	transient;
 
-#exec MESH IMPORT MESH=Skull_Proj SKELFILE=skull_Proj.ngf
+//#exec MESH IMPORT MESH=Skull_Proj SKELFILE=skull_Proj.ngf
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 struct Sequence
 {

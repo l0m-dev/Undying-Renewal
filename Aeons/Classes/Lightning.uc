@@ -5,10 +5,10 @@ class Lightning expands AttSpell;
 
 // ============================================================================
 // Sounds
-#exec AUDIO IMPORT FILE="E_Spl_LightningStart01.wav" NAME="E_Spl_LightningStart01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_LightningSustain01.wav" NAME="E_Spl_LightningSustain01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_LightningSustain02.wav" NAME="E_Spl_LightningSustain02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_LightningSustain03.wav" NAME="E_Spl_LightningSustain03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_LightningStart01.wav" NAME="E_Spl_LightningStart01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_LightningSustain01.wav" NAME="E_Spl_LightningSustain01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_LightningSustain02.wav" NAME="E_Spl_LightningSustain02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_LightningSustain03.wav" NAME="E_Spl_LightningSustain03" GROUP="Spells"
 // ============================================================================
 
 simulated function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)

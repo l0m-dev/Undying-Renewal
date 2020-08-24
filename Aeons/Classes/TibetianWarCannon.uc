@@ -230,7 +230,7 @@ state Idle
 		{
 			PlaySound(SnortSound);
 			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('RWhiskerBase').pos, PlayerPawn(Owner).ViewRotation);
-			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('LWhiskerBse').pos, PlayerPawn(Owner).ViewRotation);
+			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('LWhiskerBase').pos, PlayerPawn(Owner).ViewRotation);
 		}
 
 		if ( VSize(PlayerPawn(Owner).Velocity) < 300 )

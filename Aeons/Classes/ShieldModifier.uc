@@ -3,7 +3,7 @@
 //=============================================================================
 class ShieldModifier expands PlayerModifier;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var travel bool 	bHUDEffect;
 var travel int		ShieldHealth, NumCracks, CrackID[8];

@@ -3,61 +3,61 @@
 //=============================================================================
 class MainMenuWindow expands ShellWindow;
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
-#exec Texture Import File=Main_0.bmp Mips=Off
-#exec Texture Import File=Main_1.bmp Mips=Off
-#exec Texture Import File=Main_2.bmp Mips=Off
-#exec Texture Import File=Main_3.bmp Mips=Off
-#exec Texture Import File=Main_4.bmp Mips=Off
-#exec Texture Import File=Main_5.bmp Mips=Off
+//#exec Texture Import File=Main_0.bmp Mips=Off
+//#exec Texture Import File=Main_1.bmp Mips=Off
+//#exec Texture Import File=Main_2.bmp Mips=Off
+//#exec Texture Import File=Main_3.bmp Mips=Off
+//#exec Texture Import File=Main_4.bmp Mips=Off
+//#exec Texture Import File=Main_5.bmp Mips=Off
 
-#exec Texture Import File=Gen1_up.bmp	Mips=Off	Flags=2
-#exec Texture Import File=Gen2_up.bmp	Mips=Off	Flags=2
-#exec Texture Import File=Gen3_up.bmp	Mips=Off	Flags=2
-#exec Texture Import File=Gen4_up.bmp	Mips=Off	Flags=2
+//#exec Texture Import File=Gen1_up.bmp	Mips=Off	Flags=2
+//#exec Texture Import File=Gen2_up.bmp	Mips=Off	Flags=2
+//#exec Texture Import File=Gen3_up.bmp	Mips=Off	Flags=2
+//#exec Texture Import File=Gen4_up.bmp	Mips=Off	Flags=2
 
-#exec Texture Import File=Main_Back_up.bmp		Mips=Off
-#exec Texture Import File=Main_Back_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Back_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Back_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Back_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Back_dn.bmp		Mips=Off
 
 #exec Texture Import File=Main_Disconnect_up.bmp		Mips=Off
 #exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
 #exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_audio_up.bmp		Mips=Off
-#exec Texture Import File=Main_audio_ov.bmp		Mips=Off
-#exec Texture Import File=Main_audio_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_audio_up.bmp		Mips=Off
+//#exec Texture Import File=Main_audio_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_audio_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_Controls_up.bmp		Mips=Off
-#exec Texture Import File=Main_Controls_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Controls_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Controls_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Controls_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Controls_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_quit_up.bmp			Mips=Off
-#exec Texture Import File=Main_quit_ov.bmp			Mips=Off
-#exec Texture Import File=Main_quit_dn.bmp			Mips=Off
+//#exec Texture Import File=Main_quit_up.bmp			Mips=Off
+//#exec Texture Import File=Main_quit_ov.bmp			Mips=Off
+//#exec Texture Import File=Main_quit_dn.bmp			Mips=Off
 
-#exec Texture Import File=Main_credits_dn.bmp		Mips=Off
-#exec Texture Import File=Main_credits_ov.bmp		Mips=Off
-#exec Texture Import File=Main_credits_up.bmp		Mips=Off
+//#exec Texture Import File=Main_credits_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_credits_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_credits_up.bmp		Mips=Off
 
-#exec Texture Import File=Main_sload_up.bmp			Mips=Off
-#exec Texture Import File=Main_sload_ov.bmp			Mips=Off
-#exec Texture Import File=Main_sload_dn.bmp			Mips=Off
+//#exec Texture Import File=Main_sload_up.bmp			Mips=Off
+//#exec Texture Import File=Main_sload_ov.bmp			Mips=Off
+//#exec Texture Import File=Main_sload_dn.bmp			Mips=Off
 
-#exec Texture Import File=Main_new_up.bmp		Mips=Off
-#exec Texture Import File=Main_new_ov.bmp		Mips=Off
-#exec Texture Import File=Main_new_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_new_up.bmp		Mips=Off
+//#exec Texture Import File=Main_new_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_new_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_video_up.bmp			Mips=Off
-#exec Texture Import File=Main_video_ov.bmp			Mips=Off
-#exec Texture Import File=Main_video_dn.bmp			Mips=Off
+//#exec Texture Import File=Main_video_up.bmp			Mips=Off
+//#exec Texture Import File=Main_video_ov.bmp			Mips=Off
+//#exec Texture Import File=Main_video_dn.bmp			Mips=Off
 
 #exec Texture Import File=Main_Multiplayer_up.bmp		Mips=Off
 #exec Texture Import File=Main_Multiplayer_ov.bmp		Mips=Off
 #exec Texture Import File=Main_Multiplayer_dn.bmp		Mips=Off
 
-#exec Texture Import Name=Light File=Light.pcx Mips=Off Flags=4
+//#exec Texture Import Name=Light File=Light.pcx Mips=Off Flags=4
 
 var ShellButton Buttons[8];
 var ShellButton BackToGame;
@@ -232,6 +232,7 @@ function Created()
 	SaveString = GetPlayerOwner().GetSaveGameList();
 	if ((InStr (SaveString, "99,")) >= 0)
 	{	
+		GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
 		FromRelaunch = True;
 	}
 }

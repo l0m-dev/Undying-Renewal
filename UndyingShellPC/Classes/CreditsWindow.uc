@@ -3,12 +3,12 @@
 //=============================================================================
 class CreditsWindow expands ShellWindow;
 
-#exec Texture Import File=Credits_0.bmp Mips=Off
-#exec Texture Import File=Credits_1.bmp Mips=Off
-#exec Texture Import File=Credits_2.bmp Mips=Off
-#exec Texture Import File=Credits_3.bmp Mips=Off
-#exec Texture Import File=Credits_4.bmp Mips=Off
-#exec Texture Import File=Credits_5.bmp Mips=Off
+//#exec Texture Import File=Credits_0.bmp Mips=Off
+//#exec Texture Import File=Credits_1.bmp Mips=Off
+//#exec Texture Import File=Credits_2.bmp Mips=Off
+//#exec Texture Import File=Credits_3.bmp Mips=Off
+//#exec Texture Import File=Credits_4.bmp Mips=Off
+//#exec Texture Import File=Credits_5.bmp Mips=Off
 
 //----------------------------------------------------------------------------
 

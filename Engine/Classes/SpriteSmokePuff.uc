@@ -3,7 +3,7 @@
 //=============================================================================
 class SpriteSmokePuff extends Effects;
 
-#exec OBJ LOAD FILE=textures\SmokeGray.utx PACKAGE=UnrealShare.SmokeGray
+//#exec OBJ LOAD FILE=textures\SmokeGray.utx PACKAGE=UnrealShare.SmokeGray
 
 var() Texture SSprites[20];
 var() int NumSets;

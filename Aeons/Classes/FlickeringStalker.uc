@@ -3,60 +3,60 @@
 //=============================================================================
 class FlickeringStalker expands ScriptedFlyer;
 
-#exec MESH IMPORT MESH=FlickeringStalker_m SKELFILE=FlickeringStalker.ngf
-#exec MESH JOINTNAME Head1=Head Jaw1=Jaw
+//#exec MESH IMPORT MESH=FlickeringStalker_m SKELFILE=FlickeringStalker.ngf
+//#exec MESH JOINTNAME Head1=Head Jaw1=Jaw
 
 //****************************************************************************
 // Animation sequence notifications.
 //****************************************************************************
-#exec MESH NOTIFY SEQ=bite1 TIME=0.294 FUNCTION=DoNearDamageReset
-#exec MESH NOTIFY SEQ=bite1 TIME=0.353 FUNCTION=DoNearDamage
-#exec MESH NOTIFY SEQ=bite1 TIME=0.412 FUNCTION=DoNearDamage
-#exec MESH NOTIFY SEQ=chomp TIME=0.333 FUNCTION=DoNearDamageReset
-#exec MESH NOTIFY SEQ=chomp TIME=0.400 FUNCTION=DoNearDamage
-#exec MESH NOTIFY SEQ=rightwhip TIME=0.282 FUNCTION=DoNearDamage2
-#exec MESH NOTIFY SEQ=rightwhip TIME=0.333 FUNCTION=DoNearDamage2
-#exec MESH NOTIFY SEQ=rightwhip TIME=0.385 FUNCTION=DoNearDamage2
-#exec MESH NOTIFY SEQ=rightwhip TIME=0.358 FUNCTION=GibPlayer
-#exec MESH NOTIFY SEQ=coil TIME=1.000 FUNCTION=hiss_1
-#exec MESH NOTIFY SEQ=alert_to_coil TIME=1.000 FUNCTION=hiss_1
-#exec MESH NOTIFY SEQ=hiss_1 TIME=1.000 FUNCTION=hiss_2
-#exec MESH NOTIFY SEQ=hiss_2 TIME=1.000 FUNCTION=hiss_2
-#exec MESH NOTIFY SEQ=cobra1 TIME=1.000 FUNCTION=cobra2
-#exec MESH NOTIFY SEQ=cobra2 TIME=1.000 FUNCTION=cobra2
-#exec MESH NOTIFY SEQ=death1a TIME=1.000 FUNCTION=death1b
-#exec MESH NOTIFY SEQ=death1b TIME=1.000 FUNCTION=death1b
+//#exec MESH NOTIFY SEQ=bite1 TIME=0.294 FUNCTION=DoNearDamageReset
+//#exec MESH NOTIFY SEQ=bite1 TIME=0.353 FUNCTION=DoNearDamage
+//#exec MESH NOTIFY SEQ=bite1 TIME=0.412 FUNCTION=DoNearDamage
+//#exec MESH NOTIFY SEQ=chomp TIME=0.333 FUNCTION=DoNearDamageReset
+//#exec MESH NOTIFY SEQ=chomp TIME=0.400 FUNCTION=DoNearDamage
+//#exec MESH NOTIFY SEQ=rightwhip TIME=0.282 FUNCTION=DoNearDamage2
+//#exec MESH NOTIFY SEQ=rightwhip TIME=0.333 FUNCTION=DoNearDamage2
+//#exec MESH NOTIFY SEQ=rightwhip TIME=0.385 FUNCTION=DoNearDamage2
+//#exec MESH NOTIFY SEQ=rightwhip TIME=0.358 FUNCTION=GibPlayer
+//#exec MESH NOTIFY SEQ=coil TIME=1.000 FUNCTION=hiss_1
+//#exec MESH NOTIFY SEQ=alert_to_coil TIME=1.000 FUNCTION=hiss_1
+//#exec MESH NOTIFY SEQ=hiss_1 TIME=1.000 FUNCTION=hiss_2
+//#exec MESH NOTIFY SEQ=hiss_2 TIME=1.000 FUNCTION=hiss_2
+//#exec MESH NOTIFY SEQ=cobra1 TIME=1.000 FUNCTION=cobra2
+//#exec MESH NOTIFY SEQ=cobra2 TIME=1.000 FUNCTION=cobra2
+//#exec MESH NOTIFY SEQ=death1a TIME=1.000 FUNCTION=death1b
+//#exec MESH NOTIFY SEQ=death1b TIME=1.000 FUNCTION=death1b
 
-#exec MESH NOTIFY SEQ=idle_alert TIME=0.0166667 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Bite1 TIME=0.0294118 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Bite1 TIME=0.0588235 FUNCTION=PlaySound_N ARG="Atk PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Bite1 TIME=0.205882 FUNCTION=PlaySound_N ARG="Bite PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=run TIME=0.0322581 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Chomp TIME=0.0333333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Chomp TIME=0.0666667 FUNCTION=PlaySound_N ARG="Atk PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Chomp TIME=0.333333 FUNCTION=PlaySound_N ARG="Bite PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Cobra1 TIME=0.0714286 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Cobra2 TIME=0.0166667 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Cobra2 TIME=0.366667 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Cobra3 TIME=0.0555556 FUNCTION=PlaySound_N ARG="TurnSlow PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Coil TIME=0.0344828 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Coil TIME=0.0344828 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Coil TIME=0.241379 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1a TIME=0.0526316 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1b TIME=0.0833333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1c TIME=0.15 FUNCTION=PlaySound_N ARG="TurnFast P=0.8 PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1c TIME=0.15 FUNCTION=C_BFallS
-#exec MESH NOTIFY SEQ=Hiss_1 TIME=0.125 FUNCTION=PlaySound_N ARG="Taunt P=0.75 PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Hiss_2 TIME=0.047619 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Hunt TIME=0.0222222 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=RightWhip TIME=0.0263158 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=RightWhip TIME=0.210526 FUNCTION=PlaySound_N ARG="TurnFast P=1.25 PVar=0.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Damage1 TIME=0.0333333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=idle TIME=0.0111111 FUNCTION=PlaySound_N ARG="Mvmt P=0.75 PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=turn_left TIME=0.05 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=turn_right TIME=0.05 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=turn_180 TIME=0.0227273 FUNCTION=PlaySound_N ARG="TurnSlow PVar=0.2 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Alert_To_Coil TIME=0.0434783 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=idle_alert TIME=0.0166667 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Bite1 TIME=0.0294118 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Bite1 TIME=0.0588235 FUNCTION=PlaySound_N ARG="Atk PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Bite1 TIME=0.205882 FUNCTION=PlaySound_N ARG="Bite PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=run TIME=0.0322581 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Chomp TIME=0.0333333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Chomp TIME=0.0666667 FUNCTION=PlaySound_N ARG="Atk PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Chomp TIME=0.333333 FUNCTION=PlaySound_N ARG="Bite PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Cobra1 TIME=0.0714286 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Cobra2 TIME=0.0166667 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Cobra2 TIME=0.366667 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Cobra3 TIME=0.0555556 FUNCTION=PlaySound_N ARG="TurnSlow PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Coil TIME=0.0344828 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Coil TIME=0.0344828 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Coil TIME=0.241379 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1a TIME=0.0526316 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1b TIME=0.0833333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1c TIME=0.15 FUNCTION=PlaySound_N ARG="TurnFast P=0.8 PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1c TIME=0.15 FUNCTION=C_BFallS
+//#exec MESH NOTIFY SEQ=Hiss_1 TIME=0.125 FUNCTION=PlaySound_N ARG="Taunt P=0.75 PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Hiss_2 TIME=0.047619 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Hunt TIME=0.0222222 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=RightWhip TIME=0.0263158 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=RightWhip TIME=0.210526 FUNCTION=PlaySound_N ARG="TurnFast P=1.25 PVar=0.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Damage1 TIME=0.0333333 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=idle TIME=0.0111111 FUNCTION=PlaySound_N ARG="Mvmt P=0.75 PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=turn_left TIME=0.05 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=turn_right TIME=0.05 FUNCTION=PlaySound_N ARG="TurnFast PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=turn_180 TIME=0.0227273 FUNCTION=PlaySound_N ARG="TurnSlow PVar=0.2 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Alert_To_Coil TIME=0.0434783 FUNCTION=PlaySound_N ARG="Mvmt PVar=0.2 V=0.75 VVar=0.1"
 
 //****************************************************************************
 // Member vars.

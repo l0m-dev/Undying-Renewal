@@ -7,7 +7,7 @@ class Scrye expands AttSpell;
 //									Sounds
 //-----------------------------------------------------------------------------
 //
-#exec AUDIO IMPORT FILE="E_Spl_ScryeLaunch01.wav" NAME="E_Spl_ScryeLaunch01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_ScryeLaunch01.wav" NAME="E_Spl_ScryeLaunch01" GROUP="Spells"
 
 function FireAttSpell( float Value )
 {
@@ -73,6 +73,7 @@ state NormalFire
 	
 	Begin:
 		AeonsPlayer(owner).scryeTimer = 10 + castingLevel * 2;
+		AeonsPlayer(owner).ScryeFullTime = 10 + castingLevel * 2;
 		AeonsPlayer(owner).ScryeMod.gotoState('Activated');
 		AeonsPlayer(owner).ScryeMod.castingLevel = localCastingLevel;
 		GhelzUse(ManaCostPerLevel[castingLevel]);

@@ -3,7 +3,7 @@
 //=============================================================================
 class UMenuRootWindow extends UWindowRootWindow;
 
-#exec TEXTURE IMPORT NAME=MenuBlack FILE=Textures\MenuBlack.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuBlack FILE=Textures\MenuBlack.bmp GROUP="Icons" MIPS=OFF
 
 function Created() 
 {

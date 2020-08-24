@@ -6,7 +6,7 @@ class Ammo extends Pickup
 	native
 	nativereplication;
 
-#exec Texture Import File=Textures\Ammo.pcx Name=S_Ammo Mips=On Flags=2
+//#exec Texture Import File=Textures\Ammo.pcx Name=S_Ammo Mips=On Flags=2
 
 var() travel savable int AmmoAmount;
 var() travel savable int MaxAmmo;

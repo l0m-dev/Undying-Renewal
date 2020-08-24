@@ -5,9 +5,9 @@
 
 class UWindowPulldownMenu extends UWindowListControl;
 
-#exec TEXTURE IMPORT NAME=MenuTick FILE=Textures\MenuTick.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuDivider FILE=Textures\MenuDivider.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuSubArrow FILE=Textures\MenuSubArrow.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuTick FILE=Textures\MenuTick.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuDivider FILE=Textures\MenuDivider.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuSubArrow FILE=Textures\MenuSubArrow.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
 var UWindowPulldownMenuItem		Selected;
 

@@ -3,9 +3,9 @@
 //=============================================================================
 class ScryeHintTrigger expands Trigger;
 
-#exec TEXTURE IMPORT NAME=TrigScryeHint FILE=TrigScryeHint.pcx GROUP=System Mips=Off Flags=2
+//#exec TEXTURE IMPORT NAME=TrigScryeHint FILE=TrigScryeHint.pcx GROUP=System Mips=Off Flags=2
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
 var bool bCanPlayScryeSound, bEventSeen;
 var int NumTimesTriggered;

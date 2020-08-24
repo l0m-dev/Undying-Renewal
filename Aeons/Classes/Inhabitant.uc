@@ -3,84 +3,84 @@
 //=============================================================================
 class Inhabitant expands ScriptedPawn;
 
-#exec MESH IMPORT MESH=Inhabitant_m SKELFILE=Inhabitant.ngf
-#exec MESH MODIFIERS R_Pelvis_Cloth1:Cloth L_Leg_Cloth1:Cloth R_Chest_Cloth1:Cloth L_Arm_Cloth1:Cloth
+//#exec MESH IMPORT MESH=Inhabitant_m SKELFILE=Inhabitant.ngf
+//#exec MESH MODIFIERS R_Pelvis_Cloth1:Cloth L_Leg_Cloth1:Cloth R_Chest_Cloth1:Cloth L_Arm_Cloth1:Cloth
 
 //****************************************************************************
 // Animation sequence notifications.
 //****************************************************************************
-#exec MESH NOTIFY SEQ=attack2 TIME=0.500 FUNCTION=DoNearDamage
-#exec MESH NOTIFY SEQ=death1 TIME=1.000 FUNCTION=death2
-#exec MESH NOTIFY SEQ=death2 TIME=1.000 FUNCTION=death2
-#exec MESH NOTIFY SEQ=mindshatter TIME=0.875 FUNCTION=FireSpell
-#exec MESH NOTIFY SEQ=jumpstart TIME=1.000 FUNCTION=jumpcycle
-#exec MESH NOTIFY SEQ=jumpcycle TIME=1.000 FUNCTION=jumpcycle
-#exec MESH NOTIFY SEQ=jumpstart TIME=0.500 FUNCTION=TriggerJump
-#exec MESH NOTIFY SEQ=specialkill TIME=0.100 FUNCTION=OJDidIt
+//#exec MESH NOTIFY SEQ=attack2 TIME=0.500 FUNCTION=DoNearDamage
+//#exec MESH NOTIFY SEQ=death1 TIME=1.000 FUNCTION=death2
+//#exec MESH NOTIFY SEQ=death2 TIME=1.000 FUNCTION=death2
+//#exec MESH NOTIFY SEQ=mindshatter TIME=0.875 FUNCTION=FireSpell
+//#exec MESH NOTIFY SEQ=jumpstart TIME=1.000 FUNCTION=jumpcycle
+//#exec MESH NOTIFY SEQ=jumpcycle TIME=1.000 FUNCTION=jumpcycle
+//#exec MESH NOTIFY SEQ=jumpstart TIME=0.500 FUNCTION=TriggerJump
+//#exec MESH NOTIFY SEQ=specialkill TIME=0.100 FUNCTION=OJDidIt
 
-#exec MESH NOTIFY SEQ=Attack1 TIME=0.0384615 FUNCTION=PlaySound_N ARG="AttackClaw PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Attack1 TIME=0.461538 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Attack1 TIME=0.576923 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Attack2 TIME=0.0789474 FUNCTION=PlaySound_N ARG="AttackClaw PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Attack2 TIME=0.631579 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Attack2 TIME=0.684211 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Death1 TIME=0.0625 FUNCTION=PlaySound_N ARG="Stun PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1 TIME=0.375 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death1 TIME=0.75 FUNCTION=C_Bodyfall
-#exec MESH NOTIFY SEQ=Death2 TIME=0.0222222 FUNCTION=PlaySound_N ARG="DeathStruggle PVar=0.25 V=1.2 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death2 TIME=0.0222222 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death2 TIME=0.288889 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death2 TIME=0.488889 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death3 TIME=0.0172414 FUNCTION=PlaySound_N ARG="Death PVar=0.25 V=1.4 VVar=0.1"
-#exec MESH NOTIFY SEQ=Death3 TIME=0.689655 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Hunt TIME=0.185185 FUNCTION=C_BackLeft	//
-#exec MESH NOTIFY SEQ=Hunt TIME=0.740741 FUNCTION=C_BackRight	//
-#exec MESH NOTIFY SEQ=Idle1 TIME=0.855556 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=idle_alert TIME=0.0111111 FUNCTION=PlaySound_N ARG="Sleep CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle4 TIME=0.0111111 FUNCTION=PlaySound_N ARG="Sleep CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.0111111 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.0111111 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.277778 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.277778 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.533333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.777778 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Idle5 TIME=0.777778 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=JumpEnd TIME=0.0625 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=JumpEnd TIME=0.25 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=JumpEnd TIME=0.4375 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=JumpStart TIME=0.1875 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=JumpStart TIME=0.25 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Mindshatter TIME=0.0151515 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Mindshatter TIME=0.0909091 FUNCTION=PlaySound_N ARG="MindShatter PVar=0.25 V=1.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Mindshatter TIME=0.106061 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Mindshatter TIME=0.863636 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.010101 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.10101 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.121212 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.131313 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.191919 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.30303 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.383838 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.424242 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.436 FUNCTION=PlaySound_N ARG="PatDeath"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.636364 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=SpecialKill TIME=0.767677 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Stun TIME=0.0166667 FUNCTION=PlaySound_N ARG="Stun PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Stun TIME=0.383333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Stun TIME=0.45 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=0.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=Taunt1 TIME=0.166667 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 V=2.0 VVar=0.1"
-#exec MESH NOTIFY SEQ=Taunt2 TIME=0.0833333 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Taunt2 TIME=0.0833333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Taunt2 TIME=0.308333 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Taunt2 TIME=0.541667 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Attack1 TIME=0.0384615 FUNCTION=PlaySound_N ARG="AttackClaw PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Attack1 TIME=0.461538 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=Attack1 TIME=0.576923 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=Attack2 TIME=0.0789474 FUNCTION=PlaySound_N ARG="AttackClaw PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Attack2 TIME=0.631579 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=Attack2 TIME=0.684211 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=Death1 TIME=0.0625 FUNCTION=PlaySound_N ARG="Stun PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1 TIME=0.375 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death1 TIME=0.75 FUNCTION=C_Bodyfall
+//#exec MESH NOTIFY SEQ=Death2 TIME=0.0222222 FUNCTION=PlaySound_N ARG="DeathStruggle PVar=0.25 V=1.2 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death2 TIME=0.0222222 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death2 TIME=0.288889 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death2 TIME=0.488889 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death3 TIME=0.0172414 FUNCTION=PlaySound_N ARG="Death PVar=0.25 V=1.4 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Death3 TIME=0.689655 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Hunt TIME=0.185185 FUNCTION=C_BackLeft	//
+//#exec MESH NOTIFY SEQ=Hunt TIME=0.740741 FUNCTION=C_BackRight	//
+//#exec MESH NOTIFY SEQ=Idle1 TIME=0.855556 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=idle_alert TIME=0.0111111 FUNCTION=PlaySound_N ARG="Sleep CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle4 TIME=0.0111111 FUNCTION=PlaySound_N ARG="Sleep CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.0111111 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.0111111 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.277778 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.277778 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.533333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.777778 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Idle5 TIME=0.777778 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=JumpEnd TIME=0.0625 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=JumpEnd TIME=0.25 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=JumpEnd TIME=0.4375 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=JumpStart TIME=0.1875 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=JumpStart TIME=0.25 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=Mindshatter TIME=0.0151515 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Mindshatter TIME=0.0909091 FUNCTION=PlaySound_N ARG="MindShatter PVar=0.25 V=1.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Mindshatter TIME=0.106061 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Mindshatter TIME=0.863636 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.010101 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.10101 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.121212 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.131313 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.191919 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.30303 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.383838 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.424242 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.436 FUNCTION=PlaySound_N ARG="PatDeath"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.636364 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=SpecialKill TIME=0.767677 FUNCTION=PlaySound_N ARG="Bite PVar=0.25 V=1.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Stun TIME=0.0166667 FUNCTION=PlaySound_N ARG="Stun PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Stun TIME=0.383333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Stun TIME=0.45 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Taunt1 TIME=0.166667 FUNCTION=PlaySound_N ARG="Taunt PVar=0.2 V=2.0 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Taunt2 TIME=0.0833333 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Taunt2 TIME=0.0833333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Taunt2 TIME=0.308333 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Taunt2 TIME=0.541667 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Turn TIME=0.5 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=Turn TIME=0.55 FUNCTION=C_BareFS
-#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=Wake TIME=0.366667 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
-#exec MESH NOTIFY SEQ=search1 TIME=0.026 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=search1 TIME=0.256 FUNCTION=C_BackLeft	//
-#exec MESH NOTIFY SEQ=search1 TIME=0.436 FUNCTION=C_BackLeft	//
+//#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=Wake TIME=0.366667 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
+//#exec MESH NOTIFY SEQ=search1 TIME=0.026 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=search1 TIME=0.256 FUNCTION=C_BackLeft	//
+//#exec MESH NOTIFY SEQ=search1 TIME=0.436 FUNCTION=C_BackLeft	//
 
 
 //****************************************************************************

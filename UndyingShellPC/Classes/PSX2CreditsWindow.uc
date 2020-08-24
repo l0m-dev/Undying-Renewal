@@ -3,12 +3,12 @@
 //=============================================================================
 class PSX2CreditsWindow expands ShellWindow;
 
-#exec Texture Import File=PSX2Credits_0.bmp Mips=Off
-#exec Texture Import File=PSX2Credits_1.bmp Mips=Off
-#exec Texture Import File=PSX2Credits_2.bmp Mips=Off
-#exec Texture Import File=PSX2Credits_3.bmp Mips=Off
-#exec Texture Import File=PSX2Credits_4.bmp Mips=Off
-#exec Texture Import File=PSX2Credits_5.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_0.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_1.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_2.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_3.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_4.bmp Mips=Off
+//#exec Texture Import File=PSX2Credits_5.bmp Mips=Off
 
 //----------------------------------------------------------------------------
 

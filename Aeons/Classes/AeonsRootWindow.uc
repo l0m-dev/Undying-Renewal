@@ -4,8 +4,8 @@
 class AeonsRootWindow extends UWindowRootWindow;
 
 //#exec AUDIO IMPORT FILE="Shell_Blacken01.WAV" GROUP="Shell"
-#exec AUDIO IMPORT FILE="Shell_FlameLoop01.WAV" GROUP="Shell"
-#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
+//#exec AUDIO IMPORT FILE="Shell_FlameLoop01.WAV" GROUP="Shell"
+//#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
 
 var float ScaleX;
@@ -29,7 +29,10 @@ function Created()
 	local class<UWindowWindow> MainWindowClass;
 	local class<UWindowWindow> FindWindowClass;
 	local class<UWindowWindow> BookWindowClass;
-
+	
+	local int I;
+	local string KeyName;
+	
 	Super.Created();
 
 	//Scale = (WinHeight - WinTop) / 600.0;
@@ -47,7 +50,24 @@ function Created()
 	if ( AeonsConsole(Console).bRequestedBook )
 		MainMenu.HideWindow();
 	
+	FindMenu.HideWindow();
+	
 	Resized();
+	
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice OutputRate 44100Hz");
+	
+	for (I=0; I<255; I++)
+	{
+		KeyName = GetPlayerOwner().ConsoleCommand( "KEYNAME "$i );
+
+		if ( KeyName != "" )
+		{
+			if ( GetPlayerOwner().ConsoleCommand( "KEYBINDING "$KeyName ) == "ShowBook" )
+				return;
+		}
+	}
+
+	GetPlayerOwner().ConsoleCommand("SET Input"@"F3"@"ShowBook");
 }
 
 function NotifyBeforeLevelChange()
@@ -104,12 +124,6 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 	switch(Msg) {
 
 	case WM_KeyDown:
-		if (Key == 114) //fix hardcoded for IK_F3 since EInputKey isn't visible here
-		{
-			if ( (Book != None) && (Book.bWindowVisible) )
-				Book.Close();
-		}
-
 		if(HotKeyDown(Key, X, Y))
 			return;
 		break;

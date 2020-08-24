@@ -5,7 +5,7 @@
 class Teleporter extends NavigationPoint
 	native;
 
-#exec Texture Import File=Textures\Teleport.pcx Name=S_Teleport Mips=On Flags=2
+//#exec Texture Import File=Textures\Teleport.pcx Name=S_Teleport Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Teleporter URL can be one of the following forms:

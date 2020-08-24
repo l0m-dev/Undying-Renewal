@@ -4,7 +4,7 @@
 class SkyZoneInfo extends ZoneInfo
 	native;
 
-#exec Texture Import File=Textures\S_SkyZone.pcx Name=S_SkyZone Mips=On Flags=4194432
+//#exec Texture Import File=Textures\S_SkyZone.pcx Name=S_SkyZone Mips=On Flags=4194432
 
 var() bool bRotating;
 var() float DegreesPerSec;

@@ -7,7 +7,7 @@ class Inventory extends Visible
 	native
 	nativereplication;
 
-#exec Texture Import File=Textures\Inventry.pcx Name=S_Inventory Mips=On Flags=2
+//#exec Texture Import File=Textures\Inventry.pcx Name=S_Inventory Mips=On Flags=2
 
 var() enum EItemType
 {

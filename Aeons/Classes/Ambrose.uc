@@ -2,135 +2,135 @@
 // ambrose.
 //=============================================================================
 class ambrose expands ScriptedBiped;
-#exec MESH IMPORT MESH=ambrose_m SKELFILE=ambrose.ngf INHERIT=ScriptedBiped_m
-#exec MESH JOINTNAME Neck=Head
-#exec MESH MODIFIERS Cloth01:Cloth
+//#exec MESH IMPORT MESH=ambrose_m SKELFILE=ambrose.ngf INHERIT=ScriptedBiped_m
+//#exec MESH JOINTNAME Neck=Head
+//#exec MESH MODIFIERS Cloth01:Cloth
 
 // notifiers for proper hand holding.
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=attack_jumpcycle TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=grow TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=shrink TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=defense_houndshake TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=weakened TIME=0.0 FUNCTION=PutAxeInLeftHand
-#exec MESH NOTIFY SEQ=idle_alert TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=idle_alert_giant TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.0 FUNCTION=PutAxeInRightHand
-#exec MESH NOTIFY SEQ=walk_giant TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_jumpcycle TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=grow TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=shrink TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=defense_houndshake TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=weakened TIME=0.0 FUNCTION=PutAxeInLeftHand
+//#exec MESH NOTIFY SEQ=idle_alert TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=idle_alert_giant TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.0 FUNCTION=PutAxeInRightHand
+//#exec MESH NOTIFY SEQ=walk_giant TIME=0.0 FUNCTION=PutAxeInRightHand
 
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.205 FUNCTION=DoNearDamage		//
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.231 FUNCTION=DoNearDamage		//
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.205 FUNCTION=DoNearDamage		//
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.231 FUNCTION=DoNearDamage		//
 
 //#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.000 FUNCTION=SuspendLookAt
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
 //#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=1.000 FUNCTION=ResumeLookAt
 
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.286 FUNCTION=TriggerJump		//
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=1.000 FUNCTION=PlayInAir			//
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.286 FUNCTION=TriggerJump		//
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=1.000 FUNCTION=PlayInAir			//
 
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.250 FUNCTION=DoNearDamage3
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.750 FUNCTION=DoNearDamage3
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.250 FUNCTION=DoNearDamage3
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.750 FUNCTION=DoNearDamage3
 
-#exec MESH NOTIFY SEQ=grow TIME=.641 FUNCTION=AmbroseGrow
-#exec MESH NOTIFY SEQ=grow TIME=1.00 FUNCTION=AmbroseStartGiantNormal
+//#exec MESH NOTIFY SEQ=grow TIME=.641 FUNCTION=AmbroseGrow
+//#exec MESH NOTIFY SEQ=grow TIME=1.00 FUNCTION=AmbroseStartGiantNormal
 //#exec MESH NOTIFY SEQ=shrink TIME=.100 FUNCTION=AmbroseShrink
 //#exec MESH NOTIFY SEQ=shrink TIME=1.00 FUNCTION=AmbroseStartWeakened
 
 //#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.00 FUNCTION=AmbrosePutStoneOnGround
-#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.440 FUNCTION=AmbrosePutStoneInHand
-#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.980 FUNCTION=AmbrosePutStoneInAxe
+//#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.440 FUNCTION=AmbrosePutStoneInHand
+//#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.980 FUNCTION=AmbrosePutStoneInAxe
 
-#exec MESH NOTIFY SEQ=defense_houndthrow TIME=1.00 FUNCTION=AmbroseHoundThrown
+//#exec MESH NOTIFY SEQ=defense_houndthrow TIME=1.00 FUNCTION=AmbroseHoundThrown
 
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.153 FUNCTION=Obliterate
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.153 FUNCTION=Obliterate
 
 //#exec MESH NOTIFY SEQ=walk_giant_intro TIME=1.000 FUNCTION=walk_giant
 //#exec MESH NOTIFY SEQ=walk_giant TIME=1.0 FUNCTION=walk_giant
 
 
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.146 FUNCTION=PlaySound_N ARG="VEffortA CHANCE=0.7 PVar=0.1"
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.271 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 VVar=0.1"
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.292 FUNCTION=PlaySound_N ARG="AxeHitGnt PVar=0.1 VVar=0.1"
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.520 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 V=.75 VVar=0.1"
-#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.813 FUNCTION=PlaySound_N ARG="VEffortB CHANCE=0.5 PVar=0.1 V=0.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.146 FUNCTION=PlaySound_N ARG="VEffortA CHANCE=0.7 PVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.271 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.292 FUNCTION=PlaySound_N ARG="AxeHitGnt PVar=0.1 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.520 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 V=.75 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.813 FUNCTION=PlaySound_N ARG="VEffortB CHANCE=0.5 PVar=0.1 V=0.75 VVar=0.1"
 
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.100 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 VVar=0.1"
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.250 FUNCTION=PlaySound_N ARG="AxeHitGnt"
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.150 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.200 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.100 FUNCTION=PlaySound_N ARG="AxeWhshGnt PVar=0.1 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.250 FUNCTION=PlaySound_N ARG="AxeHitGnt"
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.150 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=attack_jumpland TIME=0.200 FUNCTION=PlaySound_N ARG="GiantFS"
 
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.533 FUNCTION=PlaySound_N ARG="VEffortA CHANCE=0.7 PVar=0.1"
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.520 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.600 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 VVar=0.1
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.533 FUNCTION=PlaySound_N ARG="VEffortA CHANCE=0.7 PVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.520 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.600 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 VVar=0.1
 
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.075 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.125 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=attack_scythe TIME=0.2 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.075 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.125 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=attack_scythe TIME=0.2 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
 
-#exec MESH NOTIFY SEQ=death_beheadspin TIME=0.0 FUNCTION=PlaySound_N ARG="BSpin"
+//#exec MESH NOTIFY SEQ=death_beheadspin TIME=0.0 FUNCTION=PlaySound_N ARG="BSpin"
 
 //#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.46 FUNCTION=C_FS
 //#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.8 FUNCTION=C_FS
 
-#exec MESH NOTIFY SEQ=grow TIME=0.0 FUNCTION=PlaySound_N ARG="GrowA"
-#exec MESH NOTIFY SEQ=grow TIME=0.27665 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=grow TIME=0.291878 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-#exec MESH NOTIFY SEQ=grow TIME=0.474619 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-#exec MESH NOTIFY SEQ=grow TIME=0.733503 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=grow TIME=0.761421 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=grow TIME=0.92132 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=grow TIME=0.951777 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=grow TIME=0.0 FUNCTION=PlaySound_N ARG="GrowA"
+//#exec MESH NOTIFY SEQ=grow TIME=0.27665 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=grow TIME=0.291878 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=grow TIME=0.474619 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=grow TIME=0.733503 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=grow TIME=0.761421 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=grow TIME=0.92132 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=grow TIME=0.951777 FUNCTION=PlaySound_N ARG="GiantFSScuff"
 
-#exec MESH NOTIFY SEQ=shrink TIME=0.0 FUNCTION=PlaySound_N ARG="GrowC"
-#exec MESH NOTIFY SEQ=shrink TIME=0.131868 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=shrink TIME=0.32967 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=shrink TIME=0.0 FUNCTION=PlaySound_N ARG="GrowC"
+//#exec MESH NOTIFY SEQ=shrink TIME=0.131868 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=shrink TIME=0.32967 FUNCTION=PlaySound_N ARG="GiantFSScuff"
 
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.0434783 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.130435 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.217391 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.25 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.413043 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.521739 FUNCTION=C_BackLeft
-#exec MESH NOTIFY SEQ=taunt_axe TIME=0.597826 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.0434783 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.130435 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.217391 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.25 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.413043 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.521739 FUNCTION=C_BackLeft
+//#exec MESH NOTIFY SEQ=taunt_axe TIME=0.597826 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
 
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.0434783 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.130435 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.217391 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.25 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.413043 FUNCTION=PlaySound_N ARG="AxeWhsh"
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.521739 FUNCTION=C_BackLeft
-#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.597826 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.0434783 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.130435 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.217391 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.25 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.413043 FUNCTION=PlaySound_N ARG="AxeWhsh"
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.521739 FUNCTION=C_BackLeft
+//#exec MESH NOTIFY SEQ=taunt_axeGIANT TIME=0.597826 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.1 V=0.5 VVar=0.1"
 
-#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="VEffortB CHANCE=0.5 PVar=0.1 V=.7 VVar=0.2"
-#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="GiantFS"
-#exec MESH NOTIFY SEQ=walk_giant TIME=0.806 FUNCTION=PlaySound_N ARG="GiantFSScuff"
+//#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="VEffortB CHANCE=0.5 PVar=0.1 V=.7 VVar=0.2"
+//#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="GiantFS"
+//#exec MESH NOTIFY SEQ=walk_giant TIME=0.806 FUNCTION=PlaySound_N ARG="GiantFSScuff"
 //#exec MESH NOTIFY SEQ=walk_giant TIME=0.722222 FUNCTION=C_FS
 
-#exec MESH NOTIFY SEQ=defense_houndshake TIME=0.354 FUNCTION=PlaySound_N ARG="GrabA CHANCE=0.5 PVar0.2 VVar=0.2"
+//#exec MESH NOTIFY SEQ=defense_houndshake TIME=0.354 FUNCTION=PlaySound_N ARG="GrabA CHANCE=0.5 PVar0.2 VVar=0.2"
 
-#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.386 FUNCTION=PlaySound_N ARG="VEffortA"
+//#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.386 FUNCTION=PlaySound_N ARG="VEffortA"
 
-#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.246 FUNCTION=PlaySound_N ARG="Stone"
+//#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.246 FUNCTION=PlaySound_N ARG="Stone"
 
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.109 FUNCTION=PlaySound_N ARG="VEffortA"
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.001 FUNCTION=PlaySound_N ARG="SPKill"
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.900 FUNCTION=PlaySound_N ARG="VTaunt"
-#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.141 FUNCTION=PlaySound_N ARG="PatDeath"
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.109 FUNCTION=PlaySound_N ARG="VEffortA"
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.001 FUNCTION=PlaySound_N ARG="SPKill"
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.900 FUNCTION=PlaySound_N ARG="VTaunt"
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.141 FUNCTION=PlaySound_N ARG="PatDeath"
 
-#exec MESH NOTIFY SEQ=Idle_Alert_Giant TIME=0.0 FUNCTION=PlaySound_N ARG="VEffortB"
-#exec MESH NOTIFY SEQ=defense_spell TIME=0.774 FUNCTION=PlaySound_N ARG="ShieldUp"
+//#exec MESH NOTIFY SEQ=Idle_Alert_Giant TIME=0.0 FUNCTION=PlaySound_N ARG="VEffortB"
+//#exec MESH NOTIFY SEQ=defense_spell TIME=0.774 FUNCTION=PlaySound_N ARG="ShieldUp"
 
 enum EAmbroseBossFightState
 {

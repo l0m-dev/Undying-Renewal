@@ -12,7 +12,7 @@ class LevelInfo extends ZoneInfo
 	nativereplication;
 
 // Textures.
-#exec Texture Import File=Textures\DefaultTexture.pcx
+//#exec Texture Import File=Textures\DefaultTexture.pcx
 
 //-----------------------------------------------------------------------------
 // Level time.

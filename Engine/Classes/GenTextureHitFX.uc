@@ -3,7 +3,7 @@
 //=============================================================================
 class GenTextureHitFX expands ParticleFX;
 
-#exec Texture Import Name=noisy1pfx File=Textures\noisy1pfx.pcx Group=Particles Mips=OFF
+//#exec Texture Import Name=noisy1pfx File=Textures\noisy1pfx.pcx Group=Particles Mips=OFF
 
 defaultproperties
 {

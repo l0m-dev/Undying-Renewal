@@ -13,7 +13,7 @@
 class ClipMarker extends Keypoint
 	native;
 
-#exec Texture Import File=Textures\S_ClipMarker.pcx Name=S_ClipMarker Mips=On Flags=2
+//#exec Texture Import File=Textures\S_ClipMarker.pcx Name=S_ClipMarker Mips=On Flags=2
 
 defaultproperties
 {

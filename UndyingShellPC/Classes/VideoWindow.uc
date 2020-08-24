@@ -4,41 +4,41 @@
 class VideoWindow expands ShellWindow;
 
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
-#exec Texture Import File=Video_0.bmp Mips=Off
-#exec Texture Import File=Video_1.bmp Mips=Off
-#exec Texture Import File=Video_2.bmp Mips=Off
-#exec Texture Import File=Video_3.bmp Mips=Off
-#exec Texture Import File=Video_4.bmp Mips=Off
-#exec Texture Import File=Video_5.bmp Mips=Off
+//#exec Texture Import File=Video_0.bmp Mips=Off
+//#exec Texture Import File=Video_1.bmp Mips=Off
+//#exec Texture Import File=Video_2.bmp Mips=Off
+//#exec Texture Import File=Video_3.bmp Mips=Off
+//#exec Texture Import File=Video_4.bmp Mips=Off
+//#exec Texture Import File=Video_5.bmp Mips=Off
 
-#exec Texture Import File=video_advan_up.bmp Mips=Off
-#exec Texture Import File=video_advan_dn.bmp Mips=Off
-#exec Texture Import File=video_advan_ov.bmp Mips=Off
+//#exec Texture Import File=video_advan_up.bmp Mips=Off
+//#exec Texture Import File=video_advan_dn.bmp Mips=Off
+//#exec Texture Import File=video_advan_ov.bmp Mips=Off
 
 /* 
-#exec Texture Import File=video_adv_up.bmp Flags=2 Mips=Off
-#exec Texture Import File=video_adv_dn.bmp Flags=2 Mips=Off
-#exec Texture Import File=video_adv_ov.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_up.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_dn.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_ov.bmp Flags=2 Mips=Off
 */
 
-#exec Texture Import File=video_ok_up.bmp Mips=Off
-#exec Texture Import File=video_ok_dn.bmp Mips=Off
-#exec Texture Import File=video_ok_ov.bmp Mips=Off
+//#exec Texture Import File=video_ok_up.bmp Mips=Off
+//#exec Texture Import File=video_ok_dn.bmp Mips=Off
+//#exec Texture Import File=video_ok_ov.bmp Mips=Off
 
-#exec Texture Import File=video_Cancel_up.bmp Mips=Off
-#exec Texture Import File=video_Cancel_dn.bmp Mips=Off
-#exec Texture Import File=video_Cancel_ov.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_up.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_dn.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_ov.bmp Mips=Off
 
-#exec Texture Import File=Video_resol_up.bmp  Mips=Off
-#exec Texture Import File=Video_resol_dn.bmp  Mips=Off
-#exec Texture Import File=Video_resol_ov.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_up.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_dn.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_ov.bmp  Mips=Off
 
 /*
-#exec Texture Import File=Video_res_up.bmp Flags=2 Mips=Off
-#exec Texture Import File=Video_res_dn.bmp Flags=2 Mips=Off
-#exec Texture Import File=Video_res_ov.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_up.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_dn.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_ov.bmp Flags=2 Mips=Off
 */
 //----------------------------------------------------------------------------
 
@@ -539,10 +539,12 @@ function ChangeDriverPressed()
 {
 	//	ConfirmDriver = MessageBox(ConfirmDriverTitle, ConfirmDriverText, MB_YesNo, MR_No);
 	
-	Close();
-
+	GetPlayerOwner().EnableSaveGame();
+	
 	GetPlayerOwner().ConsoleCommand("SaveGame 99");
 	GetPlayerOwner().ConsoleCommand("RELAUNCH -changevideo?-nointro");
+	
+	Close();
 }
 
 
@@ -642,6 +644,9 @@ function BrightnessChanged()
 
 function GetCurrentSettings()
 {
+	local string VideoDriverClassName;//, ClassLeft, ClassRight, VideoDriverDesc;
+	local int i;
+	
 	// get current values and save
 	OrigBrightness = float(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager Brightness"));
 	
@@ -673,11 +678,26 @@ function GetCurrentSettings()
 		BitDepth_16.OverTexture = texture'Video_resol_ov';
 		BitDepth_16.DownTexture = texture'Video_resol_up';
 	}
+	
+	VideoDriverClassName = GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.GameRenderDevice Class");
+	i = InStr(VideoDriverClassName, "'");
+	// Get class name from class'...'
+	if(i != -1)
+	{
+		VideoDriverClassName = Mid(VideoDriverClassName, i+1);
+		i = InStr(VideoDriverClassName, "'");
+		VideoDriverClassName = Left(VideoDriverClassName, i);
+		//ClassLeft = Left(VideoDriverClassName, InStr(VideoDriverClassName, "."));
+		//ClassRight = Mid(VideoDriverClassName, InStr(VideoDriverClassName, ".") + 1);
+		//VideoDriverDesc = Localize(ClassRight, "ClassCaption", ClassLeft);
+	}
 
-	DriverLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentDriver"); 
+	DriverLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentDriver");
 	ResLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentRes"); 
 	
-
+	if (VideoDriverClassName ~= "d3d11drv.d3d11renderdevice")
+		DriverLabel.Text = DriverLabel.Text$" 11";
+	
 	// Will save changes by default
 	bSaveChanges = True;
 }

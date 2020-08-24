@@ -33,6 +33,9 @@ function CreateExplosion(Pawn Instigator)
 
 function CreateExplosion(Pawn Instigator)
 {
+	local Texture HitTexture;
+	local int flags;
+	
 	Super.CreateExplosion(Instigator);
 
 	// Damage
@@ -49,11 +52,22 @@ function CreateExplosion(Pawn Instigator)
 
 	// Decals
 	GenerateDecal();
+
+	// Sound
+	HitTexture = TraceTexture( location + vect(0,0,-1)*48*2, location, flags );
+	if ( HitTexture != none )
+	{
+		if (HitTexture.ImpactID == TID_Water)
+		{
+			PlaySound(Sound'Aeons.Weapons.E_Wpn_DynaExplWater01',SLOT_Interact, 3.0 ,,4096, 1.0);
+			Spawn (class 'UnderwaterExplosionFX',,,Location);
+			return;
+		}
+	}
 	
 	// Wind
 	Spawn(class 'ExplosionWind',,,Location);
-
-	// Sound
+	
 	PlayEffectSound();
 }
 
@@ -65,6 +79,7 @@ defaultproperties
      MomentumTransfer=5000
      Sounds(0)=Sound'Aeons.Weapons.E_Wpn_DynaExpl01'
      Sounds(1)=Sound'Aeons.Weapons.E_Wpn_DynaExpl02'
+     Sounds(2)=Sound'Aeons.Weapons.E_Wpn_DynaExpl03'
      DecalClass=Class'Aeons.ExplosionDecal'
      DrawScale=2
 }

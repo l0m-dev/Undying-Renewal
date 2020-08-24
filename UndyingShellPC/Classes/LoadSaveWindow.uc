@@ -3,28 +3,28 @@
 //=============================================================================
 class LoadSaveWindow expands ShellWindow;
 
-#exec Texture Import File=LoadSave_0.bmp Mips=Off
-#exec Texture Import File=LoadSave_1.bmp Mips=Off
-#exec Texture Import File=LoadSave_2.bmp Mips=Off
-#exec Texture Import File=LoadSave_3.bmp Mips=Off
-#exec Texture Import File=LoadSave_4.bmp Mips=Off
-#exec Texture Import File=LoadSave_5.bmp Mips=Off
+//#exec Texture Import File=LoadSave_0.bmp Mips=Off
+//#exec Texture Import File=LoadSave_1.bmp Mips=Off
+//#exec Texture Import File=LoadSave_2.bmp Mips=Off
+//#exec Texture Import File=LoadSave_3.bmp Mips=Off
+//#exec Texture Import File=LoadSave_4.bmp Mips=Off
+//#exec Texture Import File=LoadSave_5.bmp Mips=Off
 
-#exec Texture Import File=sload_cancel_dn.bmp	Mips=Off
-#exec Texture Import File=sload_cancel_ov.bmp	Mips=Off
-#exec Texture Import File=sload_cancel_up.bmp	Mips=Off
-#exec Texture Import File=sload_delete_dn.bmp	Mips=Off
-#exec Texture Import File=sload_delete_ov.bmp	Mips=Off
-#exec Texture Import File=sload_delete_up.bmp	Mips=Off
-#exec Texture Import File=sload_delete_ds.bmp	Mips=Off
-#exec Texture Import File=sload_load_dn.bmp		Mips=Off
-#exec Texture Import File=sload_load_ov.bmp		Mips=Off
-#exec Texture Import File=sload_load_up.bmp		Mips=Off
-#exec Texture Import File=sload_load_ds.bmp		Mips=Off
-#exec Texture Import File=sload_save_dn.bmp		Mips=Off
-#exec Texture Import File=sload_save_ov.bmp		Mips=Off
-#exec Texture Import File=sload_save_up.bmp		Mips=Off
-#exec Texture Import File=sload_save_ds.bmp		Mips=Off
+//#exec Texture Import File=sload_cancel_dn.bmp	Mips=Off
+//#exec Texture Import File=sload_cancel_ov.bmp	Mips=Off
+//#exec Texture Import File=sload_cancel_up.bmp	Mips=Off
+//#exec Texture Import File=sload_delete_dn.bmp	Mips=Off
+//#exec Texture Import File=sload_delete_ov.bmp	Mips=Off
+//#exec Texture Import File=sload_delete_up.bmp	Mips=Off
+//#exec Texture Import File=sload_delete_ds.bmp	Mips=Off
+//#exec Texture Import File=sload_load_dn.bmp		Mips=Off
+//#exec Texture Import File=sload_load_ov.bmp		Mips=Off
+//#exec Texture Import File=sload_load_up.bmp		Mips=Off
+//#exec Texture Import File=sload_load_ds.bmp		Mips=Off
+//#exec Texture Import File=sload_save_dn.bmp		Mips=Off
+//#exec Texture Import File=sload_save_ov.bmp		Mips=Off
+//#exec Texture Import File=sload_save_up.bmp		Mips=Off
+//#exec Texture Import File=sload_save_ds.bmp		Mips=Off
 
 //Dynamic #exec Texture Import File=Black.tga	Mips=Off
 //Dynamic #exec Texture Import File=Screenshot4.tga	Mips=Off

@@ -4,8 +4,8 @@
 class ParticleFX expands Visible
 	native;
 
-#exec Texture Import File=Textures\Particle.pcx Name=Particle MIPS=On Flags=2 
-#exec Texture Import File=Textures\ParticleSystem.pcx Name=S_Particle MIPS=On Flags=2
+//#exec Texture Import File=Textures\Particle.pcx Name=Particle MIPS=On Flags=2 
+//#exec Texture Import File=Textures\ParticleSystem.pcx Name=S_Particle MIPS=On Flags=2
 
 enum EParticlePrimitive
 {

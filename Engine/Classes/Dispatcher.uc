@@ -4,7 +4,7 @@
 //=============================================================================
 class Dispatcher extends Triggers;
 
-#exec Texture Import File=Textures\Dispatch.pcx Name=S_Dispatcher Mips=On Flags=2
+//#exec Texture Import File=Textures\Dispatch.pcx Name=S_Dispatcher Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Dispatcher variables.

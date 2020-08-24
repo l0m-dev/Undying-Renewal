@@ -3,22 +3,21 @@
 //=============================================================================
 class FindGameMainWindow expands ShellWindow;
 
-#exec Texture Import File=PSetup_0.bmp Mips=Off
-#exec Texture Import File=PSetup_1.bmp Mips=Off
-#exec Texture Import File=PSetup_2.bmp Mips=Off
-#exec Texture Import File=PSetup_3.bmp Mips=Off
-#exec Texture Import File=PSetup_4.bmp Mips=Off
-#exec Texture Import File=PSetup_5.bmp Mips=Off
+//#exec Texture Import File=PSetup_0.bmp Mips=Off
+//#exec Texture Import File=PSetup_1.bmp Mips=Off
+//#exec Texture Import File=PSetup_2.bmp Mips=Off
+//#exec Texture Import File=PSetup_3.bmp Mips=Off
+//#exec Texture Import File=PSetup_4.bmp Mips=Off
+//#exec Texture Import File=PSetup_5.bmp Mips=Off
 
-#exec Texture Import File=psetup_ok_ov.BMP	Mips=Off Flags=2
-#exec Texture Import File=psetup_ok_up.BMP	Mips=Off Flags=2
-#exec Texture Import File=psetup_ok_dn.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_ov.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_up.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_dn.BMP	Mips=Off Flags=2
 
 function Created()
 {
 	local int i;
 	local AeonsRootWindow AeonsRoot;
-	local float RootScaleX, RootScaleY;
 	
 	Super.Created();
 	
@@ -29,38 +28,13 @@ function Created()
 		Log("AeonsRoot is Null!");
 		return;
 	}
-
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
-
-	
-	
-	Resized();
 }
 
 //----------------------------------------------------------------------------
 
 function Resized()
 {
-	local AeonsRootWindow AeonsRoot;
-	local float RootScaleX, RootScaleY;
-	local int i;
-
 	Super.Resized();
-
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
 }
 
 

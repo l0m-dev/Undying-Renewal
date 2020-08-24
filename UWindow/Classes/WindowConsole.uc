@@ -12,10 +12,12 @@ var bool				bCreatedRoot;
 var float				MouseX;
 var float				MouseY;
 
-var class<UWindowConsoleWindow> ConsoleClass;
+var class<UWindowWindow> ConsoleClass;
+var class<UWindowWindow> ModClass;
 var config float		MouseScale;
 var config bool			ShowDesktop;
 var config bool			bShowConsole;
+var config bool			bShowMod;
 var bool				bBlackout;
 var bool				bUWindowType;
 
@@ -28,7 +30,8 @@ var globalconfig byte	ConsoleKey;
 
 var config EInputKey	UWindowKey;
 
-var UWindowConsoleWindow ConsoleWindow;
+var UWindowWindow ConsoleWindow;
+var UWindowWindow ModWindow;
 
 var float XaxisPSX2;	// for getting analog input
 var float YaxisPSX2;	// in state UWindow
@@ -46,6 +49,7 @@ function ResetUWindow()
 	bCreatedRoot = False;
 	ConsoleWindow = None;
 	bShowConsole = False;
+	bShowMod = False;
 	CloseUWindow();
 }
 
@@ -110,15 +114,22 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 						ConsoleCommand("ResetInput");
 						LaunchUWindow();
 
-						if(!bShowConsole)
+						if(!bShowConsole && !bShowMod)
 							ShowConsole();
 					}
 					return true;
 					break;
 
-				case EInputKey.IK_F3:
-					//AeonsPlayer(Viewport.Actor).ShowBook();
-					RequestBook(Viewport.Actor);
+				case EInputKey.IK_F4:
+					if (!bLocked)
+					{
+						bQuickKeyEnable = True;
+						ConsoleCommand("ResetInput");
+						LaunchUWindow();
+
+						if(!bShowConsole && !bShowMod)
+							ShowMod();
+					}
 					return true;
 					break;
 			}
@@ -144,6 +155,21 @@ function HideConsole()
 	
 	if (ConsoleWindow != None)
 		ConsoleWindow.HideWindow();
+}
+
+function ShowMod()
+{
+	bShowMod = true;
+	if(bCreatedRoot)
+		ModWindow.ShowWindow();
+}
+
+function HideMod()
+{
+	bShowMod = false;
+	
+	if (ModWindow != None)
+		ModWindow.HideWindow();
 }
 
 event Tick( float Delta )
@@ -178,8 +204,8 @@ event Tick( float Delta )
 		else
 		{
 			bQuickKeyEnable = False;
-			ShowDesktop = True;
-			bNoDrawWorld = True;
+			ShowDesktop = False;
+			bNoDrawWorld = False;
 			//ViewPort.Actor.Level.bLoadBootShellPSX2 = False;
 			LaunchUWindow();
 			//Locked = true; ?
@@ -275,8 +301,27 @@ state UWindow
 				{
 					if (!bLocked)
 					{
-						if(Root.bAllowConsole)
+						if(Root.bAllowConsole && !bShowMod)
 							ShowConsole();
+						else
+							Root.WindowEvent(WM_KeyDown, None, MouseX, MouseY, k);
+					}
+				}
+				break;
+
+			case EInputKey.IK_F4:
+				if (bShowMod)
+				{
+					HideMod();
+					if(bQuickKeyEnable)
+						CloseUWindow();
+				}
+				else
+				{
+					if (!bLocked)
+					{
+						if(!bShowConsole)
+							ShowMod();
 						else
 							Root.WindowEvent(WM_KeyDown, None, MouseX, MouseY, k);
 					}
@@ -294,6 +339,9 @@ state UWindow
 
 				if (bShowConsole)
 					HideConsole();
+
+				if (bShowMod)
+					HideMod();
 
 				if(bQuickKeyEnable)
 					CloseUWindow();
@@ -462,13 +510,17 @@ function CreateRootWindow(Canvas Canvas)
 	bCreatedRoot = True;
 
 	// Create the console window.
-	ConsoleWindow = UWindowConsoleWindow(Root.CreateWindow(ConsoleClass, 100, 100, 200, 200));
+	ConsoleWindow = Root.CreateWindow(ConsoleClass, 100, 100, 200, 200);
 	if(!bShowConsole)
 		HideConsole();
+		
+	ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
+	if(!bShowMod)
+		HideMod();
 
-	UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(" ");
-	for (I=0; I<4; I++)
-		UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(MsgText[I]);
+	//UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(" ");
+	//for (I=0; I<4; I++)
+	//	UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(MsgText[I]);
 }
 
 function RenderUWindow( canvas Canvas )
@@ -552,8 +604,8 @@ event Message( PlayerReplicationInfo PRI, coerce string Msg, name N )
 			OutText = MsgPlayer[TopLine].PlayerName$": "$MsgText[TopLine];
 		else
 			OutText = MsgText[TopLine];
-		if (ConsoleWindow != None)
-			UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(OutText);
+		//if (ConsoleWindow != None)
+		//	UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(OutText);
 	}
 }
 
@@ -563,8 +615,8 @@ event AddString( coerce string Msg )
 
 	if( Msg!="" )
 	{
-		if (ConsoleWindow != None)
-			UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(Msg);
+		//if (ConsoleWindow != None)
+		//	UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(Msg);
 	}
 }
 
@@ -608,6 +660,7 @@ defaultproperties
 {
      RootWindow="Aeons.AeonsRootWindow"
      ConsoleClass=Class'UWindow.UWindowConsoleWindow'
+     ModClass=Class'UWindow.UWindowModWindow'
      MouseScale=0.6
      UWindowKey=IK_Escape
      ShellAnalogThreshold=0.5

@@ -4,7 +4,7 @@
 //=============================================================================
 class Counter extends Triggers;
 
-#exec Texture Import File=Textures\Counter.pcx Name=S_Counter Mips=On Flags=2
+//#exec Texture Import File=Textures\Counter.pcx Name=S_Counter Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Counter variables.

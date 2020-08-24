@@ -4,7 +4,7 @@
 class NavigationPoint extends Invisible
 	native;
 
-#exec Texture Import File=Textures\S_Pickup.pcx Name=S_Pickup Mips=On Flags=2
+//#exec Texture Import File=Textures\S_Pickup.pcx Name=S_Pickup Mips=On Flags=2
 
 //------------------------------------------------------------------------------
 // NavigationPoint variables

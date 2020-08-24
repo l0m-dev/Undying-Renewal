@@ -11,10 +11,10 @@ class Canvas extends Object
 	noexport;
 
 // Objects.
-#exec Font Import File=Textures\SmallFont.bmp Name=SmallFont
-#exec Font Import File=Textures\MedFont.pcx   Name=MedFont
-#exec Font Import File=Textures\LargeFont.pcx Name=LargeFont
-#exec Font Import File=Textures\BigFont.pcx   Name=BigFont
+//#exec Font Import File=Textures\SmallFont.bmp Name=SmallFont
+//#exec Font Import File=Textures\MedFont.pcx   Name=MedFont
+//#exec Font Import File=Textures\LargeFont.pcx Name=LargeFont
+//#exec Font Import File=Textures\BigFont.pcx   Name=BigFont
 
 // Modifiable properties.
 var font    Font;            // Font for DrawText.

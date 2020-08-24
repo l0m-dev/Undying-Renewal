@@ -3,11 +3,11 @@
 //=============================================================================
 class ShotgunAmmo expands Ammo;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
-#exec MESH IMPORT MESH=ShotgunAmmo_m SKELFILE=ShotgunAmmo.ngf
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec MESH IMPORT MESH=ShotgunAmmo_m SKELFILE=ShotgunAmmo.ngf
 
 // Pickup Sound
-#exec AUDIO IMPORT  FILE="I_ShotAmmoPU01.WAV" NAME="I_ShotAmmoPU01" GROUP="Inventory"
+//#exec AUDIO IMPORT  FILE="I_ShotAmmoPU01.WAV" NAME="I_ShotAmmoPU01" GROUP="Inventory"
 
 state Activated
 {

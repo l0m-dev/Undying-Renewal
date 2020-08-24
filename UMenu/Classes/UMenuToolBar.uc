@@ -1,7 +1,7 @@
 class UMenuToolBar extends UWindowWindow
 	config;
 
-#exec TEXTURE IMPORT NAME=TempBG FILE=Textures\TempBG.pcx GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=TempBG FILE=Textures\TempBG.pcx GROUP="Icons" MIPS=OFF
 
 function Created()
 {

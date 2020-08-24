@@ -4,7 +4,7 @@
 //=============================================================================
 class TriggerLight extends Light;
 
-#exec Texture Import File=Textures\S_TrigLight.pcx  Name=S_TrigLight Mips=On Flags=2
+//#exec Texture Import File=Textures\S_TrigLight.pcx  Name=S_TrigLight Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Variables.

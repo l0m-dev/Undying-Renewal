@@ -3,14 +3,14 @@
 //=============================================================================
 class AdvControlWindow expands ShellWindow;
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
-#exec Texture Import File=AdvControls_0.bmp Mips=Off
-#exec Texture Import File=AdvControls_1.bmp Mips=Off
-#exec Texture Import File=AdvControls_2.bmp Mips=Off
-#exec Texture Import File=AdvControls_3.bmp Mips=Off
-#exec Texture Import File=AdvControls_4.bmp Mips=Off
-#exec Texture Import File=AdvControls_5.bmp Mips=Off
+//#exec Texture Import File=AdvControls_0.bmp Mips=Off
+//#exec Texture Import File=AdvControls_1.bmp Mips=Off
+//#exec Texture Import File=AdvControls_2.bmp Mips=Off
+//#exec Texture Import File=AdvControls_3.bmp Mips=Off
+//#exec Texture Import File=AdvControls_4.bmp Mips=Off
+//#exec Texture Import File=AdvControls_5.bmp Mips=Off
 
 
 var ShellButton OK;

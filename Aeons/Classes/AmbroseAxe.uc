@@ -2,7 +2,7 @@
 // ambroseaxe.
 //=============================================================================
 class ambroseaxe expands HeldProp;
-#exec MESH IMPORT MESH=ambroseaxe_m SKELFILE=ambroseaxe.ngf
+//#exec MESH IMPORT MESH=ambroseaxe_m SKELFILE=ambroseaxe.ngf
 
 var(AICombat) float Health;
 

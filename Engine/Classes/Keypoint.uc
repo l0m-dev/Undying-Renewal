@@ -6,7 +6,7 @@ class Keypoint extends Invisible
 	native;
 
 // Sprite.
-#exec Texture Import File=Textures\Keypoint.pcx Name=S_Keypoint Mips=On Flags=2
+//#exec Texture Import File=Textures\Keypoint.pcx Name=S_Keypoint Mips=On Flags=2
 
 defaultproperties
 {

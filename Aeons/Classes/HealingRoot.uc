@@ -3,7 +3,7 @@
 //=============================================================================
 class HealingRoot expands Health;
 
-#exec MESH IMPORT MESH=HealingRoot_m SKELFILE=HealingRoot.ngf
+//#exec MESH IMPORT MESH=HealingRoot_m SKELFILE=HealingRoot.ngf
 
 
 function PreBeginPlay()

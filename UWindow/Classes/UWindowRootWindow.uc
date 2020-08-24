@@ -3,18 +3,18 @@
 //=============================================================================
 class UWindowRootWindow extends UWindowWindow;
 
-#exec TEXTURE IMPORT NAME=MouseCursor FILE=Textures\MouseCursor.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseMove FILE=Textures\MouseMove.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseDiag1 FILE=Textures\MouseDiag1.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseDiag2 FILE=Textures\MouseDiag2.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseNS FILE=Textures\MouseNS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseWE FILE=Textures\MouseWE.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseHand FILE=Textures\MouseHand.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseHSplit FILE=Textures\MouseHSplit.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseVSplit FILE=Textures\MouseVSplit.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MouseWait FILE=Textures\MouseWait.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseCursor FILE=Textures\MouseCursor.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseMove FILE=Textures\MouseMove.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseDiag1 FILE=Textures\MouseDiag1.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseDiag2 FILE=Textures\MouseDiag2.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseNS FILE=Textures\MouseNS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseWE FILE=Textures\MouseWE.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseHand FILE=Textures\MouseHand.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseHSplit FILE=Textures\MouseHSplit.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseVSplit FILE=Textures\MouseVSplit.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MouseWait FILE=Textures\MouseWait.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT FILE=Textures\ShellCursor.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT FILE=Textures\ShellCursor.bmp GROUP="Icons" MIPS=OFF
 
 //!! Japanese text (experimental).
 //#exec OBJ LOAD FILE=..\Textures\Japanese.utx

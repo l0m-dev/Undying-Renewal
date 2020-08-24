@@ -3,7 +3,7 @@
 //=============================================================================
 class HasteModifier expands PlayerModifier;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var travel bool 	bHUDEffect;		// HUD can be activated?
 var travel float 	str;			// strength of HUD Effect

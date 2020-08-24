@@ -50,6 +50,8 @@ function Close(optional bool bByParent)
 {
 	ClientArea.Close(True);
 	Root.Console.HideConsole();
+	if(Root.Console.bQuickKeyEnable)
+		Root.Console.CloseUWindow();
 }
 
 defaultproperties

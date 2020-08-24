@@ -16,53 +16,53 @@ class SkullStorm expands AttSpell;
 //                                                      Sounds
 // --------------------------------------------------------------------------------------------------------------------------
 // Spawning
-#exec AUDIO IMPORT FILE="E_Spl_SkullLaunch01.wav" NAME="E_Spl_Skulllaunch01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullLaunch01.wav" NAME="E_Spl_Skulllaunch01" GROUP="Spells"
 
-#exec AUDIO IMPORT FILE="E_Spl_SkullScream01.wav" NAME="E_Spl_SkullScream01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullScream02.wav" NAME="E_Spl_SkullScream02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullScream01.wav" NAME="E_Spl_SkullScream01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullScream02.wav" NAME="E_Spl_SkullScream02" GROUP="Spells"
 
 // --------------------------------------------------------------------------------------------------------------------------
 // Threats
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL01.wav" NAME="E_Spl_SkullThreatL01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL02.wav" NAME="E_Spl_SkullThreatL02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL03.wav" NAME="E_Spl_SkullThreatL03" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL04.wav" NAME="E_Spl_SkullThreatL04" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL01.wav" NAME="E_Spl_SkullThreatL01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL02.wav" NAME="E_Spl_SkullThreatL02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL03.wav" NAME="E_Spl_SkullThreatL03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatL04.wav" NAME="E_Spl_SkullThreatL04" GROUP="Spells"
 
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatS01.wav" NAME="E_Spl_SkullThreatS01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullThreatS02.wav" NAME="E_Spl_SkullThreatS02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatS01.wav" NAME="E_Spl_SkullThreatS01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullThreatS02.wav" NAME="E_Spl_SkullThreatS02" GROUP="Spells"
 
 // --------------------------------------------------------------------------------------------------------------------------
 // Talking
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL01.wav" NAME="E_Spl_SkullTalkL01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL02.wav" NAME="E_Spl_SkullTalkL02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL03.wav" NAME="E_Spl_SkullTalkL03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL01.wav" NAME="E_Spl_SkullTalkL01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL02.wav" NAME="E_Spl_SkullTalkL02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkL03.wav" NAME="E_Spl_SkullTalkL03" GROUP="Spells"
 
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS01.wav" NAME="E_Spl_SkullTalkS01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS02.wav" NAME="E_Spl_SkullTalkS02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS03.wav" NAME="E_Spl_SkullTalkS03" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS04.wav" NAME="E_Spl_SkullTalkS04" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS01.wav" NAME="E_Spl_SkullTalkS01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS02.wav" NAME="E_Spl_SkullTalkS02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS03.wav" NAME="E_Spl_SkullTalkS03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullTalkS04.wav" NAME="E_Spl_SkullTalkS04" GROUP="Spells"
 
 
 /*
 // these are all Beavis samples
 // --------------------------------------------------------------------------------------------------------------------------
 // Screaming
-#exec AUDIO IMPORT FILE="E_Spl_SkullScream01.wav" NAME="E_Spl_SkullScream01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullScream02.wav" NAME="E_Spl_SkullScream02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullScream01.wav" NAME="E_Spl_SkullScream01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullScream02.wav" NAME="E_Spl_SkullScream02" GROUP="Spells"
 
 // --------------------------------------------------------------------------------------------------------------------------
 // Commentary
-#exec AUDIO IMPORT FILE="E_Spl_SkullComment01.wav" NAME="E_Spl_SkullComment01" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullComment02.wav" NAME="E_Spl_SkullComment02" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullComment03.wav" NAME="E_Spl_SkullComment03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullComment01.wav" NAME="E_Spl_SkullComment01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullComment02.wav" NAME="E_Spl_SkullComment02" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullComment03.wav" NAME="E_Spl_SkullComment03" GROUP="Spells"
 
 // --------------------------------------------------------------------------------------------------------------------------
 // Greetings
-#exec AUDIO IMPORT FILE="E_Spl_SkullGreet01.wav" NAME="E_Spl_SkullGreet01" GROUP="Spells"		// hey how's it goin'?
-#exec AUDIO IMPORT FILE="E_Spl_SkullGreet02.wav" NAME="E_Spl_SkullGreet02" GROUP="Spells"		// let's go breaksomething
-#exec AUDIO IMPORT FILE="E_Spl_SkullGreet03.wav" NAME="E_Spl_SkullGreet03" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullGreet04.wav" NAME="E_Spl_SkullGreet04" GROUP="Spells"
-#exec AUDIO IMPORT FILE="E_Spl_SkullGreet05.wav" NAME="E_Spl_SkullGreet05" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullGreet01.wav" NAME="E_Spl_SkullGreet01" GROUP="Spells"		// hey how's it goin'?
+//#exec AUDIO IMPORT FILE="E_Spl_SkullGreet02.wav" NAME="E_Spl_SkullGreet02" GROUP="Spells"		// let's go breaksomething
+//#exec AUDIO IMPORT FILE="E_Spl_SkullGreet03.wav" NAME="E_Spl_SkullGreet03" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullGreet04.wav" NAME="E_Spl_SkullGreet04" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_SkullGreet05.wav" NAME="E_Spl_SkullGreet05" GROUP="Spells"
 // --------------------------------------------------------------------------------------------------------------------------
 */
 

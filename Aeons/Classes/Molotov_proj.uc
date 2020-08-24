@@ -3,16 +3,16 @@
 //=============================================================================
 class Molotov_proj expands WeaponProjectile;
 
-#exec MESH IMPORT MESH=Molotov_m SKELFILE=Molotov.ngf
+//#exec MESH IMPORT MESH=Molotov_m SKELFILE=Molotov.ngf
 
 //=============================================================================
 // Sounds =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-
 //=============================================================================
 
 // Explosion sound
-#exec AUDIO IMPORT FILE="E_Wpn_MoltExpl01.wav" NAME="E_Wpn_MoltExpl01" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="E_Wpn_MoltBounce01.wav" NAME="E_Wpn_MoltBounce01" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="E_Wpn_MoltFireLoop01vL.wav" NAME="E_Wpn_MoltFireLoop01" GROUP="Weapons"
+//#exec AUDIO IMPORT FILE="E_Wpn_MoltExpl01.wav" NAME="E_Wpn_MoltExpl01" GROUP="Weapons"
+//#exec AUDIO IMPORT FILE="E_Wpn_MoltBounce01.wav" NAME="E_Wpn_MoltBounce01" GROUP="Weapons"
+//#exec AUDIO IMPORT FILE="E_Wpn_MoltFireLoop01vL.wav" NAME="E_Wpn_MoltFireLoop01" GROUP="Weapons"
 
 //=============================================================================
 

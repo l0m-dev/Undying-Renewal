@@ -8,8 +8,8 @@ class Console extends Object
 	transient;
 
 // Imports.
-#exec Texture Import NAME=ConsoleBack File=Textures\Console.pcx
-#exec Texture Import File=Textures\Border.pcx
+//#exec Texture Import NAME=ConsoleBack File=Textures\Console.pcx
+//#exec Texture Import File=Textures\Border.pcx
 
 // Internal.
 var private const int vtblOut;

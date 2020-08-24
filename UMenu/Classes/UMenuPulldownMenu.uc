@@ -1,21 +1,21 @@
 class UMenuPulldownMenu extends UWindowPulldownMenu;
 
 
-#exec TEXTURE IMPORT NAME=BMenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHL FILE=Textures\MenuHL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHM FILE=Textures\MenuHM.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=BMenuHR FILE=Textures\MenuHR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuLine FILE=Textures\MenuLine.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHL FILE=Textures\MenuHL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHM FILE=Textures\MenuHM.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=BMenuHR FILE=Textures\MenuHR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuLine FILE=Textures\MenuLine.bmp GROUP="Icons" MIPS=OFF
 
-#exec AUDIO IMPORT FILE="Sounds\littleselect.WAV" NAME="LittleSelect" GROUP="Menu"
+//#exec AUDIO IMPORT FILE="Sounds\littleselect.WAV" NAME="LittleSelect" GROUP="Menu"
 
 
 var UWindowPulldownMenuItem OldSelected;

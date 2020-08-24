@@ -3,12 +3,12 @@
 //=============================================================================
 class BulletAmmo expands Ammo;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 // #exec MESH IMPORT MESH=bulletammo_m SKELFILE=bulletammo_m.ngf
-#exec MESH IMPORT MESH=RevolverAmmo_m SKELFILE=RevolverAmmo.ngf
+//#exec MESH IMPORT MESH=RevolverAmmo_m SKELFILE=RevolverAmmo.ngf
 
-#exec AUDIO IMPORT  FILE="I_RevAmmoPU01.WAV" NAME="I_RevAmmoPU01" GROUP="Inventory"
+//#exec AUDIO IMPORT  FILE="I_RevAmmoPU01.WAV" NAME="I_RevAmmoPU01" GROUP="Inventory"
 
 state Activated
 {

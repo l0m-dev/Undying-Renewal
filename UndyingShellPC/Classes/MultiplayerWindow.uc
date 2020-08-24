@@ -10,9 +10,9 @@ class MultiplayerWindow expands ShellWindow;
 #exec Texture Import File=Multiplayer_4.bmp Mips=Off
 #exec Texture Import File=Multiplayer_5.bmp Mips=Off
 
-#exec Texture Import File=audio_ok_ov.BMP	Mips=Off Flags=2
-#exec Texture Import File=audio_ok_up.BMP	Mips=Off Flags=2
-#exec Texture Import File=audio_ok_dn.BMP	Mips=Off Flags=2
+//#exec Texture Import File=audio_ok_ov.BMP	Mips=Off Flags=2
+//#exec Texture Import File=audio_ok_up.BMP	Mips=Off Flags=2
+//#exec Texture Import File=audio_ok_dn.BMP	Mips=Off Flags=2
 
 #exec Texture Import File=player_setup_ov.bmp	Mips=Off Flags=2
 #exec Texture Import File=player_setup_up.bmp	Mips=Off Flags=2

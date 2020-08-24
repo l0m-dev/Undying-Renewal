@@ -4,7 +4,7 @@
 class TWC_proj expands SpellProjectile
 	abstract;
 
-#exec MESH IMPORT MESH=IceChunk_proj_m SKELFILE=IceChunk_proj.ngf 
+//#exec MESH IMPORT MESH=IceChunk_proj_m SKELFILE=IceChunk_proj.ngf 
 
 var PlayerStateTrigger 		attachedTrigger;
 var PlayerPawn 				ViewOwner;

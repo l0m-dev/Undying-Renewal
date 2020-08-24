@@ -1,32 +1,32 @@
 class UWindowWin95LookAndFeel expands UWindowLookAndFeel;
 
-#exec TEXTURE IMPORT NAME=ActiveFrame FILE=Textures\ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=InactiveFrame FILE=Textures\InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ActiveFrameS FILE=Textures\ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=InactiveFrameS FILE=Textures\InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ActiveFrame FILE=Textures\ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=InactiveFrame FILE=Textures\InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ActiveFrameS FILE=Textures\ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=InactiveFrameS FILE=Textures\InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=Misc FILE=Textures\Misc.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=Misc FILE=Textures\Misc.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=ChkChecked FILE=Textures\ChkChecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkUnchecked FILE=Textures\ChkUnchecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkCheckedDisabled FILE=Textures\ChkCheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=ChkUncheckedDisabled FILE=Textures\ChkUncheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkChecked FILE=Textures\ChkChecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkUnchecked FILE=Textures\ChkUnchecked.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkCheckedDisabled FILE=Textures\ChkCheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=ChkUncheckedDisabled FILE=Textures\ChkUncheckedDisabled.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MenuBar FILE=Textures\MenuBar.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuHighlightL FILE=Textures\MenuHighlightL.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuHighlightM FILE=Textures\MenuHighlightM.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuHighlightR FILE=Textures\MenuHighlightR.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuBar FILE=Textures\MenuBar.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuHighlightL FILE=Textures\MenuHighlightL.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuHighlightM FILE=Textures\MenuHighlightM.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuHighlightR FILE=Textures\MenuHighlightR.bmp FLAGS=2 GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MenuHighlight FILE=Textures\MenuHighlight.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuArea FILE=Textures\MenuArea.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuTL FILE=Textures\MenuTL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuT FILE=Textures\MenuT.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuTR FILE=Textures\MenuTR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuL FILE=Textures\MenuL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuR FILE=Textures\MenuR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuBL FILE=Textures\MenuBL.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuB FILE=Textures\MenuB.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuBR FILE=Textures\MenuBR.bmp GROUP="Icons" MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MenuHighlight FILE=Textures\MenuHighlight.bmp GROUP="Icons" MIPS=OFF
 
 var() Region	SBUpUp;
 var() Region	SBUpDown;

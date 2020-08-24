@@ -22,6 +22,7 @@ var bool					bBRSizing;
 
 var bool					bMoving;
 var bool					bSizable;
+var bool					bMovable;
 var bool					bStatusBar;
 var UWindowFrameCloseBox	CloseBox;
 
@@ -68,7 +69,8 @@ function LMouseDown(float X, float Y)
 
 	if(H == HT_TitleBar)
 	{
-		return; // l0m
+		if (!bMovable)
+			return;
 		
 		MoveX = X;
 		MoveY = Y;
@@ -287,5 +289,6 @@ function WindowHidden()
 
 defaultproperties
 {
+	 bMovable=True
      ClientClass=Class'UWindow.UWindowClientWindow'
 }

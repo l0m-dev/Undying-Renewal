@@ -5,11 +5,11 @@ class AeonsHUD expands HUD;
 
 // BURT - All exec imports were ripped since it is just an update
 
-#exec Texture Import File=Revolver_Icon_Yellow.bmp		Mips=Off
+#exec Texture Import File=Revolver_Icon_Silver.bmp		Mips=Off
 
-#exec OBJ LOAD FILE=\Textures\fxB2.utx PACKAGE=fxB2
-#exec OBJ LOAD FILE=\Textures\fxB.utx PACKAGE=fxB
-#exec OBJ LOAD FILE=\textures\FX.utx PACKAGE=FX
+//#exec OBJ LOAD FILE=\Textures\fxB2.utx PACKAGE=fxB2
+//#exec OBJ LOAD FILE=\Textures\fxB.utx PACKAGE=fxB
+//#exec OBJ LOAD FILE=\textures\FX.utx PACKAGE=FX
 
 //=============================================================================
 
@@ -258,10 +258,6 @@ simulated function UpdateSubtitles(Float DeltaTime)
 	}
 }
 
-exec function test() {
-	AddSubtitle("FUCK");
-}
-
 simulated function DrawSubtitles(Canvas canvas)
 {
 	local float X, Y;
@@ -381,7 +377,8 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	Canvas.DrawColor = PlayerPawn(Owner).CrossHairColor;
 	
 	PlayerPawn(Owner).bHaveTarget = false;
-
+	
+	Scale = Scale * (Canvas.ClipY / 600);
 	CurrentCrossHair = CrossHairs[ CrossHair ];	
 	// if we are tracing a Scripted Pawn, change the crosshair to green.
 	if ( A != none )
@@ -816,10 +813,18 @@ simulated function PostRender( canvas Canvas )
 		Canvas.SetPos(0,Canvas.ClipY - YDelta);
 		Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
 
-
+		// BURT: FIX 1
 		// force draw on screen messages during cutscenes
-		if ( (AeonsPlayer(Owner).OSMMod != none) && Level.bIsCutsceneLevel)
+		if (AeonsPlayer(Owner).OSMMod != none)
+		{
 			AeonsPlayer(Owner).OSMMod.RenderOverlays(Canvas);
+		}
+		else if (AeonsPlayer(Owner).OverlayActor != none &&
+				 AeonsPlayer(Owner).OverlayActor.IsA('OnScreenMessage'))
+		{
+			AeonsPlayer(Owner).OverlayActor.RenderOverlays(Canvas);		
+		}
+		// --BURT
 
 		// Draw debug Cutscene Info
 		if (MP == none)
@@ -837,15 +842,15 @@ simulated function PostRender( canvas Canvas )
 		bDrawHUD = false;
 	} 
 
-	if ( AeonsPlayer(Owner).OverlayActor != none )
-	{
+	//if ( AeonsPlayer(Owner).OverlayActor != none )
+	//{
 		//AeonsPlayer(Owner).OverlayActor.RenderOverlays(Canvas);		
 		/*
 		if ( AeonsPlayer(Owner).OverlayActor.IsA('OnScreenMessage') )
 			if ( OnScreenMessage(AeonsPlayer(Owner).OverlayActor).bHideHUD )
 				bDrawHUD = false;
 		*/
-	}
+	//}
 
 	
 	if ( bDrawHUD )
@@ -905,10 +910,9 @@ simulated function PostRender( canvas Canvas )
 				}
 			}
 			
-			if ( (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) )
+			if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) )
 			{
-				if ( !PlayerOwner.bBehindView )
-					PlayerOwner.Weapon.PostRender(Canvas);
+				PlayerOwner.Weapon.PostRender(Canvas);
 				if ( !PlayerOwner.Weapon.bOwnsCrossHair && !AeonsPlayer(PlayerOwner).bSelectObject )
 					DrawCrossHair(Canvas, (0.5 * Canvas.ClipX) + AeonsPlayer(Owner).crossHairOffsetX, (0.5 * Canvas.ClipY) + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
 			}
@@ -971,18 +975,18 @@ simulated function PostRender( canvas Canvas )
 				DrawInvCount(Canvas, 104*Scale, Canvas.ClipY-88*Scale);
 			}
 	
-			DrawInventoryItem(Canvas, 104*Scale, Canvas.ClipY-80*Scale);		
+			DrawInventoryItem(Canvas, 104*ScaleX, Canvas.ClipY-72*Scale);		
 			if ( !AeonsPlayer(Owner).Weapon.IsA('Scythe') && !AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-				DrawAmmo(Canvas, 16*Scale, Canvas.ClipY-88*Scale);
+				DrawAmmo(Canvas, 16*ScaleX, Canvas.ClipY-80*Scale);
 
-			DrawConventionalWeapon(Canvas, 16*Scale, Canvas.ClipY - 80*Scale );		
+			DrawConventionalWeapon(Canvas, 16*Scale, Canvas.ClipY - 72*Scale );		
 		}
 	
 		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - 79*Scale, Canvas.ClipY - 84*Scale);
-		DrawOffensiveSpell(Canvas, Canvas.ClipX - 168*Scale, Canvas.ClipY - 80*Scale );	
+		DrawOffensiveSpell(Canvas, Canvas.ClipX - 80*Scale, Canvas.ClipY - 72*Scale );	
 	
 		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - 140*Scale, Canvas.ClipY - 84*Scale );	
-		DrawDefensiveSpell(Canvas, Canvas.ClipX - 188*Scale, Canvas.ClipY - 80*Scale );	
+		DrawDefensiveSpell(Canvas, Canvas.ClipX - 140*Scale, Canvas.ClipY - 72*Scale );
 			
 		DrawActiveSpells(Canvas);
 
@@ -1118,7 +1122,8 @@ simulated function PostRender( canvas Canvas )
 	*/
 
 	// Draw the subtitles
-	DrawSubtitles (Canvas);
+	if (Aeonsplayer(Owner).bEnableSubtitles)
+		DrawSubtitles (Canvas);
 	
 }
 
@@ -2566,8 +2571,7 @@ simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 
 			Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	
-			//Canvas.SetPos( X, Y );
-			Canvas.SetPos( Canvas.ClipX - 80*Scale, Canvas.ClipY - 72*Scale );
+			Canvas.SetPos( X, Y );
 				
 			Canvas.DrawColor.r = 255;
 			Canvas.DrawColor.g = 255;
@@ -2644,7 +2648,7 @@ simulated function DrawDefensiveSpell(Canvas Canvas, int X, int Y)
 
 			Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	
-			Canvas.SetPos( Canvas.ClipX - 140*Scale, Canvas.ClipY - 72*Scale );
+			Canvas.SetPos(X, Y);
 	
 			Canvas.DrawColor.r = 255;
 			Canvas.DrawColor.g = 255;
@@ -2996,7 +3000,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 	
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.SetPos( 317*ScaleX, 536*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Health', 64*Scale, 64*Scale, 0, 0, 64, 64);
+	Canvas.DrawTileClipped( Texture'Health', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
@@ -3008,7 +3012,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*Scale, 64*Scale, 0, 0, 64, 64);
+	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 }
 
 
@@ -3774,7 +3778,7 @@ simulated function DrawMOTD(Canvas Canvas)
 simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent)
 {
 	
-	Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*Scale, 64*Scale, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
+	Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
 }
 
 
@@ -4001,7 +4005,7 @@ simulated function DrawIconsofShame(Canvas Canvas)
 simulated function DrawScryeOverlay(Canvas Canvas)
 {
 	local PlayerPawn P;
-	local float ScryePercent; 
+	//local float ScryePercent; 
 
 	P = PlayerPawn(Owner);
 	
@@ -4015,6 +4019,7 @@ simulated function DrawScryeOverlay(Canvas Canvas)
 		return;
 	
 	// should we expose ScryeFraction() to script ?	
+	/*
 	if (( P.ScryeTimer >= P.ScryeRampTime )&&( P.ScryeTimer <= (P.ScryeFullTime - P.ScryeRampTime)))
 	{
 		ScryePercent = 1.0f;
@@ -4030,7 +4035,7 @@ simulated function DrawScryeOverlay(Canvas Canvas)
 	
 	Canvas.Style = ERenderStyle.STY_Modulated;
 
-	/*
+	
 	Canvas.DrawColor.R = 96 - ScryePercent * 96;
 	Canvas.DrawColor.G = 96 - ScryePercent * 96;
 	Canvas.DrawColor.B = 255 - ScryePercent * 200;
@@ -4694,7 +4699,7 @@ defaultproperties
      CrossHairs(22)=Texture'Aeons.Icons.CrossHair22'
      CrossHairs(23)=Texture'Aeons.Icons.CrossHair23'
      Icons(0)=Texture'Aeons.Icons.null_Icon'
-     Icons(1)=Texture'Aeons.Icons.Revolver_Icon_Yellow'
+     Icons(1)=Texture'Aeons.Icons.Revolver_Icon_Silver'
      Icons(2)=Texture'Aeons.Icons.Ghelz_Icon'
      Icons(3)=Texture'Aeons.Icons.Scythe_Icon'
      Icons(4)=Texture'Aeons.Icons.Cannon_Icon'

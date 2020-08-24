@@ -5,8 +5,8 @@ class AeonsPlayer expands PlayerPawn
     config(user)
 	abstract;
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
 
 // Deaths
 //#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death01.wav" NAME="P_Death01" GROUP="Player"
@@ -28,7 +28,7 @@ class AeonsPlayer expands PlayerPawn
 //#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
 
 // Misc
-#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
+#exec AUDIO IMPORT FILE="P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
 
 // Take Hits
 //#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
@@ -44,7 +44,7 @@ class AeonsPlayer expands PlayerPawn
 //#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Grunt01.wav" NAME="P_Land_Grunt01" GROUP="Player"
 //#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Splash01.wav" NAME="P_Land_Splash01" GROUP="Player"
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 var(Sounds) sound   Drown;
 var(Sounds) sound	BreathAgain;
@@ -891,7 +891,7 @@ simulated function GiveJournal(class<JournalEntry> JournalClass, optional bool b
 }
 
 /*exec brady doesn't want this to be bindable*/ 
-function ShowBook()
+exec function ShowBook()
 {
 	local windowconsole wconsole;
 	
@@ -2735,7 +2735,7 @@ ignores SeePlayer, HearNoise, Bump;
 //		log( "in ProcessMove, OldAccel is <" $ OldAccel $ "> (" $ OldVSize $ "), NewAccel is <" $ NewAccel $ "> (" $ NewVSize $ ")" );
 
 		Acceleration = NewAccel;
-		bIsTurning = ( Abs(DeltaRot.Yaw/DeltaTime) > 5000 );
+		bIsTurning = ( Abs(RawDeltaRotation(DeltaTime).Yaw) > 5000 );
 
 		if ( bPressedJump )
 			DoJump();
@@ -7617,7 +7617,7 @@ defaultproperties
      Die2=Sound'Voiceover.Patrick.Pa_131'
      Die3=Sound'Voiceover.Patrick.Pa_132'
      Die4=Sound'Voiceover.Patrick.Pa_132'
-     GaspSound=Sound'Voiceover.Patrick.Pa_140'
+     GaspSound=Sound'Aeons.Player.P_Gasp_Air01'
      LandGrunt=Sound'Voiceover.Patrick.Pa_138'
      UnderWater=Sound'CreatureSFX.SharedHuman.P_Underwater01'
      VoiceType=Class'Engine.VoicePack'
@@ -7632,7 +7632,7 @@ defaultproperties
      bCanStrafe=True
      bIsHuman=True
      MeleeRange=50
-     GroundSpeed=400
+     GroundSpeed=350
      AirSpeed=256
      AccelRate=2048
      JumpZ=350

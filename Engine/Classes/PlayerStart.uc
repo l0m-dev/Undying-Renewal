@@ -4,7 +4,7 @@
 class PlayerStart extends NavigationPoint 
 	native;
 
-#exec Texture Import File=Textures\S_Player.pcx Name=S_Player Mips=On Flags=2
+//#exec Texture Import File=Textures\S_Player.pcx Name=S_Player Mips=On Flags=2
 
 // Players on different teams are not spawned in areas with the
 // same TeamNumber unless there are more teams in the level than

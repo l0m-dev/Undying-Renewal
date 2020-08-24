@@ -262,6 +262,8 @@ var int DemoViewYaw;
 
 var float LastPlaySound;
 
+var globalconfig bool bEnableSubtitles;
+
 replication
 {
 	// Things the server should send to the client.
@@ -5164,6 +5166,8 @@ exec function RenderSelf()
 	bRenderSelf = !bRenderSelf;
 }
 
+exec function ShowBook();
+
 //=============================================================================
 // Multiskin support
 static function SetMultiSkin( playerpawn SkinActor, string SkinName, string FaceName, byte TeamNum )
@@ -5257,6 +5261,7 @@ defaultproperties
      Handedness=-1
      bAlwaysMouseLook=True
      bKeyboardLook=True
+	 bEnableSubtitles=False
      bMessageBeep=True
      bCheatsEnabled=True
      bUpdateInventorySelect=True

@@ -81,7 +81,7 @@ function MeleeAttack(float Range)
 	impulse.z = (chargeCount/20.0) * 256;
 	// log("Impulse: "$Impulse);
 
-	 spawn(class 'GhelziabahrRing',Pawn(Owner),,Location,rot(0,0,0));
+	spawn(class 'GhelziabahrRing',,,Owner.Location, rot(0,0,0));
 	
 	//rb net spawn(class 'GhelzRingFX',Pawn(Owner),,Location,rot(0,0,0));
 	g = spawn(class 'GhelzRingFX',Pawn(Owner),,Owner.Location,rot(0,0,0));

@@ -9,9 +9,9 @@ class Actor extends Object
 	nativereplication;
 
 // Imported data (during full rebuild).
-#exec Texture Import File=Textures\S_Actor.pcx Name=S_Actor Mips=On Flags=2
-#exec Texture Import File=Textures\Flag1.pcx Name=S_Flag Mips=On Flags=2
-#exec Texture Import File=Textures\generic_i.pcx Name=Generic_Inv Mips=On
+//#exec Texture Import File=Textures\S_Actor.pcx Name=S_Actor Mips=On Flags=2
+//#exec Texture Import File=Textures\Flag1.pcx Name=S_Flag Mips=On Flags=2
+//#exec Texture Import File=Textures\generic_i.pcx Name=Generic_Inv Mips=On
 
 // Flags for sound properties
 const SOUND_LOCKED			= 0x0001;

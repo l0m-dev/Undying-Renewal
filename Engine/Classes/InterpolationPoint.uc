@@ -5,7 +5,7 @@ class InterpolationPoint extends Keypoint
 	native;
 
 // Sprite.
-#exec Texture Import File=Textures\IntrpPnt.pcx Name=S_Interp Mips=On Flags=2
+//#exec Texture Import File=Textures\IntrpPnt.pcx Name=S_Interp Mips=On Flags=2
 
 // Number in sequence sharing this tag.
 var() int    Position;

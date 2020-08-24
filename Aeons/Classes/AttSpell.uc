@@ -8,7 +8,7 @@ class AttSpell extends AeonsSpell
 //#exec Texture Import File=Weapon.pcx Name=S_Weapon Mips=Off Flags=2
 
 // general spell pickup sound
-#exec AUDIO IMPORT FILE="E_Spl_GenPck01.wav" NAME="E_Spl_GenPck01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_GenPck01.wav" NAME="E_Spl_GenPck01" GROUP="Spells"
 
 // Weightings for spell projectiles seeking Pawns.
 var int localCastingLevel;

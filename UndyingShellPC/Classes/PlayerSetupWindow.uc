@@ -3,16 +3,16 @@
 //=============================================================================
 class PlayerSetupWindow expands ShellWindow;
 
-#exec Texture Import File=PSetup_0.bmp Mips=Off
-#exec Texture Import File=PSetup_1.bmp Mips=Off
-#exec Texture Import File=PSetup_2.bmp Mips=Off
-#exec Texture Import File=PSetup_3.bmp Mips=Off
-#exec Texture Import File=PSetup_4.bmp Mips=Off
-#exec Texture Import File=PSetup_5.bmp Mips=Off
+//#exec Texture Import File=PSetup_0.bmp Mips=Off
+//#exec Texture Import File=PSetup_1.bmp Mips=Off
+//#exec Texture Import File=PSetup_2.bmp Mips=Off
+//#exec Texture Import File=PSetup_3.bmp Mips=Off
+//#exec Texture Import File=PSetup_4.bmp Mips=Off
+//#exec Texture Import File=PSetup_5.bmp Mips=Off
 
-#exec Texture Import File=psetup_ok_ov.BMP	Mips=Off Flags=2
-#exec Texture Import File=psetup_ok_up.BMP	Mips=Off Flags=2
-#exec Texture Import File=psetup_ok_dn.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_ov.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_up.BMP	Mips=Off Flags=2
+//#exec Texture Import File=psetup_ok_dn.BMP	Mips=Off Flags=2
 
 
 var int PlayCount;
@@ -31,7 +31,7 @@ var localized string FaceText, BodyText;
 var int		SmokingWindows[2];
 var float	SmokingTimers[2];
 
-var actor SoundEmitter;
+//var actor SoundEmitter;
 
 var bool bFace;
 //----------------------------------------------------------------------------
@@ -120,11 +120,13 @@ function Created()
 	
 	//Root.Console.bBlackout = True;
 
+	/*
 	SoundEmitter = GetPlayerOwner().Spawn( class'Engine.ParticleFX');
 	SoundEmitter.AmbientSound = Sound(DynamicLoadObject("Aeons.Spells.E_Spl_SkullScream02", class'Sound'));
 	SoundEmitter.SoundPitch=48;
 	SoundEmitter.SOundRadius=255;
-
+	*/
+	
 	Resized();
 }
 
@@ -203,7 +205,7 @@ function OverEffect(ShellButton B)
 
 function Close(optional bool bByParent)
 {
-	SoundEmitter.SoundRadius = 0;
+	//SoundEmitter.SoundRadius = 0;
 	
 	GetPlayerOwner().ConsoleCommand("name " $ TextBox.Value);
 

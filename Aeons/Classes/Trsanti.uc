@@ -3,47 +3,47 @@
 //=============================================================================
 class Trsanti expands ScriptedBiped;
 
-#exec MESH IMPORT MESH=Trsanti_Dead_Hanging_m SKELFILE=Poses\Dead_Hanging.ngf
-#exec MESH IMPORT MESH=Trsanti_Dead_Floating_m SKELFILE=Poses\Dead_Floating.ngf
-#exec MESH IMPORT MESH=TrsantiGrunt_m SKELFILE=Trsanti_Grunt.ngf INHERIT=TrsantiBase_m
-#exec MESH JOINTNAME Head=Hair Neck=Head
+//#exec MESH IMPORT MESH=Trsanti_Dead_Hanging_m SKELFILE=Poses\Dead_Hanging.ngf
+//#exec MESH IMPORT MESH=Trsanti_Dead_Floating_m SKELFILE=Poses\Dead_Floating.ngf
+//#exec MESH IMPORT MESH=TrsantiGrunt_m SKELFILE=Trsanti_Grunt.ngf INHERIT=TrsantiBase_m
+//#exec MESH JOINTNAME Head=Hair Neck=Head
 
 //****************************************************************************
 // Animation sequence notifications.
 //****************************************************************************
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.275 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.300 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.325 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.350 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.375 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.475 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.500 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.525 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.550 FUNCTION=DoNearDamage	//
-#exec MESH NOTIFY SEQ=invoke_death TIME=0.400 FUNCTION=PopACap			//
-#exec MESH NOTIFY SEQ=invoke_death TIME=0.990 FUNCTION=BleedOut			//
-#exec MESH NOTIFY SEQ=taunt_sword_start TIME=1.000 FUNCTION=taunt_sword_cycle	//
-#exec MESH NOTIFY SEQ=taunt_sword_cycle TIME=1.000 FUNCTION=taunt_sword_cycle	//
-#exec MESH NOTIFY SEQ=special_kill TIME=0.059 FUNCTION=StickPlayer		//
-#exec MESH NOTIFY SEQ=special_kill TIME=0.197 FUNCTION=StickPlayer		//
-#exec MESH NOTIFY SEQ=special_kill TIME=0.430 FUNCTION=OJDidItAgain		//
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.275 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.300 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.325 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.350 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.375 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.475 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.500 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.525 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.550 FUNCTION=DoNearDamage	//
+//#exec MESH NOTIFY SEQ=invoke_death TIME=0.400 FUNCTION=PopACap			//
+//#exec MESH NOTIFY SEQ=invoke_death TIME=0.990 FUNCTION=BleedOut			//
+//#exec MESH NOTIFY SEQ=taunt_sword_start TIME=1.000 FUNCTION=taunt_sword_cycle	//
+//#exec MESH NOTIFY SEQ=taunt_sword_cycle TIME=1.000 FUNCTION=taunt_sword_cycle	//
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.059 FUNCTION=StickPlayer		//
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.197 FUNCTION=StickPlayer		//
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.430 FUNCTION=OJDidItAgain		//
 
-#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.275 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
-#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.439024 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
-#exec MESH NOTIFY SEQ=taunt_sword_cycle TIME=0.0625 FUNCTION=PlaySound_N ARG="Taunt PVar=0.1 VVar=0.1"
-#exec MESH NOTIFY SEQ=taunt_sword_end TIME=0.212121 FUNCTION=C_BackRight			//
-#exec MESH NOTIFY SEQ=taunt_sword_end TIME=0.121212 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
-#exec MESH NOTIFY SEQ=taunt_sword_start TIME=0.761905 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
-#exec MESH NOTIFY SEQ=taunt_sword_start TIME=0.857143 FUNCTION=C_BackRight			//
-#exec MESH NOTIFY SEQ=special_kill TIME=0.000 FUNCTION=PlaySound_N ARG="SpKill"
-#exec MESH NOTIFY SEQ=special_kill TIME=0.203 FUNCTION=PlaySound_N ARG="PatDeath"
-#exec MESH NOTIFY SEQ=special_kill TIME=0.477 FUNCTION=PlaySound_N ARG="SpKillTaunt"
-#exec MESH NOTIFY SEQ=invoke_death TIME=0.473 FUNCTION=PlaySound_N ARG="WpnImpact"
-#exec MESH NOTIFY SEQ=invoke_death TIME=0.473 FUNCTION=PlaySound_N ARG="GoreImpact"
-#exec MESH NOTIFY SEQ=invoke_death TIME=0.780 FUNCTION=BFallBig
+//#exec MESH NOTIFY SEQ=attack_sword1 TIME=0.275 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
+//#exec MESH NOTIFY SEQ=attack_sword2 TIME=0.439024 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
+//#exec MESH NOTIFY SEQ=taunt_sword_cycle TIME=0.0625 FUNCTION=PlaySound_N ARG="Taunt PVar=0.1 VVar=0.1"
+//#exec MESH NOTIFY SEQ=taunt_sword_end TIME=0.212121 FUNCTION=C_BackRight			//
+//#exec MESH NOTIFY SEQ=taunt_sword_end TIME=0.121212 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
+//#exec MESH NOTIFY SEQ=taunt_sword_start TIME=0.761905 FUNCTION=PlaySound_N ARG="SwordWhsh PVar=0.2 V=0.8 VVar=0.2"
+//#exec MESH NOTIFY SEQ=taunt_sword_start TIME=0.857143 FUNCTION=C_BackRight			//
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.000 FUNCTION=PlaySound_N ARG="SpKill"
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.203 FUNCTION=PlaySound_N ARG="PatDeath"
+//#exec MESH NOTIFY SEQ=special_kill TIME=0.477 FUNCTION=PlaySound_N ARG="SpKillTaunt"
+//#exec MESH NOTIFY SEQ=invoke_death TIME=0.473 FUNCTION=PlaySound_N ARG="WpnImpact"
+//#exec MESH NOTIFY SEQ=invoke_death TIME=0.473 FUNCTION=PlaySound_N ARG="GoreImpact"
+//#exec MESH NOTIFY SEQ=invoke_death TIME=0.780 FUNCTION=BFallBig
 
-#exec AUDIO IMPORT FILE="Invoke1.wav" NAME="TrsantiInvoke1" GROUP="Trsanti"
-#exec AUDIO IMPORT FILE="Invoke2.wav" NAME="TrsantiInvoke2" GROUP="Trsanti"
+//#exec AUDIO IMPORT FILE="Invoke1.wav" NAME="TrsantiInvoke1" GROUP="Trsanti"
+//#exec AUDIO IMPORT FILE="Invoke2.wav" NAME="TrsantiInvoke2" GROUP="Trsanti"
 
 //****************************************************************************
 // Member vars.

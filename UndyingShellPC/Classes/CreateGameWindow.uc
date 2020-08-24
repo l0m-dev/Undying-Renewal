@@ -4,41 +4,41 @@
 class CreateGameWindow expands ShellWindow;
 
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
 #exec Texture Import File=CreateGame_0.bmp Mips=Off
 #exec Texture Import File=CreateGame_1.bmp Mips=Off
 #exec Texture Import File=CreateGame_2.bmp Mips=Off
-#exec Texture Import File=Video_3.bmp Mips=Off
-#exec Texture Import File=Video_4.bmp Mips=Off
+//#exec Texture Import File=Video_3.bmp Mips=Off
+//#exec Texture Import File=Video_4.bmp Mips=Off
 #exec Texture Import File=CreateGame_5.bmp Mips=Off
 
-#exec Texture Import File=video_advan_up.bmp Mips=Off
-#exec Texture Import File=video_advan_dn.bmp Mips=Off
-#exec Texture Import File=video_advan_ov.bmp Mips=Off
+//#exec Texture Import File=video_advan_up.bmp Mips=Off
+//#exec Texture Import File=video_advan_dn.bmp Mips=Off
+//#exec Texture Import File=video_advan_ov.bmp Mips=Off
 
 /* 
-#exec Texture Import File=video_adv_up.bmp Flags=2 Mips=Off
-#exec Texture Import File=video_adv_dn.bmp Flags=2 Mips=Off
-#exec Texture Import File=video_adv_ov.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_up.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_dn.bmp Flags=2 Mips=Off
+//#exec Texture Import File=video_adv_ov.bmp Flags=2 Mips=Off
 */
 
-#exec Texture Import File=video_ok_up.bmp Mips=Off
-#exec Texture Import File=video_ok_dn.bmp Mips=Off
-#exec Texture Import File=video_ok_ov.bmp Mips=Off
+//#exec Texture Import File=video_ok_up.bmp Mips=Off
+//#exec Texture Import File=video_ok_dn.bmp Mips=Off
+//#exec Texture Import File=video_ok_ov.bmp Mips=Off
 
-#exec Texture Import File=video_Cancel_up.bmp Mips=Off
-#exec Texture Import File=video_Cancel_dn.bmp Mips=Off
-#exec Texture Import File=video_Cancel_ov.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_up.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_dn.bmp Mips=Off
+//#exec Texture Import File=video_Cancel_ov.bmp Mips=Off
 
-#exec Texture Import File=Video_resol_up.bmp  Mips=Off
-#exec Texture Import File=Video_resol_dn.bmp  Mips=Off
-#exec Texture Import File=Video_resol_ov.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_up.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_dn.bmp  Mips=Off
+//#exec Texture Import File=Video_resol_ov.bmp  Mips=Off
 
 /*
-#exec Texture Import File=Video_res_up.bmp Flags=2 Mips=Off
-#exec Texture Import File=Video_res_dn.bmp Flags=2 Mips=Off
-#exec Texture Import File=Video_res_ov.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_up.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_dn.bmp Flags=2 Mips=Off
+//#exec Texture Import File=Video_res_ov.bmp Flags=2 Mips=Off
 */
 //----------------------------------------------------------------------------
 

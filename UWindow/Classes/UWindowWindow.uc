@@ -3,8 +3,8 @@
 //=============================================================================
 class UWindowWindow extends UWindowBase;
 
-#exec TEXTURE IMPORT NAME=BlackTexture FILE=TEXTURES\Black.PCX
-#exec TEXTURE IMPORT NAME=WhiteTexture FILE=TEXTURES\White.PCX
+//#exec TEXTURE IMPORT NAME=BlackTexture FILE=TEXTURES\Black.PCX
+//#exec TEXTURE IMPORT NAME=WhiteTexture FILE=TEXTURES\White.PCX
 
 // Dimensions, offset relative to parent.
 var float				WinLeft;

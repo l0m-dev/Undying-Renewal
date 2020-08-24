@@ -7,7 +7,7 @@ class Pawn extends Visible
 	native
 	nativereplication;
 
-#exec Texture Import File=Textures\Pawn.pcx Name=S_Pawn Mips=On Flags=2
+//#exec Texture Import File=Textures\Pawn.pcx Name=S_Pawn Mips=On Flags=2
 
 //-----------------------------------------------------------------------------
 // Pawn variables.

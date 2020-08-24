@@ -3,7 +3,7 @@
 //=============================================================================
 class ShellWindow expands ManagerWindow;
 
-#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
+//#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
 
 var() texture Back[6];
 

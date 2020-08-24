@@ -3,41 +3,41 @@
 //=============================================================================
 class ControlsWindow expands ShellWindow;
 
-#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
 // Textures ////////////////////////////////////////////////
-#exec Texture Import File=Controls_0.bmp Mips=Off
-#exec Texture Import File=Controls_1.bmp Mips=Off
-#exec Texture Import File=Controls_2.bmp Mips=Off
-#exec Texture Import File=Controls_3.bmp Mips=Off
-#exec Texture Import File=Controls_4.bmp Mips=Off
-#exec Texture Import File=Controls_5.bmp Mips=Off
+//#exec Texture Import File=Controls_0.bmp Mips=Off
+//#exec Texture Import File=Controls_1.bmp Mips=Off
+//#exec Texture Import File=Controls_2.bmp Mips=Off
+//#exec Texture Import File=Controls_3.bmp Mips=Off
+//#exec Texture Import File=Controls_4.bmp Mips=Off
+//#exec Texture Import File=Controls_5.bmp Mips=Off
 
-#exec Texture Import File=cntrl_ok_ov.BMP	Mips=Off
-#exec Texture Import File=cntrl_ok_up.BMP	Mips=Off
-#exec Texture Import File=cntrl_ok_dn.BMP	Mips=Off
+//#exec Texture Import File=cntrl_ok_ov.BMP	Mips=Off
+//#exec Texture Import File=cntrl_ok_up.BMP	Mips=Off
+//#exec Texture Import File=cntrl_ok_dn.BMP	Mips=Off
 
-#exec Texture Import File=cntrl_cancl_ov.BMP	Mips=Off
-#exec Texture Import File=cntrl_cancl_up.BMP	Mips=Off
-#exec Texture Import File=cntrl_cancl_dn.BMP	Mips=Off
+//#exec Texture Import File=cntrl_cancl_ov.BMP	Mips=Off
+//#exec Texture Import File=cntrl_cancl_up.BMP	Mips=Off
+//#exec Texture Import File=cntrl_cancl_dn.BMP	Mips=Off
 
-#exec Texture Import File=Cntrl_defau_up.bmp	Mips=Off
-#exec Texture Import File=Cntrl_dafau_ov.bmp	Mips=Off
-#exec Texture Import File=Cntrl_defau_dn.bmp	Mips=Off
+//#exec Texture Import File=Cntrl_defau_up.bmp	Mips=Off
+//#exec Texture Import File=Cntrl_dafau_ov.bmp	Mips=Off
+//#exec Texture Import File=Cntrl_defau_dn.bmp	Mips=Off
 
-#exec Texture Import File=Cntrl_upbut_up.BMP	Mips=Off
-#exec Texture Import File=Cntrl_upbut_ov.BMP	Mips=Off
-#exec Texture Import File=Cntrl_upbut_dn.BMP	Mips=Off
-#exec Texture Import File=Cntrl_upbut_ds.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_upbut_up.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_upbut_ov.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_upbut_dn.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_upbut_ds.BMP	Mips=Off
 
-#exec Texture Import File=Cntrl_dnbut_up.BMP	Mips=Off
-#exec Texture Import File=Cntrl_dnbut_ov.BMP	Mips=Off
-#exec Texture Import File=Cntrl_dnbut_dn.BMP	Mips=Off
-#exec Texture Import File=Cntrl_dnbut_ds.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_dnbut_up.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_dnbut_ov.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_dnbut_dn.BMP	Mips=Off
+//#exec Texture Import File=Cntrl_dnbut_ds.BMP	Mips=Off
 
 
-#exec Texture Import File=cntrl_slidr.BMP	Mips=Off
-#exec Texture Import File=cntrl_selec.BMP	Mips=Off
+//#exec Texture Import File=cntrl_slidr.BMP	Mips=Off
+//#exec Texture Import File=cntrl_selec.BMP	Mips=Off
 
 // Controls /////////////////////////////////////////////////
 
@@ -374,8 +374,8 @@ function Created()
 
 	SensitivitySlider.bNoSlidingNotify = true;
 
-	SensitivitySlider.SetRange(1.0, 10.0, 1.0);
-	SensitivitySlider.SetValue(7.0);
+	SensitivitySlider.SetRange(0.5, 8.0, 0.1);
+	SensitivitySlider.SetValue(3.0);
 
 	SensitivitySlider.Manager = Self;
 	SensitivitySlider.Text = "";
@@ -1266,7 +1266,8 @@ defaultproperties
      AliasNames(46)="PickPhosphorusShell"
      AliasNames(47)="PickAmplifier"
      AliasNames(48)="PickEtherTrap"
-     AliasCount=49
+     AliasNames(49)="ShowBook"
+     AliasCount=50
      LabelList(0)="Weapon Fire"
      LabelList(1)="Weapon Select"
      LabelList(2)="Spell Fire"
@@ -1316,6 +1317,7 @@ defaultproperties
      LabelList(46)="Phosphorus Shells"
      LabelList(47)="Amplifier"
      LabelList(48)="Ether Trap"
+     LabelList(49)="Show Journal"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

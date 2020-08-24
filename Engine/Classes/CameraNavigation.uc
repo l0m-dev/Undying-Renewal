@@ -4,8 +4,8 @@
 class CameraNavigation expands Actor
 	abstract;
 
-#exec TEXTURE IMPORT NAME=CamNav FILE=Textures\CamNav.pcx GROUP=System Mips=On Flags=2
-#exec TEXTURE IMPORT NAME=CamNav_m FILE=Textures\CamNav_m.pcx GROUP=System Mips=On Flags=2
+//#exec TEXTURE IMPORT NAME=CamNav FILE=Textures\CamNav.pcx GROUP=System Mips=On Flags=2
+//#exec TEXTURE IMPORT NAME=CamNav_m FILE=Textures\CamNav_m.pcx GROUP=System Mips=On Flags=2
 
 // Camera FOV
 var() int 		FOV_Target;				// FOV the camera acquires at this location

@@ -3,20 +3,20 @@
 //=============================================================================
 class QuitWindow expands ShellWindow;
 
-#exec Texture Import File=Quit_0.bmp Mips=Off
-#exec Texture Import File=Quit_1.bmp Mips=Off
-#exec Texture Import File=Quit_2.bmp Mips=Off
-#exec Texture Import File=Quit_3.bmp Mips=Off
-#exec Texture Import File=Quit_4.bmp Mips=Off
-#exec Texture Import File=Quit_5.bmp Mips=Off
+//#exec Texture Import File=Quit_0.bmp Mips=Off
+//#exec Texture Import File=Quit_1.bmp Mips=Off
+//#exec Texture Import File=Quit_2.bmp Mips=Off
+//#exec Texture Import File=Quit_3.bmp Mips=Off
+//#exec Texture Import File=Quit_4.bmp Mips=Off
+//#exec Texture Import File=Quit_5.bmp Mips=Off
 
-#exec Texture Import File=quit_yes_up.bmp Mips=Off Flags=2
-#exec Texture Import File=quit_yes_ov.bmp Mips=Off Flags=2
-#exec Texture Import File=quit_yes_dn.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_yes_up.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_yes_ov.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_yes_dn.bmp Mips=Off Flags=2
 
-#exec Texture Import File=quit_no_up.bmp Mips=Off Flags=2
-#exec Texture Import File=quit_no_ov.bmp Mips=Off Flags=2
-#exec Texture Import File=quit_no_dn.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_no_up.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_no_ov.bmp Mips=Off Flags=2
+//#exec Texture Import File=quit_no_dn.bmp Mips=Off Flags=2
 
 //----------------------------------------------------------------------------
 
