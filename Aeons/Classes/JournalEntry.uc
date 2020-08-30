@@ -39,6 +39,8 @@ var int PrevCharOffset;
 var int CurrCharOffset;
 var int NextCharOffset;
 
+var color FontColor;
+
 //var const string CODE_NewLine;
 //var const string CODE_Image;
 
@@ -164,14 +166,16 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 			class'JournalEntry'.static.EatLeadingWhitespace(Line);
 
 			token = InStr(Line, "&");
-
+			
+			Tex.bNoSmooth = True;
+			
 			if ( token >= 0 )
 			{
-				Tex.DrawText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont);
+				Tex.DrawColoredText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont, FontColor );
 			}
 			else
 			{
-				Tex.DrawText( LeftMargin, y-sizey, Line, SourceFont);
+				Tex.DrawColoredText( LeftMargin, y-sizey, Line, SourceFont, FontColor );
 			}
 		}
 
@@ -373,6 +377,7 @@ static function EatLeadingWhitespace( out string Text )
 
 defaultproperties
 {
+	 FontColor=(R=84,G=41,B=11)
      Icon=Texture'Aeons.bk_book'
      MAX_LINES=150
      NumPages=1

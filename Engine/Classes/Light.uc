@@ -9,9 +9,9 @@ class Light extends Invisible
 function PostBeginPlay()
 {
 	//Super.PreBeginPlay();
-	LightBrightness = LightBrightness / 4;
-	bCorona = False;
-	bActorShadows = True;
+	//LightBrightness = LightBrightness / 4;
+	//bCorona = False;
+	//bActorShadows = True;
 	//bDarkLight= True;
 }
 

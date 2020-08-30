@@ -473,9 +473,9 @@ function DrawLevelAction( canvas C )
 
 		C.Style = 1;
 		C.Font = C.LargeFont;
-		C.DrawColor.R = 255;
-		C.DrawColor.G = 255;
-		C.DrawColor.B = 255;
+		C.DrawColor.R = 250;
+		C.DrawColor.G = 133;
+		C.DrawColor.B = 0;
 		C.DrawColor.A = 255;
 
 		PrintActionMessage(C, BigMessage);
@@ -513,7 +513,7 @@ event PostRender( canvas C )
 	}
 
 	if ( C.LargeFont == Font'Engine.LargeFont')
-		C.LargeFont = Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
+		C.LargeFont = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
 	// call overridable "level action" rendering code to draw the "big message"
 	DrawLevelAction( C );
 

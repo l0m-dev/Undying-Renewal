@@ -95,9 +95,9 @@ function Created()
 
 		SaveGameButtons[i].TextStyle = 2;
 
-		TextColor.R = 255;
-		TextColor.G = 255;
-		TextColor.B = 255;
+		TextColor.R = 60;
+		TextColor.G = 35;
+		TextColor.B = 0;
 		SaveGameButtons[i].SetTextColor(TextColor);
 		SaveGameButtons[i].Font = 5;
 

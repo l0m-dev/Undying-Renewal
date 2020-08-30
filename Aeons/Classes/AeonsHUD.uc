@@ -184,8 +184,8 @@ simulated function PostBeginPlay()
 	DigitInfo.Offset[9] = 225;
 	DigitInfo.Width[9] = 21;
 
-	MyLargeFont =	Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
-	MyMediumFont =	Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
+	MyLargeFont =	Font(DynamicLoadObject("Morpheus.Morpheus22",class'Font'));
+	MyMediumFont =	Font(DynamicLoadObject("dauphin.dauphin16",class'Font'));
 	MySmallFont =	Font(DynamicLoadObject("Comic.Comic10", class'Font'));
 	
 	/*
@@ -363,7 +363,7 @@ simulated function HUDSetup(canvas canvas)
 	Canvas.DrawColor.g = 255;
 	Canvas.DrawColor.b = 255;	
 	//Log("AeonsHud: HudSetup");
-	Canvas.Font = Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));//Canvas.LargeFont;
+	Canvas.Font = Canvas.LargeFont;
 }
 
 simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float Scale)
@@ -378,7 +378,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	
 	PlayerPawn(Owner).bHaveTarget = false;
 	
-	Scale = Scale * (Canvas.ClipY / 600);
+	Scale = Scale * (Canvas.ClipY / 768);
 	CurrentCrossHair = CrossHairs[ CrossHair ];	
 	// if we are tracing a Scripted Pawn, change the crosshair to green.
 	if ( A != none )
@@ -4042,6 +4042,7 @@ simulated function DrawScryeOverlay(Canvas Canvas)
 	*/
 	Canvas.SetPos(0,0);
 	
+	Canvas.Style = ERenderStyle.STY_Modulated;
 	Canvas.bNoSmooth = FALSE;
 	
 	/*
