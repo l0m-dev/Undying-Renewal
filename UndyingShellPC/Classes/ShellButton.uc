@@ -108,6 +108,17 @@ function Paint(Canvas C, float X, float Y)
 		C.DrawColor = TextColor;
 		C.Style = TextStyle;
 		C.bNoSmooth = false;
+		
+		C.DrawColor.R = 0;
+		C.DrawColor.G = 0;
+		C.DrawColor.B = 0;
+		
+		ClipText(C, TextX - 1, TextY, Text, True);
+		ClipText(C, TextX + 1, TextY, Text, True);
+		ClipText(C, TextX, TextY - 1, Text, True);
+		ClipText(C, TextX, TextY + 1, Text, True);
+		
+		C.DrawColor = TextColor;
 		ClipText(C, TextX, TextY, Text, True);
 		C.DrawColor.R = 255;
 		C.DrawColor.G = 255;

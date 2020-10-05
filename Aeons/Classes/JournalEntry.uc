@@ -139,7 +139,7 @@ function Repaginate( string Source, byte TopMargin, byte LeftMargin, int Width, 
 	//Log("repaginate: charoffsets[currentpage+1]=" $ charoffsets[currentpage+1]);
 }
 
-function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly )
+function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly, optional bool english )
 {
 	local int y;
 	local float sizex, sizey;
@@ -151,7 +151,9 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 	local string temp;
 	local string texturename;
 	local int offset;
-
+	//local float tx, ty;
+	//local bool english;
+	
 	y = TopMargin;
 	Width -= LeftMargin*2;
 	drawx = LeftMargin;
@@ -167,15 +169,26 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 
 			token = InStr(Line, "&");
 			
-			Tex.bNoSmooth = True;
+			Tex.bNoSmooth = False;
 			
+			//Tex.TextSize("This is the english version of the game", tx, ty, SourceFont);
+			//english = (tx == 224 && ty == 20);
+			
+			//Tex.DrawColoredText( 50, 120, "X "$tx $ " Y "$ty, SourceFont, FontColor );
+
 			if ( token >= 0 )
 			{
-				Tex.DrawColoredText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont, FontColor );
+				if (english)
+					Tex.DrawText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont );
+				else
+					Tex.DrawColoredText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont, FontColor );
 			}
 			else
 			{
-				Tex.DrawColoredText( LeftMargin, y-sizey, Line, SourceFont, FontColor );
+				if (english)
+					Tex.DrawText( LeftMargin, y-sizey, Line, SourceFont );
+				else
+					Tex.DrawColoredText( LeftMargin, y-sizey, Line, SourceFont, FontColor );
 			}
 		}
 

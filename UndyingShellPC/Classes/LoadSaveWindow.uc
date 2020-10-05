@@ -93,13 +93,13 @@ function Created()
 		SaveGameButtons[i].TextX = 0;
 		SaveGameButtons[i].TextY = 0;
 
-		SaveGameButtons[i].TextStyle = 2;
+		SaveGameButtons[i].TextStyle = 5;
 
-		TextColor.R = 60;
-		TextColor.G = 35;
-		TextColor.B = 0;
+		TextColor.R = 84;
+		TextColor.G = 41;
+		TextColor.B = 11;
 		SaveGameButtons[i].SetTextColor(TextColor);
-		SaveGameButtons[i].Font = 5;
+		SaveGameButtons[i].Font = 3;
 
 		//SaveGameButtons[i].UpTexture =		texture'Engine.DefaultTexture';
 		//SaveGameButtons[i].TexCoords = NewRegion(0,0,64,64);

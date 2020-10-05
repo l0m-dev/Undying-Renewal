@@ -49,6 +49,7 @@ var() bool bCapsOnly;
 var() bool bDisplay3D;
 
 var() Font TextFont;
+var() Font TextFontEnglish;
 
 var() float		BookFOV;
 var() vector	BookOffset;
@@ -116,7 +117,7 @@ function UpdateObjectives()
 					TempString = Right(TempString, Len(TempString)-Token-1);	
 				}
 
-				ObjectivesEntry.Text = ObjectivesEntry.Text $ TempString $ " &n¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦.  .  . &n ";	
+				ObjectivesEntry.Text = ObjectivesEntry.Text $ TempString $ " &n &n ";	
 			}
 		}
 		
@@ -181,6 +182,7 @@ function PreBeginPlay()
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin_Book_pad", class'Font'));
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin16_pad", class'Font'));
 	TextFont = Font(DynamicLoadObject("dauphin.dauphin16", class'Font'));
+	TextFontEnglish = Font(DynamicLoadObject("Aeons.Dauphin16_Skinny", class'Font'));
 	
 	Textures[0].NotifyActor = Self;
 	Textures[1].NotifyActor = Self;
@@ -211,7 +213,18 @@ simulated event RenderTexture(ScriptedTexture Tex)
 	local string Source;
 	local string CurrentText;
 	local string SourceOffset;
-
+	local float tx, ty;
+	local bool english;
+	local font CurrentFont;
+	
+	Tex.TextSize("This is the english version of the game", tx, ty, TextFont);
+	english = (tx == 224 && ty == 20);
+	
+	CurrentFont = TextFontEnglish;
+	
+	if (!english)
+		CurrentFont = TextFont;
+	
 	if ( CurrentJournalIndex == -1 )
 		CurrentEntry = ObjectivesEntry;
 	else
@@ -251,8 +264,8 @@ simulated event RenderTexture(ScriptedTexture Tex)
 
 	x = MarginLeft;
 
-	//class'JournalEntry'.static.FillQuad( Text, y, x, 245, 256, Tex, TextFont, false );
-//	CurrentEntry.FillQuad( Text, y, x, 245, 256, Tex, TextFont, false );
+	//class'JournalEntry'.static.FillQuad( Text, y, x, 245, 256, Tex, CurrentFont, false );
+//	CurrentEntry.FillQuad( Text, y, x, 245, 256, Tex, CurrentFont, false );
 
 	// the texture doesn't need to be updated again until we change the contents
 	Tex.bRedraw=false;
@@ -268,16 +281,16 @@ simulated event RenderTexture(ScriptedTexture Tex)
 
 		SourceOffset = Mid(Source, CurrentEntry.CharOffsets[CurrentEntry.CurrentPage], Len(Source)-CurrentEntry.CharOffsets[CurrentEntry.CurrentPage]);
 
-		CurrentText = CUrrentEntry.FillQuad( SourceOffset, MarginTop, MarginLeft, 245, 256, Textures[0], TextFont, false );
+		CurrentText = CUrrentEntry.FillQuad( SourceOffset, MarginTop, MarginLeft, 245, 256, Textures[0], CurrentFont, false, english );
 		// CurrentText = TextSections[0];
 
-		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), 5, MarginLeft, 245, 256, Textures[1], TextFont, false );
+		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), 5, MarginLeft, 245, 256, Textures[1], CurrentFont, false, english );
 		// CurrentText = CurrentText $ TextSections[1];
 
-		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), MarginTop, MarginLeft, 245, 256, Textures[2], TextFont, false );
+		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), MarginTop, MarginLeft, 245, 256, Textures[2], CurrentFont, false, english );
 		// CurrentText = CurrentText $ TextSections[2];
 
-		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), 5, MarginLeft, 245, 256, Textures[3], TextFont, false );
+		CurrentText = CurrentText $ CUrrentEntry.FillQuad( Right(SourceOffset, Len(SourceOffset)-Len(CurrentText)), 5, MarginLeft, 245, 256, Textures[3], CurrentFont, false, english );
 		// CurrentText = CurrentText $ TextSections[3];
 
 		//Log("rendertexture: charoffsets[currentpage]=" $ CurrentEntry.charoffsets[CurrentEntry.currentpage]);

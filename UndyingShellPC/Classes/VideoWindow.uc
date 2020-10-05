@@ -170,9 +170,9 @@ function Created()
 		Resolutions[i].OverTexture = texture'Video_resol_ov';
 
 
-		TextColor.R = 255;
-		TextColor.G = 255;
-		TextColor.B = 255;
+		TextColor.R = 184;
+		TextColor.G = 141;
+		TextColor.B = 111;
 		Resolutions[i].SetTextColor(TextColor);
 		Resolutions[i].Font = 4;
 	}
