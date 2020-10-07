@@ -153,7 +153,7 @@ auto state Idle
 
 		// Refresh fuel
 		// no refresh when guiding phoenix
-		if ( Owner != None && (AeonsPlayer(Owner).GetStateName() != 'GuidingPhoenix') && !bNoPass)
+		if ( (AeonsPlayer(Owner).GetStateName() != 'GuidingPhoenix') && !bNoPass)
 		{
 			if ( Fuel < 60 ) 
 			{

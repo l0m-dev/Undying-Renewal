@@ -9,7 +9,7 @@ defaultproperties
      AngularSpreadWidth=(Base=180)
      AngularSpreadHeight=(Base=180)
      Speed=(Base=800,Rand=500)
-     Lifetime=(Base=0.5,Rand=1)
+     Lifetime=(Base=0.25,Rand=0.25)
      ColorStart=(Base=(R=175,G=81,B=238))
      ColorEnd=(Base=(R=0,G=255,B=6))
      SizeEndScale=(Rand=0.5)

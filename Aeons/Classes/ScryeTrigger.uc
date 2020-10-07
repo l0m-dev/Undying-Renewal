@@ -41,8 +41,6 @@ simulated function Timer()
 			{
 				bScryeDetected = True;
 				
-				Player.bShowScryeHint = false;
-				
 				if( Message != "" && Level.bDebugMessaging)
 					// Send a string message to the toucher.
 					Player.Instigator.ClientMessage( Message );

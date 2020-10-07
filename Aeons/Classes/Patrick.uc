@@ -47,7 +47,6 @@ function PreBeginPlay()
 	
 	// bBloodyFootprints = true;
 	
-	/*
 	EnableLog('Spell');
 	EnableLog('Weapon');
 	EnableLog('Trigger');
@@ -63,21 +62,14 @@ function PreBeginPlay()
 	EnableLog('GameState');
 	EnableLog('GameEvents');
 	EnableLog('Pickups');
-	*/
-	
-	ClientAdjustGlow( 0.0, vect(1,0,0) );
 }
-	
-simulated function PostBeginPlay()
+
+function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	ServerReStartPlayer();
 	
-	if (Player != None)
-		WindowConsole(Player.Console).bShellPauses = false;
+	WindowConsole(Player.Console).bShellPauses = false;
 	Level.bDontAllowSavegame = false;
-	
-	ReplicateAnimations();
 }
 
 function bool IsAlert()
@@ -165,35 +157,24 @@ exec function MakeWet(bool bWet)
 }
 */
 
-exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
+exec function DetachJoint()
 {
-	local vector start, end, eyeOffset, HitLocation, HitNormal, x, y, z;
+	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A, B;
-
+	
 	eyeOffset.z = eyeHeight;
-
-	if (Distance == 0)
-		Distance = 65536;
-
+	
 	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
-	end = start + (Vector(ViewRotation) * Distance);
-
+	end = start + (Vector(ViewRotation) * 65536);
+	
 	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
 
-	GetAxes(ViewRotation, x, y, z);
-
-	if ( A != none && A.IsA('ScriptedPawn') && Pawn(A).Health <= 0 )
+	if ( A != none )
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
-		B.Velocity = (y + vect(0,0,0.25)) * 256;
+		B.Velocity = vect(0,0,456);
 		B.DesiredRotation = RotRand();
-		B.bBounce = true;
-		B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
-
-		Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Normal(B.Velocity));
-		if (PawnImpactSound != None)
-			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
 	}
 }
 
@@ -396,6 +377,8 @@ function C_TurnStepRight()
 {
 }
 
+
+
 state Dying
 {
 	ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneChange, ZoneChange, SwitchWeapon, Falling, PainTimer, FireAttSpell, FireDefSpell, QuickSave; //SaveGameToMemoryCard, SaveGame;;
@@ -411,6 +394,9 @@ state Dying
 			TimeMargin = 0;
 			Enemy = None;
 			Level.Game.StartPlayer(self);
+			if ( Mesh != None )
+				PlayLocomotion( vect(0,0,0) );	//PlayWaiting();
+			ClientReStart();
 		}
 		else
 			log("Restartplayer failed");
@@ -429,10 +415,19 @@ state Dying
 
 	exec function Fire( optional float F )
 	{
-		if ( (Level.NetMode == NM_Standalone) || (Level.Game.IsA('Coop') && !Coop(Level.Game).bForceRespawn) )
+		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
 		{
-			ServerReStartPlayer();
+			//E3 hack.. should go back to shell, to load menu? 
+			ServerRestartPlayer();
+				return;
+
+			if ( bFrozen )
+				return;
+
+			ShowLoadMenu();
 		}
+		else if ( !bFrozen )
+			ServerReStartPlayer();
 	}
 
 	
@@ -628,10 +623,22 @@ state Dying
 			HasteMod.GotoState('Deactivated');
 		Level.bDontAllowSavegame = true;
 		WindowConsole(Player.Console).bShellPauses = true;
-		//SpawnCarcass();
+		bHidden = true;
 		AttSpell.OwnerDead();
 		DefSpell.OwnerDead();
-		
+		ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
+		BaseEyeheight = Default.BaseEyeHeight;
+		EyeHeight = BaseEyeHeight;
+//		if ( Carcass(ViewTarget) == None )
+	//		bBehindView = true;
+		bFrozen = true;
+		bPressedJump = false;
+		bJustFired = false;
+		// FindGoodView();
+		if ( (Role == ROLE_Authority) && !bHidden )
+			Super.Timer(); 
+		SetTimer(1.0, false);
+
 		// clean out saved moves
 		while ( SavedMoves != None )
 		{
@@ -643,25 +650,6 @@ state Dying
 			PendingMove.Destroy();
 			PendingMove = None;
 		}
-		
-		//if singleplayer
-		if (Level.NetMode == NM_Standalone) {
-			ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
-			bHidden = true;
-		} else {
-			PlayAnim( 'death_gun_back' );
-		}
-		BaseEyeheight = Default.BaseEyeHeight;
-		EyeHeight = BaseEyeHeight;
-		if ( Carcass(ViewTarget) == None )
-			bBehindView = true;
-		bFrozen = true;
-		bPressedJump = false;
-		bJustFired = false;
-		// FindGoodView();
-		if ( (Role == ROLE_Authority) && bHidden )
-			Super.Timer(); 
-		SetTimer(1.0, false);
 	}
 	
 	function EndState()
@@ -717,8 +705,7 @@ state DialogScene expands PlayerWalking
 
 		Velocity.X = 0.0;
 		Velocity.Y = 0.0;
-		if (WindowConsole(Player.Console) != None)
-			WindowConsole(Player.Console).bShellPauses = true;
+		WindowConsole(Player.Console).bShellPauses = true;
 		Level.bDontAllowSavegame = true;
 		bAckClickThrough = false;
 		SetTimer( 1.5, false );		// delay until Fire() will cause click-though
@@ -727,8 +714,7 @@ state DialogScene expands PlayerWalking
 	function EndState()
 	{
 		UnFreeze();
-		if (WindowConsole(Player.Console) != None)
-			WindowConsole(Player.Console).bShellPauses = false;
+		WindowConsole(Player.Console).bShellPauses = false;
 		Level.bDontAllowSavegame = false;
 		bFire = 0;
 		bFireAttSpell = 0;
@@ -815,7 +801,18 @@ state FallingDeath expands Dying
 
 	function EndSpecialKill()
 	{
-		ServerRestartPlayer();
+		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
+		{
+			//E3 hack.. should go back to shell, to load menu? 
+			ServerRestartPlayer();
+				return;
+
+			if ( bFrozen )
+				return;
+			ShowLoadMenu();
+		}
+		else if ( !bFrozen || (FRand() < 0.2) )
+			ServerReStartPlayer();
 	}
 	
 	function PressedEnter()
@@ -883,8 +880,8 @@ state FallingDeath expands Dying
 		Health = 0;
 		sleep(2);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -932,10 +929,10 @@ state FadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1.0,vect(0,0,0));
-		sleep(4);
+		sleep(2);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -980,10 +977,10 @@ state InstantFadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1000.0,vect(0,0,0));
-		sleep(1);
+		sleep(0);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 exec function KillNPC()
@@ -1015,24 +1012,7 @@ exec function SetLocTag(name NewTag)
 	}
 }
 
-simulated function ReplicateAnimations()
-{	
-	if ( Role == ROLE_Authority || Level.NetMode == NM_DedicatedServer )
-		return;
-	
-	SetTimer( 1.0/60, true );
-}
 
-simulated function Timer()
-{
-	local Actor A;
-	
-	ForEach AllActors(class 'Actor', A)
-	{
-		A.bClientAnim = true;
-		A.PlayAnim(A.AnimSequence);
-	}
-}
 
 /*
 exec function CS()
@@ -1307,11 +1287,9 @@ defaultproperties
      bRunMode=True
      BaseEyeHeight=55
      FootSoundClass=Class'Aeons.DefaultFootSoundSet'
-     bClientAnim=True
      Physics=PHYS_Walking
      LODBias=5
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
-     AirControl=0.4
 }

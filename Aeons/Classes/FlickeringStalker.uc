@@ -460,7 +460,7 @@ state AISpecialKill
 defaultproperties
 {
      BiteManaDrain=20
-     HasteScalar=6
+     HasteScalar=4
      HasteFrequency=4
      HasteVariance=0.5
      HoverAltitude=400

@@ -8,6 +8,7 @@
 // the properties of all zones which don't themselves have ZoneInfo.
 //=============================================================================
 class LevelInfo extends ZoneInfo
+	config(user)
 	native
 	nativereplication;
 
@@ -225,5 +226,6 @@ defaultproperties
      Brightness=1
      DefaultTexture=Texture'Engine.DefaultTexture'
      bCheckWalkSurfaces=True
+     bStatic=False
      bHiddenEd=True
 }

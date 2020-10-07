@@ -24,7 +24,7 @@ function Tick(float DeltaTime)
 
 	if ( f >= 0.2 )
 	{
-		if ( Owner != None && AeonsPlayer(Owner).Weapon.IsA('Scythe') )
+		if ( AeonsPlayer(Owner).Weapon.IsA('Scythe') )
 		{
 			if ( Scythe(AeonsPlayer(Owner).Weapon).bBerserk )
 			{

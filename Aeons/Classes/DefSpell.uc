@@ -82,7 +82,6 @@ function PassControl()
     bPassControl = false;
 }
 
-
 // we override to disable parent's version
 // this global function can currently only be accessed while spell is in Idle state
 function FireAttSpell( float Value )
@@ -109,7 +108,6 @@ function FireAttSpell( float Value )
         bPassControl = true;
     }
 }
-
 
 //=============================================================================
 // Finish a firing sequence
@@ -161,7 +159,7 @@ simulated function playFiring()
 }
 
 
-
+/*
 function FireDefSpell( float Value )
 {
 	local bool bPCL;
@@ -194,7 +192,7 @@ function FireDefSpell( float Value )
 		}
 	}
 }
-
+*/
 
 function GhelzUse(int cost)
 {
@@ -207,46 +205,6 @@ function ForceFire()
 {
 	//Log("DefSpell: Global ForceFire");
 	FireDefSpell(0);
-}
-
-// OVERRIDABLES FROM Spell CLASS TO NOT MODIFY Engine PACKAGE
-
-state Idle2
-{
-	function BeginState()
-	{
-		Super.BeginState();
-
-		if (AeonsPlayer(Owner).DefSpell == None)
-			AeonsPlayer(Owner).DefSpell = self;
-	}
-}
-
-//**********************************************************************************
-// Bring newly active spell up
-state Active
-{
-    function FireDefSpell(float Value) 
-    {
-	    //if we're an aborted offensive spell being asked to switch
-        if ( ItemType == SPELL_Offensive && Pawn(Owner).bFireAttSpell == 0 )
-        {
-            PutDown();
-            bPassControl = true;
-        }
-    }
-}
-
-//**********************************************************************************
-// Putting down spell in favor of a new one.
-State DownSpell
-{
-    function FireDefSpell(float F) 
-    {
-        //if we're an aborted offensive spell being asked to switch
-        if ( ItemType == SPELL_Offensive && Pawn(Owner).bFireAttSpell == 0 )
-            bPassControl = true;
-    }
 }
 
 defaultproperties

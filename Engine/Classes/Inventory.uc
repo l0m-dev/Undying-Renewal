@@ -144,8 +144,8 @@ function StartLevel()
 	if ( ItemName == "" )
 		ItemName = GetItemName(string(Class));
 
-	if ( (ConditionalEvent != 'none') && Owner != None && !Owner.IsA('PlayerPawn') )
-		if ( Player != None && Player.CheckGameEvent(ConditionalEvent) )
+	if ( (ConditionalEvent != 'none') && !Owner.IsA('PlayerPawn') )
+		if ( Player.CheckGameEvent(ConditionalEvent) )
 			Destroy();
 		
 	Super.StartLevel();

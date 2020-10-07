@@ -216,12 +216,12 @@ simulated event RenderTexture(ScriptedTexture Tex)
 	local float tx, ty;
 	local bool english;
 	local font CurrentFont;
-	
+
 	Tex.TextSize("This is the english version of the game", tx, ty, TextFont);
 	english = (tx == 224 && ty == 20);
-	
+
 	CurrentFont = TextFontEnglish;
-	
+
 	if (!english)
 		CurrentFont = TextFont;
 	
@@ -265,7 +265,7 @@ simulated event RenderTexture(ScriptedTexture Tex)
 	x = MarginLeft;
 
 	//class'JournalEntry'.static.FillQuad( Text, y, x, 245, 256, Tex, CurrentFont, false );
-//	CurrentEntry.FillQuad( Text, y, x, 245, 256, Tex, CurrentFont, false );
+//	CurrentEntry.FillQuad( Text, y, x, 245, 256, Tex, CurrentFont, false, english );
 
 	// the texture doesn't need to be updated again until we change the contents
 	Tex.bRedraw=false;

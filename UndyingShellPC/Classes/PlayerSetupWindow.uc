@@ -23,21 +23,14 @@ var rotator ViewRotator;
 var MeshActor Model;
 
 var ShellButton Back;
-var ShellButton FaceButton;
-var ShellTextBox TextBox;
 
-var localized string FaceText, BodyText;
+var bool bSaveChanges;
 
-var int		SmokingWindows[2];
-var float	SmokingTimers[2];
-
-//var actor SoundEmitter;
-
-var bool bFace;
 //----------------------------------------------------------------------------
 
 function Created()
 {
+
 	local int i;
 	local color TextColor;
 	local AeonsRootWindow AeonsRoot;
@@ -53,8 +46,6 @@ function Created()
 		Log("AeonsRoot is Null!");
 		return;
 	}
-	
-	SmokingWindows[0] = -1;
 
 	RootScaleX = AeonsRoot.ScaleX;
 	RootScaleY = AeonsRoot.ScaleY;
@@ -72,61 +63,41 @@ function Created()
 
 
 // Back Button
-	Back = ShellButton(CreateWindow(class'ShellButton', 48*RootScaleX, 500*RootScaleY, 160*RootScaleX, 64*RootScaleY));
+	Back = ShellButton(CreateWindow(class'ShellButton', 48*RootScaleX, 500*RootScaleY, 139*RootScaleX, 46*RootScaleY));
 
-	Back.TexCoords = NewRegion(0,0,160,64);
-	Back.Template = NewRegion(48,500,160,64);
+	Back.TexCoords.X = 0;
+	Back.TexCoords.Y = 0;
+	Back.TexCoords.W = 139;
+	Back.TexCoords.H = 46;
+
+	// position and size in designed resolution of 800x600
+	Back.Template = NewRegion(48,500,139,46);
 
 	Back.Manager = Self;
-	Back.Style=5;
-
-	Back.bBurnable = true;
-	Back.OverSound=sound'Aeons.Shell_Blacken01';
-
-	Back.UpTexture =   texture'sload_cancel_up';
-	Back.DownTexture = texture'sload_cancel_dn';
-	Back.OverTexture = texture'sload_cancel_ov';
-	
-	FaceButton = ShellButton(CreateWindow(class'ShellButton', 60*RootScaleX, 350*RootScaleY, 160*RootScaleX, 40*RootScaleY));
-	
-	FaceButton.TexCoords = NewRegion(0,0,160,40);
-	FaceButton.Template = NewRegion(60,350,160,40);
-	
-	FaceButton.Manager = Self;
-	FaceButton.Style = 5;
-	FaceButton.Text = FaceText;
+	Back.Text = "";
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	FaceButton.SetTextColor(TextColor);
-	FaceButton.TextStyle=1;
-	FaceButton.Align = TA_Center;
-	FaceButton.Font = 4;
+	Back.SetTextColor(TextColor);
+	Back.Font = 0;
 
-	FaceButton.UpTexture =		texture'Video_resol_up';
-	FaceButton.DownTexture =		texture'Video_resol_up';
-	FaceButton.OverTexture =		texture'Video_resol_ov';
-	FaceButton.DisabledTexture =	None;
-	
-	TextBox = ShellTextBox(CreateWindow(class'ShellTextBox', 48*RootScaleX, 130*RootScaleY, 160*RootScaleX, 128*RootScaleY));
+	Back.bBurnable = true;
 
-	//TextBox.TexCoords = NewRegion(0,0,160,128);
-	TextBox.Template = NewRegion(48,130,160,128);
-	TextBox.Font = 2;
-	TextBox.Value = GetPlayerOwner().PlayerReplicationInfo.PlayerName;
-	TextBox.CaretOffset = Len(TextBox.Value);
+	Back.UpTexture =   texture'audio_ok_up';
+	Back.DownTexture = texture'audio_ok_dn';
+	Back.OverTexture = texture'audio_ok_ov';
+	Back.DisabledTexture = None;
 
-	TextBox.Manager = Self;
-	
-	//Root.Console.bBlackout = True;
+	Root.Console.bBlackout = True;
 
-	/*
+	GetCurrentSettings();
+
+/*
 	SoundEmitter = GetPlayerOwner().Spawn( class'Engine.ParticleFX');
 	SoundEmitter.AmbientSound = Sound(DynamicLoadObject("Aeons.Spells.E_Spl_SkullScream02", class'Sound'));
 	SoundEmitter.SoundPitch=48;
 	SoundEmitter.SOundRadius=255;
-	*/
-	
+*/
 	Resized();
 }
 
@@ -153,15 +124,67 @@ function Resized()
 		RootScaleX = 1.0;
 		RootScaleY = 1.0;
 	}
-	
-	if ( FaceButton != None )
-		FaceButton.ManagerResized(RootScaleX, RootScaleY);
-		
-	if ( TextBox != None )
-		TextBox.ManagerResized(RootScaleX, RootScaleY);
-		
+
 	if ( Back != None )
 		Back.ManagerResized(RootScaleX, RootScaleY);
+}
+
+//----------------------------------------------------------------------------
+
+function GetCurrentSettings()
+{
+/*
+	// get current values for Music, Sound and VoiceOver Volumes and remember them in case they cancel
+	OrigMusicVolume = int(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice MusicVolume ")) * (9.0 / 255.0);
+	OrigSoundVolume = int(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice SoundVolume ")) * (9.0 / 255.0);
+	OrigVoiceVolume = int(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice VoiceVolume ")) * (9.0 / 255.0);
+	OrigbUse3DHardware = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice Use3dHardware")); 
+	OrigbHighSoundQuality = ! bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice LowSoundQuality"));
+
+	// set local values to current values
+	MusicVolume = OrigMusicVolume;
+	SoundVolume = OrigSoundVolume;
+	VoiceVolume = OrigVoiceVolume;
+	bUse3DHardware = OrigbUse3DHardware;
+	bHighSoundQuality = OrigbHighSoundQuality;
+
+	// link up shell components with variables
+	HighQuality.bChecked = bHighSoundQuality;
+	EAx.bChecked = bUse3DHardware;	
+	MusicVolumeChanged(0.0);
+	SoundVolumeChanged(0.0);
+	VoiceVolumeChanged(0.0);
+*/
+}
+
+//----------------------------------------------------------------------------
+
+function UndoChanges()
+{
+/*
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice SoundVolume "$Clamp(OrigSoundVolume*255.0/9.0,0,255) );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice MusicVolume "$Clamp(OrigMusicVolume*255.0/9.0,0,255) );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice VoiceVolume "$Clamp(OrigVoiceVolume*255.0/9.0,0,255) );
+
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ OrigbUse3DHardware);
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ !OrigbHighSoundQuality);
+	
+	GetPlayerOwner().SaveConfig();
+*/
+}
+
+function SaveChanges()
+{
+/*
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice SoundVolume "$Clamp(SoundVolume*255.0/9.0,0,255) );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice MusicVolume "$Clamp(MusicVolume*255.0/9.0,0,255) );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice VoiceVolume "$Clamp(VoiceVolume*255.0/9.0,0,255) );
+	
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ bUse3DHardware);
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ !bHighSoundQuality);
+
+	GetPlayerOwner().SaveConfig();
+*/
 }
 
 //----------------------------------------------------------------------------
@@ -175,39 +198,29 @@ function Message(UWindowWindow B, byte E)
 			switch (B)
 			{
 				case Back:
+					bSaveChanges = true;
 					Close();
 					break;
-				case FaceButton:
-					FacePressed();
-					break;
+
 			}
 			break;
 
 		case DE_Change:
 			break;
-			
-		case DE_MouseEnter:
-			OverEffect(ShellButton(B));
-			break;
 	}
 }
 
-function OverEffect(ShellButton B)
-{
-	switch (B) 
-	{
-		case Back:
-			SmokingWindows[0] = 1;
-			SmokingTimers[0] = 90;
-			break;
-	}
-}
 
 function Close(optional bool bByParent)
 {
 	//SoundEmitter.SoundRadius = 0;
-	
-	GetPlayerOwner().ConsoleCommand("name " $ TextBox.Value);
+
+	if ( bSaveChanges ) 
+		SaveChanges();
+	else
+		UndoChanges();
+
+	bSaveChanges = false;
 
 	HideWindow();
 }
@@ -231,7 +244,7 @@ function HideWindow()
 
 function Tick(float Delta)
 {
-	if (false) //bRotate
+//	if (bRotate)
 		ViewRotator.Yaw += 128;
 }
 
@@ -240,32 +253,21 @@ function Paint(Canvas C, float X, float Y)
 {
 	local float OldFov;
 
-	C.Style = GetPlayerOwner().ERenderStyle.STY_Modulated;
-	DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
-	C.Style = GetPlayerOwner().ERenderStyle.STY_Normal;
+//	C.Style = GetPlayerOwner().ERenderStyle.STY_Modulated;
+//	DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
+//	C.Style = GetPlayerOwner().ERenderStyle.STY_Normal;
 	Super.Paint(C, X, Y);
-	
-	Super.PaintSmoke(C, Back, SmokingWindows[0], SmokingTimers[0]);
 
 	if (Model != None)
 	{
 		OldFov = GetPlayerOwner().FOVAngle;
 		GetPlayerOwner().SetFOVAngle(30);
-	    if (bFace)
-			DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset + vect(-40, 0, 0 ));
-		else
-			DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset);
+//		if (bFace)
+//			DrawClippedActor( C, WinWidth/2, WinHeight/2, Model, False, ViewRotator, vect(-10, 0, -3) );
+//		else
+			DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset);//vect(0, 0, 0) );
 		GetPlayerOwner().SetFOVAngle(OldFov);
 	}
-}
-
-function FacePressed()
-{
-	bFace = !bFace;
-	if (bFace)
-		FaceButton.Text = BodyText;
-	else
-		FaceButton.Text = FaceText;
 }
 
 //----------------------------------------------------------------------------
@@ -290,10 +292,10 @@ function SetNoAnimMesh(mesh NewMesh)
 
 //----------------------------------------------------------------------------
 
-// function SetMeshString(string NewMesh)
-// {
-	// SetMesh(mesh(DynamicLoadObject(NewMesh, Class'Mesh')));
-// }
+function SetMeshString(string NewMesh)
+{
+	SetMesh(mesh(DynamicLoadObject(NewMesh, Class'Mesh')));
+}
 
 //----------------------------------------------------------------------------
 
@@ -335,7 +337,7 @@ function AnimEnd(MeshActor MyMesh)
 	switch( CurrentMesh )
 	{
 		case 0: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.AaronGhost_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.AaronBoss_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
@@ -370,7 +372,7 @@ function AnimEnd(MeshActor MyMesh)
 			break;
 
 		case 7: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Drinen_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Butler_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
@@ -390,12 +392,13 @@ function AnimEnd(MeshActor MyMesh)
 			break;
 
 		case 11: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Evelyn_m", class'SkelMesh'));
+			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Patrick_m", class'SkelMesh'));
 			MyMesh.PlayAnim('Walk');
 			break;
 
 	}
-	//SetMeshString(MyMesh);
+	// SetMeshString()
+
 }
 
 //----------------------------------------------------------------------------
@@ -403,6 +406,8 @@ function AnimEnd(MeshActor MyMesh)
 function ShowWindow()
 {
 	Super.ShowWindow();
+
+	GetCurrentSettings();
 }
 
 //----------------------------------------------------------------------------
@@ -411,8 +416,6 @@ defaultproperties
 {
      NumMeshes=12
      ViewRotator=(Yaw=32768)
-     FaceText="Face"
-     BodyText="Body"
      BackNames(0)="UndyingShellPC.PSetup_0"
      BackNames(1)="UndyingShellPC.PSetup_1"
      BackNames(2)="UndyingShellPC.PSetup_2"

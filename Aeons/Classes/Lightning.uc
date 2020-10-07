@@ -88,7 +88,7 @@ function FireAttSpell( float Value )
 			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
 			{
 				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-					if ( PawnOwner.useMana(50) )
+					if ( PawnOwner.useMana(100) )
 						ChargeSpear();
 			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {
 				PlayFiring();
@@ -904,10 +904,10 @@ defaultproperties
      damagePerLevel(3)=30
      damagePerLevel(4)=40
      damagePerLevel(5)=50
-     MaxTargetRange=4096
+     MaxTargetRange=512
      FireOffset=(Y=16,Z=-10)
      ProjectileClass=Class'Aeons.LtngBlast_proj'
-     RefireRate=0.5
+     RefireRate=2
      FireSound=Sound'Aeons.Spells.E_Spl_LightningStart01'
      ItemType=SPELL_Offensive
      InventoryGroup=14

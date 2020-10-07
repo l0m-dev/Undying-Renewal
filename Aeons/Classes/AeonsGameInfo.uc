@@ -49,22 +49,9 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 	return (Damage * instigatedBy.DamageScaling);
 }
 
-exec function message (string Msg) {
-	ServerSay(Msg);
-}
-
-function ServerSay (string Msg) {
-	local Patrick P;
-
-	ForEach AllActors (class 'Patrick', P)
-	{
-		P.ScreenMessage(Msg, 3.0, True);
-	}
-}
-
 function float PlaySpawnEffect(inventory Inv)
 {
-	//spawn( class 'ReSpawn',,, Inv.Location );
+//	spawn( class 'ReSpawn',,, Inv.Location );
 	return 0.3;
 }
 
@@ -343,9 +330,8 @@ function AddDefaultInventory( pawn PlayerPawn )
 		AeonsPlayer(PlayerPawn).Book = TempBook;
 	}
 
-	
-	// default Defense/Misc Spell
 	/*
+	// default Defense/Misc Spell
 	newSpell = Spawn(class'Aeons.ShalasVortex');
 	if( newSpell != None )
 	{
@@ -354,7 +340,19 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newSpell.Instigator = PlayerPawn;
 		PlayerPawn.DefSpell = newSpell;
 	}
-	
+
+	// default Attack Spell
+	newSpell = Spawn(class'Aeons.Phoenix');
+	if( newSpell != None )
+	{
+		newSpell.BecomeItem();
+		PlayerPawn.AddInventory(newSpell);
+		newSpell.Instigator = PlayerPawn;
+		PlayerPawn.AttSpell = newSpell;
+	}
+
+
+
  	// example default spell
 	newSpell = Spawn(class'Aeons.Spell');
 	if( newSpell != None )
@@ -363,6 +361,18 @@ function AddDefaultInventory( pawn PlayerPawn )
 		PlayerPawn.AddInventory(newSpell);
 		newSpell.Instigator = PlayerPawn;
 		// force assign it to player's AttSpell or DefSpell vars?
+	}
+
+	newWeapon = Spawn(class'Aeons.hand');
+	if( newWeapon != None )
+	{
+		newWeapon.BecomeItem();
+		PlayerPawn.AddInventory(newWeapon);
+		newWeapon.BringUp();
+		newWeapon.Instigator = PlayerPawn;
+		newWeapon.GiveAmmo(PlayerPawn);
+		newWeapon.SetSwitchPriority(PlayerPawn);
+		newWeapon.WeaponSet(PlayerPawn);
 	}
 	*/
 }

@@ -67,7 +67,6 @@ var int VoiceVolume, OrigVoiceVolume;
 
 var bool bUse3DHardware, OrigbUse3DHardware;
 var bool bHighSoundQuality, OrigbHighSoundQuality;
-var bool OrigbEnableSubtitles;
 
 var vector SoundSliderSlots[10];
 //var vector VoiceSliderSlots[10];
@@ -82,7 +81,7 @@ var ShellButton SoundVolumeUp, SoundVolumeDown;
 var ShellButton BackgroundVolumeUp, BackgroundVolumeDown;
 var ShellButton VoiceVolumeUp, VoiceVolumeDown;
 
-var ShellCheckbox HighQuality, Use3D, EnableSubtitles;//A3D, EAX;
+var ShellCheckbox HighQuality, Use3D;//A3D, EAX;
 
 var ShellButton OK;
 var ShellButton Cancel;
@@ -93,7 +92,7 @@ var ShellBitmap SoundVolumeSlider;
 var ShellBitmap BackgroundVolumeSlider;
 var ShellBitmap VoiceVolumeSlider;
 
-//var actor SoundEmitter;
+var actor SoundEmitter;
 
 var sound ChangeSound;
 var sound CheckboxSound;
@@ -214,24 +213,6 @@ function Created()
 	Use3D.DownTexture = texture'audio_x';
 	Use3D.OverTexture = None;
 	Use3D.DisabledTexture = None;
-	
-// EnableSubtitles
-	EnableSubtitles = ShellCheckbox(CreateWindow(class'ShellCheckBox', 325*RootScaleX, 541*RootScaleY, 39*RootScaleX, 37*RootScaleY));
-
-	EnableSubtitles.TexCoords.X = 0;
-	EnableSubtitles.TexCoords.Y = 0;
-	EnableSubtitles.TexCoords.W = 39;
-	EnableSubtitles.TexCoords.H = 37;
-
-	// position and size in designed resolution of 800x600
-	EnableSubtitles.Template = NewRegion(325,541,39,37);
-
-	EnableSubtitles.Manager = Self;
-
-	EnableSubtitles.UpTexture =   None;
-	EnableSubtitles.DownTexture = texture'audio_x';
-	EnableSubtitles.OverTexture = None;
-	EnableSubtitles.DisabledTexture = None;
 
 // Sound Volume Slider
 	SoundVolumeSlider = ShellBitmap(CreateWindow(class'ShellBitmap', 164*RootScaleX,224*RootScaleY,32*RootScaleX,32*RootScaleY));
@@ -373,13 +354,11 @@ function Created()
 
 	GetCurrentSettings();
 
-	/*
 	SoundEmitter = GetPlayerOwner().Spawn( class'Engine.ParticleFX');
 	SoundEmitter.AmbientSound = Sound(DynamicLoadObject("Aeons.Spells.E_Spl_SkullScream02", class'Sound'));
 	SoundEmitter.SoundPitch=48;
 	SoundEmitter.SOundRadius=255;
-	*/
-	
+
 	Resized();
 
 	bInitialized = True;
@@ -421,7 +400,6 @@ function Resized()
 
 	HighQuality.ManagerResized(RootScaleX, RootScaleY);
 	Use3D.ManagerResized(RootScaleX, RootScaleY);
-	EnableSubtitles.ManagerResized(RootScaleX, RootScaleY);
 
 	OK.ManagerResized(RootScaleX, RootScaleY);
 	Cancel.ManagerResized(RootScaleX, RootScaleY);
@@ -583,7 +561,6 @@ function GetCurrentSettings()
 
 	OrigbUse3DHardware = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice Use3dHardware")); 
 	OrigbHighSoundQuality = ! bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice LowSoundQuality"));
-	OrigbEnableSubtitles = GetPlayerOwner().bEnableSubtitles;
  
 /* 
 	OrigSoundVolume =		ForcePowerOfTwo(OrigSoundVolume);
@@ -601,8 +578,7 @@ function GetCurrentSettings()
 
 	// link up shell components with variables
 	HighQuality.bChecked = bHighSoundQuality;
-	Use3D.bChecked = bUse3DHardware;
-	EnableSubtitles.bChecked = GetPlayerOwner().bEnableSubtitles;
+	Use3D.bChecked = bUse3DHardware;	
 	SoundVolumeChanged(0);
 	VoiceVolumeChanged(0);
 	BackgroundVolumeChanged(0);
@@ -621,7 +597,6 @@ function UndoChanges()
 
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ OrigbUse3DHardware);
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ !OrigbHighSoundQuality);
-	GetPlayerOwner().bEnableSubtitles = OrigbEnableSubtitles;
 	
 	GetPlayerOwner().SaveConfig();
 }
@@ -642,14 +617,13 @@ function SaveChanges()
 
 function Paint(Canvas C, float X, float Y)
 {
-	//local vector SoundLocation;
+	local vector SoundLocation;
 
 	Super.Paint(C, X, Y);
 
 	Super.PaintSmoke(C, OK, SmokingWindows[0], SmokingTimers[0]);
 	Super.PaintSmoke(C, Cancel, SmokingWindows[1], SmokingTimers[1]);
 	
-	/*
 	Theta += ThetaRate;
 	if ( Theta > 6.28 ) 
 		Theta -= 6.28;
@@ -664,7 +638,6 @@ function Paint(Canvas C, float X, float Y)
 	SoundEmitter.SetLocation(SoundLocation);
 
 	SoundEmitter.SoundRadius = 255;
-	*/
 }
 
 function Message(UWindowWindow B, byte E)
@@ -729,13 +702,6 @@ function Message(UWindowWindow B, byte E)
 					if ( (CheckboxSound != none) && bInitialized )
 						GetPlayerOwner().PlaySound( CheckboxSound,, 0.25, [Flags]482 );
 					break;
-
-				case EnableSubtitles:
-					GetPlayerOwner().bEnableSubtitles = EnableSubtitles.bChecked;
-
-					if ( (CheckboxSound != none) && bInitialized )
-						GetPlayerOwner().PlaySound( CheckboxSound,, 0.25, [Flags]482 );
-					break;
 			}
 			break;
 
@@ -763,7 +729,7 @@ function OverEffect(ShellButton B)
 
 function Close(optional bool bByParent)
 {
-	//SoundEmitter.SoundRadius = 0;
+	SoundEmitter.SoundRadius = 0;
 
 	if ( bSaveChanges ) 
 		SaveChanges();

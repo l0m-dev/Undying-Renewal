@@ -33,6 +33,18 @@ var	transient byte	AnimStream[64];
 //-----------------------------------------------------------------------------
 // Network replication.
 
+replication
+{
+	// Physics.
+	unreliable if( bSimFall || (RemoteRole==ROLE_SimulatedProxy && bNetInitial && !bSimulatedPawn) )
+		Acceleration;
+
+	// Animation. 
+	reliable if( DrawType==DT_Mesh && ((RemoteRole<=ROLE_AutonomousProxy && (/*!bNetOwner ||*/ !bClientAnim)) || bDemoRecording) )
+		AnimStream;
+
+}
+
 defaultproperties
 {
 }

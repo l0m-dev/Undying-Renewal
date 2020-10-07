@@ -31,7 +31,6 @@ class AeonsSpell extends Spell
 //#exec MESH NOTIFY SEQ=PowerWord TIME=0.0100 FUNCTION=FireSpell
 //#exec MESH NOTIFY SEQ=PowerWord TIME=0.071 FUNCTION=StartParticles
 //#exec MESH NOTIFY SEQ=PowerWord TIME=0.943 FUNCTION=StopParticles
-//#exec MESH NOTIFY SEQ=Firecantrip TIME=0.350 FUNCTION=FirePyro
 //#exec MESH NOTIFY SEQ=Scrye TIME=0.250 FUNCTION=FireSpell
 //#exec MESH NOTIFY SEQ=Invoke TIME=0.684 FUNCTION=FireSpell
 //#exec MESH NOTIFY SEQ=ShalaVortex TIME=0.001 FUNCTION=FireSpell
@@ -64,8 +63,10 @@ replication
 {
     // Things the server should send to the client.
     Reliable if ( bNetOwner && (Role == ROLE_Authority) )
-		bCanClientFire, HandAnim;		
+		bCanClientFire;		
 }
+
+
 
 simulated event RenderOverlays( canvas Canvas )
 {
@@ -122,25 +123,8 @@ function FireSpell()
 		Owner.PlaySound(FireSound,, 1);
 		AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 	}
-	//Enable('FireAttSpell');:TODO
-	//Enable('FireDefSpell');:TODO
-	GotoState('NormalFire');
-}
-
-function FirePyro()
-{
-	if (AeonsPlayer(Owner).AttSpell.ItemName != "Pyro" || AeonsPlayer(Owner).Weapon.ItemName == "Molotov")
-		return;
-	
-	// log ("AeonsSpell FireSpell()", 'Misc');
-	// PlayerPawn(Owner).ClientMessage("AeonsSpell:FireSpell");
-	if ( AeonsPlayer(Owner).bMagicSound )
-	{
-		Owner.PlaySound(FireSound,, 1);
-		AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
-	}
-	//Enable('FireAttSpell');:TODO
-	//Enable('FireDefSpell');:TODO
+	Enable('FireAttSpell');
+	Enable('FireDefSpell');
 	GotoState('NormalFire');
 }
 

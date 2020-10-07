@@ -11,7 +11,7 @@ class AeonsAmbushPoint extends AeonsNavNode;
 // Member vars.
 //****************************************************************************
 var AeonsAmbushPoint		MatingPoint;		//
-var vector lookdir; //direction to look while ambushing
+
 
 //****************************************************************************
 // Inherited member funcs.
@@ -20,7 +20,6 @@ function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	MatingPoint = FindMatingPoint( Event );
-	lookdir = 2000 * vector(Rotation);
 }
 
 

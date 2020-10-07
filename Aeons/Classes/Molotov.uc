@@ -3,6 +3,16 @@
 //=============================================================================
 class Molotov expands AeonsWeapon;
 
+//=============================================================================
+// Molotov 1st person view
+//#exec MESH IMPORT MESH=Molotov1st_m SKELFILE=Molotov1st\Molotov1st_m.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=Molotov1st_m YAW=64
+//#exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=FireStart TIME=0.99 FUNCTION=FireWeapon
+
+//#exec MESH IMPORT MESH=Molotov3rd_m SKELFILE=Molotov3rd\MolotovPat.ngf MOVERELATIVE=0
+
+//=============================================================================
 var int sndID;
 var ParticleFX fuseFX ;
 var() Sound FuseLiteSound;
@@ -44,7 +54,7 @@ function PlayFiring()
 	}
 
 	playAnim('Fire',RefireMult,,,0);
-	PlaySound(IdleSounds[Rand(2)]);
+	// PlaySound(IdleSounds[Rand(2)]);
 }
 
 // send a warning to ScriptedPawns within specified radius
@@ -193,16 +203,12 @@ state Idle
 	Begin:
 		ClearAnims();
 		FinishAnim();
-		//SetTimer((1 + FRand() * 3), true);
+		SetTimer((1 + FRand() * 3), true);
 		bPointing=False;
 		if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) ) 
 		{
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 			Firing = 0.0;
-		}
-		else
-		{
-			PlaySound(IdleSounds[Rand(2)]);
 		}
 		if ( Pawn(Owner).bFire!=0 ) Global.Fire(0.0);
 		Disable('AnimEnd');

@@ -75,10 +75,6 @@ function SetOffset(int i)
 		case 2:
 			PlayerOffset = vect(16,12,-5);
 			break;
-
-		case 3:
-			PlayerOffset = vect(16,7,-10);
-			break;
 	};
 }
 
@@ -101,7 +97,7 @@ function PreBeginPlay()
 		RotationRate.Roll = RandRange(32768, 60000);
 		
 		// next time 
-		NextTimeCheck = Level.TimeSeconds + 15;
+		NextTimeCheck = Level.TimeSeconds + 5;
 
 		Frenzy = 0.0;
 		DrawScale = 0.075;
@@ -452,11 +448,10 @@ function Tick(float DeltaTime)
 			fBob += DeltaTime * (3.0 + (Frenzy * 24.0));
 			Loc.z += ( cos(fBob) * (1.0 + ( 1.0 - Frenzy )) );
 		} else {
-			// removed the skull shake
-			//if ( bCanSeeEnemy )
-			//	Loc += VRand() * 0.25;
-			//else
-			//	Loc += VRand() * 0.75;
+			if ( bCanSeeEnemy )
+				Loc += VRand() * 0.25;
+			else
+				Loc += VRand() * 0.75;
 		}
 		
 		// place it
@@ -514,7 +509,7 @@ function Tick(float DeltaTime)
 					} else {
 						Threaten();
 					}
-					NextTimeCheck = LevelTime + 1 + ((1-Frenzy) * (1.0 + (Frand() * 2.0))) * 2;
+					NextTimeCheck = LevelTime + 1 + ((1-Frenzy) * (1.0 + (Frand() * 2.0)));
 					// log ("NextTimeCheck set to "$NextTimeCheck, 'Misc');
 				}
 			} else {

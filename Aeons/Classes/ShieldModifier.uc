@@ -162,19 +162,19 @@ state Activated
 			shieldHealth = 15;
 			OverlayStr = 0.15;
 		} else if ( castingLevel == 1 ) {
-			shieldHealth = 25;
+			shieldHealth = 30;
 			OverlayStr = 0.3;
 		} else if ( castingLevel == 2 ) {
-			shieldHealth = 35;
+			shieldHealth = 45;
 			OverlayStr = 0.45;
 		} else if ( castingLevel == 3 ) {
-			shieldHealth = 45;
+			shieldHealth = 60;
 			OverlayStr = 0.6;
 		} else if ( castingLevel == 4 ) {
-			shieldHealth = 55;
+			shieldHealth = 100;
 			OverlayStr = 1.0;
 		} else if ( castingLevel == 5 ) {
-			shieldHealth = 65;
+			shieldHealth = 125;
 			OverlayStr = 1.0;
 		} else {
 			log("CastingLevel is invalid!!!");

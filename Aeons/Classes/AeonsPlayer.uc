@@ -28,7 +28,7 @@ class AeonsPlayer expands PlayerPawn
 //#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
 
 // Misc
-#exec AUDIO IMPORT FILE="P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
+//#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
 
 // Take Hits
 //#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
@@ -335,6 +335,7 @@ var() bool bDrawDebugHUD;		// Draw debug items in the hud
 var float NoManaFlashTime;
 
 var globalconfig bool bAllowSelectionHUD;
+var bool bAllowSpellSelectionHUD;
 var enum ESelectMode
 {
     SM_None,
@@ -410,8 +411,6 @@ var wind wind;
 var travel byte			Objectives[100];
 var localized string	ObjectivesText[100];
 
-var savable travel bool bShowScryeHint;
-
 replication
 {
 	// Variables the server should send to the client.
@@ -419,10 +418,11 @@ replication
 		ManaWellsFound, ManaWhorlsFound, crossHairScale,
         FavAttSpell1, FavAttSpell2, FavAttSpellToggle,
         FavDefSpell1, FavDefSpell2, FavDefSpellToggle, ScryeMod, 
-		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
-		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
-		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, AddAll, bDrawInvList, bShowScryeHint;
+		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive, 
+		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye;
+
+	reliable if ( Role==ROLE_Authority )
+		SendClientFire, RealWeapon;
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
@@ -452,8 +452,6 @@ event PreBeginPlay()
 	// bDrawInvList = true;		// Draw the inventory list
 	
 	bRenderWeapon = true;
-	
-	bShowScryeHint = true;
 
 	wind = spawn(class 'PlayerWind',self,,Location);
 	wind.setBase(self);
@@ -463,6 +461,7 @@ event PreBeginPlay()
 
 	//EMod = spawn(class 'EnvironmentModifier',self,,Location);
 	//EMod.setBase(self);
+	bAllowSpellSelectionHUD = true;
 }
 
 event HeadZoneChange(ZoneInfo newHeadZone)
@@ -528,10 +527,9 @@ function PlayerTick( float DeltaTime )
 	}
 }
 
-function ScreenMessage(string Message, float HoldTime, optional bool bFromServer)
+function ScreenMessage(string Message, float HoldTime)
 {
-	if (OSMMod != none)
-		OSMMod.NewMessage(Message, HoldTime, bFromServer);
+	OSMMod.NewMessage(Message, HoldTime);
 }
 
 simulated event RenderOverlays( canvas Canvas )
@@ -891,7 +889,7 @@ simulated function GiveJournal(class<JournalEntry> JournalClass, optional bool b
 }
 
 /*exec brady doesn't want this to be bindable*/ 
-exec function ShowBook()
+function ShowBook()
 {
 	local windowconsole wconsole;
 	
@@ -940,7 +938,7 @@ exec function FireAttSpell( optional float F )
 	Log("");
 	Log("AeonsPlayer: FireAttSpell");
 */
-	if ( bShowMenu || (Level.Pauser!="") || (AttSpell == None) || Region.Zone.bNeutralZone )
+	if ( bShowMenu || (Level.Pauser!="") || (AttSpell == None) )
 		return;
 	
 	//Log("AeonsPlayer: FireAttSpell: AttSpell is valid");
@@ -972,7 +970,7 @@ exec function FireAttSpell( optional float F )
 			bJustFiredAttSpell = true;
 			AttSpell.FireAttSpell(F);
 		}
-		
+
 	}
 }
 
@@ -980,9 +978,10 @@ exec function FireAttSpell( optional float F )
 
 
 // The player wants to fire a defense spell
+/*
 exec function FireDefSpell( optional float F ) 
 {
-	if ( bShowMenu || (Level.Pauser!="") || (DefSpell == None) || Region.Zone.bNeutralZone )
+	if ( bShowMenu || (Level.Pauser!="") || (DefSpell == None) )
 		return;
 
 	//bJustFiredDefSpell = true;
@@ -1031,6 +1030,7 @@ exec function FireDefSpell( optional float F )
 //	}
 
 }
+*/
 
 
 /*
@@ -1115,7 +1115,7 @@ exec function SelectWeapon( optional float F )
 
 exec function SelectAttSpell( optional float F )
 {
-	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || bShowMenu  || (Level.Pauser!="") )
+	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || !bAllowSpellSelectionHUD || bShowMenu  || (Level.Pauser!="") )
 		return;
 
 //	Log("Select AttSpell called");
@@ -1289,35 +1289,7 @@ exec function SwitchDefSpell( byte F )
     //defense spells are inventory groups 21 to 30
     if ( F < 11 )
         F += 20;
-		
-	if ( F == 21 || F == 24 || F == 25)
-	{
-	if ( (AttSpell != None) && (AttSpell.Inventory != None) )
-		newSpell = Spell(AttSpell.Inventory.FindItemInGroup(F));
-	else
-		newSpell = None;
-	if ( newSpell == None )
-		newSpell = Spell(Inventory.FindItemInGroup(F));
 
-	if ( newSpell == None )
-		return;
-	
-    if ( AttSpell == newSpell )
-	    return;	
-
-	if ( AttSpell.bInControl )
-	{
-        AttSpell.PutDown();
-		PendingAttSpell = newSpell;
-	}
-	else
-    {
-		PendingAttSpell = newSpell;
-		ChangedAttSpell();
-    }
-	}
-	else
-	{
 	if ( (DefSpell != None) && (DefSpell.Inventory != None) )
 		newSpell = Spell(DefSpell.Inventory.FindItemInGroup(F));
 	else
@@ -1341,7 +1313,6 @@ exec function SwitchDefSpell( byte F )
 		PendingDefSpell = newSpell;
 		ChangedDefSpell();
     }
-	}
 }
 
 exec function Scrye()
@@ -1421,13 +1392,6 @@ exec function Bring( string ClassName )
 }
 */
 
-exec function skip()
-{
-	//bForceSkip = !bForceSkip;
-	log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
-	MasterCamPoint.CompleteCutscene(self);
-	MasterCamPoint.Teleport(self);
-}
 
 //-----------------------------------------------------------------------------
 // Sound functions
@@ -1460,11 +1424,11 @@ simulated function PlayFootStep()
 		{
 			if ( bIsWalking)							// half volume, half radius for walking ?
 			{
-				PlayFootSound( 1, HitTexture, 0, Location, (0.5f * VolumeMultiplier), 400.0f, 1.0f );
-				MakePlayerNoise(0.5 * VolumeMultiplier, (0.5 * 1280) * VolumeMultiplier);
+				//PlayFootSound( 1, HitTexture, 0, Location, (0.5f * VolumeMultiplier), 400.0f, 1.0f );
+				//MakePlayerNoise(0.5 * VolumeMultiplier, (0.5 * 1280) * VolumeMultiplier);
 			} else {
-				PlayFootSound( 1, HitTexture, 0, Location, (1.0f * VolumeMultiplier), 800.0f, 1.0f );
-				MakePlayerNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
+				//PlayFootSound( 1, HitTexture, 0, Location, (1.0f * VolumeMultiplier), 800.0f, 1.0f );
+				//MakePlayerNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
 			}
 		}
 	}
@@ -2735,7 +2699,7 @@ ignores SeePlayer, HearNoise, Bump;
 //		log( "in ProcessMove, OldAccel is <" $ OldAccel $ "> (" $ OldVSize $ "), NewAccel is <" $ NewAccel $ "> (" $ NewVSize $ ")" );
 
 		Acceleration = NewAccel;
-		bIsTurning = ( Abs(RawDeltaRotation(DeltaTime).Yaw) > 5000 );
+		bIsTurning = ( Abs(DeltaRot.Yaw/DeltaTime) > 5000 );
 
 		if ( bPressedJump )
 			DoJump();
@@ -2991,9 +2955,8 @@ state PlayerCutScene
 		bSelectWeapon = 0;
 		bSelectAttSpell = 0;
 		bSelectDefSpell = 0;
-	
-		if ( Player != None && Player.Console != None )
-			WindowConsole(Player.Console).bShellPauses = true;
+
+		WindowConsole(Player.Console).bShellPauses = true;
 		Level.bDontAllowSavegame = true;
 		NoDetect(true);
 	}
@@ -3003,16 +2966,13 @@ state PlayerCutScene
 		log("PlayerCutscene BeginState() ... "$Level.TimeSeconds, 'Misc');
 		NoDetect(false);
 		UnLock();
-		if ( Player != None && Player.Console != None )
-			WindowConsole(Player.Console).bShellPauses = false;
+		WindowConsole(Player.Console).bShellPauses = false;
 		Level.bDontAllowSavegame = false;
 		bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
-		if ( Weapon != None )
-			Weapon.GotoState('Idle');
-		if ( AttSpell != None )
-			AttSpell.GotoState('Idle');
+		Weapon.GotoState('Idle');
+		AttSpell.GotoState('Idle');
 	}
 
 	exec function StopCutScene()
@@ -3043,8 +3003,6 @@ state PlayerCutScene
 				UnLock();
 				GotoState('Dying');
 			}
-			if (bLanternOn)
-				useLantern2();
 		}
 		//ViewFade(DeltaTime, 4);
 		ViewFlash(DeltaTime);
@@ -3052,12 +3010,13 @@ state PlayerCutScene
 
 	exec function Fire( optional float F )
 	{
-		if ( MasterCamPoint != none && (MasterCamPoint.bEscapable || MasterCamPoint.URL != "") )
-		{
-			log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
-			MasterCamPoint.CompleteCutscene(self);
-			MasterCamPoint.Teleport(self);
-		}
+		if ( MasterCamPoint != none )
+			if ( MasterCamPoint.bEscapable ) //&& MasterCamPoint.bAnimatedCamera )
+			{
+				log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
+				MasterCamPoint.CompleteCutscene(self);
+				MasterCamPoint.Teleport(self);
+			}
 	}
 
 	Begin:
@@ -4113,10 +4072,7 @@ exec function AddAll()
 	local Weapon newWeapon;
 	local Spell newSpell;
 	local Items newItem;
-		
-	AttSpell.LocalCastingLevel = 4;
-	AttSpell.CastingLevel = 4;
-
+	
 	// Conventional Weapons
 
 
@@ -4251,8 +4207,6 @@ exec function AddAll()
 		if( newSpell != None )
 		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
 			AttSpell = newSpell;
 		}
 	}
@@ -4261,11 +4215,7 @@ exec function AddAll()
 	{
 		newSpell = Spawn(class'Aeons.SkullStorm');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
 
@@ -4273,14 +4223,10 @@ exec function AddAll()
 	{
 		newSpell = Spawn(class'Aeons.Lightning');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
-	
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Mindshatter');
@@ -4294,7 +4240,7 @@ exec function AddAll()
 		newSpell = Spawn(class'Aeons.PowerWord');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
-	}
+	}*/
 
 	if (Inventory.FindItemInGroup(class'Aeons.Phoenix'.default.InventoryGroup) == none)
 	{
@@ -4315,54 +4261,42 @@ exec function AddAll()
 	{
 		newSpell = Spawn(class'Aeons.Invoke');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
-	
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Ward'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Ward');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
-	}
+	}*/
 
 	// Defensive Spells
 	if (Inventory.FindItemInGroup(class'Aeons.DispelMagic'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.DispelMagic');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
 
-	if (Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
+	/*if (Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Firefly');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
-	}
+	}*/
 
 
 	if (Inventory.FindItemInGroup(class'Aeons.Haste'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Haste');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
-	if (Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
+	/*if (Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.IncantationOfSilence');
 		if( newSpell != None )
@@ -4374,7 +4308,7 @@ exec function AddAll()
 		newSpell = Spawn(class'Aeons.Phase');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
-	}
+	}*/
 
 	if (Inventory.FindItemInGroup(class'Aeons.Scrye'.default.InventoryGroup) == none)
 	{
@@ -4382,39 +4316,23 @@ exec function AddAll()
 		if( newSpell != None )
 		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
 			AttSpell = newSpell;
 		}
 	}
 
-	if (Inventory.FindItemInGroup(class'Aeons.ShalasVortex'.default.InventoryGroup) == none)
+
+	/*if (Inventory.FindItemInGroup(class'Aeons.ShalasVortex'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.ShalasVortex');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
-	}
+	}*/
 
 	if (Inventory.FindItemInGroup(class'Aeons.Shield'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Shield');
 		if( newSpell != None )
-		{
 			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
-	}
-	
-	if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
-	{
-		newSpell = Spawn(class'Aeons.Pyro');
-		if( newSpell != None )
-		{
-			newSpell.GiveTo(self);
-			newSpell.LocalCastingLevel = 4;
-			newSpell.CastingLevel = 4;
-		}
 	}
 
 	/* Lantern is cut
@@ -4429,9 +4347,7 @@ exec function AddAll()
 		}
 	}*/
 
-	AttSpell.LocalCastingLevel = 4;
-	AttSpell.CastingLevel = 4;
-
+	
 	// all ammo
 	Woo();
 }
@@ -4628,7 +4544,7 @@ exec function GiveMe(name this, optional int Amplitude)
 			}
 			break;
 
-		case 'mshat':
+		/*case 'mshat':
 		case 'mindshatter':
 			if (Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
 			{
@@ -4651,6 +4567,7 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
+		*/
 		case 'phoenix':
 		case 'bird':
 			if (Inventory.FindItemInGroup(class'Aeons.Phoenix'.default.InventoryGroup) == none)
@@ -4679,7 +4596,7 @@ exec function GiveMe(name this, optional int Amplitude)
 			}
 			break;
 
-		case 'ward':
+		/*case 'ward':
 			if (Inventory.FindItemInGroup(class'Aeons.Ward'.default.InventoryGroup) == none)
 			{
 				newSpell = Spawn(class'Aeons.Ward');
@@ -4688,6 +4605,7 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
+*/
 		// Defensive Spells
 		case 'dispel':
 		case 'dispelmagic':
@@ -4701,7 +4619,7 @@ exec function GiveMe(name this, optional int Amplitude)
 			break;
 
 
-		case 'firefly':
+/*		case 'firefly':
 			if (Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
 			{
 				newSpell = Spawn(class'Aeons.Firefly');
@@ -4710,6 +4628,7 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
+*/
 		case 'Haste':
 			if (Inventory.FindItemInGroup(class'Aeons.Haste'.default.InventoryGroup) == none)
 			{
@@ -4720,7 +4639,7 @@ exec function GiveMe(name this, optional int Amplitude)
 			}
 			break;
 
-		case 'silence':
+/*		case 'silence':
 
 			if (Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
 			{
@@ -4743,6 +4662,7 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
+*/
 		case 'scrye':
 
 			if (Inventory.FindItemInGroup(class'Aeons.Scrye'.default.InventoryGroup) == none)
@@ -4757,7 +4677,7 @@ exec function GiveMe(name this, optional int Amplitude)
 			}
 			break;
 
-		case 'vortex':
+/*		case 'vortex':
 		case 'shala':
 		case 'shalas':
 		case 'shalasvortex':
@@ -4770,6 +4690,7 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
+*/
 		case 'shield':
 			if (Inventory.FindItemInGroup(class'Aeons.Shield'.default.InventoryGroup) == none)
 			{
@@ -4779,20 +4700,12 @@ exec function GiveMe(name this, optional int Amplitude)
 					newSpell.GiveTo(self);
 			}
 			break;
-		case 'pyro':
-			if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
-			{
-				newSpell = Spawn(class'Aeons.Pyro');
-				NewSpell.CastingLevel = Clamp(Amplitude, 0, 4);
-				if( newSpell != None )
-					newSpell.GiveTo(self);
-			}
-			break;
+		
 		default:
-			if (FRand() > 0.5)
+			/*if (FRand() > 0.5)
 				bring('donkey');
 			else
-				bring('sheep');
+				bring('sheep');*/
 			break;
 	}
 }
@@ -4890,8 +4803,6 @@ function GiveStartupWeapons()
 			AttSpell = newSpell;
 		}
 	}
-	
-	//ConsoleCommand("SetupInv");
 }
 
 exec function movViewOffsetX (float value)
@@ -5294,16 +5205,8 @@ exec function useLantern()
 	local Inventory Inv;
 	
 	Inv = Inventory.FindItemInGroup(105);
-	if ( Inv != none && MasterCamPoint == none)
+	if ( Inv != none )
 		Inv.Activate();
-}
-
-exec function useLantern2()
-{
-	local Inventory Inv;
-		
-	Inv = Inventory.FindItemInGroup(105);
-	Inv.Activate();
 }
 
 // a direct function to use the Powder of the Siren
@@ -5524,15 +5427,6 @@ exec function PrevDefSpell()
 	if ( DefSpell == None )
 	{
 		// SwitchToBestSpell();
-		for (inv=Inventory; inv!=None; inv=inv.Inventory)
-		{
-			s = DefSpell(inv);
-			if ( s != None )
-			{
-				DefSpell = s;
-				break;
-			}
-		}
 		return;
 	}
 
@@ -5592,8 +5486,7 @@ exec function PrevDefSpell()
 			}
 		}
 
-	if (PendingDefSpell != None)
-		DefSpell = PendingDefSpell;
+	DefSpell = PendingDefSpell;
 }
 
 // PrevAttSpell()
@@ -5768,15 +5661,6 @@ exec function NextDefSpell()
 	if ( DefSpell == None )
 	{
 		// SwitchToBestWeapon();
-		for (inv=Inventory; inv!=None; inv=inv.Inventory)
-		{
-			s = DefSpell(inv);
-			if ( s != None )
-			{
-				DefSpell = s;
-				break;
-			}
-		}
 		return;
 	}
 
@@ -7597,7 +7481,7 @@ exec function QuickSave()
 	{
 		//dynamic ConsoleCommand("SaveShot ..\\save\\0\\save.bmp");
 
-		//ScreenMessage(QuickSaveString, 3.0);
+		ClientMessage(QuickSaveString);
 		ConsoleCommand("SaveGame 0");
 	}
 }
@@ -7617,13 +7501,13 @@ defaultproperties
      Die2=Sound'Voiceover.Patrick.Pa_131'
      Die3=Sound'Voiceover.Patrick.Pa_132'
      Die4=Sound'Voiceover.Patrick.Pa_132'
-     GaspSound=Sound'Aeons.Player.P_Gasp_Air01'
+     GaspSound=Sound'Voiceover.Patrick.Pa_140'
      LandGrunt=Sound'Voiceover.Patrick.Pa_138'
      UnderWater=Sound'CreatureSFX.SharedHuman.P_Underwater01'
      VoiceType=Class'Engine.VoicePack'
      bAllowSelectionHUD=True
      SelectTime=0.15
-     SelectTimePSX2=0.2
+     SelectTimePSX2=1
      UserSettingsPSX2=(SoundVolumePSX2=7,MusicVolumePSX2=5,EasyAimPSX2=True,VibrationPSX2=True)
      ScrollDelayPSX2=0.3
      JumpSound(0)=Sound'Voiceover.Patrick.Pa_135'
@@ -7632,7 +7516,7 @@ defaultproperties
      bCanStrafe=True
      bIsHuman=True
      MeleeRange=50
-     GroundSpeed=350
+     GroundSpeed=400
      AirSpeed=256
      AccelRate=2048
      JumpZ=350
@@ -7661,5 +7545,4 @@ defaultproperties
      Sprite=Texture'Engine.S_Pawn'
      CollisionRadius=32
      CollisionHeight=64
-	 bShowScryeHint=True
 }

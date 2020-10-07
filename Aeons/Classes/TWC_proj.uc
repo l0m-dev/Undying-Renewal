@@ -142,6 +142,7 @@ defaultproperties
      AltDamagePerLevel(3)=50
      AltDamagePerLevel(4)=60
      AltDamagePerLevel(5)=70
+     Speed=1200
      Damage=30
      ProjImpactSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_TWCMiss01'
      PawnImpactSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_TWCHit01'

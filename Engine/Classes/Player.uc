@@ -37,6 +37,6 @@ const IDC_WAIT=6;
 
 defaultproperties
 {
-     ConfiguredInternetSpeed=20000
+     ConfiguredInternetSpeed=2600
      ConfiguredLanSpeed=20000
 }

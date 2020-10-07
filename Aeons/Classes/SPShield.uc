@@ -149,7 +149,7 @@ state Shrinking
 defaultproperties
 {
      FullDrawScale=1.35
-     GrowTime=0.5
+     GrowTime=1
      ShrinkTime=0.5
      Strength=80
      DrawType=DT_Mesh

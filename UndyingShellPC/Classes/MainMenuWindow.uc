@@ -21,10 +21,6 @@ class MainMenuWindow expands ShellWindow;
 //#exec Texture Import File=Main_Back_ov.bmp		Mips=Off
 //#exec Texture Import File=Main_Back_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_Disconnect_up.bmp		Mips=Off
-#exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
-
 //#exec Texture Import File=Main_audio_up.bmp		Mips=Off
 //#exec Texture Import File=Main_audio_ov.bmp		Mips=Off
 //#exec Texture Import File=Main_audio_dn.bmp		Mips=Off
@@ -53,15 +49,17 @@ class MainMenuWindow expands ShellWindow;
 //#exec Texture Import File=Main_video_ov.bmp			Mips=Off
 //#exec Texture Import File=Main_video_dn.bmp			Mips=Off
 
-#exec Texture Import File=Main_Multiplayer_up.bmp		Mips=Off
-#exec Texture Import File=Main_Multiplayer_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Multiplayer_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Website_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Website_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Website_dn.bmp		Mips=Off
+
+
 
 //#exec Texture Import Name=Light File=Light.pcx Mips=Off Flags=4
 
+
 var ShellButton Buttons[8];
 var ShellButton BackToGame;
-var ShellButton Disconnect;
 
 var UWindowWindow Single;
 var UWindowWindow Audio;
@@ -70,17 +68,16 @@ var UWindowWindow Credits;
 var UWindowWindow Quit; //fix messagebox ?
 var UWindowWindow Website;
 var UWindowWindow LoadSave;
-var UWindowWindow Multiplayer;
-var UWindowWindow Video;
-var UWindowWindow Console;
+//var UWindowWindow Multiplayer;
 
-var UWindowWindow Confirm;
+var UWindowWindow Video;
+
 //var ShellWindow Dialog;
 //var UWindowMessageBox ConfirmJoin;
 //var() sound NewScreenSound;
 //var sound ExitSound;
-var int		SmokingWindows[10];
-var float	SmokingTimers[10];
+var int		SmokingWindows[9];
+var float	SmokingTimers[9];
 
 var int AmbientSoundID;
 
@@ -88,6 +85,7 @@ var bool Initialized;
 var bool FromReLaunch;
 
 var int XCenter, YCenter;
+
 /*
 var MeshActor Model;
 
@@ -155,10 +153,9 @@ function Created()
 	Buttons[4].DownTexture = texture'Main_quit_dn';	
 	Buttons[4].OverTexture = texture'Main_quit_ov';	
 	
-	Buttons[5].UpTexture =   texture'Main_Multiplayer_up';
-	Buttons[5].DownTexture = texture'Main_Multiplayer_dn';	
-	Buttons[5].OverTexture = texture'Main_Multiplayer_ov';		
-	Buttons[5].Style = 5;		
+	Buttons[5].UpTexture =   texture'Main_Website_up';
+	Buttons[5].DownTexture = texture'Main_Website_dn';	
+	Buttons[5].OverTexture = texture'Main_Website_ov';		
 	
 	Buttons[6].UpTexture =   texture'Main_sload_up';	
 	Buttons[6].DownTexture = texture'Main_sload_dn';
@@ -184,7 +181,7 @@ function Created()
 
 	BackToGame.TexCoords = NewRegion(0,0,160,64);
 
-	BackToGame.Template = NewRegion( 616, 500, 160, 64);
+	BackToGame.Template = NewRegion( 616, 492, 160, 64);
 
 	BackToGame.Manager = Self;
 	BackToGame.Style=5;
@@ -195,27 +192,10 @@ function Created()
 
 	BackToGame.bBurnable = true;
 	BackToGame.OverSound=sound'Aeons.Shell_Blacken01';
-	
-// disconnect button
-	Disconnect = ShellButton(CreateWindow(class'ShellButton', 620*RootScaleX, 430*RootScaleY, 160*RootScaleX, 64*RootScaleY));
-
-	Disconnect.TexCoords = NewRegion(0,0,160,64);
-
-	Disconnect.Template = NewRegion( 620, 430, 160, 64);
-
-	Disconnect.Manager = Self;
-	Disconnect.Style=5;
-
-	Disconnect.UpTexture   = texture'Main_Disconnect_Up';
-	Disconnect.DownTexture = texture'Main_Disconnect_Dn';
-	Disconnect.OverTexture = texture'Main_Disconnect_Ov';
-
-	Disconnect.bBurnable = true;
-	Disconnect.OverSound=sound'Aeons.Shell_Blacken01';
 
 //	ExitSound = Sound(DynamicLoadObject("Aeons.Shell_Select01", class'Sound'));
 
-	/*
+/*
 	velx = 0.12; 
 	vely = 0.23;
 	Model = GetPlayerOwner().Spawn(class'MeshActor', GetEntryLevel());
@@ -223,8 +203,7 @@ function Created()
 	Model.Skin = GetPlayerOwner().Skin;
 	Model.NotifyClient = Self;
 	SetMesh(Model.Mesh);
-	*/
-
+*/
 	Initialized = True;
 	Root.Console.bBlackout = True;
 
@@ -232,13 +211,13 @@ function Created()
 	SaveString = GetPlayerOwner().GetSaveGameList();
 	if ((InStr (SaveString, "99,")) >= 0)
 	{	
-		GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
 		FromRelaunch = True;
 	}
 }
 
 
 //----------------------------------------------------------------------------
+
 /*
 function SetMesh(mesh NewMesh)
 {
@@ -247,9 +226,10 @@ function SetMesh(mesh NewMesh)
 	Model.Mesh = NewMesh;
 	if(Model.Mesh != None)
 		Model.LoopAnim( 'hunt', 3 );
-		// Model.PlayAnim('Walk');//, 0.5);
+		//Model.PlayAnim('Walk');//, 0.5);
 }
 */
+
 //----------------------------------------------------------------------------
 
 function Message(UWindowWindow B, byte E)
@@ -277,19 +257,19 @@ function Message(UWindowWindow B, byte E)
 					ControlsPressed();
 					break;
 				case Buttons[6]:
+					//MultiplayerPressed();
 					LoadSavePressed();
 					break;
 				case Buttons[5]:
-					MultiplayerPressed();
+					WebsitePressed();
+					//Close();
 					break;
 				case Buttons[3]:
 					CreditsPressed();
 					break;
+
 				case BackToGame:
 					BackPressed();
-					break;
-				case Disconnect:
-					DisconnectPressed();
 					break;
 			}
 			break;
@@ -353,11 +333,6 @@ function OverEffect(ShellButton B)
 		case BackToGame:
 			SmokingWindows[8] = 1;
 			SmokingTimers[8] = 90;
-			break;
-			
-		case Disconnect:
-			SmokingWindows[9] = 1;
-			SmokingTimers[9] = 90;
 			break;
 	}
 }
@@ -488,43 +463,16 @@ function CreditsPressed()
 */
 
 	PlayNewScreenSound(); //PlayExitSound();
-	
+
 	if ( Credits == None )
 		Credits = ManagerWindow(Root.CreateWindow(class'CreditsWindow', 100, 100, 200, 200, Root, True));
 	else
 		Credits.ShowWindow();
 
-	//ShowConfirm(Credits);
 }
 
-function ShowConfirm(UwindowWindow W)
-{
-	if (Confirm == None ) 
-		Confirm = ManagerWindow(Root.CreateWindow(class'ConfirmWindow', 0, 0, 200, 200, Root, True));
-
-	Confirm.ShowWindow();		
-	ConfirmWindow(Confirm).Owner = self;
-	ConfirmWindow(Confirm).QuestionWindow = W;
-}
-
-function QuestionAnswered( UWindowWindow W, int Answer )
-{
-	if(W != Credits)
-		return;
-		
-	// answered yes
-	if ( Answer == 1 ) 
-	{
-		//GetPlayerOwner().Level.bLoadBootShellPSX2 = false;	
-		BackPressed();
-	}
-	// answered no
-	else
-	{
-		BackPressed();
-	}
-}
 //----------------------------------------------------------------------------
+/*
 function MultiplayerPressed()
 {
 	PlayNewScreenSound(); //PlayExitSound();
@@ -534,20 +482,13 @@ function MultiplayerPressed()
 	else
 		Multiplayer.ShowWindow();
 }
+*/
 //----------------------------------------------------------------------------
 
 function BackPressed()
 {
 	PlayNewScreenSound(); //PlayExitSound();
 	Close(); 
-}
-
-function DisconnectPressed()
-{
-	SmokingTimers[9] = 0;
-	GetPlayerOwner().ClientTravel("start?nosave", TRAVEL_Absolute, false);
-	PlayNewScreenSound(); //PlayExitSound();
-	//Close(); 
 }
 
 //----------------------------------------------------------------------------
@@ -590,7 +531,7 @@ function Paint(Canvas C, float X, float Y)
 	local int Brightness;
 	local float Distance;
 	//local vector cursorloc, windowloc, direction;
-	local int OldFOV;
+//	local int OldFOV;
 	local UWindowWindow Book;
 
 	//log("mainmenuwindow: paint");
@@ -607,13 +548,11 @@ function Paint(Canvas C, float X, float Y)
 	if ( GetPlayerOwner().Level.bLoadBootShellPSX2 )
 	{
 		BackToGame.HideWindow();
-		Disconnect.HideWindow();
 	}
-	else
-	{
+	else 
 		BackToGame.ShowWindow();
-		Disconnect.ShowWindow();
-	}
+
+
 
 	Root.Console.bLocked =  True;
 
@@ -631,11 +570,11 @@ function Paint(Canvas C, float X, float Y)
 	}
 
 	Super.PaintSmoke(C, BackToGame, SmokingWindows[8], SmokingTimers[8]);
-	Super.PaintSmoke(C, Disconnect, SmokingWindows[9], SmokingTimers[9]);
 	for ( i=0; i<8; i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
 
-	/*
+
+/*
 	if (Model != None)
 	{
 		OldFov = GetPlayerOwner().FOVAngle;
@@ -665,7 +604,7 @@ function Paint(Canvas C, float X, float Y)
 		DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, GetPlayerOwner().Rotation, Model.ViewOffset);//vect(0, 0, 0) );
 		GetPlayerOwner().SetFOVAngle(OldFov);
 	}
-	*/
+*/	
 }
 
 //----------------------------------------------------------------------------
@@ -714,8 +653,8 @@ function Resized()
 	if ( Single != None )
 		Single.Resized();
 	
-	if ( Multiplayer != None )
-		Multiplayer.Resized();
+//	if ( Multiplayer != None )
+//		Multiplayer.Resized();
 
 	if ( LoadSave != None )
 		LoadSave.Resized();
@@ -737,14 +676,12 @@ function Resized()
 
 	if ( BackToGame != None )
 		BackToGame.ManagerResized(RootScaleX, RootScaleY);
-		
-	if ( Disconnect != None )
-		Disconnect.ManagerResized(RootScaleX, RootScaleY);
 
 	for ( i=0; i<8; i++ )
 	{
 		Buttons[i].ManagerResized(RootScaleX, RootScaleY);
 	}
+
 }
 
 //----------------------------------------------------------------------------

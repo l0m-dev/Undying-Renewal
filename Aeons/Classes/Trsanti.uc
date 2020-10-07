@@ -44,6 +44,7 @@ class Trsanti expands ScriptedBiped;
 
 //#exec AUDIO IMPORT FILE="Invoke1.wav" NAME="TrsantiInvoke1" GROUP="Trsanti"
 //#exec AUDIO IMPORT FILE="Invoke2.wav" NAME="TrsantiInvoke2" GROUP="Trsanti"
+//#exec AUDIO IMPORT FILE="Invoke3.wav" NAME="TrsantiInvoke3" GROUP="Trsanti"
 
 //****************************************************************************
 // Member vars.
@@ -182,13 +183,16 @@ function bool TriggerSwitchToMelee()
 //****************************************************************************
 function PlaySoundInvoked()
 {
-	switch ( Rand(2) )
+	switch ( Rand(3) )
 	{
 		case 0:
 			PlaySound( sound'Aeons.Trsanti.TrsantiInvoke1' );
 			break;
 		case 1:
 			PlaySound( sound'Aeons.Trsanti.TrsantiInvoke2' );
+			break;
+		case 2:
+			PlaySound( sound'Aeons.Trsanti.TrsantiInvoke3' );
 			break;
 	}
 }

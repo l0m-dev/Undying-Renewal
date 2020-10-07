@@ -3,7 +3,110 @@
 //=============================================================================
 class Howler expands ScriptedPawn;
 
-// BURT - All exec imports were ripped since it is just an update
+//#exec MESH IMPORT MESH=Howler_m SKELFILE=Howler.ngf
+//#exec MESH JOINTNAME R_Shoulder=R_Collar R_Shoulder_Rot=R_Shoulder R_Hand=R_Hand1 R_Claw_A1=R_ClawA1 R_Claw_B1=R_ClawB1
+//#exec MESH JOINTNAME L_Shoulder=L_Collar L_Shoulder_Rot=L_Shoulder L_Hand=L_Hand1 L_Claw_A1=L_ClawA1 L_Claw_B1=L_ClawB1
+
+//****************************************************************************
+// Animation sequence notifications.
+//****************************************************************************
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.440 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.470 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.495 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.525 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.563 FUNCTION=DoNearDamage2	//
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.578 FUNCTION=DoNearDamage2	//
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.594 FUNCTION=DoNearDamage2	//
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.609 FUNCTION=DoNearDamage2	//
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.233 FUNCTION=TriggerJump			//
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.533 FUNCTION=DoNearDamage3		//
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.550 FUNCTION=DoNearDamage3		//
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.567 FUNCTION=DoNearDamage3		//
+//#exec MESH NOTIFY SEQ=jump TIME=0.185 FUNCTION=TriggerJump					//
+//#exec MESH NOTIFY SEQ=jump_start TIME=0.481 FUNCTION=TriggerJump			//
+//#exec MESH NOTIFY SEQ=jump_start TIME=1.000 FUNCTION=PlayInAir				//
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.615385 FUNCTION=BloodyMouth		//
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.815385 FUNCTION=BloodyMouth		//
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.285 FUNCTION=DecapitatePlayer	//
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.350 FUNCTION=OJDidItAgain		//
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.769 FUNCTION=PutHeadInMouth		//
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.875 FUNCTION=SwallowHead		//
+//#exec MESH NOTIFY SEQ=death TIME=0.100 FUNCTION=SpawnGoreDecal				//
+
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.0 FUNCTION=PlaySound_N ARG="VPreAtk PVAR=.2 V=.8 VVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.237288 FUNCTION=PlaySound_N ARG="VAttack PVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.474576 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_bite TIME=0.508475 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.0 FUNCTION=PlaySound_N ARG="VPreAtk PVAR=.2 V=.8 VVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.508475 FUNCTION=PlaySound_N ARG="VAttack PVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.559322 FUNCTION=PlaySound_N ARG="Whoosh PVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.79661 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_standslash TIME=0.830508 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.0 FUNCTION=PlaySound_N ARG="VPreAtk PVAR=.2 V=.8 VVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.0625 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.078125 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.421875 FUNCTION=PlaySound_N ARG="VAttack PVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.421875 FUNCTION=PlaySound_N ARG="Whoosh PVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.53125 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_slash TIME=0.5625 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=jump TIME=0.078125 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=jump TIME=0.09375 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=jump TIME=0.125 FUNCTION=PlaySound_N ARG="Jump PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=jump TIME=0.484375 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=jump TIME=0.5 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=jump_start TIME=0.208333 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=jump_start TIME=0.25 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=jump_start TIME=0.333333 FUNCTION=PlaySound_N ARG="Jump PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.0307692 FUNCTION=PlaySound_N ARG="VPreAtk CHANCE=.35 P=.75 PVAR=.2 V=.5 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.276923 FUNCTION=PlaySound_N ARG="VPreAtk CHANCE=.35 P=.75 PVAR=.2 V=.5 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.615385 FUNCTION=PlaySound_N ARG="Eat PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse TIME=0.815385 FUNCTION=PlaySound_N ARG="Eat PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse_bite TIME=0.0769231 FUNCTION=PlaySound_N ARG="VPreAtk CHANCE=.35 P=.75 PVAR=.2 V=.5 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse_bite TIME=0.6296296 FUNCTION=PlaySound_N ARG="Eat PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=eat_at_corpse_bite TIME=0.692308 FUNCTION=PlaySound_N ARG="VPreAtk CHANCE=.35 P=.75 PVAR=.2 V=.5 VVAR=.2"
+//#exec MESH NOTIFY SEQ=howl TIME=0.0740741 FUNCTION=PlaySound_N ARG="Howl PVAR=.25 V=1.3"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.0 FUNCTION=PlaySound_N ARG="VPreAtk V=.8 VVAR=.2"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.201342 FUNCTION=PlaySound_N ARG="VAttack"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.274 FUNCTION=PlaySound_N ARG="PatDeath"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.221477 FUNCTION=PlaySound_N ARG="Whoosh"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.270536 FUNCTION=PlaySound_N ARG="ClawStab"
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.315436 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.328859 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.484724 FUNCTION=PlaySound_N ARG="SpclKill P=.9"
+//#exec MESH NOTIFY SEQ=damage_stun TIME=0.0 FUNCTION=PlaySound_N ARG="VDamage PVAR=.2"
+//#exec MESH NOTIFY SEQ=damage_stun TIME=0.103448 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=damage_stun TIME=0.241379 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=damage_stun TIME=0.413793 FUNCTION=C_StunShake01_01_075_100_020_075_010
+//#exec MESH NOTIFY SEQ=death TIME=0.0875 FUNCTION=PlaySound_N ARG="VDeath PVAR=.2"
+//#exec MESH NOTIFY SEQ=death TIME=0.1875 FUNCTION=C_BodyFall
+//#exec MESH NOTIFY SEQ=death TIME=0.3 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=death TIME=0.35 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=death TIME=0.425 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=death TIME=0.5375 FUNCTION=C_ClawFS
+//#exec MESH NOTIFY SEQ=Idle_Alert TIME=0.0 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=Idle_Alert TIME=0.491525 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=Idle_Alert_Hang TIME=0.0169492 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=Idle_Alert_Hang TIME=0.508475 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=Idle_Alert_Hangawake TIME=0.0 FUNCTION=PlaySound_N ARG="VPreAtk PVAR=.2 V=.8 VVAR=.2"
+//#exec MESH NOTIFY SEQ=listen TIME=0.0 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=listen TIME=0.457143 FUNCTION=PlaySound_N ARG="Listen1 PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=listen TIME=0.6 FUNCTION=PlaySound_N ARG="Listen2 PVAR=.2 V=.75 VVAR=.2"
+//#exec MESH NOTIFY SEQ=Run TIME=0.7 FUNCTION=PlaySound_N ARG="Run PVAR=.2 V=.2"
+//#exec MESH NOTIFY SEQ=Run TIME=0.8 FUNCTION=C_BackRight
+//#exec MESH NOTIFY SEQ=Run TIME=0.9 FUNCTION=C_BackLeft
+//#exec MESH NOTIFY SEQ=Run TIME=0.95 FUNCTION=C_FrontRight
+//#exec MESH NOTIFY SEQ=Run TIME=1.0 FUNCTION=C_FrontLeft
+//#exec MESH NOTIFY SEQ=turn_left TIME=0.366667 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=turn_left TIME=0.733333 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=turn_left TIME=0.0 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=turn_right TIME=0.0 FUNCTION=PlaySound_N ARG="Breath PVAR=.2 V=.5"
+//#exec MESH NOTIFY SEQ=turn_right TIME=0.5 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=turn_right TIME=0.766667 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=jump_end TIME=0.454545 FUNCTION=C_BareFS
+//#exec MESH NOTIFY SEQ=jump_end TIME=0.545455 FUNCTION=C_BareFS
+
+// Poses
+//#exec MESH IMPORT MESH=Howler_Pinned_m SKELFILE=Poses\Howler_Pinned.ngf
 
 //****************************************************************************
 // Member vars.
@@ -12,8 +115,6 @@ var NavigationPoint			LastSpclNavPoint;	// Last navigation point where special a
 var float					JumpAttackTime;		// Length of jump attack (in air) time.
 var Actor					Head;				// Magnus' Head - for the special Kill sequence.
 
-// VVA 20.12.04
-var bool	bMeleeAttackFail;	// used to hack howler's freezing during near attacks
 
 //****************************************************************************
 // Animation trigger functions.
@@ -247,181 +348,6 @@ function C_ClawFS()
 //****************************************************************************
 //****************************************************************************
 
-// VVA 20.12.04
-
-//****************************************************************************
-// AINearAttack
-// attack near enemy (melee)
-// hack howlers stay still while biting
-//****************************************************************************
-state AINearAttack
-{
-	// *** ignored functions ***
-	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
-	function EffectorHearNoise( actor sensed ){}
-	function EffectorSeePlayer( actor sensed ){}
-	function Trigger( actor Other, pawn EventInstigator ){}
-	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
-
-	// *** overridden functions ***
-	function BeginState()
-	{
-		StopTimer();
-		bPendingBump = false;
-	}
-
-	function AnimEnd()
-	{
-		if( bMeleeAttackFail )
-		{
-			GotoState( , 'BEGIN' );
-		}
-
-		if ( !bDidMeleeAttack )
-		{
-			GotoState( , 'DOATTACK' );
-		}
-		else
-		{
-			GotoState( , 'ATTACKED' );
-		}
-	}
-
-	function Timer()
-	{
-		if ( !bDidMeleeAttack )
-		{
-			GotoState( , 'DOATTACK' );
-		}
-		else
-		{
-			GotoState( , 'ATTACKED' );
-		}
-	}
-
-	function Bump( actor Other )
-	{
-		bPendingBump = true;
-		BumpedPawn = pawn(Other);
-	}
-
-	function bool HandlePowderOfSiren( actor Other )
-	{
-		DispatchPowder( Other );
-		return true;
-	}
-
-	// *** new (state only) functions ***
-	function PostAttack()
-	{
-		GotoState( 'AIAttack' );
-	}
-
-	function bool MoveInAttack()
-	{
-		return bCanFly;
-	}
-
-// Entry point when returning from AITakeDamage
-DAMAGED:
-
-// Entry point when resuming this state
-RESUME:
-	GotoState( 'AIAttack' );
-
-// Default entry point
-BEGIN:
-
-	StopMovement();
-	PlayWait();
-
-
-	if( DistanceTo( Enemy ) > DamageRadius )
-	{
-		bDidMeleeAttack = false;
-
-		if( FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius )
-		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
-			{
-			case 0:	// Easy
-				sleep( FVariant( 1.0, 0.5 ) );
-				break;
-			case 1:	// Normal
-				sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 2: // Hard
-				sleep( FVariant( 0.2, 0.1 ) );
-				break;
-			}		// Very Hard will no wait
-
-			bMeleeAttackFail = false;
-			GotoState( 'AIFarAttack' );
-		}
-		else
-		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
-			{
-			case 0:	// Easy
-				sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 1:	// Normal
-				sleep( FVariant( 0.2, 0.1 ) );
-				break;
-			}
-
-			PlayRun();
-			MoveToward( Enemy, FullSpeedScale );
-
-			bMeleeAttackFail = true;	// if not set previously, helps to avoid second TurnToward
-			goto 'BEGIN';
-		}
-	}
-
-	if ( VSize(Enemy.Velocity) < 10.0 )
-	{
-		bDidMeleeAttack = false;
-		SetTimer( 2.0, false );
-
-		if( !bMeleeAttackFail ) // if there was no previous attack
-		{
-			TurnToward( Enemy, TurnTowardThreshold( 20 * DEGREES ) );
-		}
-	}
-
-	bMeleeAttackFail = false;
-
-DOATTACK:
-	bDidMeleeDamage = false;
-	bDidMeleeAttack = true;
-	PlayNearAttack();
-	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
-
-INATTACK:
-	if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
-	{
-		//PostAttack();
-		bMeleeAttackFail = true;
-		StopTimer();
-		TweenAnim( 'Idle_Alert', FVariant(0.15,0.05) );
-		//StopMovement();
-		//PlayWait();
-		goto 'BEGIN';
-	}
-	Sleep( 0.1 );
-	goto 'INATTACK';
-
-ATTACKED:
-	StopTimer();
-	if ( bPendingBump )
-		CreatureBump( BumpedPawn );
-	PostAttack();
-} // state AINearAttack
-
-// END OF VVA 20.12.04
-
 //****************************************************************************
 // AIFarAttackAnim
 // Attack far enemy with animation (projectile, non-weapon).
@@ -576,7 +502,6 @@ state AIJumpAtEnemy
 
 defaultproperties
 {
-     bNoEncounterTaunt=True
      FollowDistance=300
      LongRangeDistance=750
      JumpDownDistance=275
@@ -605,7 +530,7 @@ defaultproperties
      SightRadius=640
      HatedClass=Class'Aeons.Servant'
      BaseEyeHeight=28
-     Health=60
+     Health=50
      SoundSet=Class'Aeons.HowlerSoundSet'
      FootSoundClass=Class'Aeons.HandClawFootSoundSet'
      Mesh=SkelMesh'Aeons.Meshes.Howler_m'

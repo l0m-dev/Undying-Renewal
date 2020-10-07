@@ -23,8 +23,4 @@ function DamageInfo getDamageInfo( optional name DamageType )
 defaultproperties
 {
      LifeSpan=10
-	 Speed=12000
-     MaxSpeed=12000
-	 CollisionRadius=60
-     CollisionHeight=42
 }

@@ -119,8 +119,7 @@ function DynamiteAmmo DynamiteDrop(class<Ammo> AmmoClass, float ProjSpeed, bool 
 
 	// Owner.PlaySound(FireSound, SLOT_None,2.0);
     // AeonsPlayer(Owner).MakePlayerNoise(1.0, 1280*3);
-	Owner.PlaySound(Sound'Wpn_Spl_Inv.Inventory.E_Wpn_DynaFuse01', SLOT_None, 2.0);
-	
+
 	dProj = DynamiteFire(class 'Dynamite_proj', 300, false, false);
 	dProj.SpinRate(1.0);
 	dProj.bFuseLit = true;

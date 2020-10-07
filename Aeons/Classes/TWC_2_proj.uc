@@ -5,7 +5,6 @@ class TWC_2_proj expands TWC_proj;
 
 defaultproperties
 {
-     Speed=1400
      Radius=80
      EffectLen=4
      CastingLevel=2

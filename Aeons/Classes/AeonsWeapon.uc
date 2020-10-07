@@ -862,7 +862,7 @@ function Finish()
 //rb newweapon
 	else if (bReloadable && ClipCount<=0)
         GoToState('NewClip');
-    else if ( (PawnOwner.bFire!=0 || bForce) && !Region.Zone.bNeutralZone )
+    else if ( PawnOwner.bFire!=0 || bForce )
         Global.Fire(0);
     else 
 	{

@@ -3,37 +3,22 @@
 //=============================================================================
 class MultiplayerWindow expands ShellWindow;
 
-#exec Texture Import File=Multiplayer_0.bmp Mips=Off
-#exec Texture Import File=Multiplayer_1.bmp Mips=Off
-#exec Texture Import File=Multiplayer_2.bmp Mips=Off
-#exec Texture Import File=Multiplayer_3.bmp Mips=Off
-#exec Texture Import File=Multiplayer_4.bmp Mips=Off
-#exec Texture Import File=Multiplayer_5.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_0.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_1.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_2.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_3.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_4.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_5.bmp Mips=Off
 
-//#exec Texture Import File=audio_ok_ov.BMP	Mips=Off Flags=2
-//#exec Texture Import File=audio_ok_up.BMP	Mips=Off Flags=2
-//#exec Texture Import File=audio_ok_dn.BMP	Mips=Off Flags=2
-
-#exec Texture Import File=player_setup_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=player_setup_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=player_setup_dn.bmp	Mips=Off Flags=2
-
-#exec Texture Import File=find_game_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=find_game_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=find_game_dn.bmp	Mips=Off Flags=2
-
-#exec Texture Import File=create_game_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=create_game_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=create_game_dn.bmp	Mips=Off Flags=2
+/*
+//#exec Texture Import File=multi_ok_ov.BMP	Mips=Off Flags=2
+//#exec Texture Import File=multi_ok_up.BMP	Mips=Off Flags=2
+//#exec Texture Import File=multi_ok_dn.BMP	Mips=Off Flags=2
+*/
 
 var UWindowWindow PlayerSetupWindow;
-//var UWindowWindow FindGameWindow;
-var UWindowWindow CreateGameWindow;
 
 var ShellButton FindGame, CreateGame, PlayerSetup, Back;
-
-var int		SmokingWindows[4];
-var float	SmokingTimers[4];
 
 function Created()
 {
@@ -54,22 +39,17 @@ function Created()
 
 	RootScaleX = AeonsRoot.ScaleX;
 	RootScaleY = AeonsRoot.ScaleY;
-	
-	SmokingWindows[0] = -1;
-	SmokingWindows[1] = -1;
-	SmokingWindows[2] = -1;
-	SmokingWindows[3] = -1;
 
 	// create window items here
 
-//	Temporarily commented out since Multiplayer is not going out with our CD
+/*	Temporarily commented out since Multiplayer is not going out with our CD
 
 //  FindGame Button 405 240 140 44
-	FindGame = ShellButton(CreateWindow(class'ShellButton', 405*RootScaleX, 240*RootScaleY, 142*RootScaleX, 64*RootScaleY));
+	FindGame = ShellButton(CreateWindow(class'ShellButton', 405*RootScaleX, 240*RootScaleY, 140*RootScaleX, 44*RootScaleY));
 
-	FindGame.TexCoords = NewRegion(0,0,142,64);
-	FindGame.Template = NewRegion(405,240,142,64);
-	
+	FindGame.TexCoords = NewRegion(0,0,140,44);
+	FindGame.Template = NewRegion(405,240,140,44);
+
 	FindGame.Manager = Self;
 	FindGame.Text = "";
 	TextColor.R = 0;
@@ -79,18 +59,17 @@ function Created()
 	FindGame.Font = 0;
 
 	FindGame.bBurnable = true;
-	FindGame.OverSound=sound'Aeons.Shell_Blacken01';
 
-	FindGame.UpTexture =   texture'find_game_up';
-	FindGame.DownTexture = texture'find_game_dn';
-	FindGame.OverTexture = texture'find_game_ov';
+	FindGame.UpTexture =   texture'Gen1_up';
+	FindGame.DownTexture = texture'Gen1_up';
+	FindGame.OverTexture = texture'Gen1_up';
 	FindGame.DisabledTexture = None;
 
 //  CreateGame Button 210 70 160 48
-	CreateGame = ShellButton(CreateWindow(class'ShellButton', 210*RootScaleX, 70*RootScaleY, 154*RootScaleX, 74*RootScaleY));
+	CreateGame = ShellButton(CreateWindow(class'ShellButton', 210*RootScaleX, 70*RootScaleY, 160*RootScaleX, 48*RootScaleY));
 
-	CreateGame.TexCoords = NewRegion(0,0,154,74);
-	CreateGame.Template = NewRegion(210,70,154,74);
+	CreateGame.TexCoords = NewRegion(0,0,160,48);
+	CreateGame.Template = NewRegion(210,70,160,48);
 
 	CreateGame.Manager = Self;
 	CreateGame.Text = "";
@@ -101,18 +80,17 @@ function Created()
 	CreateGame.Font = 0;
 
 	CreateGame.bBurnable = true;
-	CreateGame.OverSound=sound'Aeons.Shell_Blacken01';
 
-	CreateGame.UpTexture =   texture'create_game_up';
-	CreateGame.DownTexture = texture'create_game_dn';
-	CreateGame.OverTexture = texture'create_game_ov';
+	CreateGame.UpTexture =   texture'Gen1_up';
+	CreateGame.DownTexture = texture'Gen1_up';
+	CreateGame.OverTexture = texture'Gen1_up';
 	CreateGame.DisabledTexture = None;
 
 //  PlayerSetup Button 56 228 146 56
-	PlayerSetup = ShellButton(CreateWindow(class'ShellButton', 56*RootScaleX, 228*RootScaleY, 164*RootScaleX, 64*RootScaleY));
+	PlayerSetup = ShellButton(CreateWindow(class'ShellButton', 56*RootScaleX, 228*RootScaleY, 146*RootScaleX, 56*RootScaleY));
 
-	PlayerSetup.TexCoords = NewRegion(0,0,164,64);
-	PlayerSetup.Template = NewRegion(56,228,164,64);
+	PlayerSetup.TexCoords = NewRegion(0,0,146,56);
+	PlayerSetup.Template = NewRegion(56,228,146,56);
 
 	PlayerSetup.Manager = Self;
 	PlayerSetup.Text = "";
@@ -123,48 +101,41 @@ function Created()
 	PlayerSetup.Font = 0;
 
 	PlayerSetup.bBurnable = true;
-	PlayerSetup.OverSound=sound'Aeons.Shell_Blacken01';
 
-	PlayerSetup.UpTexture =   texture'player_setup_up';
-	PlayerSetup.DownTexture = texture'player_setup_dn';
-	PlayerSetup.OverTexture = texture'player_setup_ov';
+	PlayerSetup.UpTexture =   texture'Gen1_up';
+	PlayerSetup.DownTexture = texture'Gen1_up';
+	PlayerSetup.OverTexture = texture'Gen1_up';
 	PlayerSetup.DisabledTexture = None;
 
 
 //  Back Button 216 384 156 70
-	Back = ShellButton(CreateWindow(class'ShellButton', 216*RootScaleX, 384*RootScaleY, 160*RootScaleX, 64*RootScaleY));
+	Back = ShellButton(CreateWindow(class'ShellButton', 216*RootScaleX, 384*RootScaleY, 156*RootScaleX, 70*RootScaleY));
 
-	Back.TexCoords = NewRegion(0,0,160,64);
-	Back.Template = NewRegion(216,384,160,64);
+	Back.TexCoords = NewRegion(0,0,156,70);
+	Back.Template = NewRegion(216,384,156,70);
 
 	Back.Manager = Self;
-	Back.Style=5;
+	Back.Text = "";
+	TextColor.R = 0;
+	TextColor.G = 0;
+	TextColor.B = 0;
+	Back.SetTextColor(TextColor); 
+	Back.Font = 0;
 
-	Back.UpTexture =   texture'sload_cancel_up';
-	Back.DownTexture = texture'sload_cancel_dn';
-	Back.OverTexture = texture'sload_cancel_ov';
-	
 	Back.bBurnable = true;
-	Back.OverSound=sound'Aeons.Shell_Blacken01';
 
-	//Root.Console.bBlackout = True; // comment out idk
+	Back.UpTexture =   texture'Gen1_up';
+	Back.DownTexture = texture'Gen1_up';
+	Back.OverTexture = texture'Gen1_up';
+	Back.DisabledTexture = None;
+*/
+
+	Root.Console.bBlackout = True;
 
 	Resized();
 }
 
 //----------------------------------------------------------------------------
-
-function Paint(Canvas C, float X, float Y)
-{
-	local vector SoundLocation;
-
-	Super.Paint(C, X, Y);
-
-	Super.PaintSmoke(C, FindGame, SmokingWindows[0], SmokingTimers[0]);
-	Super.PaintSmoke(C, CreateGame, SmokingWindows[1], SmokingTimers[1]);
-	Super.PaintSmoke(C, PlayerSetup, SmokingWindows[2], SmokingTimers[2]);
-	Super.PaintSmoke(C, Back, SmokingWindows[3], SmokingTimers[3]);
-}
 
 function Message(UWindowWindow B, byte E)
 {
@@ -187,7 +158,6 @@ function Message(UWindowWindow B, byte E)
 					break;
 
 				case Back:
-					BackPressed();
 					break;
 			}
 			break;
@@ -197,128 +167,53 @@ function Message(UWindowWindow B, byte E)
 			{
 			}
 			break;
-		case DE_MouseEnter:
-			OverEffect(ShellButton(B));
-			break;
 	}
 }
-
-function OverEffect(ShellButton B)
-{
-	switch (B) 
-	{
-		case FindGame:
-			SmokingWindows[0] = 1;
-			SmokingTimers[0] = 90;
-			break;
-
-		case CreateGame:
-			SmokingWindows[1] = 1;
-			SmokingTimers[1] = 90;
-			break;
-			
-		case PlayerSetup:
-			SmokingWindows[2] = 1;
-			SmokingTimers[2] = 90;
-			break;
-			
-		case Back:
-			SmokingWindows[3] = 1;
-			SmokingTimers[3] = 90;
-			break;
-	}
-}
-
 
 //----------------------------------------------------------------------------
 
 function CreateGamePressed()
 {
+//	PlayExitSound();
+/*
 	if ( CreateGameWindow == None )
 		CreateGameWindow = ManagerWindow(Root.CreateWindow(class'CreateGameWindow', 100, 100, 200, 200, Root, True));
 	else
 		CreateGameWindow.ShowWindow();
-		
-		
-	PlayNewScreenSound();
+*/		
 }
+
 //----------------------------------------------------------------------------
 
 function FindGamePressed()
 {
-	// 50, 30, 500, 300 from ut
-	//if ( FindGameWindow == None )
-	//	FindGameWindow = ManagerWindow(Root.CreateWindow(class'FindGameMainWindow', 100, 100, 200, 200, Root, True));
-	//else {
-	//	FindGameWindow.ShowWindow();
-	//}
-	
-	AeonsRootWindow(Root).FindMenu.NextSiblingWindow = none;
-	//AeonsRootWindow(Root).FindMenu.PrevSiblingWindow = MainMenuWindow(AeonsRootWindow(Root).MainMenu).Multiplayer;
-	AeonsRootWindow(Root).FindMenu.PrevSiblingWindow = none;
-	//AeonsRootWindow(Root).FindMenu.bWindowVisible = True;
-
-	AeonsRootWindow(Root).FindMenu.BringToFront();
-	
-	AeonsRootWindow(Root).MainMenu.HideWindow();
-	
-	//FindGameWindow.ShowOpenWindow();
-	//FindGameWindow.SelectInternet();
-		
-	PlayNewScreenSound();
-	HideWindow();
-	//GetPlayerOwner().ConsoleCommand("start 127.0.0.1");	
+//	PlayExitSound();
+/*
+	if ( FindGameWindow == None )
+		FindGameWindow = ManagerWindow(Root.CreateWindow(class'FindGameWindow', 100, 100, 200, 200, Root, True));
+	else
+		FindGameWindow.ShowWindow();
+*/		
 }
 
 //----------------------------------------------------------------------------
 
 function PlayerSetupPressed()
 {
+//	PlayExitSound();
+
 	if ( PlayerSetupWindow == None )
 		PlayerSetupWindow = ManagerWindow(Root.CreateWindow(class'PlayerSetupWindow', 100, 100, 200, 200, Root, True));
 	else
 		PlayerSetupWindow.ShowWindow();
 		
-	PlayNewScreenSound();
 }
 
 //----------------------------------------------------------------------------
 
-function BackPressed()
-{
-	PlayNewScreenSound(); //PlayExitSound();
-	Close(); 
-}
-
 function Resized()
 {
-	local int W, H, XMod, YMod, i;
-	local AeonsRootWindow AeonsRoot;
-	local float RootScaleX, RootScaleY;
-
 	Super.Resized();
-
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
-	}
-		
-	if ( AeonsRootWindow(Root).FindMenu != None )
-		AeonsRootWindow(Root).FindMenu.Resized();
-		
-	if ( CreateGameWindow != None )
-		CreateGameWindow.Resized();
-		
-	if ( PlayerSetupWindow != None )
-		PlayerSetupWindow.Resized();
-		
-	FindGame.ManagerResized(RootScaleX, RootScaleY);
-	CreateGame.ManagerResized(RootScaleX, RootScaleY);
-	PlayerSetup.ManagerResized(RootScaleX, RootScaleY);
-	Back.ManagerResized(RootScaleX, RootScaleY);
 }
 
 

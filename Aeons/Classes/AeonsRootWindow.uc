@@ -12,7 +12,6 @@ var float ScaleX;
 var float ScaleY;
 
 var UWindowWindow MainMenu;
-var UWindowWindow FindMenu;
 var UWindowWindow Book;
 
 var texture			Light;
@@ -27,12 +26,8 @@ function Created()
 {
 	local color TextColor;
 	local class<UWindowWindow> MainWindowClass;
-	local class<UWindowWindow> FindWindowClass;
 	local class<UWindowWindow> BookWindowClass;
-	
-	local int I;
-	local string KeyName;
-	
+
 	Super.Created();
 
 	//Scale = (WinHeight - WinTop) / 600.0;
@@ -42,32 +37,11 @@ function Created()
 	MainWindowClass = Class<UWindowWindow>(DynamicLoadObject("UndyingShellPC.MainMenuWindow", class'Class'));
 	if ( MainWindowClass != None ) 
 		MainMenu = CreateWindow(MainWindowClass,5,5,400,300);
-		
-	FindWindowClass = Class<UWindowWindow>(DynamicLoadObject("UBrowser.UBrowserMainWindow", class'Class'));
-	if ( FindWindowClass != None ) 
-		FindMenu = CreateWindow(FindWindowClass,5,5,400,300,MainMenu,True);
 
 	if ( AeonsConsole(Console).bRequestedBook )
 		MainMenu.HideWindow();
 	
-	FindMenu.HideWindow();
-	
 	Resized();
-	
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice OutputRate 44100Hz");
-	
-	for (I=0; I<255; I++)
-	{
-		KeyName = GetPlayerOwner().ConsoleCommand( "KEYNAME "$i );
-
-		if ( KeyName != "" )
-		{
-			if ( GetPlayerOwner().ConsoleCommand( "KEYBINDING "$KeyName ) == "ShowBook" )
-				return;
-		}
-	}
-
-	GetPlayerOwner().ConsoleCommand("SET Input"@"F3"@"ShowBook");
 }
 
 function NotifyBeforeLevelChange()
@@ -91,11 +65,11 @@ function SetupFonts()
 	Fonts[4] =			Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
 	*/
 	
-	Fonts[F_Normal] =	AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Bold] =		AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Large] =	AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Comic.Comic18",		class'Font'));
-	Fonts[F_LargeBold]= AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
-	Fonts[4] =			AeonsHUd(GetPlayerOwner().MyHud).MyMediumFont;//Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
+	Fonts[F_Normal] =	AeonsHud(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
+	Fonts[F_Bold] =		AeonsHud(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
+	Fonts[F_Large] =	AeonsHud(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Comic.Comic18",		class'Font'));
+	Fonts[F_LargeBold]= AeonsHud(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
+	Fonts[4] =			AeonsHud(GetPlayerOwner().MyHud).MyMediumFont;//Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
 	Fonts[5] =			Font(DynamicLoadObject("dauphin.Dauphin16",class'Font'));
 }
 
@@ -112,9 +86,6 @@ function Resized()
 	
 	if ( MainMenu != None )
 		MainMenu.Resized();
-		
-	if ( FindMenu != None )
-		FindMenu.Resized();
 
 	if ( Book != None ) 
 		Book.Resized();
@@ -123,9 +94,17 @@ function Resized()
 
 function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
 {
+	Console.GetVersion(C);
+	
 	switch(Msg) {
 
 	case WM_KeyDown:
+		if (Key == 114) //fix hardcoded for IK_F3 since EInputKey isn't visible here
+		{
+			if ( (Book != None) && (Book.bWindowVisible) )
+				Book.Close();
+		}
+
 		if(HotKeyDown(Key, X, Y))
 			return;
 		break;

@@ -539,12 +539,10 @@ function ChangeDriverPressed()
 {
 	//	ConfirmDriver = MessageBox(ConfirmDriverTitle, ConfirmDriverText, MB_YesNo, MR_No);
 	
-	GetPlayerOwner().EnableSaveGame();
-	
+	Close();
+
 	GetPlayerOwner().ConsoleCommand("SaveGame 99");
 	GetPlayerOwner().ConsoleCommand("RELAUNCH -changevideo?-nointro");
-	
-	Close();
 }
 
 
@@ -644,9 +642,6 @@ function BrightnessChanged()
 
 function GetCurrentSettings()
 {
-	local string VideoDriverClassName;//, ClassLeft, ClassRight, VideoDriverDesc;
-	local int i;
-	
 	// get current values and save
 	OrigBrightness = float(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager Brightness"));
 	
@@ -678,26 +673,11 @@ function GetCurrentSettings()
 		BitDepth_16.OverTexture = texture'Video_resol_ov';
 		BitDepth_16.DownTexture = texture'Video_resol_up';
 	}
-	
-	VideoDriverClassName = GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.GameRenderDevice Class");
-	i = InStr(VideoDriverClassName, "'");
-	// Get class name from class'...'
-	if(i != -1)
-	{
-		VideoDriverClassName = Mid(VideoDriverClassName, i+1);
-		i = InStr(VideoDriverClassName, "'");
-		VideoDriverClassName = Left(VideoDriverClassName, i);
-		//ClassLeft = Left(VideoDriverClassName, InStr(VideoDriverClassName, "."));
-		//ClassRight = Mid(VideoDriverClassName, InStr(VideoDriverClassName, ".") + 1);
-		//VideoDriverDesc = Localize(ClassRight, "ClassCaption", ClassLeft);
-	}
 
-	DriverLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentDriver");
+	DriverLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentDriver"); 
 	ResLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentRes"); 
 	
-	if (VideoDriverClassName ~= "d3d11drv.d3d11renderdevice")
-		DriverLabel.Text = DriverLabel.Text$" 11";
-	
+
 	// Will save changes by default
 	bSaveChanges = True;
 }

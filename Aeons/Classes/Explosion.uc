@@ -26,31 +26,6 @@ var() float RumbleRadius;
 var() float RumbleStrength;
 var() EActEffects RumbleType;
 
-function GibRadius( float DamageRadius, vector HitLocation, DamageInfo DInfo, pawn Instigator )
-{
-	local actor Victims;
-
-	if( DInfo.DamageRadius == 0.0 )
-		DInfo.DamageRadius = DamageRadius;
-
-	if( DInfo.DamageLocation == vect(0,0,0) )
-		DInfo.DamageLocation = HitLocation;
-	
-	foreach VisibleCollidingActors( class 'Actor', Victims, DamageRadius, HitLocation )
-	{
-		if( Victims != self && Victims.IsA('ScriptedPawn') && Pawn(Victims).Health <= 0 )
-		{
-			if (DInfo.ImpactForce != vect(0,0,0))
-				ScriptedPawn(Victims).SpawnGibbedCarcass(HitLocation-Victims.Location);
-			else
-				ScriptedPawn(Victims).SpawnGibbedCarcass(DInfo.ImpactForce);
-			
-			Pawn(Victims).gibbedBy( PlayerPawn(Instigator) );
-			Pawn(Victims).Destroy();
-		}  
-	}
-}
-
 function DamageInfo GetDamageInfo(optional name DamageType)
 {
 	local DamageInfo DInfo;

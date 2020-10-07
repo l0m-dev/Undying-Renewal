@@ -1,26 +1,26 @@
 //=============================================================================
 // GhelziabahrRing.
 //=============================================================================
-class GhelziabahrRing expands Effects;
+class GhelziabahrRing expands PlayerEffects;
 
 //#exec MESH IMPORT MESH=GhelziabahrRing_m SKELFILE=GhelziabahrRing.ngf
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
+	setTimer(0.05,true);
 	super.PreBeginPlay();
 }
 
-function Tick(float DeltaTime)
+simulated function Timer()
 {
-	DrawScale += 32 * DeltaTime;
-	
-	if (DrawScale > 16)
+	if ((8.0 - DrawScale) > 0.1)
+		DrawScale += (0.5 * (8.0 - DrawScale));
+	else
 		Destroy();
 }
 
 defaultproperties
 {
-	 RemoteRole=ROLE_SimulatedProxy
      DrawType=DT_Mesh
      Style=STY_Translucent
      Mesh=SkelMesh'Aeons.Meshes.GhelziabahrRing_m'

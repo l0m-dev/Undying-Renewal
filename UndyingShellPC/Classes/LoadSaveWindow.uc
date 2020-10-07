@@ -92,15 +92,16 @@ function Created()
 		SaveGameButtons[i].Text = "";
 		SaveGameButtons[i].TextX = 0;
 		SaveGameButtons[i].TextY = 0;
-
+		
 		SaveGameButtons[i].TextStyle = 5;
-
-		TextColor.R = 84;
-		TextColor.G = 41;
-		TextColor.B = 11;
+		
+		TextColor.R = 102;
+		TextColor.G = 0;
+		TextColor.B = 0;
+	
 		SaveGameButtons[i].SetTextColor(TextColor);
 		SaveGameButtons[i].Font = 3;
-
+	
 		//SaveGameButtons[i].UpTexture =		texture'Engine.DefaultTexture';
 		//SaveGameButtons[i].TexCoords = NewRegion(0,0,64,64);
 	}
@@ -193,9 +194,7 @@ function Created()
 	ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
 	ScreenShot.Template = NewRegion(425,46,116,88);
 	ScreenShot.bStretch = true;
-	ScreenShot.Style = 5;
-	ScreenShot.Manager = Self;
-	
+
 	SelectedSlot = -1;
 
 	UpdateButtons();
@@ -494,8 +493,29 @@ function DeletePressed()
 
 function BeforePaint(Canvas C, float X, float Y)
 {
+	local int I;
+	local color TextColor;
+	
 	Super.BeforePaint(C, X, Y);
-
+	
+	for( i=0; i<ArrayCount(SaveGameButtons); i++ )
+	{
+		if (AeonsHUd(GetPlayerOwner().MyHud).CanvasWidth < 1920)
+		{
+			TextColor.R = 255;
+			TextColor.G = 255;
+			TextColor.B = 255;
+		}
+		else
+		{
+			TextColor.R = 255;
+			TextColor.G = 255;
+			TextColor.B = 255;
+		}
+		
+		SaveGameButtons[i].SetTextColor(TextColor);
+	}
+	
 	// if a slot is selected
 	if ( SelectedSlot >= 0 ) 
 	{

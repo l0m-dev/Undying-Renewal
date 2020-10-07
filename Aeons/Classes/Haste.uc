@@ -44,7 +44,7 @@ function FireAttSpell( float Value )
 						bFiring = true;
 						GhelzUse(manaCostPerLevel[castingLevel]);
 						PlayFiring();
-						//Disable('FireAttSpell');:TODO
+						Disable('FireAttSpell');
 						
 						if ( Owner.bHidden )
 							CheckVisibility();

@@ -9,10 +9,7 @@ function CreateExplosion(Pawn Instigator)
 
 	// Damage
 	if (bCausesDamage)
-	{
-		HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo(DamageType) );
-		GibRadius(DamageRadius, Location, getDamageInfo(DamageType), Instigator);
-	}
+		HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo() );
 
 	// Visual Effects
 	spawn (class 'PhoenixHotExplosionFX', , , Location);

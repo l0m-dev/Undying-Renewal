@@ -2,7 +2,8 @@
 // Parent class of all spells.
 //=============================================================================
 class Spell extends Inventory
-	native;
+	native 
+    abstract;
 
 // Share Weapon icon for now.
 //#exec Texture Import File=Textures\Weapon.pcx Name=S_Weapon Mips=On Flags=2

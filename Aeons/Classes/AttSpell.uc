@@ -81,7 +81,7 @@ function PassControl()
 
 // we override to disable parent's version
 // this global function can currently only be accessed while spell is in Idle state
-function FireDefSpell( float Value )
+/*function FireDefSpell( float Value )
 {
     // we could place code here to facilitate a faster switch from
     // firing an Attack spell to a Defense spell.
@@ -105,7 +105,7 @@ function FireDefSpell( float Value )
         bPassControl = true;
     }
 }
-
+*/
 
 // Finish a firing sequence
 function Finish()
@@ -158,8 +158,6 @@ function FireAttSpell( float Value )
 	local int cost;
 
 	// LogTime("AttSpell: FireAttSpell");
-	if ( Self.IsA('Pyro') && AeonsPlayer(Owner).Weapon.ItemName == "Molotov" )
-		return;
 
 	if ( !bFiring )
 	{
@@ -274,35 +272,6 @@ state Idle2
 	{
 		bFiring = false;
 	}
-}
-
-// OVERRIDABLES FROM Spell CLASS TO NOT MODIFY Engine PACKAGE
-
-//**********************************************************************************
-// Bring newly active spell up
-state Active
-{
-    function FireDefSpell(float Value) 
-    {
-	    //if we're an aborted offensive spell being asked to switch
-        if ( ItemType == SPELL_Offensive && Pawn(Owner).bFireAttSpell == 0 )
-        {
-            PutDown();
-            bPassControl = true;
-        }
-    }
-}
-
-//**********************************************************************************
-// Putting down spell in favor of a new one.
-State DownSpell
-{
-    function FireDefSpell(float F) 
-    {
-        //if we're an aborted offensive spell being asked to switch
-        if ( ItemType == SPELL_Offensive && Pawn(Owner).bFireAttSpell == 0 )
-            bPassControl = true;
-    }
 }
 
 defaultproperties

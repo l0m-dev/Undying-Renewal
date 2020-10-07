@@ -3,6 +3,26 @@
 //=============================================================================
 class GhelziabahrStone expands AeonsWeapon;
 
+//-----------------------------------------------------------------------------
+// 1st Person View Mesh
+//#exec MESH IMPORT MESH=GhelziabahrStone1st_m SKELFILE=GhelziabahrStone1st\GhelziabahrStone1st.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=GhelziabahrStone1st_m YAW=64
+
+//-----------------------------------------------------------------------------
+// Sounds
+//#exec AUDIO IMPORT FILE="E_Wpn_GhelFire01.wav" NAME="E_Wpn_GhelFire01" GROUP="Weapons"
+
+//-----------------------------------------------------------------------------
+
+// Notifys
+//#exec MESH NOTIFY SEQ=Fire TIME=0.100 FUNCTION=FireWeapon
+
+//#exec MESH IMPORT MESH=GhelzStonePickup_m SKELFILE=GhelziabahrStone3rd\GhelzStone.ngf
+
+//#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
+
+//-----------------------------------------------------------------------------
+
 var savable travel float useMeter;		// Use Meter for the ghelzibahar Stone
 var int chargeCount;
 var int Damage;
@@ -15,7 +35,7 @@ var float GlowFlashX, GlowFlashY;
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	//AmmoType.AmmoAmount = 9999;
+	AmmoType.AmmoAmount = 9999;
 }
 
 function FellOutOfWorld()
@@ -43,14 +63,8 @@ function PlayHoundAnim()
 
 state HoundAnim
 {
-	function bool PutDown()
-	{
-		LogStack();
-		GotoState('DownWeapon');
-		
-		return True;
-	}
-	
+	function Fire(float F);
+
 	Begin:
 		Owner.PlaySound(SpawnHoundSound);
 		PlayAnim('Hound',RefireMult);
@@ -81,7 +95,7 @@ function MeleeAttack(float Range)
 	impulse.z = (chargeCount/20.0) * 256;
 	// log("Impulse: "$Impulse);
 
-	spawn(class 'GhelziabahrRing',,,Owner.Location, rot(0,0,0));
+	// spawn(class 'GhelziabahrRing',Pawn(Owner),,Location,rot(0,0,0));
 	
 	//rb net spawn(class 'GhelzRingFX',Pawn(Owner),,Location,rot(0,0,0));
 	g = spawn(class 'GhelzRingFX',Pawn(Owner),,Owner.Location,rot(0,0,0));
@@ -167,8 +181,7 @@ state Active
 		SetBase( Owner, 'Revolver_Attach_Hand', 'root' );
 		// SetBase( Owner, 'L_Wrist', 'root' );
 		bCanClientFire=true;
-		//gotoState('Idle');
-		GotoState('HoundAnim');
+		gotoState('Idle');
 }
 
 state Idle
@@ -217,13 +230,13 @@ state Idle
 		}
 	}
 
-	
+	/*
 	simulated function Timer()
 	{
 		if ( VSize(PlayerPawn(Owner).Velocity) < 200 )
 			if (FRand() > 0.75)
 				gotoState(getStateName(),'Flourish');
-	}
+	}*/
 
 
 	FLOURISH:
@@ -291,7 +304,7 @@ state ClientFiring
 			PlayIdleAnim();
 			GotoState('');
 		}
-
+/*
 		if ( (Pawn(Owner) == None) || (Ammotype.AmmoAmount <= 0) )
 		{
 			PlayIdleAnim();
@@ -303,7 +316,7 @@ state ClientFiring
 		{
 			if ( ClipCount <= 0 ) 
 			{
-				//PlayReloading();
+				PlayReloading();
 				GotoState('ClientReload');
 			}
 			else if ( Pawn(Owner).bFire != 0 )
@@ -314,7 +327,7 @@ state ClientFiring
 				GotoState('');
 			}
 		}
-
+*/
 	}
 }
 

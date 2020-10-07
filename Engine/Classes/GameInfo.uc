@@ -16,7 +16,7 @@ var() config bool   		  bNoMonsters;				// Whether monsters are allowed in this 
 var() globalconfig bool		  bMuteSpectators;			// Whether spectators are allowed to speak.
 var() config bool			  bHumansOnly;				// Whether non human player models are allowed.
 var() bool				      bRestartLevel;	
-var() config bool			  bPauseable;		// Whether the level is pauseable.
+var() bool				      bPauseable;				// Whether the level is pauseable.
 var() config bool			  bCoopWeaponMode;			// Whether or not weapons stay when picked up.
 var() config bool			  bClassicDeathmessages;	// Weapon deathmessages if false.
 var   globalconfig bool	      bLowGore;					// Whether or not to reduce gore.
@@ -1037,7 +1037,7 @@ function Logout( pawn Exiting )
 		else
 			NumPlayers--;
 	}
-	if( bMessage && Exiting.PlayerReplicationInfo != None &&(Level.NetMode==NM_DedicatedServer || Level.NetMode==NM_ListenServer) )
+	if( bMessage && (Level.NetMode==NM_DedicatedServer || Level.NetMode==NM_ListenServer) )
 		BroadcastMessage( Exiting.PlayerReplicationInfo.PlayerName$LeftMessage, false );
 
 	if ( LocalLog != None )

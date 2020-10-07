@@ -64,9 +64,6 @@ state Activated
 
 	function Tick(float DeltaTime)
 	{
-		if (Owner == None)
-			return;
-		
 		PlayerPawn(Owner).ScryeTimer -= DeltaTime;
 		
 		if ((PlayerPawn(Owner).GetStatename() == 'PlayerCutscene') || (PlayerPawn(Owner).GetStatename() == 'DialogScene') || (PlayerPawn(Owner).GetStatename() == 'SpecialKill'))
@@ -190,9 +187,6 @@ state Deactivated
 	}
 
 	Begin:
-		if (Owner == None)
-			stop;
-
 		col = vect(233,196,255);	// hud change color
 		AeonsPlayer(Owner).bScryeActive = false;
 

@@ -374,8 +374,8 @@ function Created()
 
 	SensitivitySlider.bNoSlidingNotify = true;
 
-	SensitivitySlider.SetRange(0.5, 8.0, 0.1);
-	SensitivitySlider.SetValue(3.0);
+	SensitivitySlider.SetRange(1.0, 10.0, 1.0);
+	SensitivitySlider.SetValue(7.0);
 
 	SensitivitySlider.Manager = Self;
 	SensitivitySlider.Text = "";
@@ -1266,8 +1266,7 @@ defaultproperties
      AliasNames(46)="PickPhosphorusShell"
      AliasNames(47)="PickAmplifier"
      AliasNames(48)="PickEtherTrap"
-     AliasNames(49)="ShowBook"
-     AliasCount=50
+     AliasCount=49
      LabelList(0)="Weapon Fire"
      LabelList(1)="Weapon Select"
      LabelList(2)="Spell Fire"
@@ -1317,7 +1316,6 @@ defaultproperties
      LabelList(46)="Phosphorus Shells"
      LabelList(47)="Amplifier"
      LabelList(48)="Ether Trap"
-     LabelList(49)="Show Journal"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

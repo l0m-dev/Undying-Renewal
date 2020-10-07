@@ -25,7 +25,7 @@ struct ImpactSoundParams
 };
 
 // General flags.
-var savable travel bool bBehindView;    // Outside-the-player view.
+var bool		bBehindView;    // Outside-the-player view.
 var bool        bIsPlayer;      // Pawn is a player or a player-bot.
 var bool		bJustLanded;	// used by eyeheight adjustment
 var bool		bUpAndOut;		// used by swimming 
@@ -151,8 +151,8 @@ var travel Weapon       Weapon;        // The pawn's current weapon.
 var Weapon				PendingWeapon;	// Will become weapon once current weapon is put down
 var travel Inventory	SelectedItem;	// currently selected inventory item
 
-var savable travel bool bAcceptDamage;		// accept conventional attack damage
-var savable travel bool bAcceptMagicDamage; // accept magical attack damage
+var bool 				bAcceptDamage;		// accept conventional attack damage
+var bool 				bAcceptMagicDamage; // accept magical attack damage
 var bool				bWetFeet;			// My feet are wet
 
 var savable travel Spell AttSpell; //currently selected attack spell
@@ -363,7 +363,7 @@ replication
 		 bIsPlayer, CarriedDecoration, SelectedItem,
 		 GroundSpeed, WaterSpeed, AirSpeed, AccelRate, JumpZ, MaxStepHeight, AirControl,
 		 ManaCapacity, ManaRefreshAmt, ManaRefreshTime,
-		 bBehindView, GroundFriction, PlayerRestartState;
+		 bBehindView, GroundFriction;
 	unreliable if( (bNetOwner && bIsPlayer && bNetInitial && Role==ROLE_Authority) || bDemoRecording )
 		ViewRotation;
 	unreliable if( bNetOwner && Role==ROLE_Authority )
@@ -615,17 +615,11 @@ function PlayEffectAtJoint(name JointName, name JointType)
 					break;
 			}
 		} else {
-			if ( !IsA('PlayerPawn') || (IsA('PlayerPawn') && !bIsWalking) )
-				PlayFootSound( 3, HitTexture, 0, HitLocation, VolumeMultiplier );
+			PlayFootSound( 3, HitTexture, 0, HitLocation, VolumeMultiplier );
 		}
 		
 		if ( IsA('PlayerPawn') )
-		{
-			if (bIsWalking)
-				MakeNoise(0.5 * VolumeMultiplier, (0.5 * 1280) * VolumeMultiplier);
-			else
-				MakeNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
-		}
+			MakeNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
 		
 		Dust(HitLocation, HitNormal, HitTexture, 0.65);
 
@@ -1121,12 +1115,7 @@ event FellOutOfWorld()
 	Died(None, 'Fell', Location, DInfo);
 }
 
-function PlayRecoil(float Rate) {
-	if (self.IsA('PlayerPawn'))
-	{
-		PlayAnim('StillSmFr', Rate);//StillFRRP
-	}
-}
+function PlayRecoil(float Rate);
 
 function SpecialFire();
 
@@ -2438,7 +2427,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		return;
 	}
 
-	if ( !Region.Zone.bNeutralZone && ((bAcceptDamage && !DInfo.bMagical) || (bAcceptMagicDamage && DInfo.bMagical)) )
+	if ( (bAcceptDamage && !DInfo.bMagical) || (bAcceptMagicDamage && DInfo.bMagical) )
 	{
 		//log(self@"take damage in state"@GetStateName());	
 		bAlreadyDead = (Health <= 0);
@@ -2566,8 +2555,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 				// Not Gibbed
 
 				// Special Kill?
-				if ( Level.NetMode==NM_Standalone &&
-					 ( InstigatedBy != none ) &&
+				if ( ( InstigatedBy != none ) &&
 					 InstigatedBy.CanPerformSK(self) &&
 					 ( PlayerPawn(self) != none ) )		// MJG: only PlayerPawns can do this
 				{
@@ -3197,7 +3185,7 @@ defaultproperties
      JumpZ=325
      MaxStepHeight=25
      AirControl=0.05
-     LookJoint=''
+     LookJoint='
      Visibility=128
      SightRadius=2500
      HearingThreshold=1

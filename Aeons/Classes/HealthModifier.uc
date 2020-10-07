@@ -47,10 +47,10 @@ auto state Activated
 			t -= 0.2;
 			if (HealthSurplus > 0)
 			{
-				if (Pawn(Owner).Health < 200.0)
+				if (Pawn(Owner).Health < 100.0)
 				{
-					if (Pawn(Owner).Health > 199.0) {
-						Pawn(Owner).Health = 200;
+					if (Pawn(Owner).Health > 99.0) {
+						Pawn(Owner).Health = 100;
 					} else {
 						Pawn(Owner).Health += 1.0;
 					}

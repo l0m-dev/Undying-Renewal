@@ -6,7 +6,7 @@ class PhoenixExplosion0 expands PhoenixExplosions;
 function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
-	HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo(DamageType) );
+	HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo() );
 	spawn (class 'HotExplosionFX'    ,,,Location);
 	spawn (class 'SmokyExplosionFX'  ,,,Location);
 	spawn (class 'ParticleExplosion' ,,,Location);

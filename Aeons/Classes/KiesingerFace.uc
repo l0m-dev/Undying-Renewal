@@ -29,6 +29,7 @@ function Tick(float DeltaTime)
 		SetRotation(Rotator(Player.Location-Location));
 }
 
+/*
 auto state Idle
 {
 	function Trigger( Actor Other, Pawn EventInstigator )
@@ -94,6 +95,8 @@ state FadeOut
 		SetTimer(FadeLenOut, false);
 
 }
+
+*/
 
 defaultproperties
 {

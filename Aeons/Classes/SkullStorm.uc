@@ -310,9 +310,7 @@ function bool ProcessCastingLevel()
 	if ( super.ProcessCastingLevel() )
 	{
 		// determine how many skulls are generated from the casting level.
-		if ( localCastingLevel > 4 )
-			SkullFireCount = 4;
-		else if ( localCastingLevel > 3 )
+		if ( localCastingLevel > 3 )
 			SkullFireCount = 3;
 		else if ( localCastingLevel > 1 )
 			SkullFireCount = 2;

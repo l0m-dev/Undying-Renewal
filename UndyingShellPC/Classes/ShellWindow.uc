@@ -60,6 +60,7 @@ function Paint(Canvas C, float X, float Y)
 	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop + TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[5] );
 
 	C.DrawColor = C.Default.DrawColor;
+
 }
 
 function PaintSmoke(Canvas C, ShellButton B, out int SmokingWindow, out float SmokingTimer)

@@ -54,7 +54,7 @@ state Deactivated
 defaultproperties
 {
      AmmoAmount=12
-     MaxAmmo=36
+     MaxAmmo=60
      UsedInWeaponSlot(5)=5
      bCanActivate=True
      ItemType=ITEM_Inventory

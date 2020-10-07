@@ -998,7 +998,7 @@ defaultproperties
      FireScalar=0.25
      bCanStrafe=True
      MeleeRange=120
-     AirSpeed=350
+     AirSpeed=300
      MaxStepHeight=60
      SightRadius=3000
      PeripheralVision=0.25

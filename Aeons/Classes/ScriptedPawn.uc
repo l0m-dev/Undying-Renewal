@@ -479,13 +479,7 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	
-	if ( Level.NetMode == NM_DedicatedServer )
-	{
-		FadeOutDelay = 0.01;
-		FadeOutTime = 0.01;
-	}
-	
+
 	// Check and initialize team.
 	if ( TeamTag != '' )
 		InitializeTeam();
@@ -1296,7 +1290,7 @@ function TakeDamage( pawn Instigator, vector HitLocation, vector Momentum, Damag
 		 ( DInfo.Damage < ( InitHealth * DamageAcknowledge ) ) ||
 		 HandleSpecialDamage( Instigator, HitLocation, Momentum, DInfo ) )
 		return;
-	
+
 //	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " from " $ Instigator.name $ " at joint " $ DInfo.JointName );
 	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " at joint " $ DInfo.JointName );
 	super.TakeDamage( Instigator, HitLocation, Momentum, DInfo );
@@ -1704,9 +1698,6 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
-		
-	if (damageType == 'pellet' || damageType == 'Fire')
-		Patrick(Killer).DetachJoint();
 
 	// Remove all non-persistent effectors.
 	KillEffectorList();
@@ -12030,7 +12021,7 @@ state AIRunScript
 		local pawn	P;
 
 		P = FindPlayer();
-		if ( P != None && P.IsA('PlayerPawn') && !PlayerPawn(P).bAllowMove )
+		if ( P.IsA('PlayerPawn') && !PlayerPawn(P).bAllowMove )
 		{
 			SetCollision( false, false, false );
 		}
@@ -12836,7 +12827,7 @@ defaultproperties
      ConcussiveScalar=1
      FallDamageScalar=0.5
      ReactToDamageThreshold=4
-     FadeOutDelay=100
+     FadeOutDelay=9.5
      FadeOutTime=5
      DrawScaleVariance=0.05
      DiffuseColorVariance=100

@@ -106,7 +106,7 @@ defaultproperties
      bStopCountDown=True
      ServerName="Clive Barker's Undying Server"
      ShortName="Undying Server"
-     MOTDLine1="Welcome to Undying Multiplayer !"
+     MOTDLine1=" Welcome to Undying Multiplayer !"
      RemoteRole=ROLE_SimulatedProxy
      NetUpdateFrequency=4
 }

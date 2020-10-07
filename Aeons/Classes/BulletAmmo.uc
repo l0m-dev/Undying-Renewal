@@ -63,7 +63,7 @@ function PickupFunction(Pawn Other)
 defaultproperties
 {
      AmmoAmount=24
-     MaxAmmo=90
+     MaxAmmo=120
      UsedInWeaponSlot(4)=4
      bCanActivate=True
      ItemType=ITEM_Inventory

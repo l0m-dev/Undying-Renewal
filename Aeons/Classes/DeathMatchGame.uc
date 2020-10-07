@@ -22,17 +22,17 @@ var	  int RemainingTime;
 var   int			NumBots;
 var	  int			RemainingBots;
 var() globalconfig int	InitialBots;
-var		ChallengeBotInfo		BotConfig;
+//var		BotInfo		BotConfig;
 var localized string GlobalNameChange;
 var localized string NoNameChange;
-var class<ChallengeBotInfo> BotConfigType;
+//var class<BotInfo> BotConfigType;
 
 function PostBeginPlay()
 {
 	local string NextPlayerClass;
 	local int i;
 
-	BotConfig = spawn(BotConfigType);
+//	BotConfig = spawn(BotConfigType);
 	RemainingTime = 60 * TimeLimit;
 	if ( (Level.NetMode == NM_Standalone) || bMultiPlayerBots )
 		RemainingBots = InitialBots;
@@ -64,13 +64,6 @@ function bool IsRelevant(actor Other)
 		Pawn(Other).WaterSpeed *= 1.5;
 		Pawn(Other).AirSpeed *= 1.5;
 		Pawn(Other).Acceleration *= 1.5;
-	}
-	else
-	{
-		Pawn(Other).GroundSpeed = Pawn(Other).default.GroundSpeed;
-		Pawn(Other).WaterSpeed = Pawn(Other).default.WaterSpeed;
-		Pawn(Other).AirSpeed = Pawn(Other).default.AirSpeed;
-		Pawn(Other).Acceleration = Pawn(Other).default.Acceleration;
 	}
 	return Super.IsRelevant(Other);
 }
@@ -114,7 +107,7 @@ function SetGameSpeed( Float T )
 {
 	GameSpeed = FMax(T, 0.1);
 	if ( bHardCoreMode )
-		Level.TimeDilation = 2.1 * GameSpeed;
+		Level.TimeDilation = 1.1 * GameSpeed;
 	else
 		Level.TimeDilation = GameSpeed;
 }
@@ -178,7 +171,7 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 		Damage *= 1.5;
 
 	//skill level modification
-	if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bots') && injured.IsA('PlayerPawn') )
+	//rb if ( (instigatedBy.Skill < 1.5) && instigatedBy.IsA('Bots') && injured.IsA('PlayerPawn') )
 		Damage = Damage * (0.7 + 0.15 * instigatedBy.skill);
 
 	return (Damage * instigatedBy.DamageScaling);
@@ -186,14 +179,8 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 
 function float PlaySpawnEffect(inventory Inv)
 {
-	//spawn( class 'ReSpawn',,, Inv.Location );
+//	spawn( class 'ReSpawn',,, Inv.Location );
 	return 0.3;
-}
-
-exec function restart()
-{
-	ServerSay("Restarting game...");
-	RestartGame();
 }
 
 function RestartGame()
@@ -253,57 +240,50 @@ event playerpawn Login
 	return NewPlayer;
 }
 
-exec function bot_add() {
-	AddBot();
-}
-
 function bool AddBot()
 {
 	local NavigationPoint StartSpot;
-	local bot NewBot;
+	//local bots NewBot;
 	local int BotN;
 
-	Difficulty = BotConfig.Difficulty;
-	BotN = BotConfig.ChooseBotInfo();
+//	Difficulty = BotConfig.Difficulty;
+//	BotN = BotConfig.ChooseBotInfo();
 	
 	// Find a start spot.
 	StartSpot = FindPlayerStart(None, 255);
 	if( StartSpot == None )
 	{
-		ServerSay("Could not find starting spot for Bot");
+		log("Could not find starting spot for Bot");
 		return false;
 	}
 
 	// Try to spawn the player.
-	NewBot = Spawn(class'Bot',,,StartSpot.Location,StartSpot.Rotation);
-	
-	if ( NewBot == None ) {
-		ServerSay("NewBot is none");
-		return false;
-	}
+	//NewBot = Spawn(BotConfig.GetBotClass(BotN),,,StartSpot.Location,StartSpot.Rotation);
 
+//	if ( NewBot == None )
+		return false;
+
+/*
 	if ( (bHumansOnly || Level.bHumansOnly) && !NewBot.bIsHuman )
 	{
 		NewBot.Destroy();
-		ServerSay("Failed to spawn bot (not human)");
+		log("Failed to spawn bot");
 		return false;
 	}
 
 	StartSpot.PlayTeleportEffect(NewBot, true);
 
 	// Init player's information.
-	BotConfig.CHIndividualize(NewBot, BotN, NumBots);
-	NewBot.ViewRotation = StartSpot.Rotation;
+	//BotConfig.Individualize(NewBot, BotN, NumBots);
+	//NewBot.ViewRotation = StartSpot.Rotation;
 
 	// broadcast a welcome message.
-	ServerSay( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage );
+	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
-	//AddDefaultInventory( NewBot );
-	AcceptInventory(NewBot);
+	AddDefaultInventory( NewBot );
 	NumBots++;
 
 	NewBot.PlayerReplicationInfo.bIsABot = True;
-	NewBot.PlayerReplicationInfo.Team = BotConfig.GetBotTeam(BotN);
 
 	// Set the player's ID.
 	NewBot.PlayerReplicationInfo.PlayerID = CurrentID++;
@@ -313,40 +293,23 @@ function bool AddBot()
 		LocalLog.LogPlayerConnect(NewBot);
 	if (WorldLog != None)
 		WorldLog.LogPlayerConnect(NewBot);
-		
-		/*
-		if ( bRequireReady && (CountDown > 0) )
-			NewBot.GotoState('Dying', 'WaitingForStart');
-
-		if ( (Level.NetMode != NM_Standalone) && (bNetReady || bRequireReady) )
-		{
-			// replicate skins
-			for ( P=Level.PawnList; P!=None; P=P.NextPawn )
-				if ( P.bIsPlayer && (P.PlayerReplicationInfo != None) && P.PlayerReplicationInfo.bWaitingPlayer && P.IsA('PlayerPawn') )
-				{
-					if ( NewBot.bIsMultiSkinned )
-						PlayerPawn(P).ClientReplicateSkins(NewBot.MultiSkins[0], NewBot.MultiSkins[1], NewBot.MultiSkins[2], NewBot.MultiSkins[3]);
-					else
-						PlayerPawn(P).ClientReplicateSkins(NewBot.Skin);	
-				}						
-		}
-		*/
+*/
 	return true;
 }
 
 function Logout(pawn Exiting)
 {
 	Super.Logout(Exiting);
-	if ( Exiting.IsA('Bots') )
-    	NumBots--;
+	//if ( Exiting.IsA('Bots') )
+	//	NumBots--;
 }
 	
 function Timer()
 {
 	Super.Timer();
 
-	if ( (RemainingBots > 0) && AddBot() )
-		RemainingBots--;
+	//if ( (RemainingBots > 0) && AddBot() )
+	//	RemainingBots--;
 
 	if ( bGameEnded )
 	{
@@ -357,50 +320,50 @@ function Timer()
 	else if ( TimeLimit > 0 )
 	{
 		RemainingTime--;
-
-		// switch (RemainingTime)
-		// {
-			// case 300:
-				// BroadcastMessage(TimeMessage[0], True, 'CriticalEvent');
-				// break;
-			// case 240:
-				// BroadcastMessage(TimeMessage[1], True, 'CriticalEvent');
-				// break;
-			// case 180:
-				// BroadcastMessage(TimeMessage[2], True, 'CriticalEvent');
-				// break;
-			// case 120:
-				// BroadcastMessage(TimeMessage[3], True, 'CriticalEvent');
-				// break;
-			// case 60:
-				// BroadcastMessage(TimeMessage[4], True, 'CriticalEvent');
-				// break;
-			// case 30:
-				// BroadcastMessage(TimeMessage[5], True, 'CriticalEvent');
-				// break;
-			// case 10:
-				// BroadcastMessage(TimeMessage[6], True, 'CriticalEvent');
-				// break;
-			// case 5:
-				// BroadcastMessage(TimeMessage[7], True, 'CriticalEvent');
-				// break;
-			// case 4:
-				// BroadcastMessage(TimeMessage[8], True, 'CriticalEvent');
-				// break;
-			// case 3:
-				// BroadcastMessage(TimeMessage[9], True, 'CriticalEvent');
-				// break;
-			// case 2:
-				// BroadcastMessage(TimeMessage[10], True, 'CriticalEvent');
-				// break;
-			// case 1:
-				// BroadcastMessage(TimeMessage[11], True, 'CriticalEvent');
-				// break;
-			// case 0:
-				// BroadcastMessage(TimeMessage[12], True, 'CriticalEvent');
-				// break;
-		// }
-
+/*
+		switch (RemainingTime)
+		{
+			case 300:
+				BroadcastMessage(TimeMessage[0], True, 'CriticalEvent');
+				break;
+			case 240:
+				BroadcastMessage(TimeMessage[1], True, 'CriticalEvent');
+				break;
+			case 180:
+				BroadcastMessage(TimeMessage[2], True, 'CriticalEvent');
+				break;
+			case 120:
+				BroadcastMessage(TimeMessage[3], True, 'CriticalEvent');
+				break;
+			case 60:
+				BroadcastMessage(TimeMessage[4], True, 'CriticalEvent');
+				break;
+			case 30:
+				BroadcastMessage(TimeMessage[5], True, 'CriticalEvent');
+				break;
+			case 10:
+				BroadcastMessage(TimeMessage[6], True, 'CriticalEvent');
+				break;
+			case 5:
+				BroadcastMessage(TimeMessage[7], True, 'CriticalEvent');
+				break;
+			case 4:
+				BroadcastMessage(TimeMessage[8], True, 'CriticalEvent');
+				break;
+			case 3:
+				BroadcastMessage(TimeMessage[9], True, 'CriticalEvent');
+				break;
+			case 2:
+				BroadcastMessage(TimeMessage[10], True, 'CriticalEvent');
+				break;
+			case 1:
+				BroadcastMessage(TimeMessage[11], True, 'CriticalEvent');
+				break;
+			case 0:
+				BroadcastMessage(TimeMessage[12], True, 'CriticalEvent');
+				break;
+		}
+*/
 		if ( RemainingTime <= 0 )
 			EndGame("timelimit");
 	}
@@ -502,7 +465,6 @@ function AcceptInventory(pawn PlayerPawn)
 	PlayerPawn.Weapon = None;
 	PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
-	PlayerPawn.ConsoleCommand("SetupInv");
 }
 
 function ChangeName( Pawn Other, coerce string S, bool bNameChange )
@@ -527,8 +489,8 @@ function ChangeName( Pawn Other, coerce string S, bool bNameChange )
 		APlayer = APlayer.NextPawn;
 	}
 
-	//if (bNameChange)
-		ServerSay(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S);
+	if (bNameChange)
+		BroadcastMessage(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S, false);
 			
 	Other.PlayerReplicationInfo.PlayerName = S;
 }
@@ -552,15 +514,13 @@ function Killed(pawn killer, pawn Other, name damageType)
 	if ( !bTeamGame && (FragLimit > 0) && (killer.PlayerReplicationInfo.Score >= FragLimit) )
 		EndGame("fraglimit");
 
-	/*
-	if ( BotConfig.bAdjustSkill && (killer.IsA('PlayerPawn') || Other.IsA('PlayerPawn')) )
-	{
-		if ( killer.IsA('Bots') )
-			Bot(killer).AdjustSkill(true);
-		if ( Other.IsA('Bots') )
-			Bot(Other).AdjustSkill(false);
-	}
-	*/
+	//if ( BotConfig.bAdjustSkill && (killer.IsA('PlayerPawn') || Other.IsA('PlayerPawn')) )
+	//{
+		//if ( killer.IsA('Bots') )
+		//	Bots(killer).AdjustSkill(true);
+		//if ( Other.IsA('Bots') )
+		//	Bots(Other).AdjustSkill(false);
+	//}
 }	
 
 function EndGame( string Reason )
@@ -577,14 +537,16 @@ function EndGame( string Reason )
 
 defaultproperties
 {
-	 BotConfigType=Class'Aeons.ChallengeBotInfo'
-	 InitialBots=4
      bMultiWeaponStay=True
      FragLimit=20
+     bMultiPlayerBots=True
+     bChangeLevels=True
+     InitialBots=1
      GlobalNameChange=" changed name to "
      NoNameChange=" is already in use"
-     bRestartLevel=True
-	 bSinglePlayer=False
+     bHumansOnly=True
+     bRestartLevel=False
+     bClassicDeathMessages=True
      bDeathMatch=True
      ScoreBoardType=Class'Aeons.UndyingScoreboard'
      MapPrefix="DM"

@@ -117,7 +117,7 @@ function bool ReplaceWith(actor Other, string aClassName)
 		return false;
 	aClass = class<Actor>(DynamicLoadObject(aClassName, class'Class'));
 	if ( aClass != None )
-		A = Spawn(aClass,Other.Owner,Other.tag,Other.Location, Other.Rotation);
+		A = Spawn(aClass,,Other.tag,Other.Location, Other.Rotation);
 	if ( Other.IsA('Inventory') )
 	{
 		if ( Inventory(Other).MyMarker != None )

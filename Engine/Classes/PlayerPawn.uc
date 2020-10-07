@@ -262,8 +262,6 @@ var int DemoViewYaw;
 
 var float LastPlaySound;
 
-var globalconfig bool bEnableSubtitles;
-
 replication
 {
 	// Things the server should send to the client.
@@ -276,7 +274,7 @@ replication
 
 	// Things the client should send to the server
 	reliable if ( Role<ROLE_Authority )
-		Password, bReadyToPlay, bNeverAutoSwitch;
+		Password, bReadyToPlay;
 
 	// Functions client can call.
 	unreliable if( Role<ROLE_Authority )
@@ -286,10 +284,9 @@ replication
 		PrevItem, ActivateItem, ShowInventory, ServerFeignDeath, ServerSetWeaponPriority,
 		ChangeName, ChangeTeam, Eh, ViewClass, ViewPlayerNum, ViewSelf, ViewPlayer, ServerSetSloMo, ServerAddBots,
 		PlayersOnly, ServerRestartPlayer, NeverSwitchOnPickup, BehindView, ServerNeverSwitchOnPickup, 
-		PrevWeapon, NextWeapon, NextAttSpell, Arm, ServerReStartGame, ServerUpdateWeapons, ServerTaunt, ServerChangeSkin,
+		PrevWeapon, NextWeapon, Arm, ServerReStartGame, ServerUpdateWeapons, ServerTaunt, ServerChangeSkin,
 		SwitchLevel, SwitchCoopLevel, Kick, KickBan, SnuffAll, Bring, Admin, AdminLogin, AdminLogout, Typing, Mutate;
-	
-	//ProcessMove, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon
+
 	unreliable if( Role<ROLE_Authority )
 		ServerMove, Aerial, Walk, Astral;
 
@@ -299,11 +296,15 @@ replication
 	reliable if( Role==ROLE_Authority )
 		ClientReliablePlaySound, ClientReplicateSkins, ClientAdjustGlow, ClientChangeTeam, ClientSetMusic, StartZoom, ToggleZoom, StopZoom, EndZoom, SetDesiredFOV, ClearProgressMessages, SetProgressColor, SetProgressMessage, SetProgressTime, ClientWeaponEvent;//, ClientPlayAnim;
 	unreliable if( Role==ROLE_Authority )
-		SetFOVAngle, ClientShake, ClientFlash, ClientInstantFlash;//, bRenderSelf//fix bRenderSelf should just be coded in a special game type for CutScenes or in a subclassed player
+		SetFOVAngle, ClientShake, ClientFlash, ClientInstantFlash, bRenderSelf; //fix bRenderSelf should just be coded in a special game type for CutScenes or in a subclassed player
 	unreliable if( Role==ROLE_Authority && !bDemoRecording )
 		ClientPlaySound;
 	unreliable if( RemoteRole==ROLE_AutonomousProxy )//***
 		ClientAdjustPosition;
+
+	// Rendering.
+	unreliable if( DrawType==DT_Mesh && Role==ROLE_Authority )
+		MultiSkins;
 }
 
 //
@@ -494,7 +495,7 @@ function DoEyeTrace()
 {
 	local float Range;
 	
-	Range = 8192;
+	Range = 2048;
 	EyeTraceActor = none;
 
 	EyeTraceActor = EyeTrace(EyeTraceLoc, EyeTraceNormal, EyeTraceJoint, Range, true);
@@ -1732,83 +1733,6 @@ exec function NextWeapon()
 	Weapon.PutDown();
 }
 
-exec function NextAttSpell()
-{
-	local int nextGroup;
-	local Inventory inv;
-	local Spell realAttSpell, s, Prev;
-	local bool bFoundAttSpell;
-
-	if( bShowMenu || Level.Pauser!="" )
-		return;
-	if ( AttSpell == None )
-	{
-		// SwitchToBestWeapon();
-		return;
-	}
-
-	nextGroup = 100;
-	realAttSpell = AttSpell;
-	if ( PendingAttSpell != None )
-		AttSpell = PendingAttSpell;
-	PendingAttSpell = None;
-
-	for (inv=Inventory; inv!=None; inv=inv.Inventory)
-	{
-		s = Spell(inv);
-		if ( s != None )
-		{
-			if ( s.InventoryGroup == AttSpell.InventoryGroup )
-			{
-				if ( s == AttSpell )
-					bFoundAttSpell = true;
-				else if ( bFoundAttSpell )
-				{
-					PendingAttSpell = s;
-					break;
-				}
-			}
-			else if ( (s.InventoryGroup > AttSpell.InventoryGroup) && (s.InventoryGroup < nextGroup) )
-			{
-				nextGroup = s.InventoryGroup;
-				PendingAttSpell = s;
-			}
-		}
-	}
-
-	bFoundAttSpell = false;
-	nextGroup = AttSpell.InventoryGroup;
-	if ( PendingAttSpell == None )
-		for (inv=Inventory; inv!=None; inv=inv.Inventory)
-		{
-			s = Spell(Inv);
-			if ( s != None )
-			{
-				if ( s.InventoryGroup == AttSpell.InventoryGroup )
-				{
-					if ( s == AttSpell )
-					{
-						bFoundAttSpell = true;
-						if ( Prev != None )
-							PendingAttSpell = Prev;
-					}
-					else if ( !bFoundAttSpell && (PendingAttSpell == None) )
-						Prev = s;
-				}
-				else if ( s.InventoryGroup < nextGroup ) 
-				{
-					nextGroup = s.InventoryGroup;
-					PendingAttSpell = s;
-				}
-			}
-		}
-
-	if ( PendingAttSpell != None ) 
-		AttSpell = PendingAttSpell;
-}
-
-
-
 exec function Mutate(string MutateString)
 {
 	if( Level.NetMode == NM_Client )
@@ -2111,7 +2035,7 @@ exec function ActivateItem()
 {
 	if( bShowMenu || Level.Pauser!="" )
 		return;
-	if (SelectedItem!=None && !(Region.Zone.bNeutralZone && SelectedItem.ItemName == "Dynamite")) 
+	if (SelectedItem!=None) 
 		SelectedItem.Activate();
 }
 
@@ -2120,9 +2044,6 @@ exec function StopCutScene();
 // The player wants to fire.
 exec function Fire( optional float F )
 {
-	if ( Region.Zone.bNeutralZone )
-		return;
-	
 	bJustFired = true;
 	if( bShowMenu || (Level.Pauser!="") || (Role < ROLE_Authority) )
 	{
@@ -3237,7 +3158,7 @@ event UnPossess()
 	if ( myHUD != None )
 		myHUD.Destroy();
 	bIsPlayer = false;
-	EyeHeight = 0.8 * CollisionHeight;
+	//EyeHeight = 0.8 * CollisionHeight;
 }
 
 function Carcass SpawnCarcass()
@@ -3296,6 +3217,22 @@ Event PlayerTick( float DeltaTime );
 //
 event PreBeginPlay()
 {
+	local PlayerPawn P;
+	local Actor A;
+
+	ForEach AllActors(class 'PlayerPawn', P)
+	{
+		if ( P != self )
+		{
+			ForEach AllActors (class 'Actor', A)
+			{
+				if (A.Owner == P)
+					A.Destroy();
+			}
+			P.Destroy();
+		}
+	}
+
 	bIsPlayer = true;
 	bRenderSelf = true;
 	bAllowMove = true;
@@ -3352,15 +3289,16 @@ event PostBeginPlay()
 
 	if (Level.LevelEnterText != "" )
 		ClientMessage(Level.LevelEnterText);
-
+	if ( Level.NetMode != NM_Client )
+	{
 		HUDType = Level.Game.HUDType;
 		ScoringType = Level.Game.ScoreboardType;
 		MyAutoAim = FMax(MyAutoAim, Level.Game.AutoAim);
-	
+	}
 	bIsPlayer = true;
 	DesiredFOV = DefaultFOV;
 	EyeHeight = BaseEyeHeight;
-	if ( Level.Game.IsA('SinglePlayer') && (Level.NetMode == NM_Standalone) )
+	if ( Level.Game.IsA('SinglePlayerInfo') && (Level.NetMode == NM_Standalone) )
 		FlashScale = vect(0,0,0);
 
 	// set up the actuator (PSX2)
@@ -3585,10 +3523,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 	CameraLocation = Location;
 
 	if( bBehindView ) //up and behind
-	{
-		CameraLocation.Z += EyeHeight;
-		CalcBehindView(CameraLocation, CameraRotation, CollisionHeight * 5.0);
-	}
+		CalcBehindView(CameraLocation, CameraRotation, CollisionHeight * 2.5);
 	else
 	{
 		// First-person view.
@@ -5166,8 +5101,6 @@ exec function RenderSelf()
 	bRenderSelf = !bRenderSelf;
 }
 
-exec function ShowBook();
-
 //=============================================================================
 // Multiskin support
 static function SetMultiSkin( playerpawn SkinActor, string SkinName, string FaceName, byte TeamNum )
@@ -5261,11 +5194,11 @@ defaultproperties
      Handedness=-1
      bAlwaysMouseLook=True
      bKeyboardLook=True
-	 bEnableSubtitles=False
+     bMouseDecel=True
      bMessageBeep=True
      bCheatsEnabled=True
      bUpdateInventorySelect=True
-     MouseSensitivity=1
+     MouseSensitivity=7
      GoreLevel=1
      WeaponPriority(1)=Phoenix
      WeaponPriority(2)=Molotov
