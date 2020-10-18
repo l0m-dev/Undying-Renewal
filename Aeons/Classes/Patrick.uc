@@ -183,7 +183,7 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 
 	GetAxes(ViewRotation, x, y, z);
 
-	if ( A != none && A.IsA('ScriptedPawn') && Pawn(A).Health <= 0 )
+	if ( A != none && A.IsA('ScriptedPawn') && Pawn(A).Health <= 0 && ScriptedPawn(A).bHackable)
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
 		B.Velocity = (y + vect(0,0,0.25)) * 256;

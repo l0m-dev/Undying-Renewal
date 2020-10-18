@@ -391,7 +391,7 @@ function MeleeAttack(float Range)
 	if ( (AeonsPlayer(Owner).GetStateName() == 'DialogScene') || (AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene') || (AeonsPlayer(Owner).GetStateName() == 'SpecialKill'))
 		return;
 	
-	Patrick(Owner).DetachJoint(PawnImpactSound, 128);
+	Patrick(Owner).DetachJoint(PawnImpactSound, Range);
 	
 	BladeLocB = jointPlace('Blade5').pos;
 	
@@ -640,7 +640,7 @@ function MeleeAttack(float Range)
 					}
 				}
 
-				if (bSpawnWounds)
+				if (bSpawnWounds && ScriptedPawn(Other).bHackable)
 				{
 					if (BloodDrip == none)
 					{
@@ -655,6 +655,13 @@ function MeleeAttack(float Range)
 						Wound.AttachJoint = JointName;
 						Wound.setup();
 					}
+				}
+				else if (Other.IsA('DecayedSaint'))
+				{
+					Spawn(class 'DustPuffFX',Other,,HitLocation);
+					//Wound = Spawn(class 'DustPuffFX',Other,,Other.JointPlace(JointName).pos, Rotator(HitNormal));
+					//Wound.AttachJoint = JointName;
+					//Wound.setup();
 				}
 			}
 		}

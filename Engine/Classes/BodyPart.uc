@@ -5,8 +5,20 @@ class BodyPart expands Projectile;
 
 simulated singular function Touch(Actor Other){}
 simulated function ProcessTouch(Actor Other, Vector HitLocation){}
-simulated function HitWall (vector HitNormal, actor Wall, byte TextureID){}
 
+simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
+{
+	if (Physics == PHYS_None)
+		return;
+	
+	if (Velocity.Z < 2)
+	{
+		setPhysics(PHYS_None);
+	}
+	
+	Velocity = reflect(-Normal(Velocity), HitNormal);
+	setRotation(Rotator(Velocity));
+}
 
 function Tick(float DeltaTime)
 {

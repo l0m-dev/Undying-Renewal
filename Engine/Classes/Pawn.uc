@@ -2547,20 +2547,20 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 
 				// the amount of damage we are recieving must be greater than the gib damage threshold to gib
 
-				if (DInfo.ImpactForce != vect(0,0,0))
+				if (DInfo.ImpactForce == vect(0,0,0))
 					SpawnGibbedCarcass(HitLocation-Location);
 				else
 					SpawnGibbedCarcass(DInfo.ImpactForce);
 
 				if ( bIsPlayer )
 				{
-					HidePlayer();
+					//HidePlayer();
 					GotoState('Dying');
 				}
 				else
 				{
 					gibbedBy( InstigatedBy );
-					Destroy();
+					//Destroy();
 				}
 			} else {
 				// Not Gibbed
@@ -2594,20 +2594,20 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 				// the amount of damage we are recieving must be greater than the gib damage threshold to gib
 				if ( actualDamage > GibDamageThresh )
 				{
-					if (DInfo.ImpactForce != vect(0,0,0))
+					if (DInfo.ImpactForce == vect(0,0,0))
 						SpawnGibbedCarcass(HitLocation-Location);
 					else
 						SpawnGibbedCarcass(DInfo.ImpactForce);
 
 					if ( bIsPlayer )
 					{
-						HidePlayer();
+						//HidePlayer();
 						GotoState('Dying');
 					}
 					else
 					{
 						gibbedBy( InstigatedBy );
-						Destroy();
+						//Destroy();
 					}
 				}
 			}
@@ -3026,16 +3026,16 @@ ignores SeePlayer, EnemyNotVisible, HearNoise, KilledBy, Trigger, Bump, HitWall,
 		AddVelocity( momentum ); 
 		if ( !bHidden && Gibbed( DInfo.DamageType ) )
 		{
-			bHidden = true;
+			//bHidden = true;
 			if (DInfo.ImpactForce == vect(0,0,0))
 				SpawnGibbedCarcass(HitLocation-Location);
 			else
 				SpawnGibbedCarcass(DInfo.ImpactForce);
 
-			if ( bIsPlayer )
-				HidePlayer();
-			else
-				Destroy();
+			//if ( bIsPlayer )
+			//	HidePlayer();
+			//else
+			//	Destroy();
 		}
 	}
 
@@ -3043,12 +3043,12 @@ ignores SeePlayer, EnemyNotVisible, HearNoise, KilledBy, Trigger, Bump, HitWall,
 	{
 		if ( !bHidden )
 		{
-			bHidden = true;
+			//bHidden = true;
 			SpawnCarcass();
-			if ( bIsPlayer )
-				HidePlayer();
-			else
-				Destroy();
+			//if ( bIsPlayer )
+			//	HidePlayer();
+			//else
+			//	Destroy();
 		}
 	}
 

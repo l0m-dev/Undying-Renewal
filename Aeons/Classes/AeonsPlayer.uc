@@ -5252,6 +5252,39 @@ function Killed(pawn Killer, pawn Other, name damageType)
 	super.Killed(Killer, Other, DamageType);
 }
 
+// Spawn a gibbed version of this actor.
+function SpawnGibbedCarcass( vector Dir )
+{
+	local int i;
+	local Actor Gib;
+	//local place P;
+	local vector Vel;
+	
+	for (i=0; i<NumJoints(); i++)
+	{
+		//P = JointPlace( JointName(i) );
+		//Gib = Spawn(class 'MandorlaParticleFX', self,, P.pos);
+		//Vel = vect(FRand(), FRand(), 0.25) * 256;
+		Vel = VRand() * 512;
+		//Vel = Vector(RotRand()) * 256;
+		Vel.Z = 64;
+		
+		Gib = DetachLimb(JointName(i), Class 'BodyPart');
+		Gib.Velocity = Vel;
+		Gib.DesiredRotation = RotRand();
+		Gib.bBounce = true;
+		Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+		//SetBase(self, JointName(i));
+	}
+	
+	// km - this is a bit temp :)
+	//Spawn( class'Gibs',,, Location, Rotator(Dir) );
+
+	//PlaySound( GibbedSound );
+	//if ( CarcassClass != none )
+	//	Spawn( CarcassClass,,, Location );
+}
+
 // ===============================================================================
 // Direct Access Inventory activation - the following functions
 // can be called from the game console or bound to a keystroke

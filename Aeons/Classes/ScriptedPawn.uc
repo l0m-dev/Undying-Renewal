@@ -1685,7 +1685,7 @@ function CleanUp()
 
 // Just died.
 function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )
-{
+{	
 	DebugInfoMessage( ".Died(), Killer is " $ Killer.name $ " damage is " $ damageType );
 
 	ClearAnims();
@@ -1742,8 +1742,41 @@ function bool Gibbed( name damageType )
 // Spawn a gibbed version of this actor.
 function SpawnGibbedCarcass( vector Dir )
 {
+	local int i;
+	local Actor Gib;
+	//local place P;
+	local vector Vel;
+	local float damageScale, DamageRadius, dist;
+	
+	DamageRadius = 640;
+	//dir = Victims.Location - HitLocation;
+	dist = FMax(1,VSize(Dir));
+	Dir = Dir/dist;
+	damageScale = FMax(0, 1 - FMax(0,(dist - CollisionRadius)/DamageRadius));
+	
+	if (Health <= 0 && bHackable)
+	{
+		for (i=0; i<NumJoints(); i++)
+		{
+			//P = JointPlace( JointName(i) );
+			Vel = VRand() * 512;
+			if (Dir == vect(0, 0, 0))
+				return;
+			Gib = DetachLimb(JointName(i), Class 'BodyPart');
+			//	Gib.Velocity = Vel;
+			//else
+			//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
+			Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
+			Gib.Velocity.Z = 64;
+			Gib.DesiredRotation = RotRand();
+			Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+			
+			//SetBase(self, JointName(i));
+		}
+	}
+	
 	// km - this is a bit temp :)
-	Spawn( class'Gibs',,, Location, Rotator(Dir) );
+	//Spawn( class'Gibs',,, Location, Rotator(Dir) );
 
 	PlaySound( GibbedSound );
 	if ( CarcassClass != none )

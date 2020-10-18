@@ -40,13 +40,13 @@ function GibRadius( float DamageRadius, vector HitLocation, DamageInfo DInfo, pa
 	{
 		if( Victims != self && Victims.IsA('ScriptedPawn') && Pawn(Victims).Health <= 0 )
 		{
-			if (DInfo.ImpactForce != vect(0,0,0))
-				ScriptedPawn(Victims).SpawnGibbedCarcass(HitLocation-Victims.Location);
+			if (DInfo.ImpactForce == vect(0,0,0))
+				ScriptedPawn(Victims).SpawnGibbedCarcass(Location-Victims.Location);
 			else
 				ScriptedPawn(Victims).SpawnGibbedCarcass(DInfo.ImpactForce);
 			
-			Pawn(Victims).gibbedBy( PlayerPawn(Instigator) );
-			Pawn(Victims).Destroy();
+			//Pawn(Victims).gibbedBy( PlayerPawn(Instigator) );
+			//Pawn(Victims).Destroy();
 		}  
 	}
 }
