@@ -102,6 +102,9 @@ var SPDrawScaleEffector		DrawScaleEffector;
 var() sound HowlSounds[2];
 var bool					bGetThrown;
 
+var bool	bMeleeAttackFail;	// used to hack howler's freezing during near attacks
+var NavigationPoint			LastSpclNavPoint;	// Last navigation point where special action was performed.
+
 //****************************************************************************
 // Animation trigger functions.
 //****************************************************************************
@@ -195,6 +198,57 @@ function PreSetMovement()
 	super.PreSetMovement();
 	bCanJump = true;
 }
+
+function bool DoFarAttack()
+{
+	local float		dist;
+
+	dist = DistanceTo( Enemy );
+	if ( ( dist > ( MeleeRange * 2.5 ) ) &&
+		 ( dist < ( MeleeRange * 4.0 ) ) &&
+		 actorReachable( Enemy ) )
+		return true;
+	else
+		return false;
+}
+
+function bool SpecialNavChoiceAction( NavigationPoint navPoint )
+{
+	if ( navPoint.IsA('AeonsNavChoicePoint') && ( navPoint != LastSpclNavPoint ) )
+		return true;
+	else
+		return false;
+}
+
+function SpecialNavChoiceActing( NavigationPoint navPoint )
+{
+	LastSpclNavPoint = navPoint;
+}
+
+function bool SpecialNavTargetAction( NavChoiceTarget NavTarget )
+{
+	return ( FRand() < 0.10 );
+}
+
+function WorldEventAlert( actor Alerter )
+{
+	DebugInfoMessage( ".WorldEventAlert() from " $ Alerter.name );
+	super.WorldEventAlert( Alerter );
+	if ( FRand() < 0.25 )
+	{
+		PushState( GetStateName(), 'RESUME' );
+		GotoState( 'AIAlertReaction' );
+	}
+}
+
+function bool AcknowledgeDamageFrom( pawn Damager )
+{
+	if ( Damager.IsA('PlayerPawn') )
+		return false;
+	else
+		return super.AcknowledgeDamageFrom( Damager );
+}
+
 
 // Near damage is applied based on specific joints.
 function bool NearStrikeValid( actor Victim, int DamageNum )
@@ -362,6 +416,174 @@ Begin:
 	Destroy();
 }
 
+state AINearAttack
+{
+	// *** ignored functions ***
+	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
+	function EffectorHearNoise( actor sensed ){}
+	function EffectorSeePlayer( actor sensed ){}
+	function Trigger( actor Other, pawn EventInstigator ){}
+	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
+
+	// *** overridden functions ***
+	function BeginState()
+	{
+		StopTimer();
+		bPendingBump = false;
+	}
+
+	function AnimEnd()
+	{
+		if( bMeleeAttackFail )
+		{
+			GotoState( , 'BEGIN' );
+		}
+
+		if ( !bDidMeleeAttack )
+		{
+			GotoState( , 'DOATTACK' );
+		}
+		else
+		{
+			GotoState( , 'ATTACKED' );
+		}
+	}
+
+	function Timer()
+	{
+		if ( !bDidMeleeAttack )
+		{
+			GotoState( , 'DOATTACK' );
+		}
+		else
+		{
+			GotoState( , 'ATTACKED' );
+		}
+	}
+
+	function Bump( actor Other )
+	{
+		bPendingBump = true;
+		BumpedPawn = pawn(Other);
+	}
+
+	function bool HandlePowderOfSiren( actor Other )
+	{
+		DispatchPowder( Other );
+		return true;
+	}
+
+	// *** new (state only) functions ***
+	function PostAttack()
+	{
+		GotoState( 'AIAttack' );
+	}
+
+	function bool MoveInAttack()
+	{
+		return bCanFly;
+	}
+
+// Entry point when returning from AITakeDamage
+DAMAGED:
+
+// Entry point when resuming this state
+RESUME:
+	GotoState( 'AIAttack' );
+
+// Default entry point
+BEGIN:
+
+	//StopMovement();
+	//PlayWait();
+
+
+	if( DistanceTo( Enemy ) > DamageRadius )
+	{
+		bDidMeleeAttack = false;
+
+		if( (FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius) && bHasFarAttack )
+		{
+			// check difficulty
+			switch( Level.Game.Difficulty )
+			{
+			case 0:	// Easy
+				sleep( FVariant( 1.0, 0.5 ) );
+				break;
+			case 1:	// Normal
+				sleep( FVariant( 0.5, 0.25 ) );
+				break;
+			case 2: // Hard
+				sleep( FVariant( 0.2, 0.1 ) );
+				break;
+			}		// Very Hard will no wait
+
+			bMeleeAttackFail = false;
+			GotoState( 'AIFarAttack' );
+		}
+		else
+		{
+			// check difficulty
+			switch( Level.Game.Difficulty )
+			{
+			case 0:	// Easy
+				sleep( FVariant( 0.5, 0.25 ) );
+				break;
+			case 1:	// Normal
+				sleep( FVariant( 0.2, 0.1 ) );
+				break;
+			}
+
+			PlayRun();
+			MoveToward( Enemy, FullSpeedScale );
+
+			bMeleeAttackFail = true;	// if not set previously, helps to avoid second TurnToward
+			goto 'BEGIN';
+		}
+	}
+
+	if ( VSize(Enemy.Velocity) < 10.0 )
+	{
+		bDidMeleeAttack = false;
+		SetTimer( 2.0, false );
+
+		if( !bMeleeAttackFail ) // if there was no previous attack
+		{
+			TurnToward( Enemy, TurnTowardThreshold( 20 * DEGREES ) );
+		}
+	}
+
+	bMeleeAttackFail = false;
+
+DOATTACK:
+	bDidMeleeDamage = false;
+	bDidMeleeAttack = true;
+	PlayNearAttack();
+	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
+
+INATTACK:
+	if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
+	{
+		PostAttack();
+		bMeleeAttackFail = true;
+		StopTimer();
+		TweenAnim( 'Idle_Alert', FVariant(0.15,0.05) );
+		//StopMovement();
+		//PlayWait();
+		goto 'BEGIN';
+	}
+	Sleep( 0.1 );
+	goto 'INATTACK';
+
+ATTACKED:
+	StopTimer();
+	if ( bPendingBump )
+		CreatureBump( BumpedPawn );
+	PostAttack();
+} // state AINearAttack
+
+// END OF VVA 20.12.04
+
 //****************************************************************************
 // AIFarAttackAnim
 // Attack far enemy with animation (projectile, non-weapon).
@@ -488,6 +710,21 @@ BEGIN:
 
 } // state AISpawn
 
+//****************************************************************************
+// AIJumpAtEnemy
+// try to jump toward Enemy
+//****************************************************************************
+state AIJumpAtEnemy
+{
+	// *** ignored functions ***
+
+	// *** overridden functions ***
+	function bool PlayJumpAttackLanding()
+	{
+		return true;
+	}
+
+} // state AIJumpAtEnemy
 
 //****************************************************************************
 // Def props.
@@ -504,7 +741,7 @@ defaultproperties
      MeleeInfo(0)=(Damage=25,EffectStrength=0.35,Method=Bite)
      MeleeInfo(1)=(Damage=25,EffectStrength=0.35,Method=RipSlice)
      MeleeInfo(2)=(Damage=25,EffectStrength=0.35,Method=Blunt)
-     DamageRadius=120
+     DamageRadius=130
      SK_PlayerOffset=(X=95)
      bHasSpecialKill=True
      HearingEffectorThreshold=0.4
@@ -515,14 +752,14 @@ defaultproperties
      FireScalar=0
      ConcussiveScalar=0.5
      FallDamageScalar=0.2
-     MeleeRange=80
-     GroundSpeed=700
+     MeleeRange=100
+     GroundSpeed=600
      AirSpeed=1200
      AccelRate=3000
      MaxStepHeight=50
      SightRadius=1000
      BaseEyeHeight=54
-     Health=500
+     Health=600
      SoundSet=Class'Aeons.HoundSoundSet'
      FootSoundClass=Class'Aeons.BareFootSoundSet'
      Style=STY_AlphaBlend

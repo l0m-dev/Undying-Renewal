@@ -332,15 +332,15 @@ RESUME:
 // Default entry point
 BEGIN:
 
-	StopMovement();
-	PlayWait();
+	//StopMovement();
+	//PlayWait();
 
 
 	if( DistanceTo( Enemy ) > DamageRadius )
 	{
 		bDidMeleeAttack = false;
 
-		if( FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius )
+		if( (FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius) && bHasFarAttack )
 		{
 			// check difficulty
 			switch( Level.Game.Difficulty )
@@ -601,7 +601,7 @@ defaultproperties
      AccelRate=1800
      JumpZ=450
      MaxStepHeight=45
-     Alertness=0.5
+     Alertness=1.0
      SightRadius=640
      HatedClass=Class'Aeons.Servant'
      BaseEyeHeight=28

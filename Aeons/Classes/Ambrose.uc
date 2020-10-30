@@ -755,6 +755,10 @@ state AmbroseBossFightGiantNormal
 	}
 
 Begin:
+	LoopAnim( 'Idle_Alert_Giant', 1.0f );
+	Sleep(4);
+	AttitudeToEnemy = ATTITUDE_Hate;
+	AttitudeToPlayer = ATTITUDE_Hate;
 	SetEnemy( FindPlayer() );
 	HatedEnemy = Enemy;
 	GotoState( 'AIAttack' );
@@ -1434,4 +1438,6 @@ defaultproperties
 	 bCanCastShield=True
 	 SkullstormTimer=10
 	 bCanCastSkullstorm=True
+	 AttitudeToEnemy=ATTITUDE_Ignore
+	 AttitudeToPlayer=ATTITUDE_Ignore
 }

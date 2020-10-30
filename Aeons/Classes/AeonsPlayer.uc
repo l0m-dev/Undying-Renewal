@@ -6003,7 +6003,8 @@ exec function bool SpawnHound()
 	}
 	return false;
 	*/
-
+	
+	
 	local SpawnPoint	SP;
 	local SpawnPoint	Chosen;
 	local float			PCount;
@@ -6013,10 +6014,14 @@ exec function bool SpawnHound()
 	local vector		DVect;
 	local class<pawn>	HClass;
 	local Hound			H;
+	
+	bring('Hound');
+
+	return true;
 
 	// Don't bring a Hound until Ambrose is dead.
-	if( !CheckGameEvent( 'AmbroseDead' ) )
-		return false;
+	//if( !CheckGameEvent( 'AmbroseDead' ) )
+	//	return false;
 
 	Chosen = none;
 	R = FRand();

@@ -38,7 +38,7 @@ function bool processCastingLevel()
 		if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
 		{
 			amplitudeBonus = 1;
-			GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(Clamp((castingLevel + amplitudeBonus), 0, 5));
+			//GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(Clamp((castingLevel + amplitudeBonus), 0, 5));
 		} else
 			amplitudeBonus = 0;
 	
@@ -200,7 +200,7 @@ function GhelzUse(int cost)
 {
 	// Ghelziabahr use
 	if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
-		GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(localCastingLevel * cost);
+		GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(localCastingLevel);
 }
 
 function ForceFire()

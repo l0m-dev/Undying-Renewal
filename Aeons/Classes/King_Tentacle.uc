@@ -217,7 +217,8 @@ Attacked:
 
 defaultproperties
 {
-     StayOutOfWaterTime=5
+	 DrawScale=1.25
+     StayOutOfWaterTime=15
      MaxSinePitch=2
      MinSinePitch=-2
      MaxTanYaw=1024
@@ -225,7 +226,7 @@ defaultproperties
      RootJointName=Tent01
      MeleeInfo(0)=(Damage=1000,EffectStrength=1,Method=RipSlice)
      DamageRadius=150
-     MeleeRange=1250
+     MeleeRange=1500
      SoundSet=Class'Aeons.KingSoundSet'
      Style=STY_Masked
      Mesh=SkelMesh'Aeons.Meshes.King_Tentacle_m'

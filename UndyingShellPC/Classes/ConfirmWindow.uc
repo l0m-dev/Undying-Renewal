@@ -193,12 +193,14 @@ function Paint(Canvas C, float X, float Y)
 
 	C.DrawColor = BackColor;
 	
-	C.bNoSmooth = false;
+	C.bNoSmooth = true;
 
-	DrawStretchedTextureSegment( C, TileWidth/2, TileHeight/2, TileWidth, TileHeight, 1, 1, 254, 254, Back[0] );
-	DrawStretchedTextureSegment( C, TileWidth/2+TileWidth, TileHeight/2, TileWidth, TileHeight, 1, 1, 254, 254, Back[1] );
+	DrawStretchedTextureSegment( C, TileWidth/2, TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
+	DrawStretchedTextureSegment( C, TileWidth/2+TileWidth, TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[1] );
 
 	C.DrawColor = C.Default.DrawColor;
+	
+	C.bNoSmooth = false;
 
 	Super.PaintSmoke(C, Yes, SmokingWindows[0], SmokingTimers[0]);
 	Super.PaintSmoke(C, No, SmokingWindows[1], SmokingTimers[1]);

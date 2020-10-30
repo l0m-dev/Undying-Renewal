@@ -2512,7 +2512,10 @@ function bool FlankEnemy( )
 function TookDamage( actor Other )
 {
 	local bool	bEncounter;
-
+	
+	if (!Other.IsA('PlayerPawn'))
+		return;
+	
 	bEncounter = false;
 	if ( ( ScriptedPawn(Other) != none ) &&
 		 ( HatedClass == none ) &&

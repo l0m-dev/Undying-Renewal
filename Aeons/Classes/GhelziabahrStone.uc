@@ -3,7 +3,7 @@
 //=============================================================================
 class GhelziabahrStone expands AeonsWeapon;
 
-var savable travel float useMeter;		// Use Meter for the ghelzibahar Stone
+var savable travel int useMeter;		// Use Meter for the ghelzibahar Stone
 var int chargeCount;
 var int Damage;
 var() int SpawnHoundLimit;
@@ -43,13 +43,8 @@ function PlayHoundAnim()
 
 state HoundAnim
 {
-	function bool PutDown()
-	{
-		LogStack();
-		GotoState('DownWeapon');
-		
-		return True;
-	}
+	ignores Fire, Reload, PutDown;
+
 	
 	Begin:
 		Owner.PlaySound(SpawnHoundSound);
@@ -59,7 +54,7 @@ state HoundAnim
 		GotoState('Idle');
 }
 
-function addUse(float amt)
+function addUse(int amt)
 {
 	useMeter += amt;
 	if ( useMeter > SpawnHoundLimit )
@@ -124,6 +119,8 @@ function MeleeAttack(float Range)
 	//		Other.Velocity += momentum;
 		}
 	}
+	
+	addUse(RandRange(2, 5));
 }
 
 function Fire(float F)
@@ -168,7 +165,7 @@ state Active
 		// SetBase( Owner, 'L_Wrist', 'root' );
 		bCanClientFire=true;
 		//gotoState('Idle');
-		GotoState('HoundAnim');
+		GotoState('Idle');
 }
 
 state Idle
@@ -201,7 +198,7 @@ state Idle
 		if ( chargeCount < 20 )
 		{
 			chargeCount += 1;
-			AddUse(1);
+			//AddUse(1);
 		}
 
         if ( bChangeWeapon )
@@ -237,6 +234,7 @@ state Idle
 		if ( bChangeWeapon )
 			GotoState('DownWeapon');
 		chargeCount = 0;
+		//AddUse(1);
 		bWeaponUp = True;
 		Enable('Tick');
 		// setTimer(0.05, true);
@@ -360,7 +358,7 @@ simulated function RenderOverlays( canvas Canvas )
 
 defaultproperties
 {
-     SpawnHoundLimit=5000
+     SpawnHoundLimit=100
      GlowTexture=WetTexture'FX.Gglow_wet'
      GlowFlashX=0.35
      GlowFlashY=0.677

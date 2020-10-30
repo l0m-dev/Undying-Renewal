@@ -151,9 +151,7 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 	local string temp;
 	local string texturename;
 	local int offset;
-	//local float tx, ty;
-	//local bool english;
-	
+
 	y = TopMargin;
 	Width -= LeftMargin*2;
 	drawx = LeftMargin;
@@ -169,13 +167,8 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 
 			token = InStr(Line, "&");
 			
-			Tex.bNoSmooth = False;
+			Tex.bNoSmooth = false;
 			
-			//Tex.TextSize("This is the english version of the game", tx, ty, SourceFont);
-			//english = (tx == 224 && ty == 20);
-			
-			//Tex.DrawColoredText( 50, 120, "X "$tx $ " Y "$ty, SourceFont, FontColor );
-
 			if ( token >= 0 )
 			{
 				if (english)

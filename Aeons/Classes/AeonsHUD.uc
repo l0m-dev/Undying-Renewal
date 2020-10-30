@@ -6,6 +6,8 @@ class AeonsHUD expands HUD;
 // BURT - All exec imports were ripped since it is just an update
 
 #exec Texture Import File=Revolver_Icon_Silver.bmp		Mips=Off
+#exec Texture Import File=FlightBar_Icon_Fixed.bmp		Mips=Off FLAGS=2
+#exec Texture Import File=HUD_Numbers_HD.bmp
 
 //#exec OBJ LOAD FILE=\Textures\fxB2.utx PACKAGE=fxB2
 //#exec OBJ LOAD FILE=\Textures\fxB.utx PACKAGE=fxB
@@ -183,16 +185,6 @@ simulated function PostBeginPlay()
 
 	DigitInfo.Offset[9] = 225;
 	DigitInfo.Width[9] = 21;
-
-	MyLargeFont =	Font(DynamicLoadObject("Morpheus.Morpheus22",class'Font'));
-	MyMediumFont =	Font(DynamicLoadObject("dauphin.dauphin16",class'Font'));
-	MySmallFont =	Font(DynamicLoadObject("Comic.Comic10", class'Font'));
-	
-	/*
-	MyLargeFont =	Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
-	MyMediumFont =	Font(DynamicLoadObject("Aeons.Dauphin16",class'Font'));
-	MySmallFont =	Font(DynamicLoadObject("Aeons.Dauphin12", class'Font'));
-	*/
 }
 
 simulated function PreBeginPlay()
@@ -432,7 +424,9 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	else if (Crosshair==1) 	Canvas.DrawIcon(Texture'Crosshair2', 1.0);  //     for this mindshatter crosshair modification to work	
 	else if (Crosshair==2) 	Canvas.DrawIcon(Texture'Crosshair3', 1.0);  
 	*/
-
+	
+	Canvas.bNoSmooth = false;
+	
 	if ( CurrentCrossHair != None ) 
 		Canvas.DrawIcon( CurrentCrossHair, Scale );
 		
@@ -473,14 +467,21 @@ simulated function PreRender( canvas Canvas )
 {
 	if (PlayerPawn(Owner).Weapon != None)
 		PlayerPawn(Owner).Weapon.PreRender(Canvas);
-
+	
+	if (MyLargeFont == None)
+	{
+		MyLargeFont = Canvas.LargeFont;
+		MyMediumFont = Canvas.MedFont;
+		MySmallFont = Canvas.SmallFont;
+	}
+	
 	CanvasWidth  = Canvas.ClipX;
 	CanvasHeight = Canvas.ClipY;
 
 	//Log("AeonsHud: PreRender");
-	Canvas.LargeFont = MyLargeFont;
-	Canvas.MedFont = MyMediumFont;
-	Canvas.SmallFont = MySmallFont;
+	//Canvas.LargeFont = MyLargeFont;
+	//Canvas.MedFont = MyMediumFont;
+	//Canvas.SmallFont = MySmallFont;
 }
 
 simulated function DisplayMenu( canvas Canvas )
@@ -681,9 +682,9 @@ function DrawTexData(Canvas Canvas)
 exec function testSaveShot(string SavePath)
 {
 	if ( AeonsPlayer(Owner) != None )
-	{			
-		AeonsPlayer(Owner).bRequestedShot = true;
+	{
 		AeonsPlayer(Owner).SavePath = SavePath;
+		AeonsPlayer(Owner).bRequestedShot = true;
 	}
 }
 */
@@ -773,7 +774,9 @@ simulated function PostRender( canvas Canvas )
 	local int i;
 	local string LevelName;
 	local string url;
-
+	local string TempString;
+	local int Token;
+	
 	url = Level.GetLocalURL();
 
 	i=instr(url, "?");
@@ -952,8 +955,8 @@ simulated function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		DrawHealth(Canvas, 265*ScaleX, 536*ScaleY);
-		DrawMana(Canvas, 484*ScaleX, 536*ScaleY);
+		DrawHealth(Canvas, 265*ScaleX, 532*ScaleY);
+		DrawMana(Canvas, 484*ScaleX, 532*ScaleY);
 	
 		if (Level.bDebugMessaging)
 			DrawManaInfo(Canvas);		// mana maintenence values
@@ -1093,7 +1096,7 @@ simulated function PostRender( canvas Canvas )
 		//	if ( AeonsPlayer(Owner).bDrawDebugHUD )
 			DrawIconsofShame(Canvas);
 	}
-
+	
 	/*
 	if ( AeonsPlayer(Owner) != None ) 
 	{
@@ -1101,14 +1104,17 @@ simulated function PostRender( canvas Canvas )
 		{
 			AeonsPlayer(Owner).bRequestedShot = false;
 
-			if ( AeonsPlayer(Owner).SavePath != "" ) 
+			if ( AeonsPlayer(Owner).SavePath != "" )
+			{
+				Owner.ConsoleCommand("shot " $ AeonsPlayer(Owner).SavePath);
 				Owner.ConsoleCommand("SaveShot " $ AeonsPlayer(Owner).SavePath);
-
+			}
+			
 			AeonsPlayer(Owner).SavePath = "";
 		}
 	}
 	*/
-
+	
 	// objectives debugging
 	/*
 	Canvas.DrawColor = WhiteColor;
@@ -1116,11 +1122,20 @@ simulated function PostRender( canvas Canvas )
 
 	for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
 	{
-		Canvas.SetPos( Canvas.ClipX/2, 25+10*i );
-		Canvas.DrawText( "" $ Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ], false );
+		Canvas.SetPos( 50, 25+25*i );
+		
+		TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
+		Token = InStr(TempString, ",");
+		
+		if (Token >= 0)
+		{
+			TempString = Right(TempString, Len(TempString)-Token-1);	
+		}
+		
+		Canvas.DrawText( "" $ TempString, false );
 	}
 	*/
-
+	
 	// Draw the subtitles
 	if (Aeonsplayer(Owner).bEnableSubtitles)
 		DrawSubtitles (Canvas);
@@ -2465,7 +2480,7 @@ simulated function DrawDefensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9), Y);
+					Canvas.SetPos(X + (i*9*ScaleX), Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);
@@ -2515,7 +2530,7 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9), Y);
+					Canvas.SetPos(X + (i*9*ScaleX), Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);
@@ -2579,7 +2594,11 @@ simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.a = 255;
 			
 			//Canvas.DrawTileClipped( Texture'HUDIcons', 32, 32, Slot*32 , 64, 32, 32);
-			Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64);
+			
+			if (whatToDraw.InventoryGroup == 16) //scrye has a black bar on the left for whatever reason
+				Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 1, 0, 64, 64);
+			else
+				Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64);
 	
 			Canvas.DrawColor.r = 255;
 			Canvas.DrawColor.g = 255;
@@ -2999,19 +3018,19 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.Style = ERenderStyle.STY_Masked;
 	
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 317*ScaleX, 536*ScaleY); 
+	Canvas.SetPos( 317*ScaleX, 532*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Health', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
 		Canvas.Style = ERenderStyle.STY_Translucent;
-		Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
-		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*Scale, 64*Scale, 0, 0, 64, 64);
+		Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
+		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 	}
 
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
+	Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 }
 
@@ -3061,7 +3080,7 @@ simulated function DrawFlightMana( canvas Canvas )
   
 	Canvas.Style = ERenderStyle.STY_Masked;
 	Canvas.SetPos( 381*ScaleX, Canvas.ClipY - (Height+21)*ScaleY); 
-	Canvas.DrawTileClipped( Texture'FlightBar_Icon', 40*ScaleX, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
+	Canvas.DrawTileClipped( Texture'FlightBar_Icon_Fixed', 40*ScaleX, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
 
 	Canvas.DrawColor.r = 192;
 	Canvas.DrawColor.g = 192;
@@ -3777,8 +3796,9 @@ simulated function DrawMOTD(Canvas Canvas)
 
 simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent)
 {
+	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
 	
-	Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
+	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
 }
 
 
@@ -4589,7 +4609,9 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 				(!WheelSelection.bHaveTokens) )
 			Canvas.DrawColor.a = 64;
 
-		Canvas.DrawIcon(Icons[InventoryGroup], Scale);
+		//if (InventoryGroup == 16)
+		//else
+			Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
 	}
 	else 
 	{

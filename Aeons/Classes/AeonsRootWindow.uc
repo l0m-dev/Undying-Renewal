@@ -90,13 +90,14 @@ function SetupFonts()
 	Fonts[F_LargeBold]= Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
 	Fonts[4] =			Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
 	*/
-	
+	/*
 	Fonts[F_Normal] =	AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
 	Fonts[F_Bold] =		AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
 	Fonts[F_Large] =	AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Comic.Comic18",		class'Font'));
 	Fonts[F_LargeBold]= AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
 	Fonts[4] =			AeonsHUd(GetPlayerOwner().MyHud).MyMediumFont;//Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
 	Fonts[5] =			Font(DynamicLoadObject("dauphin.Dauphin16",class'Font'));
+	*/
 }
 
 function Resized()
@@ -121,8 +122,50 @@ function Resized()
 	
 }
 
+function ResolutionChanged(float WinWidth, float WinHeight)
+{
+	Fonts[F_Normal] = None;
+}
+
+function Font GetSmallFont()
+{
+	local font Font;
+	
+	if (WinHeight < 720)
+		Font = Font(DynamicLoadObject("Comic.Comic10", class'Font'));
+	else if (WinHeight < 800)
+		Font = Font(DynamicLoadObject("Comic.Comic12", class'Font'));
+	else
+		Font = Font(DynamicLoadObject("Comic.Comic18", class'Font'));
+	
+	return Font;
+}
+
 function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
 {
+	Console.GetVersion(C);
+	
+	if (Fonts[F_Normal] == None && Fonts[F_Normal] != C.SmallFont)
+	{
+		C.LargeFont = Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
+		C.MedFont = Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
+		C.SmallFont = GetSmallFont();
+		
+		if (!Console.bEnglish)
+			C.MedFont = Font(DynamicLoadObject("dauphin.dauphin16",class'Font'));
+		
+		Fonts[F_Normal] =	C.SmallFont;
+		Fonts[F_Bold] =		C.SmallFont;
+		Fonts[F_Large] =	C.LargeFont;
+		Fonts[F_LargeBold]= C.LargeFont;
+		Fonts[4] =			C.MedFont;
+		
+		if (!Console.bEnglish)
+			Fonts[5] = Font(DynamicLoadObject("dauphin.dauphin16",class'Font'));
+		else
+			Fonts[5] = Font(DynamicLoadObject("Aeons.Dauphin16_Skinny",class'Font'));
+	}
+	
 	switch(Msg) {
 
 	case WM_KeyDown:

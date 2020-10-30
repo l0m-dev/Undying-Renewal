@@ -38,8 +38,10 @@ var texture ConBackground, Border;
 var bool bNoStuff, bTyping;
 var bool bNoDrawWorld;
 var bool				bShellPauses;		// if this is true, then attempting to change to the shell will pause the game (for cutscenes)
+var bool bEnglish;
 
 var bool bUseTransitionScreen;
+var bool bGotVersion;
 var texture Back[6];
 var string  TransitionScreenName[6];	
 
@@ -55,7 +57,7 @@ var float LastSecondStartTime;
 var int FrameCount;
 var int LastSecondFrameCount;
 var float MinFPS;
-var float MaxFPS;		
+var float MaxFPS;
 var float LastSecFPS;
 var Font TimeDemoFont;
 
@@ -487,10 +489,22 @@ function DrawLevelAction( canvas C )
 function PrintActionMessage( Canvas C, string BigMessage )
 {
 	local float XL, YL;
-
+	//local float tx, ty;
+	//local font Font;
+	
+	//Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	//C.Font = Font;
+	//C.TextSize("This is the english version of the game", tx, ty);
+	
+	if (bEnglish)
+		C.Font =  Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
+	else
+		C.Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	
 	C.bCenter = false;
 	C.StrLen( BigMessage, XL, YL );
 	C.SetPos(FrameX/2 - XL/2, FrameY/2 - YL/2);
+	
 	C.DrawText( BigMessage, false );
 }		
 
@@ -499,7 +513,12 @@ function PrintActionMessage( Canvas C, string BigMessage )
 event PostRender( canvas C )
 {
 	local int YStart, YEnd, Y, I, J, Line, iLine;
-
+	
+	if (!bGotVersion)
+	{
+		GetVersion(C);
+	}
+	
 	if(bNoDrawWorld)
 	{
 		C.SetPos(0,0);
@@ -511,9 +530,12 @@ event PostRender( canvas C )
 		TimeDemoCalc();
 		TimeDemoRender( C );
 	}
-
-	if ( C.LargeFont == Font'Engine.LargeFont')
-		C.LargeFont = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	
+	//if ( C.ClipX <= 1280)
+	//	C.LargeFont = Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
+	//else 
+	//	C.LargeFont = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	
 	// call overridable "level action" rendering code to draw the "big message"
 	DrawLevelAction( C );
 
@@ -556,6 +578,23 @@ event PostRender( canvas C )
 		DrawSingleView( C );
 }
 
+function GetVersion( Canvas C )
+{
+	local float tx, ty;
+	local font Font;
+	
+	if (bGotVersion)
+		return;
+	
+	Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	C.Font = Font;
+	
+	C.TextSize("This is the english version of the game", tx, ty);
+	bEnglish = (tx == 362 && ty == 30);
+	
+	bGotVersion = true;
+}
+	
 simulated function DrawConsoleView( Canvas C )
 {
 	local int Y, I, Line;
@@ -1107,4 +1146,5 @@ defaultproperties
      fpsText="fps"
      SecondsText="seconds."
      FramesText="frames rendered in"
+	 bGotVersion=False
 }

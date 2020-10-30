@@ -92,15 +92,25 @@ function Created()
 		SaveGameButtons[i].Text = "";
 		SaveGameButtons[i].TextX = 0;
 		SaveGameButtons[i].TextY = 0;
-
-		SaveGameButtons[i].TextStyle = 5;
-
-		TextColor.R = 84;
-		TextColor.G = 41;
-		TextColor.B = 11;
+		
+		SaveGameButtons[i].TextStyle = 2;
+		
+		if (GetPlayerOwner().Player.Console.bEnglish)
+		{
+			TextColor.R = 255;
+			TextColor.G = 255;
+			TextColor.B = 255;
+		}
+		else
+		{
+			TextColor.R = 102;
+			TextColor.G = 0;
+			TextColor.B = 0;
+		}
+	
 		SaveGameButtons[i].SetTextColor(TextColor);
-		SaveGameButtons[i].Font = 3;
-
+		SaveGameButtons[i].Font = 5;
+	
 		//SaveGameButtons[i].UpTexture =		texture'Engine.DefaultTexture';
 		//SaveGameButtons[i].TexCoords = NewRegion(0,0,64,64);
 	}
@@ -193,7 +203,6 @@ function Created()
 	ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
 	ScreenShot.Template = NewRegion(425,46,116,88);
 	ScreenShot.bStretch = true;
-	ScreenShot.Style = 5;
 	ScreenShot.Manager = Self;
 	
 	SelectedSlot = -1;
@@ -494,8 +503,11 @@ function DeletePressed()
 
 function BeforePaint(Canvas C, float X, float Y)
 {
+	local int I;
+	local color TextColor;
+	
 	Super.BeforePaint(C, X, Y);
-
+	
 	// if a slot is selected
 	if ( SelectedSlot >= 0 ) 
 	{
@@ -571,7 +583,7 @@ function Paint(Canvas C, float X, float Y)
 		X = SaveGameButtons[SelectedSlot].WinLeft-10*RootScaleX;
 		Y = SaveGameButtons[SelectedSlot].WinTop;
 		
-		DrawStretchedTexture(C, X, Y, W, H, texture'Aeons.cntrl_selec');
+		DrawStretchedTextureSegment(C, X, Y, W, H, 1, 1, 128, 32 - 1, texture'Aeons.cntrl_selec');
 		//DrawStretchedTexture(C, X, Y, W, H, texture'Aeons.Meshes.DispelFX');
 	}
 	else
