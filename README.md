@@ -43,7 +43,11 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Edit System.ini with packages you want to build. If you get an error you might need to add other packages that are also required for that specific package. E.g.
     ```
     EditPackages=Engine
+    EditPackages=UWindow
+    EditPackages=UBrowser
+    EditPackages=UMenu
     EditPackages=Aeons
+    EditPackages=UndyingShellPC
     ```
   - In the 'System' folder of the game type 'cmd' in the file path bar.
   - Type `ucc make` in the command prompt that opens.
