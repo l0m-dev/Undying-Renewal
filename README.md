@@ -21,7 +21,6 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Made some cutscenes skippable
   - Nerfed shield health
   - Nerfed haste
-  - Added a nice animation for deploying the stone
   - Added PS2 item list
   - Increased bird damage and melee range
   - Increased accuracy of the monk archer
@@ -35,7 +34,6 @@ Demo video: <https://youtu.be/5VtpuGM3oHI>
   - Added a scrye hint feature
   - Increased the time dead bodies stay on the ground
   - New gibs system!
-  - Saves are no longer deleted on new game
   - Walking and crouching makes no noise
 
 ## Building
