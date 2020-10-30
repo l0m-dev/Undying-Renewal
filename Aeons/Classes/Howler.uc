@@ -332,15 +332,15 @@ RESUME:
 // Default entry point
 BEGIN:
 
-	//StopMovement();
-	//PlayWait();
+	StopMovement();
+	PlayWait();
 
 
 	if( DistanceTo( Enemy ) > DamageRadius )
 	{
 		bDidMeleeAttack = false;
 
-		if( (FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius) && bHasFarAttack )
+		if( FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius )
 		{
 			// check difficulty
 			switch( Level.Game.Difficulty )
