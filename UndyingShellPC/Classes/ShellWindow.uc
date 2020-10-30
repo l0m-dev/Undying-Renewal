@@ -47,19 +47,21 @@ function Paint(Canvas C, float X, float Y)
 
 	C.DrawColor = BackColor;
 	
-	C.bNoSmooth = false;
+	C.bNoSmooth = true;
 
-	DrawStretchedTextureSegment( C, WinLeft, WinTop, WinWidth, WinHeight, 1, 1, 254, 254, texture'Engine.BlackTexture' );
+	DrawStretchedTextureSegment( C, WinLeft, WinTop, WinWidth, WinHeight, 0, 0, 256, 256, texture'Engine.BlackTexture' );
 
-	DrawStretchedTextureSegment( C, InnerLeft, InnerTop, TileWidth, TileHeight, 1, 1, 254, 254, Back[0] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop, TileWidth, TileHeight, 1, 1, 254, 254, Back[1] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop,	TileWidth, TileHeight, 1, 1, 254, 254, Back[2] );
+	DrawStretchedTextureSegment( C, InnerLeft, InnerTop, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop, TileWidth, TileHeight, 0, 0, 256, 256, Back[1] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop,	TileWidth, TileHeight, 0, 0, 256, 256, Back[2] );
 
-	DrawStretchedTextureSegment( C, InnerLeft, InnerTop + TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[3] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop + TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[4] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop + TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[5] );
+	DrawStretchedTextureSegment( C, InnerLeft, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[3] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[4] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[5] );
 
 	C.DrawColor = C.Default.DrawColor;
+	
+	C.bNoSmooth = false;
 
 }
 

@@ -57,7 +57,7 @@ var float LastSecondStartTime;
 var int FrameCount;
 var int LastSecondFrameCount;
 var float MinFPS;
-var float MaxFPS;		
+var float MaxFPS;
 var float LastSecFPS;
 var Font TimeDemoFont;
 
@@ -489,12 +489,12 @@ function DrawLevelAction( canvas C )
 function PrintActionMessage( Canvas C, string BigMessage )
 {
 	local float XL, YL;
-	local float tx, ty;
-	local font Font;
+	//local float tx, ty;
+	//local font Font;
 	
-	Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
-	C.Font = Font;
-	C.TextSize("This is the english version of the game", tx, ty);
+	//Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	//C.Font = Font;
+	//C.TextSize("This is the english version of the game", tx, ty);
 	
 	if (bEnglish)
 		C.Font =  Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
@@ -506,7 +506,7 @@ function PrintActionMessage( Canvas C, string BigMessage )
 	C.SetPos(FrameX/2 - XL/2, FrameY/2 - YL/2);
 	
 	C.DrawText( BigMessage, false );
-}		
+}	
 
 // Add localization to hardcoded strings!!
 // Called after rendering the world view.
@@ -530,7 +530,7 @@ event PostRender( canvas C )
 		TimeDemoCalc();
 		TimeDemoRender( C );
 	}
-
+	
 	//if ( C.ClipX <= 1280)
 	//	C.LargeFont = Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
 	//else 
@@ -1146,4 +1146,5 @@ defaultproperties
      fpsText="fps"
      SecondsText="seconds."
      FramesText="frames rendered in"
+	 bGotVersion=False
 }

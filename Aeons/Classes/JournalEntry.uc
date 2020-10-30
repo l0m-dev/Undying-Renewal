@@ -166,7 +166,9 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 			class'JournalEntry'.static.EatLeadingWhitespace(Line);
 
 			token = InStr(Line, "&");
-
+			
+			Tex.bNoSmooth = false;
+			
 			if ( token >= 0 )
 			{
 				if (english)

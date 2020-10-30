@@ -99,6 +99,11 @@ final function DrawIcon( texture Tex, float Scale )
 	if ( Tex != None )
 		DrawTile( Tex, Tex.USize*Scale, Tex.VSize*Scale, 0, 0, Tex.USize, Tex.VSize );
 }
+final function DrawIconTrimmed( texture Tex, float Scale )
+{
+	if ( Tex != None )
+		DrawTile( Tex, Tex.USize*Scale, Tex.VSize*Scale, 1, 1, Tex.USize - 1, Tex.VSize - 1 );
+}
 final function DrawRect( texture Tex, float RectX, float RectY )
 {
 	DrawTile( Tex, RectX, RectY, 0, 0, Tex.USize, Tex.VSize );

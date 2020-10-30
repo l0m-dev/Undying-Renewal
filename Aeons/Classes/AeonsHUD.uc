@@ -11,6 +11,7 @@ class AeonsHUD expands HUD;
 //#exec OBJ LOAD FILE=\Textures\AeonsFonts.utx PACKAGE=AeonsFonts
 
 #exec Texture Import File=FlightBar_Icon_Fixed.bmp		Mips=Off FLAGS=2
+#exec Texture Import File=HUD_Numbers_HD.bmp
 
 //=============================================================================
 
@@ -185,9 +186,7 @@ simulated function PostBeginPlay()
 	DigitInfo.Offset[9] = 225;
 	DigitInfo.Width[9] = 21;
 
-	MyLargeFont =	Font(DynamicLoadObject("Morpheus.Morpheus22",class'Font'));
-	MyMediumFont =	Font(DynamicLoadObject("dauphin.dauphin16",class'Font'));
-	MySmallFont =	Font(DynamicLoadObject("Comic.Comic10", class'Font'));
+	
 }
 
 simulated function PreBeginPlay()
@@ -428,7 +427,9 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	else if (Crosshair==1) 	Canvas.DrawIcon(Texture'Crosshair2', 1.0);  //     for this mindshatter crosshair modification to work	
 	else if (Crosshair==2) 	Canvas.DrawIcon(Texture'Crosshair3', 1.0);  
 	*/
-
+	
+	Canvas.bNoSmooth = false;
+	
 	if ( CurrentCrossHair != None ) 
 		Canvas.DrawIcon( CurrentCrossHair, Scale );
 		
@@ -470,9 +471,17 @@ function PreRender( canvas Canvas )
 	if (PlayerPawn(Owner).Weapon != None)
 		PlayerPawn(Owner).Weapon.PreRender(Canvas);
 
+	if (MyLargeFont == None)
+	{
+		MyLargeFont = Canvas.LargeFont;
+		MyMediumFont = Canvas.MedFont;
+		MySmallFont = Canvas.SmallFont;
+	}
+	
 	CanvasWidth  = Canvas.ClipX;
 	CanvasHeight = Canvas.ClipY;
 	
+	/*
 	if (PlayerPawn(Owner).Player.Console.bEnglish)
 	{
 		if (CanvasHeight <= 720)
@@ -491,10 +500,11 @@ function PreRender( canvas Canvas )
 			MySmallFont =	Font(DynamicLoadObject("AeonsFonts.DauphinRenewal40", class'Font'));
 		}
 	}
+	*/
 	
-	Canvas.LargeFont = MyLargeFont;
-	Canvas.MedFont = MyMediumFont;
-	Canvas.SmallFont = MySmallFont;
+	//Canvas.LargeFont = MyLargeFont;
+	//Canvas.MedFont = MyMediumFont;
+	//Canvas.SmallFont = MySmallFont;
 }
 
 simulated function DisplayMenu( canvas Canvas )
@@ -803,7 +813,7 @@ function PostRender( canvas Canvas )
 	Scale = Canvas.ClipY / 600.0;
 	ScaleX = Canvas.ClipX / 800.0;
 	ScaleY = Canvas.ClipY / 600.0;
-
+	
 	HUDSetup(canvas);
 
 
@@ -958,8 +968,8 @@ function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		DrawHealth(Canvas, 265*ScaleX, 536*ScaleY);
-		DrawMana(Canvas, 484*ScaleX, 536*ScaleY);
+		DrawHealth(Canvas, 265*ScaleX, 532*ScaleY);
+		DrawMana(Canvas, 484*ScaleX, 532*ScaleY);
 	
 		if (Level.bDebugMessaging)
 			DrawManaInfo(Canvas);		// mana maintenence values
@@ -983,7 +993,7 @@ function PostRender( canvas Canvas )
 	
 			DrawInventoryItem(Canvas, 104*Scale, Canvas.ClipY-72*Scale);		
 			if ( !AeonsPlayer(Owner).Weapon.IsA('Scythe') && !AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-				DrawAmmo(Canvas, 16*Scale, Canvas.ClipY-80*ScaleY*1.15);
+				DrawAmmo(Canvas, 16*Scale, Canvas.ClipY-80*ScaleY);
 
 			DrawConventionalWeapon(Canvas, 16*Scale, Canvas.ClipY - 72*Scale );		
 		}
@@ -2583,8 +2593,12 @@ simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.a = 255;
 			
 			//Canvas.DrawTileClipped( Texture'HUDIcons', 32, 32, Slot*32 , 64, 32, 32);
-			Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64);
-	
+			
+			if (whatToDraw.InventoryGroup == 16) //scrye has a black bar on the left for whatever reason
+				Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 1, 0, 64, 64);
+			else
+				Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64);
+			
 			Canvas.DrawColor.r = 255;
 			Canvas.DrawColor.g = 255;
 			Canvas.DrawColor.b = 255;	
@@ -3003,19 +3017,19 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.Style = ERenderStyle.STY_Masked;
 	
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 317*ScaleX, 536*ScaleY); 
+	Canvas.SetPos( 317*ScaleX, 532*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Health', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
 		Canvas.Style = ERenderStyle.STY_Translucent;
-		Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
-		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*Scale, 64*Scale, 0, 0, 64, 64);
+		Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
+		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 	}
-
+	
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 426*ScaleX, 538*ScaleY); 
+	Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
 	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
 }
 
@@ -3781,8 +3795,9 @@ simulated function DrawMOTD(Canvas Canvas)
 
 simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent)
 {
-	
-	Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
+	//Canvas.Style = ERenderStyle.STY_Masked;
+	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
+	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
 }
 
 
@@ -4591,7 +4606,9 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 				(!WheelSelection.bHaveTokens) )
 			Canvas.DrawColor.a = 64;
 
-		Canvas.DrawIcon(Icons[InventoryGroup], Scale);
+		//if (InventoryGroup == 16)
+		//else
+			Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
 	}
 	else 
 	{
