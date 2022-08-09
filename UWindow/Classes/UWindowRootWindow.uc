@@ -404,13 +404,13 @@ function SetupFonts(optional Canvas C)
 	Fonts[5] =			Font(DynamicLoadObject("dauphin.Dauphin16",class'Font'));
 	*/
 	
-	LargeFont = Font(DynamicLoadObject(Localize( "Fonts",  "LargeFont", "Renewal"),class'Font'));
-	MedFont = Font(DynamicLoadObject(Localize( "Fonts",  "MediumFont", "Renewal"), class'Font'));
+	LargeFont = Font(DynamicLoadObject(Localize("Fonts", "LargeFont", "Renewal"), class'Font'));
+	MedFont = Font(DynamicLoadObject(Localize("Fonts", "MediumFont", "Renewal"), class'Font'));
 	
 	Fonts[F_Large] =	LargeFont;
 	Fonts[F_LargeBold]= LargeFont;
 	Fonts[4] =			MedFont;
-	Fonts[5] = Font(DynamicLoadObject(Localize( "Fonts",  "SaveNameFont", "Renewal"), class'Font'));
+	Fonts[5] = Font(DynamicLoadObject(Localize("Fonts", "SaveNameFont", "Renewal"), class'Font'));
 	UpdateSmallFont(C);
 	
 	if (C != None)

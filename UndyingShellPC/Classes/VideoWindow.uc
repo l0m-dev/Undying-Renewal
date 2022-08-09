@@ -560,9 +560,9 @@ function ResolutionClicked(UWindowWindow B)
 	local int i;
 	
 	if ( ColorDepth == 16 ) 
-		NewRes = ShellButton(b).Text @ "x16";
+		NewRes = ShellButton(b).Text $ "x16"; // @ added a space before so the check never worked
 	else
-		NewRes = ShellButton(b).Text @ "x32";
+		NewRes = ShellButton(b).Text $ "x32";
 
 
 	if ( OriginalRes != NewRes )
@@ -586,6 +586,9 @@ function ResolutionClicked(UWindowWindow B)
 function ScrolledUp()
 {
 	local int i;
+	
+	if ( (ChangeSound != none) && bInitialized ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
 
 	CurrentRow--;
 	if ( CurrentRow <= 0 ) 
@@ -606,7 +609,10 @@ function ScrolledUp()
 function ScrolledDown()
 {
 	local int i;
-
+	
+	if ( (ChangeSound != none) && bInitialized ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
+	
 	CurrentRow++;
 	if ( CurrentRow + ArrayCount(Resolutions) >= ArrayCount(ResolutionList) ) 
 	{

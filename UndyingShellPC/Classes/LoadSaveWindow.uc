@@ -33,7 +33,11 @@ class LoadSaveWindow expands ShellWindow;
 var string ScreenShotName;
 var ShellBitmap ScreenShot;
 
+var int CurrentRow; // current row in scrollable saves list
 var ShellButton SaveGameButtons[10];
+
+var ShellButton Down;
+var ShellButton Up;
 
 var ShellButton Cancel;
 var ShellButton Load;
@@ -43,10 +47,10 @@ var ShellButton Delete;
 var UWindowWindow Confirm;
 
 var string SaveList;
-var string SaveStrings[10];
-var string MapNames[10];
+var string SaveStrings[20];
+var string MapNames[20];
 
-var int Slots[10];
+var int Slots[20];
 var int FreeSlot;
 
 var int		SmokingWindows[4];
@@ -56,6 +60,8 @@ var float	SmokingTimers[4];
 var int SelectedSlot;
 
 var bool RememberBootShell;
+
+var sound ChangeSound;
 
 //----------------------------------------------------------------------------
 
@@ -95,7 +101,7 @@ function Created()
 		
 		SaveGameButtons[i].TextStyle = 2;
 		
-		TextColor = GetPlayerOwner().ParseColor(Localize( "FontColors",  "SaveNameFont", "Renewal"));
+		TextColor = GetPlayerOwner().ParseColor(Localize( "FontColors",  "SaveNameColor", "Renewal"));
 		
 		/*
 		if (GetPlayerOwner().Player.Console.bEnglish)
@@ -119,6 +125,42 @@ function Created()
 		//SaveGameButtons[i].TexCoords = NewRegion(0,0,64,64);
 	}
 
+// Saves scroll buttons
+	Up =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+	Down =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+
+	Up.Style = 5;
+	Down.Style = 5;
+
+	Up.Template =	NewRegion(720,130,64,128);
+	Down.Template = NewRegion(720,500,64,128);
+
+	Up.TexCoords = NewRegion(0,0,64,128);
+	Down.TexCoords = NewRegion(0,0,64,128);
+
+	Up.bRepeat = True;
+	Down.bRepeat = True;
+
+	Up.key_interval = 0.08;
+	Down.key_interval = 0.08;
+
+	Up.Manager = Self;
+	Down.Manager = Self;
+
+	Up.UpTexture =   texture'Cntrl_upbut_up';
+	Up.DownTexture = texture'Cntrl_upbut_dn';
+	Up.OverTexture = texture'Cntrl_upbut_ov';
+	Up.DisabledTexture = texture'Cntrl_upbut_ds';
+
+	Down.UpTexture =   texture'Cntrl_dnbut_up';
+	Down.DownTexture = texture'Cntrl_dnbut_dn';
+	Down.OverTexture = texture'Cntrl_dnbut_ov';
+	Down.DisabledTexture = texture'Cntrl_dnbut_ds';
+	
+	// initialize saves list and scroll buttons
+	CurrentRow = 0;
+	Up.bDisabled = true;
+	Down.bDisabled = false;
 
 // Cancel Button
 	Cancel = ShellButton(CreateWindow(class'ShellButton', 48*RootScaleX, 500*RootScaleY, 160*RootScaleX, 64*RootScaleY));
@@ -287,6 +329,14 @@ function Message(UWindowWindow B, byte E)
 				case SaveGameButtons[9]:
 					SelectSlot(9);
 					break;
+					
+				case Up:
+					ScrolledUp();
+					break;
+
+				case Down:
+					ScrolledDown();
+					break;
 			}
 			break;
 
@@ -336,7 +386,7 @@ function OverEffect(ShellButton B)
 
 function SelectSlot( int Slot ) 
 {
-	SelectedSlot = Slot;
+	SelectedSlot = Slot + CurrentRow;
 
 /*
 	//fix this will break when E m p t y is localized
@@ -374,6 +424,49 @@ function SelectSlot( int Slot )
 
 //----------------------------------------------------------------------------
 
+function ScrolledUp()
+{
+	local int i;
+
+	if ( (ChangeSound != none) ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
+	
+	CurrentRow--;
+	if ( CurrentRow <= 0 ) 
+	{
+		CurrentRow = 0;
+		Up.bDisabled = true;
+	}
+
+	if ( CurrentRow < ArrayCount(SaveStrings) - ArrayCount(SaveGameButtons) )
+	{
+		Down.bDisabled = false;
+	}
+
+	UpdateButtons();
+}
+
+function ScrolledDown()
+{
+	local int i;
+
+	if ( (ChangeSound != none) ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
+	
+	CurrentRow++;
+	if ( CurrentRow + ArrayCount(SaveGameButtons) >= ArrayCount(SaveStrings) ) 
+	{
+		Down.bDisabled = true;
+	}
+
+	if ( CurrentRow > 0 ) 
+	{
+		Up.bDisabled = false;
+	}
+
+	UpdateButtons();
+}
+
 function ShowConfirm(UwindowWindow W)
 {
 	if (Confirm == None ) 
@@ -389,7 +482,7 @@ function ShowConfirm(UwindowWindow W)
 function DoSave()
 {
 	local int SaveSlot;
-	local int token;
+	//local int token;
 	
 	if ( SelectedSlot < 0 ) 
 		return;
@@ -400,27 +493,21 @@ function DoSave()
 
 	PlayNewScreenSound();
 
-	SaveSlot = -1;
-
+	SaveSlot = SelectedSlot;
+	
+	/*
 	if ( Slots[SelectedSlot] >= 0 ) 
 		SaveSlot = Slots[SelectedSlot];
 	else if ( FreeSlot >= 0 )
 		SaveSlot = FreeSlot;
-
+	*/
+	
 	Close();
 	ParentWindow.Close();
 	AeonsRootWindow(Root).MainMenu.Close();
 
-	if ( SaveSlot >= 0 )
-	{
-		//log("calling SaveGame " $ SaveSlot );
-		GetPlayerOwner().ConsoleCommand("SaveGame " $ SaveSlot);	
-	}
-	else
-	{
-		Log(" invalid save game slot: " $ Slots[SelectedSlot] );
-	}
-
+	//log("calling SaveGame " $ SaveSlot );
+	GetPlayerOwner().ConsoleCommand("SaveGame " $ SaveSlot);
 }
 
 //----------------------------------------------------------------------------
@@ -513,7 +600,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	Super.BeforePaint(C, X, Y);
 	
 	// if a slot is selected
-	if ( SelectedSlot >= 0 ) 
+	if ( SelectedSlot >= 0 )
 	{
 		// map our slot to the actual save game slot
 
@@ -560,7 +647,8 @@ function Paint(Canvas C, float X, float Y)
 	local int W, H;
 	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
-
+	local int localSlot;
+	
 	Super.Paint(C, X, Y);
 	
 	AeonsRoot = AeonsRootWindow(Root);
@@ -573,8 +661,10 @@ function Paint(Canvas C, float X, float Y)
 
 	RootScaleX = AeonsRoot.ScaleX;
 	RootScaleY = AeonsRoot.ScaleY;
+	
+	localSlot = SelectedSlot - CurrentRow;
 
-	if ( SelectedSlot >= 0 ) 
+	if ( localSlot >= 0 && localSlot < ArrayCount(SaveGameButtons)) 
 	{
 		C.Style = 3;
 		C.DrawColor.r = 255;
@@ -582,10 +672,10 @@ function Paint(Canvas C, float X, float Y)
 		C.DrawColor.b = 255;
 		C.DrawColor.a = 255;
 
-		W = SaveGameButtons[SelectedSlot].WinWidth+20*RootScaleX;
-		H = SaveGameButtons[SelectedSlot].WinHeight;
-		X = SaveGameButtons[SelectedSlot].WinLeft-10*RootScaleX;
-		Y = SaveGameButtons[SelectedSlot].WinTop;
+		W = SaveGameButtons[localSlot].WinWidth+20*RootScaleX;
+		H = SaveGameButtons[localSlot].WinHeight;
+		X = SaveGameButtons[localSlot].WinLeft-10*RootScaleX;
+		Y = SaveGameButtons[localSlot].WinTop;
 		
 		DrawStretchedTextureSegment(C, X, Y, W, H, 1, 1, 128, 32 - 1, texture'Aeons.cntrl_selec');
 		//DrawStretchedTexture(C, X, Y, W, H, texture'Aeons.Meshes.DispelFX');
@@ -719,7 +809,7 @@ function MapNametoScreenShot(string MapName)
 function UpdateButtons()
 {
 	local int Token;
-	local int i;
+	local int i, listIndex, slotIndex;
 	local string Temp;
 	local string SaveMap, SaveTime;
 
@@ -731,18 +821,29 @@ function UpdateButtons()
 	FreeSlot = -1;
 
 	log("LoadSaveWindow: UpdateButtons: SaveList = " $ SaveList);
-
+	
+	for ( i=0; i<ArrayCount(SaveGameButtons); i++ )
+	{
+		SaveGameButtons[i].Align = TA_Center;
+		SaveGameButtons[i].Text = "E m p t y " @ (i + CurrentRow + 1);
+	}
+	
 	for ( i=0; i<ArrayCount(SaveStrings); i++ )
 	{
-		//LoadGameButtons[i].Text = LoadStrings[i];
-		Log("SaveString = " $ SaveStrings[i]);
+		MapNames[i] = "";
+		Slots[i] = -1;
+	}
+	
+	for ( i=0; i<ArrayCount(SaveStrings); i++ )
+	{
 		
 		if ( SaveStrings[i] != "" )
 		{
 			Token = InStr(SaveStrings[i], ",");
 			Temp = Left(SaveStrings[i], Token);
 			//log("slot = " $ Temp);
-			Slots[i] = int(Temp);
+			slotIndex = int(Temp);
+			Slots[slotIndex] = slotIndex;
 
 			// keep track of highest save slot
 			if ( Slots[i] >= FreeSlot )
@@ -753,39 +854,31 @@ function UpdateButtons()
 
 			Token = InStr(Temp, ",");
 			SaveMap = Left(Temp, Token);
+			
+			MapNames[slotIndex] = SaveMap;
 
 			//log("map name  = " $ SaveMap);
 
 			SaveTime = Right(Temp, Len(Temp)-Token-1);
+			SaveTime = Left(SaveTime, Len(SaveTime)-1);
 
 			//log("save time = " $ SaveTime);
-
-			if ( Slots[i] == 0 ) 
-				SaveGameButtons[i].Text = SaveTime $ "-Q-" $ SaveMap;
+			
+			listIndex = slotIndex - CurrentRow;
+			
+			if (listIndex < 0 || listIndex >= ArrayCount(SaveGameButtons))
+				continue;
+			
+			if ( slotIndex == 0 ) 
+				SaveGameButtons[listIndex].Text = SaveTime $ " (Quicksave) - " $ SaveMap;
 			else
-				SaveGameButtons[i].Text = SaveTime $ "-" $ SaveMap;
-
-
-			SaveGameButtons[i].Align = TA_Left;
-			//SaveGameButtons[i].ShowWindow();
+				SaveGameButtons[listIndex].Text = SaveTime $ " - " $ SaveMap;
+			
+			SaveGameButtons[listIndex].Align = TA_Left;
 		}
-		else
-		{
-			//log("Savestrings[" $ i $ " ] is empty " $ SaveStrings[i]);
-			Slots[i] = -1;
-			SaveGameButtons[i].Align = TA_Center;
-			SaveGameButtons[i].Text = "E m p t y";
-			//SaveGameButtons[i].HideWindow();
-
-			SaveMap = "";
-		}
-
-		MapNames[i] = SaveMap;
-
 		//Log("SaveGameButtons[" $ i $ "].Text=" $ SaveGameButtons[i].Text $ " Alignment=" $ SaveGameButtons[i].Align);
-		
 	}
-
+	
 	if ( FreeSlot < 0 ) 
 		FreeSlot = 0;
 
@@ -832,7 +925,13 @@ function Resized()
 	Save.ManagerResized(RootScaleX, RootScaleY);
 	Delete.ManagerResized(RootScaleX, RootScaleY);
 	ScreenShot.ManagerResized(RootScaleX, RootScaleY);
+	
+	if ( Up != None ) 
+		Up.ManagerResized(RootScaleX, RootScaleY);
 
+	if ( Down != None ) 
+		Down.ManagerResized(RootScaleX, RootScaleY);
+	
 	if ( Confirm != None ) 
 		Confirm.Resized();
 }
@@ -922,6 +1021,7 @@ function QuestionAnswered( UWindowWindow W, int Answer )
 
 defaultproperties
 {
+	 ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      BackNames(0)="UndyingShellPC.LoadSave_0"
      BackNames(1)="UndyingShellPC.LoadSave_1"
      BackNames(2)="UndyingShellPC.LoadSave_2"
