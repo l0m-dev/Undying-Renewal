@@ -20,7 +20,8 @@ var PlayerPawn PlayerOwner; // always the actual owner
 
 // Letterbox control
 var bool	bLetterbox;
-var float	LetterboxAspectRatio;
+var globalconfig bool bEnableLetterBox;
+var globalconfig float LetterboxAspectRatio;
 var float	LetterboxFadeRate;
 var float	LetterboxFadeTime;
 var int		LetterboxHeight;
@@ -40,7 +41,7 @@ struct SubtitleInfo
 
 var SubtitleInfo Subtitle;
 
-
+var float		ratio;
 struct HUDLocalizedMessage
 {
 	var Class<LocalMessage> Message;
@@ -134,6 +135,8 @@ simulated function Tick( float DeltaTime )
 	LetterboxFadeTime -= DeltaTime;
 	if ( LetterboxFadeTime < 0.0 )
 		LetterboxFadeTime = 0.0;
+	if (!bEnableLetterBox)
+		LetterboxFadeTime = 0;
 }
 
 //
@@ -152,7 +155,7 @@ simulated function SetLetterbox( bool B )
 //
 simulated function SetLetterboxAspectRatio( float aspect )
 {
-	LetterboxAspectRatio = aspect;
+	//LetterboxAspectRatio = aspect; let's stay consistent and use config setting
 }
 
 //
@@ -165,35 +168,29 @@ simulated function SetLetterboxFadeRate( float rate )
 simulated function LetterboxCanvas( Canvas canvas )
 {
 	local float		ySize;
-	local float		ratio;
 	local float		FTime;
 
 	if ( IsLetterboxed() )
 	{
 		if ( LetterboxFadeRate > 0.0 )
 		{
-			ratio = float(Canvas.SizeY) / float(Canvas.SizeX);
 			FTime = LetterboxFadeTime / LetterboxFadeRate;
 			FTime = ( cos(FTime * 3.14159) + 1.0 ) * 0.5;
 			if ( bLetterbox )
-				ratio = ratio + ( LetterboxAspectRatio - ratio ) * FTime;
+				ratio = FTime;
 			else
-				ratio = ratio + ( LetterboxAspectRatio - ratio ) * ( 1.0 - FTime );
+				ratio = ( 1.0 - FTime );
 		}
 		else
-			ratio = LetterboxAspectRatio;
+			ratio = 1;
+		
+		//ySize = int((Canvas.SizeY - Canvas.SizeX / 2.333333/*LetterboxAspectRatio*/) / 2 * ratio); // original behavior, LetterboxAspectRatio = 21/9
+		ySize = int(Canvas.SizeY * (ratio * LetterboxAspectRatio));
+		
+		//if (ySize < 150)
+		//	ySize = 0; // too small, it will mess up subtitles
 
-		ySize = int(Canvas.SizeX * ratio);
-
-		if ( false ) 
-		{
-			Canvas.OrgY = ( Canvas.SizeY - ySize ) * 0.5;
-			Canvas.ClipY = ySize;
-		}
-		else
-		{
-			LetterboxHeight = ySize;
-		}
+		LetterboxHeight = ySize;
 	}
 }
 
@@ -207,8 +204,9 @@ defaultproperties
      Crosshair=1
      HUDConfigWindowType="UMenu"
      WhiteColor=(G=128,B=255)
-     LetterboxAspectRatio=0.4545455
+     LetterboxAspectRatio=0.12
      LetterboxFadeRate=1.5
+	 bEnableLetterBox=True
      bHidden=True
      RemoteRole=ROLE_SimulatedProxy
 }

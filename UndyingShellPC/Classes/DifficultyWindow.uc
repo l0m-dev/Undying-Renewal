@@ -610,7 +610,7 @@ function MutatorClicked(UWindowWindow B)
 
 defaultproperties
 {
-     StartMap="Manor_FrontGate"
+     StartMap="CU_01"
      BackNames(0)="UndyingShellPC.Difficulty_0"
      BackNames(1)="UndyingShellPC.Difficulty_1"
      BackNames(2)="UndyingShellPC.Difficulty_2"

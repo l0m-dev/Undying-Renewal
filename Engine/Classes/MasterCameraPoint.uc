@@ -128,7 +128,7 @@ simulated function rotator GetCamRot(int i)
 simulated function SetLetterBox(PlayerPawn Player)
 {
 	log("SetLetterBox", 'Misc');
-	Player.LetterboxAspect(FClamp(LetterBoxAspect, 0.2, 10.0));
+	Player.LetterboxAspect(FClamp(LetterBoxAspect, 0.0, 0.2));
 	Player.LetterboxRate(LetterBoxTimer);
 	Player.Letterbox(true);
 }
@@ -178,7 +178,7 @@ defaultproperties
      bDebugMode=True
      bAutoClearAnims=True
      LetterBoxTimer=1.5
-     LetterboxAspect=0.454545
+     LetterboxAspect=0.12
      FOV_Target=110
      bActive=True
      bHidden=True
