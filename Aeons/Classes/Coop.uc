@@ -215,6 +215,8 @@ event playerpawn Login
 )
 {
 	local PlayerPawn NewPlayer;
+	local NavigationPoint StartSpot;
+
 	Log("DeathMatchGame - Login");
 	NewPlayer = Super.Login(Portal, Options, Error, SpawnClass );
 	if ( NewPlayer != None )
@@ -233,6 +235,23 @@ event playerpawn Login
 	{
 		Log("DeathMatchGame - Super.Login failed");
 	}
+
+	if ( !NewPlayer.IsA('Spectator') )
+		NumPlayers++;
+
+	// Find a start spot.
+	StartSpot = FindPlayerStart( None, 0, Portal );
+
+	if( StartSpot == None )
+	{
+		Error = FailedPlaceMessage;
+		return None;
+	}
+
+	if ( PlayerStart(StartSpot).bCutScene )
+		StartCutScene(NewPlayer);
+
+	//AeonsPlayer(NewPlayer).TriggerLevelBegin();
 
 	return NewPlayer;
 }
@@ -502,8 +521,64 @@ function StartCutScene(PlayerPawn Player)
 {
 	local MasterCameraPoint C, MasterPoint;
 
-	log("..............................................Starting CutScene SRW");
-	//Patrick(Player).StartCutScene();
+	// log("..............................................Starting CutScene");
+
+	forEach AllActors(class 'MasterCameraPoint', C, Event)
+	{
+		MasterPoint = C;
+		break;
+	}
+
+	if ( MasterPoint != none )
+		setupCamera(MasterPoint, Player);
+	else
+		log("Aeons.SinglePlayer: Cutscene FAILED to start - no master Point class found!");
+
+}
+
+function setupCamera(MasterCameraPoint MasterPoint, PlayerPawn Player)
+{
+	local vector eyeHeight;
+	local CameraProjectile CamProj;
+
+	if ( !MasterPoint.bAnimatedCamera )
+	{
+		// realtime interpolating camera path
+		if ( MasterPoint.CutSceneLength <= 0 )
+			MasterPoint.CutSceneLength = 10;
+
+		// Hide Player
+		if ( MasterPoint.bHidePlayer )
+			Player.bRenderSelf = false;
+
+		// Lock Player Location
+		if ( MasterPoint.bHoldPlayer )
+			Player.LockPos();
+
+		Player.LetterBox(true);
+
+		// starting at the master point location.. interpolating to the next point
+		CamProj = spawn(class 'CameraProjectile',Player,,MasterPoint.Location,Player.ViewRotation);
+		MasterPoint.getNextPoint();
+		CamProj.ToPoint = MasterPoint.NextPoint;
+		CamProj.FromPoint = MasterPoint;
+		CamProj.MasterPoint = MasterPoint;
+		CamProj.TotalTime = MasterPoint.CutSceneLength;
+		Player.ViewTarget = CamProj;
+		CamProj.StartSequence();
+		//MasterPoint.SetLetterBox(Player);
+	} else {
+		// PreAnimated camera path
+
+		// log("...............................Generating camera projectile");
+		AeonsPlayer(Player).SetFOV(36);
+		CamProj = spawn(class 'CameraProjectile');//,,,MasterPoint.Location, masterPoint.Rotation);
+		CamProj.MasterPoint = MasterPoint;
+		CamProj.SetOwner(Player);
+		Player.DesiredFOV = MasterPoint.GetCamFOVs(0);
+		Player.ViewTarget = CamProj;
+		CamProj.gotoState('PlayCannedAnim');
+	}
 }
 
 /* AcceptInventory()
@@ -519,8 +594,8 @@ applicable weapon/item as current).
 */
 function AcceptInventory(pawn PlayerPawn)
 {
-	PlayerPawn.Weapon = None;
-	PlayerPawn.SelectedItem = None;
+	//PlayerPawn.Weapon = None;
+	//PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
 	PlayerPawn.ConsoleCommand("SetupInv");
 }

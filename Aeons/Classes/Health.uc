@@ -29,7 +29,7 @@ function BecomeHealthVial()
 		pfx.SetBase(self);
 	}
 
-	PickupMessage = "You gained a Health Vial";
+	//PickupMessage = "You gained a Health Vial";
 	PickupViewMesh = SkelMesh'Aeons.Meshes.StalkerLure_m';
 	PickupViewScale = 2.2;
 	PickupSound = Sound'Wpn_Spl_Inv.Inventory.I_GlassPU01';
@@ -48,7 +48,7 @@ function BecomeHealthVial()
 
 function BecomeHealingRoot()
 {
-     PickupMessage = "You gained some Healing Roots";
+     //PickupMessage = "You gained some Healing Roots";
      PickupViewMesh = SkelMesh'Aeons.Meshes.HealingRoot_m';
      PickupViewScale = 2;
      PickupSound = Sound'Wpn_Spl_Inv.Inventory.I_HealthRootPU01';
@@ -88,18 +88,21 @@ auto state Pickup
 		{
 			AP = AeonsPlayer(Other);
 			HealthPacks = Pickup(PlayerPawn(Other).Inventory.FindItemInGroup(101)).numCopies + 1;
-			
-			if ((Level.Game.Difficulty == 0) && ( HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65 ) && (HealthPacks < 15))
+
+			if (((Level.Game.Difficulty == 0) && ( HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65 )) || bHealthVial)
 			{
 				// Picking up health when I really need it.
-				HealthModifier(AP.HealthMod).HealthSurplus += healingAmount;
-				if ( PickupMessageClass == None )
+				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget < 100)
 				{
-					Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
-				} else
-					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
-				PlaySound (PickupSound,,2.0);	
-				Destroy();
+					HealthModifier(AP.HealthMod).HealthSurplus += healingAmount;
+					if ( PickupMessageClass == None )
+					{
+						Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
+					} else
+						Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
+					PlaySound (PickupSound,,2.0);
+					Destroy();
+				}
 			} else {
 				if ((Level.Game.Difficulty == 0 && HealthPacks < 15) ||
 				    (Level.Game.Difficulty == 1 && HealthPacks < 10) ||

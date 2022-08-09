@@ -250,7 +250,10 @@ simulated function UpdateSubtitles(Float DeltaTime)
 simulated function DrawSubtitles(Canvas canvas)
 {
 	local float X, Y;
-
+	local float W, H;
+	local float StartHeight, SubtitleHeight;
+	local int LineCount;
+	
 	// Check to see if there has been a level change. If so, zero out the current subtitle sequence.
 	if (Level.LevelAction != LEVACT_None)
 	{
@@ -263,12 +266,46 @@ simulated function DrawSubtitles(Canvas canvas)
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
+		
 		Canvas.Font = Canvas.MedFont;
-		Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.85);
+		
+		Canvas.TextSize(Subtitle.Text[Subtitle.Number], W, H);
+		//StartHeight = (Canvas.ClipY/2-LetterboxHeight/2);
+		StartHeight = LetterboxHeight;
+		LineCount = ceil(W / Canvas.ClipX);
+		SubtitleHeight = (H * LineCount);
+		
+		if (IsLetterBoxed())
+		{
+			Canvas.DrawColor.R = 252;
+			Canvas.DrawColor.G = 190;
+			Canvas.DrawColor.B = 17;
+			if (LetterboxHeight <= 0)
+				Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.90);
+			
+			Y = Canvas.SizeY - (StartHeight / 2) -  SubtitleHeight / 2;
+		}
+		else
+			Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.82);
+		
+		if (Y > Canvas.SizeY - SubtitleHeight)
+			Y = Canvas.SizeY - SubtitleHeight - 10;
 		Canvas.SetPos (Canvas.OrgX, Y);
 		Canvas.bCenter = true;
-		Canvas.DrawText (Subtitle.Text[Subtitle.Number], false);
+		Canvas.DrawText (Subtitle.Text[Subtitle.Number], true);
+		Canvas.bCenter = false;
+		Canvas.SetPos (Canvas.OrgX, Canvas.OrgY);
 	}
+}
+
+function int ceil(float num) {
+    local int inum;
+	inum = int(num);
+	
+    if (num == float(inum)) {
+        return inum;
+    }
+    return inum + 1;
 }
 
 exec function ShowArrow()
@@ -782,7 +819,6 @@ simulated function PostRender( canvas Canvas )
 
 	HUDSetup(canvas);
 
-
 	if ( IsLetterBoxed() )
 		bDrawHud = false;
 
@@ -795,14 +831,18 @@ simulated function PostRender( canvas Canvas )
 		if (Level.bSepiaOverlay)
 			DrawSepiaOverlay(Canvas);
 		
-		YDelta = Canvas.ClipY/2-LetterboxHeight/2;
+		if (LetterboxHeight > 0 && bEnableLetterBox)
+		{
+			//YDelta = Canvas.ClipY/2-LetterboxHeight/2;
+			YDelta = LetterboxHeight;
 
-		Canvas.SetPos(0,0);
-		Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
+			Canvas.SetPos(0,0);
+			Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
 
-		Canvas.SetPos(0,Canvas.ClipY - YDelta);
-		Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
-
+			Canvas.SetPos(0,Canvas.ClipY - YDelta);
+			Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
+		}
+		
 		// BURT: FIX 1
 		// force draw on screen messages during cutscenes
 		if (AeonsPlayer(Owner).OSMMod != none)

@@ -1635,7 +1635,11 @@ function AdjustCrouch( float delta )
 			}
 			// GroundSpeed needs to query the speed modifiers for their effect on the player's speed.
 			if (HasteMod != none)
+			{
 				GroundSpeed = GroundSpeed * HasteModifier(HasteMod).speedMultiplier;
+				AccelRate = default.AccelRate * HasteModifier(HasteMod).speedMultiplier;
+			}
+			
 			if (SlothMod != none)
 				GroundSpeed = GroundSpeed * SlothModifier(SlothMod).speedMultiplier;
 		}

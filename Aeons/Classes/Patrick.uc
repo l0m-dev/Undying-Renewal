@@ -745,10 +745,18 @@ state DialogScene expands PlayerWalking
 	exec function Fire( optional float F )
 	{
 		local ScriptedPawn	SP;
+		local bool Skipped;
 
-		if ( bAckClickThrough )
+		if ( bAckClickThrough ) {
 			foreach AllActors( class'ScriptedPawn', SP )
+			{
 				SP.FastScript( true );
+				if (SP.Script != none && SP.Script.bClickThrough)
+					Skipped = true;
+			}
+			if (Skipped)
+				AeonsHud(myHud).RemoveSubtitle();
+		}
 	}
 
 Begin:

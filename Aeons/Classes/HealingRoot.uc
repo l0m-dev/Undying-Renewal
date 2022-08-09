@@ -8,13 +8,9 @@ class HealingRoot expands Health;
 
 function PreBeginPlay()
 {
-	local Health H;
-	
 	Super.PreBeginPlay();
 	
-	H = spawn(class 'Health',,,Location);
-	H. BecomeHealingRoot();
-	Destroy();
+	BecomeHealingRoot();
 }
 
 defaultproperties
