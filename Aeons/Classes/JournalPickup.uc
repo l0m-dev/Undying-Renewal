@@ -89,39 +89,44 @@ auto state Pickup
 		
 		ForEach AllActors(class 'PlayerPawn', P)
 		{
-			break;
+			Touch(P);
+			//break;
 		}
 
-		if ( p!= none )
-			Touch(P);
+		//if ( p!= none )
+		//	Touch(P);
 	}
 
 	// When touched by an actor.
 	function Touch( actor Other )
 	{
+		local PlayerPawn P;
+		
 		// If touched by a player pawn, let him pick this up.
 		if( ValidTouch(Other) )
 		{
-			if (Level.Game.LocalLog != None)
-				Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
-			if (Level.Game.WorldLog != None)
-				Level.Game.WorldLog.LogPickup(Self, Pawn(Other));
-			//SpawnCopy(Pawn(Other));
-			if ( PickupMessageClass == None )
-				Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
-			else
-				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
-
-			Other.PlaySound (PickupSound);
-
 			// show the book with our Entry
 			if ( AeonsPlayer(Other) != None )
 			{
-				AeonsPlayer(Other).GiveJournal(JournalClass, bShowImmediate);
+				if(!AeonsPlayer(Other).GiveJournal(JournalClass, bShowImmediate))
+					return;
+				
+				if (Level.Game.LocalLog != None)
+					Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
+				if (Level.Game.WorldLog != None)
+					Level.Game.WorldLog.LogPickup(Self, Pawn(Other));
+				//SpawnCopy(Pawn(Other));
+				if ( PickupMessageClass == None )
+					Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
+				else
+					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
+
+				Other.PlaySound (PickupSound);
+				
 				if ( bPlayWritingSound )
 					Other.PlaySound (JournalWritingSound, [Volume] 1.5);
 			}
-
+			
 			//if ( Level.Game.Difficulty > 1 )
 			//	Other.MakeNoise(0.1 * Level.Game.Difficulty);
 			//if ( Pawn(Other).MoveTarget == self )

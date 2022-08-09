@@ -15,9 +15,6 @@ class AeonsHUD expands HUD;
 
 //=============================================================================
 
-//fix take out
-var(Fonts) font MySmallFont, MyMediumFont, MyLargeFont;
-
 var float aX, aY; //updated with input when PlayerPawn is in ControlObject State
 
 var vector MouseBuffer[5];
@@ -376,7 +373,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	if ( A != none )
 	{
 		// Player is NOT scrying and the crosshair is tracing a bScryeOnly Actor
-		if ( ((AeonsPlayer(Owner).ScryeTimer == 0) && A.bScryeOnly) || (AeonsPlayer(Owner).MindShatterMod.bActive) )
+		if ( ((AeonsPlayer(Owner).ScryeTimer == 0) && A.bScryeOnly) || (AeonsPlayer(Owner).MindShatterMod != None && AeonsPlayer(Owner).MindShatterMod.bActive) )
 		{
 			// do nothing .. the crosshair color is already defined.
 		}
@@ -468,20 +465,10 @@ simulated function PreRender( canvas Canvas )
 	if (PlayerPawn(Owner).Weapon != None)
 		PlayerPawn(Owner).Weapon.PreRender(Canvas);
 	
-	if (MyLargeFont == None)
-	{
-		MyLargeFont = Canvas.LargeFont;
-		MyMediumFont = Canvas.MedFont;
-		MySmallFont = Canvas.SmallFont;
-	}
-	
 	CanvasWidth  = Canvas.ClipX;
 	CanvasHeight = Canvas.ClipY;
 
 	//Log("AeonsHud: PreRender");
-	//Canvas.LargeFont = MyLargeFont;
-	//Canvas.MedFont = MyMediumFont;
-	//Canvas.SmallFont = MySmallFont;
 }
 
 simulated function DisplayMenu( canvas Canvas )
@@ -883,7 +870,7 @@ simulated function PostRender( canvas Canvas )
 				DrawWizardEyeOverlay(Canvas);
 			}
 		} else {
-			// DrawPhoenixOverlay(Canvas);
+			DrawPhoenixOverlay(Canvas);
 		}
 	
 		PlayerOwner = PlayerPawn(Owner);
@@ -1716,9 +1703,9 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawColor.B = 255;
 
 
-		x = (Dir.x * 100);
-		y = (Dir.y * 100);
-		z = (Dir.z * 100);
+		//x = (Dir.x * 100);
+		//y = (Dir.y * 100);
+		//z = (Dir.z * 100);
 		
 		if (x<0)
 			xStr = ("-0."$int(abs(x)));
@@ -1739,7 +1726,7 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawText( ("Location: "$int(pos.x)$"  "$int(pos.y)$"  "$int(pos.z)), false);
 
 		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 24 + 48);
-		Canvas.DrawText( ("Dir:      "$xstr$"  "$yStr$"  "$zStr), false);
+		Canvas.DrawText( ("Dir:      "$Dir.x$"  "$Dir.y$"  "$Dir.z), false);
 
 		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 36 + 48);
 		Canvas.DrawText(("Speed:    "$int(VSize(Pawn(Owner).Velocity))), false);
@@ -1946,7 +1933,7 @@ simulated function Inventory GetNextInvItem(Inventory Inv)
 simulated function Inventory GetPrevInvItem(Inventory cInv)
 {
 	local Inventory Inv, LastItem;
-
+	
 	if ( cInv == None )
 	{
 		cInv = Pawn(Owner).Inventory.GetNext();
@@ -2008,6 +1995,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 
 	if ( Owner != None )
 		AP = AeonsPlayer(Owner);
+	
+	if (AP.Book == None)
+		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
 	if (((AP.Book.NewestUnread == None) && (AP.Book.NumUnreadJournals > 0)) || (AP.Book.NumUnreadJournals < 0))
@@ -3272,7 +3262,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 		MsgType = Console.GetMsgType(Console.TopLine);
 		if ( MsgType == 'Pickup' )
 		{
-			Canvas.Font = MyMediumFont;
+			Canvas.Font = Canvas.MedFont;
 			Canvas.bCenter = true;
 			//fix if ( Level.bHighDetailMode )
 				Canvas.Style = ERenderStyle.STY_Translucent;
@@ -4463,7 +4453,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 		WheelSelection = Owner.Inventory.FindItemInGroup(InventoryGroup);
 
 		// don't accept the molotov who hasn't had any ammo as valid
-		if (Weapon(WheelSelection).bSpecialIcon) 
+		if (Weapon(WheelSelection) != None && Weapon(WheelSelection).bSpecialIcon) 
 			WheelSelection = None;
 	}
 

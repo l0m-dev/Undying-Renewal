@@ -496,10 +496,7 @@ function PrintActionMessage( Canvas C, string BigMessage )
 	//C.Font = Font;
 	//C.TextSize("This is the english version of the game", tx, ty);
 	
-	if (bEnglish)
-		C.Font =  Font(DynamicLoadObject("Aeons.MorpheusFont", class'Font'));
-	else
-		C.Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	C.Font = Font(DynamicLoadObject(Localize( "Fonts",  "LargeFont", "Renewal"), class'Font'));
 	
 	C.bCenter = false;
 	C.StrLen( BigMessage, XL, YL );
@@ -586,11 +583,12 @@ function GetVersion( Canvas C )
 	if (bGotVersion)
 		return;
 	
-	Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
-	C.Font = Font;
+	//Font = Font(DynamicLoadObject("Morpheus.Morpheus22", class'Font'));
+	//C.Font = Font;
 	
-	C.TextSize("This is the english version of the game", tx, ty);
-	bEnglish = (tx == 362 && ty == 30);
+	//C.TextSize("This is the english version of the game", tx, ty);
+	//bEnglish = (tx == 362 && ty == 30);
+	bEnglish = Localize( "Language",  "Language", "Core") == "English (International)";
 	
 	bGotVersion = true;
 }

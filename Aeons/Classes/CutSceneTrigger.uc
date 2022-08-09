@@ -19,6 +19,12 @@ var MasterCameraPoint MasterPoint;		// The Master Point of the cutscene sequence
 var CameraProjectile CamProj;			// the Camera Projectile moving through th e scene.
 // var AeonsPlayer Player;
 
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		setupCamera;
+}
+
 function FindPlayer()
 {
 	ForEach AllActors(class 'PlayerPawn', Player)
@@ -39,6 +45,7 @@ function PassThru(actor Other)
 		return;
 
 	FindPlayer();
+	//Player = PlayerPawn(Other);
 	if (Player == none)
 	{
 		log("Cutscene Trigger PAssThru() -- Can't find the player!",'Misc' );

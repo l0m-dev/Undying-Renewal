@@ -32,6 +32,28 @@ var() ShellButton Buttons[4];
 var int		SmokingWindows[4];
 var float	SmokingTimers[4];
 
+struct MutatorInfo
+{
+	var string MutatorName;
+	var string MutatorClass;
+};
+
+var config string Mutators;
+
+var string MutatorBaseClass;
+
+var ShellLabelAutoWrap MutatorsLabel;
+var ShellLabelAutoWrap MutatorsHintLabel;
+var ShellButton MutatorsButtons[5]; // mutators currently displayed in the scrollable list
+var MutatorInfo MutatorList[250]; // complete list of available mutators
+var int CurrentRow; // current row in scrollable resolution list
+var ShellButton Down;
+var ShellButton Up;
+var string CurrentMutator;
+var string CurrentMutatorClass;
+var int NumberOfMutators;
+var bool MultipleSelection;
+
 function Created()
 {
 
@@ -102,18 +124,163 @@ function Created()
 	Buttons[3].DownTexture = texture'dfclt_mediu_dn';
 	Buttons[3].OverTexture = texture'dfclt_mediu_ov';
 	
-//--
+	// mutator stuff
+	
+	// Mutator buttons
+	for( i=0; i<5; i++ )
+	{
+		MutatorsButtons[i] = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+
+		MutatorsButtons[i].Template = NewRegion(584, 156+(54+5)*i, 204, 54);
+
+		MutatorsButtons[i].Manager = Self;
+		MutatorsButtons[i].Style = 5;
+		MutatorsButtons[i].TextX = 0;
+		MutatorsButtons[i].TextY = 0;
+		MutatorsButtons[i].bDisabled = True;
+		
+		MutatorsButtons[i].Align = TA_Center;
+
+		MutatorsButtons[i].TexCoords = NewRegion(0,0,204,54);
+
+		MutatorsButtons[i].UpTexture =   texture'Video_resol_up';
+		MutatorsButtons[i].DownTexture = texture'Video_resol_dn';
+		MutatorsButtons[i].OverTexture = texture'Video_resol_ov';
+
+
+		TextColor.R = 255;
+		TextColor.G = 255;
+		TextColor.B = 255;
+		MutatorsButtons[i].SetTextColor(TextColor);
+		MutatorsButtons[i].Font = 4;
+	}
+
+// Mutator scroll buttons
+	Up =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+	Down =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+
+	Up.Style = 5;
+	Down.Style = 5;
+
+	Up.Template =	NewRegion(558,130,64,128);
+	Down.Template = NewRegion(558,388,64,128);
+
+	Up.TexCoords = NewRegion(0,0,64,128);
+	Down.TexCoords = NewRegion(0,0,64,128);
+
+	Up.bRepeat = True;
+	Down.bRepeat = True;
+
+	Up.key_interval = 0.08;
+	Down.key_interval = 0.08;
+
+	Up.Manager = Self;
+	Down.Manager = Self;
+
+	Up.UpTexture =   texture'Cntrl_upbut_up';
+	Up.DownTexture = texture'Cntrl_upbut_dn';
+	Up.OverTexture = texture'Cntrl_upbut_ov';
+	Up.DisabledTexture = texture'Cntrl_upbut_ds';
+
+	Down.UpTexture =   texture'Cntrl_dnbut_up';
+	Down.DownTexture = texture'Cntrl_dnbut_dn';
+	Down.OverTexture = texture'Cntrl_dnbut_ov';
+	Down.DisabledTexture = texture'Cntrl_dnbut_ds';
+	
+	MutatorsLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
+
+	MutatorsLabel.Template=NewRegion(584, 100, 204, 54);
+	MutatorsLabel.Manager = Self;
+	MutatorsLabel.Text = "Select mutators";
+	TextColor.R = 255;
+	TextColor.G = 255;
+	TextColor.B = 255;
+	MutatorsLabel.SetTextColor(TextColor);
+	MutatorsLabel.Align = TA_Center;
+	MutatorsLabel.Font = 4;
+	
+	MutatorsHintLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
+
+	MutatorsHintLabel.Template=NewRegion(584, 116, 204, 54);
+	MutatorsHintLabel.Manager = Self;
+	MutatorsHintLabel.Text = "(ctrl for multiple)";
+	TextColor.R = 255;
+	TextColor.G = 255;
+	TextColor.B = 255;
+	MutatorsHintLabel.SetTextColor(TextColor);
+	MutatorsHintLabel.Align = TA_Center;
+	MutatorsHintLabel.Font = 4;
+	
+	LoadMutators();
+	RefreshButtons();
+	
+	//--
 	Root.Console.bBlackout = True;
 
 	Resized();
+}
+
+
+function KeyDown(int Key, float X, float Y)
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	switch (Key)
+	{
+		case P.EInputKey.IK_Ctrl:
+		case P.EInputKey.IK_Shift:
+			MultipleSelection = true;
+			break;
+		default:
+			Super.KeyDown(Key, X, Y);
+			break;
+	}
+}
+
+function KeyUp(int Key, float X, float Y)
+{
+	local PlayerPawn P;
+
+	P = GetPlayerOwner();
+
+	switch (Key)
+	{
+		case P.EInputKey.IK_Ctrl:
+		case P.EInputKey.IK_Shift:
+			MultipleSelection = false;
+			break;
+		default:
+			Super.KeyUp(Key, X, Y);
+			break;
+	}
+}
+
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg) {
+	case WM_KeyDown:
+		if(HotKeyDown(Key, X, Y))
+			return;
+		KeyDown(Key, X, Y);
+		break;
+	case WM_KeyUp:
+		if(HotKeyUp(Key, X, Y))
+			return;
+		KeyUp(Key, X, Y);
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
 }
 
 function Message(UWindowWindow B, byte E)
 {
 	switch (E)
 	{
-		case DE_DoubleClick:
 		case DE_Click:
+		case DE_DoubleClick:
 			switch (B)
 			{
 				case Buttons[0]:
@@ -131,6 +298,30 @@ function Message(UWindowWindow B, byte E)
 
 				case Buttons[3]:
 					StartGame(1);	//medium
+					break;
+				
+				// mutator stuff
+				case MutatorsButtons[0]:
+				case MutatorsButtons[1]:
+				case MutatorsButtons[2]:
+				case MutatorsButtons[3]:
+				case MutatorsButtons[4]:
+					if (!MultipleSelection)
+					{
+						CurrentMutator = "";
+						CurrentMutatorClass = "";
+					}
+					MutatorClicked(B);	
+					break;
+
+				case Up:
+					if (!Up.bDisabled)
+						ScrolledUp();
+					break;
+
+				case Down:
+					if (!Down.bDisabled)
+						ScrolledDown();
 					break;
 			}
 			break;
@@ -181,6 +372,22 @@ function Paint(Canvas C, float X, float Y)
 
 	for ( i = 0; i < 4; i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
+	
+	// mutator stuff
+	for ( i=0; i < NumberOfMutators; i++ )
+	{
+		if ( InStr(CurrentMutator, MutatorsButtons[i].Text) >= 0 )
+		{
+			//DrawStretchedTexture(C, MutatorsButtons[i].WinLeft, MutatorsButtons[i].WinTop, MutatorsButtons[i].WinWidth, MutatorsButtons[i].WinHeight, texture'Aeons.Particles.SOft_pfx');		
+			MutatorsButtons[i].UpTexture = texture'Video_resol_dn';
+			MutatorsButtons[i].DownTexture = texture'Video_resol_up';
+			MutatorsButtons[i].OverTexture = texture'Video_resol_dn';
+		} else {
+			MutatorsButtons[i].UpTexture =   texture'Video_resol_up';
+			MutatorsButtons[i].DownTexture = texture'Video_resol_dn';
+			MutatorsButtons[i].OverTexture = texture'Video_resol_ov';
+		}
+	}
 }
 
 function StartGame( int Difficulty )
@@ -188,8 +395,8 @@ function StartGame( int Difficulty )
 	local string URL;
 	
 	PlayNewScreenSound();
-
-	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty;
+	
+	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ CurrentMutatorClass;
 	//ParentWindow.Close();
 
 	Close();
@@ -203,7 +410,7 @@ function StartGame( int Difficulty )
 	
 	//GetPlayerOwner().ConsoleCommand("deletesavelevels");
 	GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
-
+	
 	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;
 }
 
@@ -228,7 +435,22 @@ function Resized()
 	{
 		Buttons[i].ManagerResized(RootScaleX, RootScaleY);
 	}
+	
+	// mutator stuff
 
+	if ( Up != None ) 
+		Up.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( Down != None ) 
+		Down.ManagerResized(RootScaleX, RootScaleY);
+	
+	for ( i=0; i<ArrayCount(MutatorsButtons); i++ )
+	{
+		MutatorsButtons[i].ManagerResized(RootScaleX, RootScaleY);
+	}
+	
+	MutatorsLabel.ManagerResized(RootScaleX, RootScaleY);
+	MutatorsHintLabel.ManagerResized(RootScaleX, RootScaleY);
 }
 
 function Close(optional bool bByParent)
@@ -242,13 +464,158 @@ function HideWindow()
 	Super.HideWindow();
 }
 
+// mutator stuff
+
+function LoadMutators()
+{
+	local int NumMutatorClasses;
+	local string NextMutator, NextDesc, MutatorName, HelpText;
+	//local UMenuMutatorList I;
+	//local string MutatorList;
+	local int j;
+	local int k;
+	
+	//DynamicLoadObject(MutatorBaseClass, class'Class');
+	//DynamicLoadObject("QuakeMovement.MovementMutator", class'Class');
+	
+	MutatorList[0].MutatorClass = "None";
+	MutatorList[0].MutatorName = "None";
+	//NumMutatorClasses++;
+	
+	GetPlayerOwner().GetNextIntDesc(MutatorBaseClass, 0, NextMutator, NextDesc);
+	while( NextMutator != "" && (NumMutatorClasses < 200) )
+	{		
+		MutatorList[NumMutatorClasses + 1].MutatorClass = NextMutator;
+
+		k = InStr(NextDesc, ",");
+		if(k == -1)
+		{
+			MutatorName = NextDesc;
+			HelpText = "";
+		}
+		else
+		{
+			MutatorName = Left(NextDesc, k);
+			HelpText = Mid(NextDesc, k+1);
+		}
+		
+		MutatorList[NumMutatorClasses + 1].MutatorName = MutatorName;
+		
+		NumMutatorClasses++;
+		GetPlayerOwner().GetNextIntDesc(MutatorBaseClass, NumMutatorClasses, NextMutator, NextDesc);
+	}
+	NumberOfMutators = NumMutatorClasses + 1;
+}
+
+
+function ScrolledUp()
+{
+	local int i;
+
+	CurrentRow--;
+	if ( CurrentRow <= 0 ) 
+	{
+		CurrentRow = 0;
+		Up.bDisabled = true;
+	}
+
+	if ( CurrentRow < ArrayCount(MutatorList) - NumberOfMutators )
+	{
+		Down.bDisabled = false;
+	}
+
+	RefreshButtons();
+}
+
+function ScrolledDown()
+{
+	local int i;
+
+	CurrentRow++;
+	if ( CurrentRow + NumberOfMutators >= ArrayCount(MutatorList) ) 
+	{
+		Down.bDisabled = true;
+	}
+
+	if ( CurrentRow > 0 ) 
+	{
+		Up.bDisabled = false;
+	}
+
+	RefreshButtons();
+}
+
+function RefreshButtons()
+{
+	local int i;
+	local string mName;
+	
+	for( i=0; i<ArrayCount(MutatorsButtons); i++ )
+	{
+		mName = MutatorList[CurrentRow + i].MutatorName;
+		if (mName != "")
+		{
+			MutatorsButtons[i].Text = mName;
+			MutatorsButtons[i].bDisabled = False;
+		}
+	}
+	
+	if ( NumberOfMutators < 2 )
+	{
+		MutatorsButtons[0].Text = "";
+		MutatorsButtons[0].bDisabled = True;
+		
+		MutatorsLabel.Text = "";
+		MutatorsHintLabel.Text = "";
+	}
+	
+	if ( ArrayCount(MutatorsButtons) >= NumberOfMutators )
+	{
+		Up.bDisabled = True;
+		Down.bDisabled = True;
+		
+		Up.DisabledTexture = None;
+		Down.DisabledTexture = None;
+	}
+}
+
+function MutatorClicked(UWindowWindow B)
+{
+	local string mName;
+	local string mClass;
+	local int i;
+	
+	mName = ShellButton(b).Text;
+	
+	for (i = 0; i < ArrayCount(MutatorList); i++)
+	{
+		if (MutatorList[i].MutatorName == mName)
+		{
+			mClass = MutatorList[i].MutatorClass;
+			break;
+		}
+	}
+	
+	if (CurrentMutator == "")
+	{
+		CurrentMutator = mName;
+		CurrentMutatorClass = mClass;
+	}
+	else
+	{
+		CurrentMutator = CurrentMutator $ "," $ mName;
+		CurrentMutatorClass = CurrentMutatorClass $ "," $ mClass;
+	}
+}
+
 defaultproperties
 {
-     StartMap="CU_01"
+     StartMap="Manor_FrontGate"
      BackNames(0)="UndyingShellPC.Difficulty_0"
      BackNames(1)="UndyingShellPC.Difficulty_1"
      BackNames(2)="UndyingShellPC.Difficulty_2"
      BackNames(3)="UndyingShellPC.Difficulty_3"
      BackNames(4)="UndyingShellPC.Difficulty_4"
      BackNames(5)="UndyingShellPC.Difficulty_5"
+	 MutatorBaseClass="Engine.Mutator"
 }

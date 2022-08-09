@@ -95,6 +95,9 @@ function Created()
 		
 		SaveGameButtons[i].TextStyle = 2;
 		
+		TextColor = GetPlayerOwner().ParseColor(Localize( "FontColors",  "SaveNameFont", "Renewal"));
+		
+		/*
 		if (GetPlayerOwner().Player.Console.bEnglish)
 		{
 			TextColor.R = 255;
@@ -107,7 +110,8 @@ function Created()
 			TextColor.G = 0;
 			TextColor.B = 0;
 		}
-	
+		*/
+		
 		SaveGameButtons[i].SetTextColor(TextColor);
 		SaveGameButtons[i].Font = 5;
 	

@@ -8,7 +8,7 @@ class SkyZoneTrigger expands Trigger;
 
 var() name NewSkyZoneTag;
 
-function PassThru(Actor Other)
+simulated function PassThru(Actor Other)
 {
 	local ZoneInfo Z;
 	local Actor A;
@@ -49,7 +49,7 @@ function PassThru(Actor Other)
 	}
 }
 
-function Touch( actor Other )
+simulated function Touch( actor Other )
 {
 	local ZoneInfo Z;
 	local Actor A;

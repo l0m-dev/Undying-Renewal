@@ -366,7 +366,7 @@ function Timer()
 /* FindPlayerStart()
 returns the 'best' player start for this player to start from.
 Re-implement for each game type
-*/
+
 function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
 {
 	local PlayerStart Dest, Candidate[8], Best;
@@ -423,6 +423,87 @@ function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, opt
 	}			
 				
 	return Best;
+}
+*/
+
+function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
+{
+	local PlayerStart Dest, Candidate[4], Best;
+	local float Score[4], BestScore, NextDist;
+	local pawn OtherPlayer;
+	local int i, num;
+	local Teleporter Tel;
+	local NavigationPoint N;
+
+	if( incomingName!="" )
+		foreach AllActors( class 'Teleporter', Tel )
+			if( string(Tel.Tag)~=incomingName )
+				return Tel;
+
+	num = 0;
+	//choose candidates	
+	N = Level.NavigationPointList;
+	While ( N != None )
+	{
+		if ( N.IsA('PlayerStart') && !N.Region.Zone.bWaterZone )
+		{
+			if (num<4)
+				Candidate[num] = PlayerStart(N);
+			else if (Rand(num) < 4)
+				Candidate[Rand(4)] = PlayerStart(N);
+			num++;
+		}
+		N = N.nextNavigationPoint;
+	}
+
+	if (num == 0 )
+		foreach AllActors( class 'PlayerStart', Dest )
+		{
+			if (num<4)
+				Candidate[num] = Dest;
+			else if (Rand(num) < 4)
+				Candidate[Rand(4)] = Dest;
+			num++;
+		}
+
+	if (num>4) num = 4;
+	else if (num == 0)
+		return None;
+		
+	//assess candidates
+	for (i=0;i<num;i++)
+		Score[i] = 4000 * FRand(); //randomize
+		
+	for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
+		if ( OtherPlayer.bIsPlayer && (OtherPlayer.Health > 0) )
+			for (i=0;i<num;i++)
+				if ( OtherPlayer.Region.Zone == Candidate[i].Region.Zone )
+				{
+					NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
+					if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
+						Score[i] -= 1000000.0;
+					else if ( (NextDist < 2000) && OtherPlayer.LineOfSightTo(Candidate[i]) )
+						Score[i] -= 10000.0;
+				}
+	
+	BestScore = Score[0];
+	Best = Candidate[0];
+	for (i=1;i<num;i++)
+		if (Score[i] > BestScore)
+		{
+			BestScore = Score[i];
+			Best = Candidate[i];
+		}
+
+	return Best;
+}
+
+function StartCutScene(PlayerPawn Player)
+{
+	local MasterCameraPoint C, MasterPoint;
+
+	log("..............................................Starting CutScene SRW");
+	//Patrick(Player).StartCutScene();
 }
 
 /* AcceptInventory()

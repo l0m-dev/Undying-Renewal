@@ -422,15 +422,15 @@ replication
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, AddAll, bDrawInvList, bShowScryeHint;
+		bDoubleShotgun, bDrawInvList, bShowScryeHint;
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
-		ClientPlayTakeHit, bRenderWeapon;
+		ClientPlayTakeHit, bRenderWeapon, GiveBook, GiveJournal;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
-        Scrye, JumpHeldTime, FireHeldTime, useWizardEye;
+        Scrye, JumpHeldTime, FireHeldTime, useWizardEye, AddAll;
 }
 
 event PreBeginPlay()
@@ -872,7 +872,7 @@ exec function TestJournal( string JournalEntryName )
 }
 
 //----------------------------------------------------------------------------
-simulated function GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
+simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
 	local JournalEntry TempEntry;
 	
@@ -882,12 +882,18 @@ simulated function GiveJournal(class<JournalEntry> JournalClass, optional bool b
 			
 		if (TempEntry!=None)
 		{
-			Book.AddEntry( TempEntry, true );
+			if (!Book.AddEntry( TempEntry, true ))
+			{
+				TempEntry.Destroy();
+				return false;
+			}
 		}
 	}
 
 	if ( bShowImmediate )
 		ShowBook();
+	
+	return true;
 }
 
 /*exec brady doesn't want this to be bindable*/ 
@@ -2029,7 +2035,7 @@ function TweenToWaiting(float tweentime)
 	}
 }
 
-function PlayFiring()
+simulated function PlayFiring()
 {
 	// switch animation sequence mid-stream if needed
 	if (AnimSequence == 'RunLG')
@@ -2053,7 +2059,7 @@ function PlayFiring()
 			TweenAnim('StillFRRP', 0.02);
 	}
 
-	//PlayAnim('attack_revolver_fire');
+	PlayAnim('attack_revolver_fire');
 }
 
 function PlayWeaponSwitch(Weapon NewWeapon)
@@ -2963,7 +2969,7 @@ ignores SeePlayer, HearNoise, Bump;
 
 //================================================================================
 // Player is being shown a cutscene.
-state PlayerCutScene
+simulated state PlayerCutScene
 {
 	ignores WeaponAction, ActivateItem, DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, FireAttSpell, FireDefSpell, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook; // SaveGameToMemoryCard, SaveGame, ;
 	
@@ -3015,7 +3021,7 @@ state PlayerCutScene
 			AttSpell.GotoState('Idle');
 	}
 
-	exec function StopCutScene()
+	exec simulated function StopCutScene()
 	{
 		UnLock();
 		Walk();
@@ -3025,7 +3031,7 @@ state PlayerCutScene
 			GotoState('PlayerWalking');
 	}
 
-	event PlayerTick( float DeltaTime ) 
+	simulated event PlayerTick( float DeltaTime ) 
 	{
 		if (Health <= 0)
 		{
@@ -4280,7 +4286,7 @@ exec function AddAll()
 		}
 	}
 
-	
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Mindshatter');
@@ -4295,7 +4301,7 @@ exec function AddAll()
 		if( newSpell != None )
 			newSpell.GiveTo(self);
 	}
-
+	*/
 	if (Inventory.FindItemInGroup(class'Aeons.Phoenix'.default.InventoryGroup) == none)
 	{
 		newWeapon = Spawn(class'Aeons.Phoenix');
@@ -4322,14 +4328,14 @@ exec function AddAll()
 		}
 	}
 
-	
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Ward'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Ward');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
 	}
-
+	*/
 	// Defensive Spells
 	if (Inventory.FindItemInGroup(class'Aeons.DispelMagic'.default.InventoryGroup) == none)
 	{
@@ -4342,14 +4348,14 @@ exec function AddAll()
 		}
 	}
 
-
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Firefly');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
 	}
-
+	*/
 
 	if (Inventory.FindItemInGroup(class'Aeons.Haste'.default.InventoryGroup) == none)
 	{
@@ -4361,7 +4367,7 @@ exec function AddAll()
 			newSpell.CastingLevel = 4;
 		}
 	}
-
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.IncantationOfSilence');
@@ -4375,7 +4381,7 @@ exec function AddAll()
 		if( newSpell != None )
 			newSpell.GiveTo(self);
 	}
-
+	*/
 	if (Inventory.FindItemInGroup(class'Aeons.Scrye'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Scrye');
@@ -4387,17 +4393,131 @@ exec function AddAll()
 			AttSpell = newSpell;
 		}
 	}
-
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.ShalasVortex'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.ShalasVortex');
 		if( newSpell != None )
 			newSpell.GiveTo(self);
 	}
-
+	*/
 	if (Inventory.FindItemInGroup(class'Aeons.Shield'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Shield');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+	/*
+	if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Pyro');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+	*/
+	/* Lantern is cut
+	// give the player the Lantern
+	if (Inventory.FindItemInGroup(class'Aeons.Lantern'.default.InventoryGroup) == none)
+	{
+		newItem = Spawn(class'Aeons.Lantern',,,Location);
+		if( newItem != None )
+		{
+			newItem.GiveTo(self);
+			newItem.setBase(self);
+		}
+	}*/
+
+	AttSpell.LocalCastingLevel = 4;
+	AttSpell.CastingLevel = 4;
+
+	// all ammo
+	Woo();
+}
+
+exec function DefAll()
+{
+	local Weapon newWeapon;
+	local Spell newSpell;
+	local Items newItem;
+	
+	if (Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Mindshatter');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+
+	if (Inventory.FindItemInGroup(class'Aeons.PowerWord'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.PowerWord');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+	if (Inventory.FindItemInGroup(class'Aeons.Ward'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Ward');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+	if (Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Firefly');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+	if (Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.IncantationOfSilence');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+	if (Inventory.FindItemInGroup(class'Aeons.Phase'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.Phase');
+		if( newSpell != None )
+		{
+			newSpell.GiveTo(self);
+			newSpell.LocalCastingLevel = 4;
+			newSpell.CastingLevel = 4;
+		}
+	}
+
+	if (Inventory.FindItemInGroup(class'Aeons.ShalasVortex'.default.InventoryGroup) == none)
+	{
+		newSpell = Spawn(class'Aeons.ShalasVortex');
 		if( newSpell != None )
 		{
 			newSpell.GiveTo(self);
@@ -4416,24 +4536,6 @@ exec function AddAll()
 			newSpell.CastingLevel = 4;
 		}
 	}
-
-	/* Lantern is cut
-	// give the player the Lantern
-	if (Inventory.FindItemInGroup(class'Aeons.Lantern'.default.InventoryGroup) == none)
-	{
-		newItem = Spawn(class'Aeons.Lantern',,,Location);
-		if( newItem != None )
-		{
-			newItem.GiveTo(self);
-			newItem.setBase(self);
-		}
-	}*/
-
-	AttSpell.LocalCastingLevel = 4;
-	AttSpell.CastingLevel = 4;
-
-	// all ammo
-	Woo();
 }
 
 exec function GiveMe(name this, optional int Amplitude)
@@ -4894,6 +4996,42 @@ function GiveStartupWeapons()
 	//ConsoleCommand("SetupInv");
 }
 
+simulated function GiveBook()
+{
+	local BookJournalBase TempBook;
+	local class<BookJournalBase> BookJournalClass;
+	local JournalEntry TempEntry;
+	
+	if ( Book == None )
+	{
+		if (GetPlatform() == PLATFORM_PSX2)
+		{
+			TempBook = Spawn(class'Aeons.BookJournalPSX2', Self);
+		}
+		else
+		{
+			//Log("We're on the PC, so give em a PC book.");
+			BookJournalClass = class<BookJournalBase>(DynamicLoadObject("Aeons.BookJournal", class'Class'));
+			if ( BookJournalClass != None )
+			{
+				//Log("BookJournalClass != None, it = "$BookJournalClass);
+				TempBook = Spawn(BookJournalClass, Self);
+
+// The book spawns it's ObjectivesJournal in it's PostBeginPlay
+//				if ( TempBook != None )
+//				{
+//					GiveJournal(class'ObjectivesJournal');
+//				}
+			}
+		}
+
+		TempBook.GiveTo(Self);
+		Book = TempBook;
+		
+		log("Got book", 'Misc');
+	}
+}
+
 exec function movViewOffsetX (float value)
 {
 	Weapon.PlayerViewOffset.x += value;
@@ -5157,6 +5295,21 @@ function ClientPutDown(Weapon Current, Weapon Next)
 	}
 }
 
+function AttachWeapon()
+{
+	local AeonsWeapon AWep;
+	AWep = AeonsWeapon(Weapon);
+	
+	log("Attached", 'Misc');
+	
+	AWep.TempMesh = AWep.Mesh;
+	AWep.Mesh = AWep.ThirdPersonMesh;
+	if ( AWep.ThirdPersonJointName != 'none' )
+		AWep.SetBase( Self, 'Revolver_Attach_Hand', AWep.ThirdPersonJointName );
+	else
+		AWep.SetBase( Self, 'Revolver_Attach_Hand', 'root' );
+	AWep.Mesh = AWep.TempMesh;
+}
 
 function SendClientFire(weapon W, int N)
 {
@@ -5182,8 +5335,10 @@ function SendFire(Weapon W)
 function UpdateRealWeapon(Weapon W)
 {
 	Log("AeonsPlayer: UpdateRealWeapon");
+	log("AeonsPlayer: UpdateRealWeapon Client", 'Misc');
 	WeaponUpdate++;
 	RealWeapon(W,WeaponUpdate);
+	AttachWeapon();
 }
 	
 function RealWeapon(weapon Real, int N)
@@ -5201,6 +5356,8 @@ function RealWeapon(weapon Real, int N)
 			Weapon.GotoState('ClientActive');
 		else
 			Weapon.TweenToStill();
+		
+		//AttachWeapon();
 	}
 	bNeedActivate = false;
 	ClientPending = None;	// make sure no client side weapon changes pending

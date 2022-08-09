@@ -50,7 +50,6 @@ state HoundAnim
 		Owner.PlaySound(SpawnHoundSound);
 		PlayAnim('Hound',RefireMult);
 		FinishAnim();
-		UseMeter = 0;
 		GotoState('Idle');
 }
 
@@ -58,10 +57,13 @@ function addUse(int amt)
 {
 	useMeter += amt;
 	if ( useMeter > SpawnHoundLimit )
+	{
+		useMeter = 0;
 		if ( AeonsPlayer(Owner).SpawnHound() )
 		{
 			GotoState('HoundAnim');
 		}
+	}
 }
 
 function MeleeAttack(float Range)

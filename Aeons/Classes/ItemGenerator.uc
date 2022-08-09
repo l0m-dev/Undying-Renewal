@@ -36,15 +36,17 @@ function Timer()
 // The generation event.
 function GenerateEvent()
 {		
-	SetTimer( FVariant( TimerInterval, 5.0 ), false);
+	SetTimer( FMax(FVariant( TimerInterval, 5.0 ), 0.1), false);
 	
-	if (GenItem != None && GenItem.GetStateName() == 'Pickup')
-		GenItem.Destroy();
-	
-	if ( SpawnClass != none )
-		GenItem = Spawn( SpawnClass, self,, GetSpawnPoint( SpawnClass ), Rotation );
-	else
-		log("No spawn class set for "$self);
+	if (GenItem == None || GenItem.GetStateName() != 'Pickup' || GenItem.bHidden)
+	{
+		//	GenItem.Destroy();
+		
+		if ( SpawnClass != none )
+			GenItem = Spawn( SpawnClass, self,, GetSpawnPoint( SpawnClass ), Rotation );
+		else
+			log("No spawn class set for "$self);
+	}
 }
 
 // Calculate a spawn point.

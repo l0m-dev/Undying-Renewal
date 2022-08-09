@@ -28,13 +28,13 @@ class ambrose expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=attack_scythe TIME=0.231 FUNCTION=DoNearDamage		//
 
 //#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.000 FUNCTION=SuspendLookAt
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
-//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.001 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.236 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.245 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.255 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.264 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.273 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.282 FUNCTION=DoNearDamage2		//
+//#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.291 FUNCTION=DoNearDamage2		//
 //#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=1.000 FUNCTION=ResumeLookAt
 
 //#exec MESH NOTIFY SEQ=attack_jumplift TIME=0.286 FUNCTION=TriggerJump		//
@@ -125,12 +125,21 @@ class ambrose expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.246 FUNCTION=PlaySound_N ARG="Stone"
 
 //#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.109 FUNCTION=PlaySound_N ARG="VEffortA"
-//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.001 FUNCTION=PlaySound_N ARG="SPKill"
+//#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.000 FUNCTION=PlaySound_N ARG="SPKill"
 //#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.900 FUNCTION=PlaySound_N ARG="VTaunt"
 //#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.141 FUNCTION=PlaySound_N ARG="PatDeath"
 
 //#exec MESH NOTIFY SEQ=Idle_Alert_Giant TIME=0.0 FUNCTION=PlaySound_N ARG="VEffortB"
-//#exec MESH NOTIFY SEQ=defense_spell TIME=0.774 FUNCTION=PlaySound_N ARG="ShieldUp"
+
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Damage_Mindshatter TIME=0.200 FUNCTION=PushBack
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Damage_Mindshatter TIME=0.9500 FUNCTION=PushBackDone
+
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Defense_Spell TIME=0.2 FUNCTION=CastShield
+//#exec MESH NOTIFY MESH=ambrose_m SEQ=Defense_Spell TIME=0.800 FUNCTION=CastDefenseSpell
+
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Attack_Spell_Start TIME=0.25 FUNCTION=SummonSkull
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Attack_Spell_Start TIME=0.50 FUNCTION=SummonSkull
+#exec MESH NOTIFY MESH=ambrose_m SEQ=Attack_Spell_Start TIME=0.75 FUNCTION=SummonSkull
 
 enum EAmbroseBossFightState
 {
@@ -158,19 +167,20 @@ var savable bool			StoneInAxe;
 var GhelzTrailFX			GhelzStoneTrail;
 var GhelzSmallGlowScriptedFX	GhelzStoneGlow;
 
-var bool	bMeleeAttackFail;
+var(AICombat) float			MomentumTransfer;	// Coefficient used for "push back" attack.
+var(AICombat) float			ShieldTimer;		// Time the shield stays up.
+var(AICombat) float			ShieldRecastTimer;	// Minimum time between casting shield.
+//var Shield3rdPerson			ShieldMesh;			// Representation of shield.
+var KeisingerHalo			ShieldMesh;			// Representation of shield.
+var(AICombat) float			ShieldHitPoints;	// Number of hit points the shield can absorb.
+var(AICombat) float			SkullStormTimer;	// Minimum time between casting Skull Storm.
+var(AICombat) name			SkullStormAnim;		// Animation to play when casting Skull Storm.
+var(AICombat) name			ShieldAnim;			// Animation to play when casting shield.
+var(AICombat) name			PushBackAnim;		// Animation to play when pushing enemy back.
+var			  name			SpellAnim;			// Animation to play when casting a spell.
 
-var SPShield				Shield;
-var() vector				ShieldOffset;
-var() int					ShieldDispelLevel;
-
-var SPSkullStorm skulls;
-
-var float ShieldTimer;
-var bool bCanCastShield;
-
-var float SkullstormTimer;
-var bool bCanCastSkullstorm;
+var		Skull2_proj			Skull[3];
+var		int					NumSkulls;
 
 function PreBeginPlay()
 {
@@ -180,11 +190,21 @@ function PreBeginPlay()
 	HoundTimer = 0.0;
 	StoneInAxe = false;
 	
-	skulls = Spawn( Class'Aeons.SPSkullStorm', self,, MyProp[0].JointPlace('Axe_4').pos, ConvertQuat(MyProp[0].JointPlace('Axe_4').rot) );
-	if ( skulls != none )
+	switch( Level.Game.Difficulty )
 	{
-		skulls.SetBase( self, 'L_Palm', WeaponAttachJoint );
+		case 0:	// Easy
+			NormalGroundSpeed *= 0.7;
+			GiantGroundSpeed *= 0.7;
+			break;
+		case 1:	// Normal
+			NormalGroundSpeed *= 0.85;
+			GiantGroundSpeed *= 0.85;
+			break;
+		case 2: // Hard
+			break;
 	}
+	
+	ShieldTimer = 0.0;
 }
 
 function PostBeginPlay()
@@ -192,6 +212,138 @@ function PostBeginPlay()
 	MyAxe = AmbroseAxe( MyProp[0] );
 	if( MyAxe == none )
 		DebugInfoMessage( ".PostBeginPlay() too early to hook up axe." );
+}
+
+function PushBack()
+{
+	local vector x, y, z, momentum, dir;
+	
+	DebugInfoMessage( ".PushBack() called." );
+	GetAxes(ViewRotation, x, y, z);
+	
+	// spawn(class 'GhelziabahrRing',self,,Location,rot(0,0,0));
+	spawn(class 'GhelzRingFX',self,,Location + 100*x,rot(0,0,0));
+		
+	spawn(class 'PulseWind',,,Location + 100*x);
+
+	if( Enemy != none )
+	{
+		dir = Enemy.Location - Location;
+		//if( VSize( dir ) < 2.0 * MeleeRange )
+		//{
+			dir.Z = 0.0;
+			dir = Normal(dir);
+			//if( (dir dot x) > 0.0 )
+			//{
+				Enemy.SetPhysics( PHYS_Falling );
+				dir.Z = 0.25;
+				momentum = dir * MomentumTransfer;
+				DebugInfoMessage( ".PushBack() on " $ Enemy.Name $ " momentum = " $ momentum $ "." );
+				Enemy.Velocity = momentum;
+			//}
+			//else
+			//	DebugInfoMessage( ".PushBack() not facing." );
+		//}
+		//else
+		//	DebugInfoMessage( ".PushBack() too far away." );
+	}
+}
+	
+function PushBackDone()
+{
+	DebugInfoMessage( ".PushBackDone() called." );
+	GotoState( 'AIAttack' );
+}
+
+
+function CastShield()
+{
+	if( (ShieldTimer <= 0.0) && (ShieldRecastTimer <= 0.0) )
+	{
+//		ShieldMesh = spawn(class 'Shield3rdPerson',self,,Location + (Vector(Rotation) * 32), Rotation );
+		ShieldMesh = spawn(class 'KeisingerHalo',self,, Location, Rotation);
+		ShieldMesh.SetBase( self, JointName(0) );
+		PlaySound_P( "ShieldUp" );
+	}
+
+	ShieldRecastTimer = 0.0;
+	ShieldTimer = Default.ShieldTimer;
+	ShieldHitPoints = Default.ShieldHitPoints;
+}
+
+function DestroyShield()
+{
+	ShieldMesh.Destroy();
+	ShieldMesh = none;
+	ShieldTimer = 0.0;
+	ShieldRecastTimer = Default.ShieldRecastTimer;
+	PlaySound_P( "ShieldDn" );
+}
+
+function ShieldAdjustDamage( out DamageInfo DInfo )
+{
+	DInfo.Damage = Max(0, DInfo.Damage - ShieldHitPoints);
+	ShieldHitPoints = ShieldHitPoints - DInfo.Damage;
+	if( ShieldHitPoints <= 0 )
+		DestroyShield();
+	else
+		PlaySound_P( "ShieldHit" );
+}
+
+function CastDefenseSpell()
+{
+	CastShield();
+}
+
+function bool CanCastSkullStorm()
+{
+	return ( SkullStormTimer <= 0.0 );
+}
+	
+function SummonSkull()
+{
+	local rotator RAim;
+
+	if( NumSkulls >= 3 )
+	{
+		return;
+	}
+	
+	if ( Enemy != none )
+		RAim = WeaponAimAt( Enemy, Location, WeaponAccuracy, true, class'Skull2_proj'.default.MaxSpeed );
+	else
+		RAim = WeaponAim( Location + vector(Owner.Rotation) * 100.0, Location, WeaponAccuracy );
+
+	Skull[NumSkulls] = Spawn( class'Skull2_proj', self,, Location, RAim );
+	/*
+	skulls = Spawn( Class'Aeons.SPSkullStorm', self,, MyProp[0].JointPlace('Axe_4').pos, ConvertQuat(MyProp[0].JointPlace('Axe_4').rot) );
+	if ( skulls != none )
+	{
+		skulls.SetBase( self, 'L_Palm', WeaponAttachJoint );
+	}
+	*/
+	
+	Skull[NumSkulls].Tag = Name;
+	Skull[NumSkulls].SetOffset(NumSkulls);
+
+	NumSkulls++;
+}
+
+function bool DoFarAttack()
+{
+	if( (DistanceTo(Enemy) < LongRangeDistance) )
+		return (FRand() < 0.40);
+	return false;
+}
+
+function name ChooseAttackSpell()
+{
+	if( (FRand() < 0.5) && CanCastSkullStorm() )
+	{
+		return 'AICastSkullStorm';
+	}
+	
+	return 'AICastNone';
 }
 
 function bool FlankEnemy()
@@ -259,10 +411,9 @@ function AmbroseShrink()
 function AmbroseStartGiantNormal()
 {
 	local pawn aPlayer;
-
 	aPlayer = FindPlayer();
 	
-	AeonsGameInfo(Level.Game).ServerSay("Health: "$aPlayer.Health);
+	//AeonsGameInfo(Level.Game).ServerSay("Health: "$aPlayer.Health);
 	
 	if (aPlayer == None || aPlayer.Health <= 0)
 		GotoState( 'AISpecialKill' );
@@ -343,19 +494,17 @@ function AmbroseHoundThrown()
 function PlayNearAttack()
 {
 	if( BossFightState == ABF_Giant )
-		PlayAnim( 'attack_axeslam_giant', 6.0 );
+		PlayAnim( 'attack_axeslam_giant', 1.0 );
 	else
 		PlayAnim( 'attack_scythe', 1.0 );
 }
 
 function PlayWait()
 {
-	//MoveSpeed = 0.0;
-	//LastLocomotion = vect(0,0,0);
+	MoveSpeed = 0.0;
+	LastLocomotion = vect(0,0,0);
 	if( BossFightState == ABF_Giant )
 		LoopAnim( 'Idle_Alert_Giant', 1.0 );
-	else if ( BossFightState == ABF_Normal )
-		LoopAnim( 'Idle_Alert', 1.0 );
 	else
 		PlayWaiting();
 }
@@ -471,12 +620,24 @@ function bool Decapitate( optional vector Dir )
 
 function AdjustDamage( out DamageInfo DInfo )
 {
+	if( ShieldTimer > 0.0 )
+		ShieldAdjustDamage( DInfo );
+	
 	super.AdjustDamage( DInfo );
+	
+	/*
+	if ( DamageSoundDelay == 0 )
+	{
+		PlaySoundDamage();
+		DamageSoundDelay = FVariant( default.DamageSoundDelay, default.DamageSoundDelay * 0.20 );
+	}
+	*/
+	
 	if (BossFightState == ABF_Giant)
 	{
 		if (DInfo.Damage >= Health)
 		{
-			DInfo.Damage = 0;
+			DInfo.Damage = 0.0;
 			Health = InitHealth;
 			StartHoundFight();
 		}
@@ -490,21 +651,19 @@ function AdjustDamage( out DamageInfo DInfo )
 			DamageSoundDelay = FVariant( default.DamageSoundDelay, default.DamageSoundDelay * 0.20 );
 		}
 	}
-	else
+	else if (GetStateName() != 'AmbroseBossFightWeakened')
 	{
 		if (DInfo.Damage >= Health)
 		{
-			DInfo.Damage = 0;
+			DInfo.Damage = 0.0;
 			Health = 350;
 	
 			GotoState( 'AmbroseBossFightWeakened' );
 		}
-		
-		if ( NeedShieldCast() )
+		else
 		{
-			PushState( GetStateName(), 'RESUME' );
-			StopMovement();
-			GotoState( 'AICastShield' );
+			if ( DistanceTo( Enemy ) < 2*MeleeRange )
+				GotoState( 'AIPushBackEnemy' );
 		}
 	}
 }
@@ -512,6 +671,8 @@ function AdjustDamage( out DamageInfo DInfo )
 function Tick( float DeltaTime )
 {
 	super.Tick( DeltaTime );
+	
+	AeonsGameInfo(Level.Game).ServerSay("State: "$GetStateName());
 	
 	/*
 	if( HoundTimer > 0.0 )
@@ -524,21 +685,28 @@ function Tick( float DeltaTime )
 	}
 	*/
 	
-	if ( ShieldTimer > 0.0 )
+	if( ShieldTimer > 0.0 )
 	{
-		ShieldTimer -= DeltaTime;
+		ShieldTimer -= deltaTime;
 		if( ShieldTimer <= 0.0 )
 		{
-			bCanCastShield = true;
+			DestroyShield();
 		}
 	}
 	
-	if ( SkullstormTimer > 0.0 )
+	if( True && (GetStateName() != 'AIRetreatNextStage') )
 	{
-		SkullstormTimer -= DeltaTime;
-		if( SkullstormTimer <= 0.0 )
+		if( ShieldRecastTimer > 0.0 )
 		{
-			bCanCastSkullstorm = true;
+			ShieldRecastTimer -= deltaTime;
+			if( ShieldRecastTimer <= 0.0 && BossFightState == ABF_Normal )
+			{
+				if( GetStateName() == 'AIRetreat' )
+					PushState( 'AIRetreat', 'Resume' );
+				else
+					PushState( 'AIAttack', 'Begin' );
+				GotoState( 'AICastShield' );
+			}
 		}
 	}
 }
@@ -598,94 +766,128 @@ function CommMessage( actor sender, string message, optional int param )
 		GotoState( 'AmbroseBossFightGiantHoundStruggle' );	
 }
 
-function bool AcceptDamage( DamageInfo DInfo )
+state AIPushBackEnemy
 {
-	if ( Shield != none )
-	{
-		Shield.BufferDamage( DInfo );
-		if ( Shield.Strength < 0.0 )
-		{
-			PlaySound_P( "ShieldDn" );
-			Shield.Shrink();
-			Shield = none;
-			
-			bCanCastShield = false;
-			ShieldTimer = default.ShieldTimer;
-		}
-		else
-			PlaySound_P( "ShieldHit" );
-		
-		return false;
-	}
+	// *** ignored functions ***
+	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
+	function EffectorHearNoise( actor sensed ){}
+	function EffectorSeePlayer( actor sensed ){}
+	function Trigger( actor Other, pawn EventInstigator ){}
+	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
+	function Bump( actor Other ){}
+	function AdjustDamage( out DamageInfo DInfo ){}
+	function TakeDamage( pawn Instigator, vector HitLocation, vector Momentum, DamageInfo DInfo ) {}
 	
-	return true;
+Begin:
+Resume:
+	StopMovement();
+	//PlayWait();
+	//TurnToward( Enemy );
+	PlayAnim( PushBackAnim, 1.0 );
+	FinishAnim();
+	//TurnToward( Enemy );
+	GotoState( 'AICharge' );
 }
 
-function int Dispel( optional bool bCheck )
-{
-	if ( bCheck )
-		return ShieldDispelLevel;
-	else if ( Shield != none )
-	{
-		PlaySound_P( "ShieldDn" );
-		Shield.Shrink();
-		Shield = none;
-	}
-}
-
-function CastShield()
-{
-	Shield = Spawn( class'SPShield', self,, Location, Rotation );
-	if ( Shield != none )
-		Shield.Offset = ShieldOffset;
-}
-
-function bool NeedShieldCast()
-{
-	return ( Shield == none && BossFightState == ABF_Normal && bCanCastShield );
-}
-
-//****************************************************************************
-// AICastShield
-// Cast the shield spell.
-//****************************************************************************
 state AICastShield
 {
 	// *** ignored functions ***
-	function Bump( actor Other ){}
-	function HearNoise( float Loudness, actor NoiseMaker ){}
+	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
 	function EffectorHearNoise( actor sensed ){}
 	function EffectorSeePlayer( actor sensed ){}
-	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
-	function TeamAIMessage( ScriptedPawn sender, ETeamMessage message, actor instigator ){}
 	function Trigger( actor Other, pawn EventInstigator ){}
 	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
+	function Bump( actor Other ){}
+	function SpellCastNotify( name SpellName, pawn Caster ) {}
+
+Begin:
+Resume:
+	StopMovement();
+	PlayWait();
+	TurnToward( Enemy );
+	PlayAnim( ShieldAnim, 1.0 );
+	FinishAnim();
+
+// Entry point when returning from AITakeDamage
+DAMAGED:
+	PopState();
+}
+
+state AICastSkullStorm
+{
+	// *** ignored functions ***
+	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
+	function EffectorHearNoise( actor sensed ){}
+	function EffectorSeePlayer( actor sensed ){}
+	function Trigger( actor Other, pawn EventInstigator ){}
+	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
+	function Bump( actor Other ){}
+	function SpellCastNotify( name SpellName, pawn Caster ) {}
+	
+	function EndState()
+	{
+		local int i;
+		super.EndState();
+
+		for( i = 0; i < NumSkulls; ++i )
+		{
+			Skull[i].Fire();
+			Skull[i] = none;
+		}
+
+		NumSkulls = 0;
+	}
+
+Resume:
+Begin:
+	StopMovement();
+	PlayWait();
+	TurnToward( Enemy );
+	PlayAnim( SkullStormAnim, 1.0 );
+	FinishAnim();
+	GotoState( 'AIAttack' );
+Damaged:
+	PopState();
+}
+
+state AICastNone
+{
+	function BeginState()
+	{
+		DebugBeginState();
+		PopState();
+	}
+}
+
+//****************************************************************************
+// AIAttack
+// primary attack dispatch state
+//****************************************************************************
+state AIAttack
+{
+	// *** ignored functions ***
 
 	// *** overridden functions ***
-	function WarnAvoidActor( actor Other, float Duration, float Distance, float Threat )
+	function Dispatch()
 	{
-		ProcessWarnAvoidActor( Other, Duration, Distance, Threat );
-	}
-	
-	// *** new (state only) functions ***
-	function DefenseSpell()
-	{
-		CastShield();
-		// PlaySound();
-	}
-// Entry point when resuming this state
-//RESUME:
+		local float dist;
 
-// Default entry point
-BEGIN:
-	if ( Enemy != none )
-		TurnToward( Enemy, 60 * DEGREES );
-	PlayAnim( 'defense_spell',, MOVE_None );
-	//CastShield();
-	FinishAnim();
-	//PopState();
-	GotoState( 'AICharge' );
-} // state AICastShield
+		DebugInfoMessage( ".AIAttack.Dispatch(), DefCon is " $ DefCon $ ", Health=" $ Health);
+		dist = DistanceTo( Enemy );
+
+		if ( dist < 1.25*MeleeRange && BossFightState == ABF_Normal && False )
+		{
+			// Push back enemy.
+			DebugInfoMessage( ".AIAttack.Dispatch(), Dist is < 1.25*MeleeRange" );
+			GotoState( 'AIPushBackEnemy' );
+		}
+		else
+			super.Dispatch();
+	}
+
+	// *** new (state only) functions ***
+
+} // state AIAttack
 
 state AmbroseBossFightStart
 {
@@ -755,10 +957,12 @@ state AmbroseBossFightGiantNormal
 	}
 
 Begin:
+	/* stall so player can choose spells and weapons */
 	LoopAnim( 'Idle_Alert_Giant', 1.0f );
-	Sleep(4);
+	Sleep(3);
 	AttitudeToEnemy = ATTITUDE_Hate;
 	AttitudeToPlayer = ATTITUDE_Hate;
+	
 	SetEnemy( FindPlayer() );
 	HatedEnemy = Enemy;
 	GotoState( 'AIAttack' );
@@ -770,12 +974,10 @@ state AmbroseBossFightNormal
 	{ 
 		global.TakeDamage( Instigator, HitLocation, Momentum, DInfo );
 	}
-
 	function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )
 	{
 		global.Died( Killer, damageType, HitLocation, DInfo );
 	}
-
 	function Killed( pawn Killer, pawn Other, name damageType )
 	{
 		global.Killed( Killer, Other, damageType );
@@ -785,7 +987,6 @@ state AmbroseBossFightNormal
 	{
 		global.KilledBy( EventInstigator );
 	}
-
 	function bool Decapitate( optional vector Dir )
 	{
 		return super.Decapitate( Dir );
@@ -803,7 +1004,6 @@ state AmbroseBossFightNormal
 			GotoState( 'AmbroseBossFightWeakened' );
 		}
 	}
-
 	
 	function BeginState()
 	{
@@ -993,12 +1193,7 @@ state AmbroseBossFightWeakened expands AIScriptedState
 		HoundTimer = 0.0;
 		GroundSpeed = Default.GroundSpeed;
 		
-		if ( Shield != none )
-		{
-			PlaySound_P( "ShieldDn" );
-			Shield.Shrink();
-			Shield = none;
-		}
+		DestroyShield();
 	}
 
 	function Timer()
@@ -1009,7 +1204,7 @@ state AmbroseBossFightWeakened expands AIScriptedState
 	}
 
 Begin:
-	SetTimer( 5.0, false );	// stay in this state for 5 seconds.
+	SetTimer( 5.0, false );	// stay in this state for 10 seconds.
 	StopMovement();
 	LoopAnim( 'weakened' );
 }
@@ -1055,171 +1250,24 @@ HaveStone:
 
 state AINearAttack
 {
-	// *** ignored functions ***
-	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
-	function EffectorHearNoise( actor sensed ){}
-	function EffectorSeePlayer( actor sensed ){}
-	function Trigger( actor Other, pawn EventInstigator ){}
-	function ReactToDamage( pawn Instigator, DamageInfo DInfo ){}
-	
-	// *** overridden functions ***
 	function BeginState()
 	{
-		StopTimer();
-		bPendingBump = false;
-	}
-
-	function AnimEnd()
-	{
-		if( bMeleeAttackFail )
+		super.BeginState();
+		if( BossFightState == ABF_Giant )
 		{
-			GotoState( , 'BEGIN' );
-		}
-
-		if ( !bDidMeleeAttack )
-		{
-			GotoState( , 'DOATTACK' );
-		}
-		else
-		{
-			GotoState( , 'ATTACKED' );
+//			PushLookAt( none );
 		}
 	}
 
-	function Timer()
+	function EndState()
 	{
-		if ( !bDidMeleeAttack )
+		super.EndState();
+		if( BossFightState == ABF_Giant )
 		{
-			GotoState( , 'DOATTACK' );
-		}
-		else
-		{
-			GotoState( , 'ATTACKED' );
+//			PopLookAt( );
 		}
 	}
-
-	function Bump( actor Other )
-	{
-		bPendingBump = true;
-		BumpedPawn = pawn(Other);
-	}
-
-	function bool HandlePowderOfSiren( actor Other )
-	{
-		DispatchPowder( Other );
-		return true;
-	}
-
-	// *** new (state only) functions ***
-	function PostAttack()
-	{
-		GotoState( 'AIAttack' );
-	}
-
-	function bool MoveInAttack()
-	{
-		return bCanFly;
-	}
-
-// Entry point when returning from AITakeDamage
-DAMAGED:
-
-// Entry point when resuming this state
-RESUME:
-	GotoState( 'AIAttack' );
-
-// Default entry point
-BEGIN:
-
-	//StopMovement();
-	//PlayWait();
-
-
-	if( DistanceTo( Enemy ) > DamageRadius )
-	{
-		bDidMeleeAttack = false;
-
-		if( FRand()>0.75 || VSize( Location-Enemy.Location ) > 2*DamageRadius )
-		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
-			{
-			case 0:	// Easy
-				//sleep( FVariant( 1.0, 0.5 ) );
-				break;
-			case 1:	// Normal
-				//sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 2: // Hard
-				//sleep( FVariant( 0.2, 0.1 ) );
-				break;
-			}		// Very Hard will no wait
-
-			bMeleeAttackFail = false;
-			GotoState( 'AIFarAttack' );
-		}
-		else
-		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
-			{
-			case 0:	// Easy
-				//sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 1:	// Normal
-				//sleep( FVariant( 0.2, 0.1 ) );
-				break;
-			}
-
-			PlayRun();
-			MoveToward( Enemy, FullSpeedScale );
-
-			bMeleeAttackFail = true;	// if not set previously, helps to avoid second TurnToward
-			goto 'BEGIN';
-		}
-	}
-
-	if ( VSize(Enemy.Velocity) < 10.0 )
-	{
-		bDidMeleeAttack = false;
-		SetTimer( 2.0, false );
-
-		if( !bMeleeAttackFail ) // if there was no previous attack
-		{
-			TurnToward( Enemy, TurnTowardThreshold( 20 * DEGREES ) );
-		}
-	}
-
-	bMeleeAttackFail = false;
-	
-DOATTACK:
-	bDidMeleeDamage = false;
-	bDidMeleeAttack = true;
-	PlayNearAttack();
-	sleep( FVariant( 0.3, 0.25 ) );
-	StopMovement();
-	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
-
-INATTACK:
-	if( DistanceTo(Enemy) > DamageRadius * 2 )	// enemy lost
-	{
-		//PostAttack();
-		bMeleeAttackFail = true;
-		StopTimer();
-		TweenAnim( 'Idle_Alert', FVariant(0.15,0.05) );
-		//StopMovement();
-		//PlayWait();
-		goto 'BEGIN';
-	}
-	Sleep( 0.1 );
-	goto 'INATTACK';
-
-ATTACKED:
-	StopTimer();
-	if ( bPendingBump )
-		CreatureBump( BumpedPawn );
-	PostAttack();
-} // state AINearAttack
+}
 
 function PlayJumpAttack()
 {
@@ -1277,7 +1325,7 @@ state AIFarAttackAnim
 		local float		distance;
 
 		distance = DistanceTo( Enemy );
-		if ( BossFightState == ABF_Giant && distance <= ( MeleeRange * 1.1 ) )
+		if ( BossFightState == ABF_Giant && distance <= ( MeleeRange * 3.5 ) )
 		{
 			// Enemy is closer, re-evaluate attack.
 			GotoState( 'AIAttack' );
@@ -1306,18 +1354,7 @@ BEGIN:
 	}
 	else
 	{
-		if (bCanCastSkullstorm)
-		{
-			skulls.FireProjectile();
-			skulls.GenerateEffects();
-			skulls.PlaySoundFiring();
-			//ClipCount -= 1;
-			ScriptedPawn(skulls.Owner).WeaponFired( skulls );
-			
-			bCanCastSkullstorm = false;
-			SkullstormTimer = default.SkullstormTimer;
-		}
-		GotoState( 'AIAttack' );
+		GotoState( ChooseAttackSpell() );
 	}
 } // state AIFarAttackAnim
 
@@ -1328,15 +1365,14 @@ BEGIN:
 state AISpecialKill
 {
 	// *** overridden functions ***
-	function StartHoundFight(){}
-	
 	function BeginState()
 	{
+		DestroyShield();
+		
 		super.BeginState();
-	
-		//if (BossFightState 
-		PlayAnim( 'specialkill_swat' );
 	}
+	
+	function StartHoundFight(){}
 
 	// *** new (state only) functions ***
 	function Obliterate()
@@ -1346,7 +1382,7 @@ state AISpecialKill
 		local actor		Blood;
 		
 		BossFightState = ABF_Giant;
-		
+
 		DVect = SK_TargetPawn.JointPlace('pelvis').pos;
 		for ( lp = 0; lp < 2; lp++ )
 			Spawn( class'Aeons.WeakGibBits',,, DVect, rotator(VRand()) );
@@ -1357,49 +1393,41 @@ state AISpecialKill
 		SK_TargetPawn.DestroyLimb( 'spine1' );
 		SK_TargetPawn.PlayAnim( 'death_gun_backhead' );
 	}
-	
-	function BeginNav()
-	{
-		if ( Shield != none )
-		{
-			Shield.Shrink();
-			Shield = none;
-		}
-	}
+
 } // state AISpecialKill
 
 defaultproperties
 {
-     HoundTimer=60
+     HoundTimer=40
      HoundBitePoint=(X=117.308,Y=90.238)
 	 NormalGroundSpeed=375
      GiantGroundSpeed=350
      MyPropInfo(0)=(Prop=Class'Aeons.AmbroseAxe',PawnAttachJointName=RTHandle,AttachJointName=axe_2)
      LongRangeDistance=1000
      bIsBoss=True
-     Aggressiveness=10
+     Aggressiveness=1
      bHasFarAttack=True
      MeleeInfo(0)=(Damage=30,Method=RipSlice)
      MeleeInfo(1)=(Damage=60,Method=RipSlice)
      MeleeInfo(2)=(Damage=60,Method=RipSlice)
      WeaponJoint=L_Wrist
-     WeaponAccuracy=10
+     WeaponAccuracy=0.95
      DamageRadius=100
      SK_PlayerOffset=(X=150)
      bHasSpecialKill=True
      HearingEffectorThreshold=0.4
      VisionEffectorThreshold=0.6
-     WalkSpeedScale=1
-     PhysicalScalar1
-     FireScalar=1
+     WalkSpeedScale=0.55
+     PhysicalScalar=0.5
+     FireScalar=0.5
      bNoBloodPool=True
      MeleeRange=90
-     AirSpeed=2000
-     AccelRate=1500
-     Alertness=10
+     AirSpeed=1000
+     AccelRate=900
+     Alertness=1
      SightRadius=9000
      BaseEyeHeight=52
-     Health=1000
+     Health=15
      Intelligence=BRAINS_Human
      SoundSet=Class'Aeons.AmbroseSoundSet'
      PI_StabSound=(Sound_1=None,Sound_2=None)
@@ -1430,14 +1458,12 @@ defaultproperties
      TransientSoundRadius=5000
      CollisionRadius=22
      CollisionHeight=57
-     Mass=1000
-	 AirControl=1.0
-	 ShieldOffset=(X=45)
-	 ShieldDispelLevel=3
-	 ShieldTimer=5
-	 bCanCastShield=True
-	 SkullstormTimer=10
-	 bCanCastSkullstorm=True
-	 AttitudeToEnemy=ATTITUDE_Ignore
-	 AttitudeToPlayer=ATTITUDE_Ignore
+     Mass=2000
+	 MomentumTransfer=1000
+     ShieldTimer=5
+     ShieldRecastTimer=6
+     ShieldHitPoints=50
+     SkullStormAnim=Attack_Spell_Start
+     ShieldAnim=defense_spell
+     PushBackAnim=Damage_Mindshatter
 }

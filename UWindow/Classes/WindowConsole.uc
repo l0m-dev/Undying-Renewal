@@ -39,7 +39,7 @@ var bool AnalogDown;	// is analog outside dead zone?
 var byte analogkey;	// which key analog is currently emulating
 var () float ShellAnalogThreshold;	// min displacement in shell
 var float EscapeDelay; // delay to keep holding escape from rapildly showing,hiding shell ( or pauing game in cutscene )
-
+var bool bInitialized;
 
 function ResetUWindow()
 {
@@ -190,8 +190,8 @@ event Tick( float Delta )
 	}
  
 
-	if ( ViewPort.Actor.Level.bLoadBootShellPSX2 && !IsInState('UWindow') )
-	{
+	if ( (ViewPort.Actor.Level.bLoadBootShellPSX2 || !bInitialized) && !IsInState('UWindow') )
+	{		
 		if ( GetPlatform() == PLATFORM_PSX2 )
 		{
 			// Check to see if boot shell is to be loaded immediately
@@ -236,9 +236,23 @@ state UWindow
 		if(Root != None)
 		{
 			Root.bUWindowActive = True;
-		
-			//fix
-			Root.SetupFonts();
+			
+			if (!bInitialized)
+			{
+				//fix
+				Root.SetupFonts(Canvas);
+				
+				if (!ViewPort.Actor.Level.bLoadBootShellPSX2)
+				{
+					if(Root != None)
+						Root.CloseActiveWindow();
+
+					if(bQuickKeyEnable)
+						CloseUWindow();
+				}
+				
+				bInitialized = True;
+			}
 		}
 
 		RenderUWindow( Canvas );

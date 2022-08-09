@@ -35,18 +35,18 @@ function Destroyed()
 }
 
 // Start sequence stuff
-function startSequence()
+simulated function startSequence()
 {
 	TotalPathLen = GetTotalPathLen(MasterPoint);		// length of the path
 	Speed = TotalPathLen/TotalTime;						// speed derived from length
 	
-	/*
+	
 	log("...........................................................................", 'Cutscenes');
 	log("...............................................TotalPathLen: "$TotalPathLen, 'Cutscenes');
 	log("...............................................Speed: "$Speed, 'Cutscenes');
 	log("...............................................New Time:"$(TotalPathLen/Speed), 'Cutscenes');
 	log("...........................................................................", 'Cutscenes');
-*/
+
 	// AeonsPlayer(Owner).bHidden = true;
 	FromLoc = Location;
 	NextPoint = ToPoint.NextPoint;
@@ -396,7 +396,7 @@ function vector GetHermitePoint(vector P1, vector T1, vector P2, vector T2, floa
 }
 
 // Camera is interpolating a sequence of points in the level.
-state PathInterpolation
+simulated state PathInterpolation
 {
 	simulated function Tick(float DeltaTime)
 	{
@@ -680,7 +680,7 @@ state PathInterpolation
 
 		if (MasterPoint.bHoldPlayer)
 			PlayerPawn(Owner).Freeze();
-
+	
 		if ( MasterPoint.bLetterBoxed )
 			MasterPoint.SetLetterBox(PlayerPawn(Owner));
 
@@ -717,7 +717,7 @@ function NextTake();
 function PrevTake();
 
 // Play a preanimated sequence
-state PlayCannedAnim
+simulated state PlayCannedAnim
 {
 	function SetTake(int t)
 	{
@@ -744,9 +744,12 @@ state PlayCannedAnim
 		AeonsPlayer(Owner).MasterCamPoint = MasterPoint;
 		MasterPoint.StartCutscene();
 		// LetterBox
-		if ( MasterPoint.bLetterBoxed )
+		if ( MasterPoint.bLetterBoxed ) {
 			MasterPoint.SetLetterBox(PlayerPawn(Owner));
-
+			log("LB", 'Misc');
+		} else
+			log("NO LB", 'Misc');
+		
 		for ( i=0;i<MasterPoint.NumTakes;i++ )
 		{
 			
@@ -827,4 +830,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.camera_m'
      bCollideActors=False
      bCollideWorld=False
+	 RemoteRole=ROLE_None
 }

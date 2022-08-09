@@ -410,6 +410,8 @@ function Created()
 
 function Message(UWindowWindow B, byte E)
 {
+	local string Checksum;
+	
 	switch (E)
 	{
 		case DE_DoubleClick:
@@ -430,6 +432,13 @@ function Message(UWindowWindow B, byte E)
 					else
 						URL = URL $ "?Game=Aeons.DeathMatchGame";
 					
+					class'StatLog'.Static.GetPlayerChecksum(GetPlayerOwner(), Checksum);
+					
+					if (Checksum == "")
+						URL = URL $ "?Checksum=NoChecksum";
+					else
+						URL = URL $ "?Checksum="$Checksum;
+					
 					if(bDedicated)
 						GetPlayerOwner().ConsoleCommand("RELAUNCH " $ URL $ "-server");
 					else {
@@ -437,7 +446,7 @@ function Message(UWindowWindow B, byte E)
 						//GetPlayerOwner().ConsoleCommand("addall"); // needs a delay...
 	
 						GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
-
+						
 						//GetPlayerOwner().Level.bLoadBootShellPSX2 = true;
 					}
 

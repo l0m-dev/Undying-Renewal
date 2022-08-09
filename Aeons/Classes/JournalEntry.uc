@@ -80,6 +80,8 @@ function PostBeginPlay()
 		Text = Text $ Lines[i];	
 		Lines[i] = "";
 	}
+	
+	FontColor = ParseColor(Localize( "FontColors",  "JournalColor", "Renewal"));
 }
 
 static function string GetWord(string SearchString)
@@ -139,7 +141,7 @@ function Repaginate( string Source, byte TopMargin, byte LeftMargin, int Width, 
 	//Log("repaginate: charoffsets[currentpage+1]=" $ charoffsets[currentpage+1]);
 }
 
-function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly, optional bool english )
+function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly, optional bool colored, optional Font EnglishFont )
 {
 	local int y;
 	local float sizex, sizey;
@@ -163,7 +165,7 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 
 		if ((Len(Line) > 0)&&(!FormatOnly)) 
 		{
-			class'JournalEntry'.static.EatLeadingWhitespace(Line);
+			EatLeadingWhitespace(Line);
 
 			token = InStr(Line, "&");
 			
@@ -171,14 +173,14 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 			
 			if ( token >= 0 )
 			{
-				if (english)
+				if (!colored)
 					Tex.DrawText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont );
 				else
 					Tex.DrawColoredText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont, FontColor );
 			}
 			else
 			{
-				if (english)
+				if (!colored)
 					Tex.DrawText( LeftMargin, y-sizey, Line, SourceFont );
 				else
 					Tex.DrawColoredText( LeftMargin, y-sizey, Line, SourceFont, FontColor );
@@ -197,6 +199,7 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 		}
 
 		Tex.TextSize( Line, sizex, sizey, SourceFont );	
+		//Tex.TextSize( Line, sizex, sizey, EnglishFont );	
 		y += sizey;
 
 		if ( Left(Line, 2) == "&i" )

@@ -45,7 +45,15 @@ var() name PlayerTeleportTag;
 
 // ============================================================================
 
-function PreBeginPlay()
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		bAnimatedCamera, NumTakes, CutSceneLength, AnimName, CamLocations, CamDirs, CamTimes, CamFOVs, CamEvents, StartLocation, StartDirection, WaitTimer, EndEvent,
+		PlayerTeleportTag, RotMethod,
+		bAutoClearAnims, bHidePlayer, bHoldPlayer, bLetterboxed, LetterBoxTimer, LetterBoxAspect, bFromPlayerEyes, bTeleportPlayer, bEscapable;
+}
+
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	if ( StartLocation != vect(0,0,0) )
@@ -55,7 +63,7 @@ function PreBeginPlay()
 		SetRotation(Rotator(StartDirection));
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	//log("Level.TimeSeconds = "$Level.TimeSeconds, 'Misc');
 	//log("Dt = "$DeltaTime, 'Misc');
@@ -63,12 +71,12 @@ function Tick(float DeltaTime)
 	TakeTime += DeltaTime;
 }
 
-function name GetAnimName(int i)
+simulated function name GetAnimName(int i)
 {
 	return AnimName[i];
 }
 
-function int GetCamFOVs(int i)
+simulated function int GetCamFOVs(int i)
 {
 	local Actor A;
 
@@ -94,12 +102,12 @@ function int GetCamFOVs(int i)
 	return CamFOVs[i];
 }
 
-function float GetWaitTimer(int i)
+simulated function float GetWaitTimer(int i)
 {
 	return WaitTimer[i];
 }
 
-function vector GetCamLoc(int i)
+simulated function vector GetCamLoc(int i)
 {
 	if (i < 64)
 		return CamLocations[i];
@@ -107,30 +115,31 @@ function vector GetCamLoc(int i)
 		return vect(0,0,0);
 }
 
-function float GetCamTime(int i)
+simulated function float GetCamTime(int i)
 {
 	return CamTimes[i];
 }
 
-function rotator GetCamRot(int i)
+simulated function rotator GetCamRot(int i)
 {
 	return Rotator(CamDirs[i]);
 }
 
-function SetLetterBox(PlayerPawn Player)
+simulated function SetLetterBox(PlayerPawn Player)
 {
+	log("SetLetterBox", 'Misc');
 	Player.LetterboxAspect(FClamp(LetterBoxAspect, 0.2, 10.0));
 	Player.LetterboxRate(LetterBoxTimer);
 	Player.Letterbox(true);
 }
 
-function StartCutscene()
+simulated function StartCutscene()
 {
 	TotalTime = 0;
 	TakeTime = 0;
 }
 
-function CompleteCutscene(PlayerPawn Player)
+simulated function CompleteCutscene(PlayerPawn Player)
 {
 	local Actor A;
 
@@ -151,7 +160,7 @@ function CompleteCutscene(PlayerPawn Player)
 
 	if ( URL != "" )
 	{
-		// log("URL is "$URL$" PlayerPawn(Owner) is "$PlayerPawn(Owner), 'Cutscenes');
+		log("URL is "$URL$" PlayerPawn(Owner) is "$PlayerPawn(Owner), 'Cutscenes');
 		
 		Teleport(PlayerPawn(Owner));
 	}

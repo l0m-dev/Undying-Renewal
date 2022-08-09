@@ -365,8 +365,8 @@ var(Sound) bool			bSoundPositional;	// whether or not the sounds appears to be c
 var(Sound) bool			bSoundLocked;		// This sound will not be overriden, when true, glxStartSample will use GLX_LOCKED
 var(Sound) byte         SoundRadius;		// OuterRadius of ambient sound.  If InnerRadius specified, Falloff will be linear from Radius to RadiusInner
 var(Sound) byte			SoundRadiusInner;	// InnerRadius of ambient sound.  Full Volume
-var(Sound) byte         SoundVolume;		// Volume of amient sound.
-var(Sound) byte         SoundPitch;			// Sound pitch shift, 64.0=none.
+var(Sound) savable byte         SoundVolume;		// Volume of amient sound.
+var(Sound) savable byte         SoundPitch;			// Sound pitch shift, 64.0=none.
 var(Sound) int			SoundFlags;			// Used to hold specialized flag values that will get detected internally
 
 // Regular sounds.
@@ -743,7 +743,8 @@ replication
 		Location;
 	unreliable if( !bCarriedItem && (DrawType==DT_Mesh || DrawType==DT_Brush || DrawType==DT_Particles) && (bNetInitial || bSimulatedPawn || RemoteRole<ROLE_SimulatedProxy) && Role==ROLE_Authority )
 		Rotation;
-	unreliable if( RemoteRole==ROLE_SimulatedProxy )
+	
+	unreliable if( RemoteRole==ROLE_SimulatedProxy)
 		Base, BaseJoint, BasePlace;
 
 	// Velocity.
@@ -760,6 +761,14 @@ replication
 	unreliable if( DrawType==DT_Mesh && ((RemoteRole<=ROLE_SimulatedProxy && (!bNetOwner || !bClientAnim)) || bDemoRecording) )
 		AnimSequence;
 
+	//reliable if( Role<ROLE_Authority )
+	//	PlayAnim, LoopAnim;
+	
+	//unreliable if( DrawType==DT_Mesh && (RemoteRole<=ROLE_SimulatedProxy && (!bNetOwner || !bClientAnim)) )
+	//	AnimSequence;
+	
+	
+	
 	// Rendering.
 	unreliable if( Role==ROLE_Authority )
 		bHidden, bOnlyOwnerSee;
@@ -845,10 +854,80 @@ native(259) final function bool PlayAnim( name Sequence, optional float Rate, op
 native(274) exec final function int PlayAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags );
 native(260) exec final function bool LoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
 native(294) exec final function bool TweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys );
+
 final function ClearAnims()
 {
 	PlayAnim('');
 }
+
+final function bool PlayAnimO( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget )
+{
+	//log("Playing Anim: "$Sequence, 'Misc');
+	//ReplicateAnim(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	return PlayAnimO(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	
+	//return true;
+}
+
+final function int PlayAnimSoundO( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags )
+{
+	PlayAnimSoundO(Sequence, Voice, Amplitude, Slot, Volume, bNoOverride, Radius, Pitch, Flags);
+	ReplicateAnimSound(Sequence, Voice, Amplitude, Slot, Volume, bNoOverride, Radius, Pitch, Flags);
+	
+	return LastSoundID; // not correct
+}
+
+exec function bool LoopAnimO( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget )
+{
+	//log("Rate: "$Rate, 'Misc');
+	//ReplicateLoopAnim(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	return LoopAnimO(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	//return true;
+}
+
+final function bool TweenAnimO( name Sequence, optional float Time, optional bool bCheckNotifys )
+{
+	TweenAnimO(Sequence, Time, bCheckNotifys);
+	ReplicateTweenAnim(Sequence, Time, bCheckNotifys);
+	
+	return true;
+}
+
+
+
+
+
+simulated event ReplicateAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget )
+{
+	if (AnimSequence != Sequence) {
+		PlayAnimO(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	}
+}
+
+simulated event ReplicateAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags )
+{
+	if (AnimSequence != Sequence) {
+		PlayAnimSoundO(Sequence, Voice, Amplitude, Slot, Volume, bNoOverride, Radius, Pitch, Flags);
+	}
+}
+
+simulated event ReplicateLoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget )
+{
+	if (AnimSequence != Sequence) {
+		LoopAnimO(Sequence, Rate, move, combine, TweenTime, JointName, AboveJoint, OverrideTarget);
+	}
+}
+
+simulated event ReplicateTweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys )
+{
+	if (AnimSequence != Sequence) {
+		TweenAnimO(Sequence, Time, bCheckNotifys);
+	}
+}
+
+
+
+
 native(282) final function bool IsAnimating();
 native(292) final function bool IsAnimResting();
 native(293) final function name GetAnimGroup( name Sequence );
@@ -1595,6 +1674,45 @@ simulated function LogTimeActor( string message )
 simulated function LogTimeActorState( string message )
 {
 	Log( "(" $ Level.Hour $ ":" $ Level.Minute $ ":" $ Level.Second $ "." $ Level.MilliSecond $ ")" @	class.name $ ": State=" $ GetStateName() $ ": " $ message );
+}
+
+function Color ParseColor(string S)
+{
+	local Color C;
+
+	if(Left(S, 1) == "#")
+		S = Mid(S, 1);
+
+	C.R = 16 * GetHexDigit(Mid(S, 0, 1)) + GetHexDigit(Mid(S, 1, 1));
+	C.G = 16 * GetHexDigit(Mid(S, 2, 1)) + GetHexDigit(Mid(S, 3, 1));
+	C.B = 16 * GetHexDigit(Mid(S, 4, 1)) + GetHexDigit(Mid(S, 5, 1));
+
+	return C;
+}
+
+function int GetHexDigit(string D)
+{
+	switch(caps(D))
+	{
+	case "0": return 0;
+	case "1": return 1;
+	case "2": return 2;
+	case "3": return 3;
+	case "4": return 4;
+	case "5": return 5; 
+	case "6": return 6; 
+	case "7": return 7; 
+	case "8": return 8; 
+	case "9": return 9; 
+	case "A": return 10; 
+	case "B": return 11; 
+	case "C": return 12; 
+	case "D": return 13; 
+	case "E": return 14; 
+	case "F": return 15; 
+	}
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@ function PreBeginPlay()
 function PassThru(Actor Other)
 {
 	local Actor A;
-
+	
 	if ( !bPassThru || !bInitiallyActive)
 		return;
 
@@ -34,7 +34,7 @@ function PassThru(Actor Other)
 	}
 }
 
-function Touch( actor Other )
+simulated function Touch( actor Other )
 {
 	local Actor A;
 

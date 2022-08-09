@@ -654,11 +654,11 @@ function Paint(Canvas C, float X, float Y)
 	//log("BookWindow: Paint");
 
 	Super.Paint(C, X, Y);
-	
-	if ( (book.CurrentJournalIndex >= 0) && (Book.FirstJournalId >= 0) && (Book.FirstJournalId-book.CurrentJournalIndex<=(MAX_VISIBLE_BOOKS-1)) ) 
-	{
-		JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
 
+	JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
+	
+	if ( (book.CurrentJournalIndex >= 0) && (Book.FirstJournalId >= 0) && (JournalDelta >= 0 && JournalDelta<=(MAX_VISIBLE_BOOKS-1)) ) 
+	{
 		SwirlX = JournalButtons[ JournalDelta ].WinLeft-10*RootScaleX;
 		SwirlY = JournalButtons[ JournalDelta ].WinTop-10*RootScaleY;
 

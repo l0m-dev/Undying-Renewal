@@ -285,7 +285,8 @@ simulated function Touch( actor Other )
 				if ( EntrySound != none )
 					Player.PlaySound(EntrySound);
 				
-				Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
+				//Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
+				Level.ServerTravel( NewURL, true );
 			}
 		}
 		else

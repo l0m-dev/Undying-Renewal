@@ -297,6 +297,12 @@ replication
 	reliable if( Role==ROLE_Authority && !bDemoRecording )
 		ClientTravel;
 	reliable if( Role==ROLE_Authority )
+		LetterBox, LetterboxAspect, LetterBoxRate;
+	
+	reliable if( Role==ROLE_Authority )
+		TriggerLevelBegin;
+	
+	reliable if( Role==ROLE_Authority )
 		ClientReliablePlaySound, ClientReplicateSkins, ClientAdjustGlow, ClientChangeTeam, ClientSetMusic, StartZoom, ToggleZoom, StopZoom, EndZoom, SetDesiredFOV, ClearProgressMessages, SetProgressColor, SetProgressMessage, SetProgressTime, ClientWeaponEvent;//, ClientPlayAnim;
 	unreliable if( Role==ROLE_Authority )
 		SetFOVAngle, ClientShake, ClientFlash, ClientInstantFlash;//, bRenderSelf//fix bRenderSelf should just be coded in a special game type for CutScenes or in a subclassed player
@@ -1949,21 +1955,21 @@ exec function ChangeCrosshair()
 }
 
 // Letterbox control
-exec function Letterbox( bool B )
+exec simulated function Letterbox( bool B )
 {
 	if ( myHUD != none )
 		myHUD.SetLetterbox( B );
 }
 
 // Letterbox aspect ratio control
-exec function LetterboxAspect( float aspect )
+exec simulated function LetterboxAspect( float aspect )
 {
 	if ( myHUD != none )
 		myHUD.SetLetterboxAspectRatio( aspect );
 }
 
 // Letterbox fade rate control
-exec function LetterboxRate( float rate )
+exec simulated function LetterboxRate( float rate )
 {
 	if ( myHUD != none )
 		myHUD.SetLetterboxFadeRate( rate );
@@ -2880,7 +2886,15 @@ exec function Bring( name ClassName, optional int SpawnCount )
 	if( !bAdmin && (Level.Netmode != NM_Standalone) )
 		return;
 	log( "Fabricate " $ ClassName );
-	NewClass = class<actor>( DynamicLoadObject( "Aeons."$string(ClassName), class'Class' ) );
+	
+	NewClass = class<actor>( DynamicLoadObject( string(ClassName), class'Class' ) );
+	
+	// if it class didn't load, try forcing the aeons. prefix
+	if ( (NewClass == None) && (InStr(ClassName, "Aeons.") < 0) )
+	{		
+		NewClass = class<actor>( DynamicLoadObject( "Aeons." $ string(ClassName), class'Class' ) );
+	}
+	
 	if( NewClass!=None )
 		if (SpawnCount > 0)
 		{
@@ -3311,6 +3325,11 @@ event PreBeginPlay()
 	Super.PreBeginPlay();
 }
 
+event PostNetBeginPlay()
+{
+	//if (Role == ROLE_Authority)
+	//	TriggerLevelBegin();
+}
 event PostBeginPlay()
 {
 	local Actor A;
@@ -3324,17 +3343,8 @@ event PostBeginPlay()
 	}
 
 	// Trigger any LevelBegin actors
-	ForEach AllActors(class 'Actor', A, 'LevelBegin')
-	{
-		if ( A.IsA('Trigger') )
-		{
-			if ( Trigger(A).bPassThru )
-			{
-				Trigger(A).PassThru(self);
-			}
-		}
-		A.Trigger(none, self);
-	}
+	//if (Role == ROLE_Authority)
+		TriggerLevelBegin();
 
 	// Set skin. Moved here from Pawn.
 	if ( bIsMultiSkinned )
@@ -3366,6 +3376,23 @@ event PostBeginPlay()
 	// set up the actuator (PSX2)
 	InitAct (0, 0);
 
+}
+
+simulated function TriggerLevelBegin()
+{
+	local Actor A;
+	
+	ForEach AllActors(class 'Actor', A, 'LevelBegin')
+	{
+		if ( A.IsA('Trigger') )
+		{
+			if ( Trigger(A).bPassThru )
+			{
+				Trigger(A).PassThru(self);
+			}
+		}
+		A.Trigger(none, self);
+	}
 }
 
 function StartLevel()

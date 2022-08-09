@@ -16,6 +16,8 @@ var sound ScryeHintSounds[5];
 var() bool bDisableAfterPlayerScrye;
 var() float Vol1, Vol2, Vol3;
 
+var localized string ScryeHintMessage;
+
 //=============================================================================
 
 function PassThru(Actor Other)
@@ -62,8 +64,8 @@ function Touch( actor Other )
 	{
 		if ( Other.IsA('AeonsPlayer') )
 		{
-			if ( AeonsPlayer(Other).bShowScryeHint )
-				AeonsPlayer(Other).ScreenMessage("Use Scrye to reveal the past when you hear whispering", 5.0);
+			//if ( AeonsPlayer(Other).bShowScryeHint && AeonsPlayer(Other).Player.Console.bEnglish )
+			AeonsPlayer(Other).ScreenMessage(ScryeHintMessage, 5.0);
 			
 			if ( AeonsPlayer(Other).ScryeMod.bActive )
 				AeonsPlayer(Other).bShowScryeHint = false;
@@ -126,4 +128,5 @@ defaultproperties
      Vol3=1
      Texture=Texture'Aeons.System.TrigScryeHint'
      DrawScale=0.5
+	 ScryeHintMessage="Use Scrye to reveal the past when you hear whispering"
 }

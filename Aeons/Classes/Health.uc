@@ -15,6 +15,7 @@ var bool bHealthVial;
 var bool bHealingRoot;
 var vector InitialLocation;
 var ParticleFX pfx;
+var localized string MaxHealthMessage;
 
 function BecomeHealthVial()
 {
@@ -105,7 +106,7 @@ auto state Pickup
 				    (Level.Game.Difficulty == 2 && HealthPacks < 5)) {
 					bContinue = true;
 				} else {
-					Pawn(Other).ClientMessage("You cannot carry any more Health", 'Pickup');
+					Pawn(Other).ClientMessage(MaxHealthMessage, 'Pickup');
 				}
 					
 				//Other.ConsoleCommand("say " $ HealthPacks);
@@ -216,6 +217,7 @@ defaultproperties
      bDisplayableInv=True
      bAmbientGlow=False
      PickupMessage="You gained a Health Pack"
+	 MaxHealthMessage="You cannot carry any more Health"
      ItemName="Health"
      PickupViewMesh=SkelMesh'Aeons.Meshes.health_m'
      PickupSound=Sound'Aeons.Inventory.I_HealthPU01'

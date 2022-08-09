@@ -217,6 +217,9 @@ state Idle
 {
 	simulated function Tick(float DeltaTime)
 	{
+		if (Owner == None)
+			return;
+		
 		if (bZoomedIn && (AeonsPlayer(Owner).Weapon == self))
 			AeonsPlayer(Owner).DesiredFOV = AeonsPlayer(Owner).ZoomFOV;
 
@@ -270,6 +273,8 @@ state Idle
 
 function Tick(float DeltaTime)
 {
+	if (Owner == None)
+		return;
 	ChargeLen += DeltaTime;
 
 	if ( ChargeLen >ChargeTimer )

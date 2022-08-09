@@ -149,15 +149,9 @@ function Resized()
 
 //----------------------------------------------------------------------------
 
-// used for Multiplayer - Player Model viewing
 function AnimEnd(MeshActor MyMesh)
 {
-/* should be subclassed in PlayerSetup window
-	if ( MyMesh.AnimSequence == 'Breath3' )
-		MyMesh.TweenAnim('All', 0.4);
-	else
-		MyMesh.PlayAnim('Breath3', 0.4);
-*/
+
 }
 
 //----------------------------------------------------------------------------

@@ -5,12 +5,12 @@ class GhelziabahrRing expands Effects;
 
 //#exec MESH IMPORT MESH=GhelziabahrRing_m SKELFILE=GhelziabahrRing.ngf
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	DrawScale += 32 * DeltaTime;
 	
@@ -21,6 +21,7 @@ function Tick(float DeltaTime)
 defaultproperties
 {
 	 RemoteRole=ROLE_SimulatedProxy
+	 bNetInitial=True
      DrawType=DT_Mesh
      Style=STY_Translucent
      Mesh=SkelMesh'Aeons.Meshes.GhelziabahrRing_m'

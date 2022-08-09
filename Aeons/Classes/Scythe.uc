@@ -539,7 +539,7 @@ function MeleeAttack(float Range)
 
 							bSpawnWounds = TotalDamage > 5.0;							
 
-							if ( TotalDamage >= SP.Health && SP.bHackable )
+							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss )
 							{
 								// we now know that the creature is going to die
 								HackLimb(SP, DInfo.JointName, SlashDir);
@@ -601,7 +601,7 @@ function MeleeAttack(float Range)
 							
 							bSpawnWounds = TotalDamage > 5.0;
 
-							if ( TotalDamage >= SP.Health && SP.bHackable)
+							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss)
 							{
 								// we now know that the creature is going to die
 								HackLimb(SP, DInfo.JointName, SlashDir);
@@ -640,7 +640,7 @@ function MeleeAttack(float Range)
 					}
 				}
 
-				if (bSpawnWounds && ScriptedPawn(Other).bHackable)
+				if (bSpawnWounds && ScriptedPawn(Other).bHackable && !ScriptedPawn(Other).bIsBoss)
 				{
 					if (BloodDrip == none)
 					{
