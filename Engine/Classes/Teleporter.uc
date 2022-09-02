@@ -74,6 +74,9 @@ function PostBeginPlay()
 	if ( !bEnabled )
 		FindTriggerActor();
 	Super.PostBeginPlay();
+	
+	if (TransitionScreenName[0] == "UndyingShellPC.Main_Back_0")
+		bUseTransitionScreen = false;
 }
 
 function FindTriggerActor()
@@ -285,8 +288,7 @@ simulated function Touch( actor Other )
 				if ( EntrySound != none )
 					Player.PlaySound(EntrySound);
 				
-				//Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
-				Level.ServerTravel( NewURL, true );
+				Level.Game.SendPlayer(PlayerPawn(Other), NewURL);
 			}
 		}
 		else
@@ -368,7 +370,7 @@ defaultproperties
 {
      bChangesYaw=True
      bEnabled=True
-     bUseTransitionScreen=True
+     bUseTransitionScreen=False
      TransitionScreenName(0)="UndyingShellPC.Main_Back_0"
      TransitionScreenName(1)="UndyingShellPC.Main_Back_1"
      TransitionScreenName(2)="UndyingShellPC.Main_Back_2"

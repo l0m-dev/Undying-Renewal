@@ -2504,13 +2504,13 @@ simulated function DrawDefensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 				Canvas.DrawColor.B = 100;
 			}
 
-			Canvas.Style = 5;
+			Canvas.Style = 3;
 
 			for (i=0; i<6; i++)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9*ScaleX), Y);
+					Canvas.SetPos(X + (i*9) * Scale, Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);
@@ -2560,7 +2560,7 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9*ScaleX), Y);
+					Canvas.SetPos(X + (i*9) * Scale, Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);

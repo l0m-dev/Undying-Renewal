@@ -1,7 +1,7 @@
 //=============================================================================
 // CameraNavigation.
 //=============================================================================
-class CameraNavigation expands Invisible
+class CameraNavigation expands Actor
 	abstract;
 
 //#exec TEXTURE IMPORT NAME=CamNav FILE=Textures\CamNav.pcx GROUP=System Mips=On Flags=2
@@ -34,17 +34,7 @@ var() string URL_PSX2;
 
 var CameraNavigation NextPoint, PrevPoint;
 
-replication
-{
-	reliable if (Role == ROLE_Authority)
-		URL, URL_PSX2, bHold, HoldLen, SpeedModifier, bCutToNextPoint, bEndCutscene, bActive, FOV_Target,
-		Event1, Event2, Event1Time, Event2Time, LookAt, LookWeight, LookAtOffset;
-		
-	//reliable if (Role < ROLE_Authority)
-	//	Teleport;
-}
-
-simulated function GetNextPoint(optional bool AutoGen)
+function GetNextPoint(optional bool AutoGen)
 {
 	local CameraNavigation A, Points[8], NewPoint;
 	local int NumPoints;
@@ -86,7 +76,7 @@ simulated function GetNextPoint(optional bool AutoGen)
 	}
 }
 
-simulated function GetPrevPoint(optional bool AutoGen)
+function GetPrevPoint(optional bool AutoGen)
 {
 	local CameraNavigation A, Points[8], NewPoint;
 	local int NumPoints;
@@ -147,9 +137,8 @@ function Teleport(PlayerPawn Player)
 	if( (InStr( NewURL, "/" ) >= 0) || (InStr( NewURL, "#" ) >= 0) )
 	{
 		// Teleport to a level on the net.
-		//if( (Role == ROLE_Authority) && (Player != None) )
-			//Level.Game.SendPlayer(Player, NewURL);
-			Level.ServerTravel( NewURL, true );
+		if( (Role == ROLE_Authority) && (Player != None) )
+			Level.Game.SendPlayer(Player, NewURL);
 	}
 }
 

@@ -360,7 +360,7 @@ simulated function RenderOverlays( canvas Canvas )
 
 defaultproperties
 {
-     SpawnHoundLimit=100
+     SpawnHoundLimit=2000
      GlowTexture=WetTexture'FX.Gglow_wet'
      GlowFlashX=0.35
      GlowFlashY=0.677
