@@ -381,7 +381,7 @@ state NewClip
 
 		if (AmmoType.AmmoAmount > 0)
 		{
-			PlayAnim('ReloadStart', RefireMult);
+			PlayAnim('ReloadStart', RefireMult / AeonsPlayer(Owner).refireMultiplier);
 			FinishAnim();
 		}
 
@@ -398,15 +398,18 @@ state NewClip
 			else
 				sndID = PlaySound(LoadShellSound);
 
-			sleep(0.5 * (1/RefireMult));
-			//FinishSound(sndID);
+			sleep(0.5 * (1/RefireMult * AeonsPlayer(Owner).refireMultiplier));
+			FinishSound(sndID);
 			ClipCount++;
+			
+			if (AeonsPlayer(Owner).refireMultiplier < 0.6)
+				ClipCount++;
 		}
 		
 		if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) && !PlayerPawn(Owner).bNeverAutoSwitch) 
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 		else {
-			PlayAnim('ReloadEnd', RefireMult);
+			PlayAnim('ReloadEnd', RefireMult / AeonsPlayer(Owner).refireMultiplier);
 			FinishAnim();
 		}
 		Finish();

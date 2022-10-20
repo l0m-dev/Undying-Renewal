@@ -2070,9 +2070,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 
 
 // Draws the held list of inventory items
+// Draws the held list of inventory items
 simulated function DrawHeldItems(Canvas Canvas)
 {
-	// crash
 	local inventory Inv, tempInv;
 	local int cnt, i, nextGroup, PrevGroup, nextIdx, PrevIdx, SelectedGroup;
 	local string InvName;
@@ -2088,31 +2088,29 @@ simulated function DrawHeldItems(Canvas Canvas)
 		if ( PlayerPawn(Owner).selectedItem == none )
 			PlayerPawn(Owner).Inventory.SelectNext();
 
-		
 		// must change window if on PSX2
-		if ( GetPlatform() != PLATFORM_PSX2 )
+		if ( GetPlatform() == PLATFORM_PSX2 )
 		{
+			// draw window texture all at once
 			Canvas.Style = 2;
 			Canvas.DrawColor = Canvas.Default.DrawColor;
-			Canvas.SetPos( -1, 86*Scale );
-			Canvas.DrawTileClipped( texture'InvWindow', 356*Scale/2, (256+16)*Scale/1.8, 0, 0, 128, 128);
+			Canvas.SetPos( 0, 64*Scale );
+			Canvas.DrawTileClipped( texture'InvWindow', 356*Scale, (256+16)*Scale, 0, 0, 128, 128);
 		}
 		else
 		{
 			// draw shadow behind inventory holder
-			/*
 			Canvas.Style = 4;
 			Canvas.DrawColor = Canvas.Default.DrawColor;
 			Canvas.SetPos( 0, (64+32)*Scale );
 			Canvas.DrawTileClipped( texture'HUD_Inv_Shad_Test', 178*Scale, (128+3)*Scale, 0, 0, 64, 64);
-			*/ // crash
-			
+
 			// draw top
 			Canvas.Style = 2;
-			//Canvas.DrawColor = Canvas.Default.DrawColor; //crash
+			Canvas.DrawColor = Canvas.Default.DrawColor;
 			Canvas.SetPos( 0, 64*Scale );
 			Canvas.DrawIcon(texture'Inv_Bar_Top', Scale);
-			
+
 			// draw right side
 			Canvas.SetPos( 149*Scale, (64+11)*Scale);
 			Canvas.DrawTileClipped( texture'Inv_Bar_Right', 64*Scale, 128*Scale, 0, 0, 64, 128);
@@ -2121,7 +2119,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			Canvas.SetPos( 0, (64+64+64)*Scale);
 			Canvas.DrawIcon(texture'Inv_Bar_Bottom', Scale);
 		}
-
+	
 		for (i=0; i<7; i++)
 			LuckySevenItems[i] = none;
 
@@ -2220,7 +2218,6 @@ simulated function DrawHeldItems(Canvas Canvas)
 			}
 			Canvas.DrawText( (""$InvName), false);
 		}
-		//Canvas.DrawText("Health: "$(Pickup(PlayerPawn(Owner).selectedItem).numCopies + 1), false);
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;				

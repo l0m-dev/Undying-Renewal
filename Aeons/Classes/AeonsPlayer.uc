@@ -7831,7 +7831,7 @@ defaultproperties
      bCanStrafe=True
      bIsHuman=True
      MeleeRange=50
-     GroundSpeed=350
+     GroundSpeed=400
      AirSpeed=256
      AccelRate=2048
      JumpZ=350

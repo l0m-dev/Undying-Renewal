@@ -24,7 +24,7 @@ function FellOutOfWorld()
 	super.FellOutOfWorld();
 }
 
-function FellOutOfEncroachedBy( actor Other )
+function EncroachedBy( actor Other )
 {
 	LogStack();
 	super.EncroachedBy( Other );
@@ -149,7 +149,7 @@ state NormalFire
 	
 	Begin:
 		// log("Play Fire Animation");
-		PlayAnim('Fire');
+		PlayAnim('Fire', 1 / AeonsPlayer(Owner).refireMultiplier);
 		FinishAnim();
 		chargeCount=0;
 		bCanClientFire=true;

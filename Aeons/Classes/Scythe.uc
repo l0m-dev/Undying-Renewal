@@ -22,7 +22,13 @@ var() sound BerserkONSound;
 var() sound BerserkOFFSound;
 var() sound WindUpSound;
 var() sound AbsorbHealthSound;
+var() sound MadSound;
+var() sound ThirstSound;
 var int SndID;
+
+var bool bMad;
+var bool bThirsty;
+var bool bThirstyFiring;
 
 //=============================================================================
 function PreBeginPlay()
@@ -38,6 +44,9 @@ function PostBeginPlay()
 
 function Berserk()
 {
+	if (bBerserk && bThirsty)
+		return;
+	
 	bBerserk = !bBerserk;
 	
 	if ( bBerserk )
@@ -247,7 +256,8 @@ function FireWeapon()
 	if ( Owner.bHidden )
 		CheckVisibility();
 
-	gotoState('NormalFire');
+	if (!bThirsty)
+		gotoState('NormalFire');
 
 	MeleeAttack(128);
 	
@@ -265,7 +275,8 @@ function FireWeapon()
 //----------------------------------------------------------------------------
 function Fire( float Value )
 {
-	GotoState('');
+	if (!bThirsty)
+		GotoState('');
 	Super.Fire(Accuracy);
 }
 
@@ -457,6 +468,14 @@ function MeleeAttack(float Range)
 						break;
 				}
 
+				if (ScriptedPawn(Other).bIsBoss)
+				{
+					if (bThirsty)
+					{
+						GotoState('NormalFire');
+					}
+				}
+
 				if ( false /*bHeadShot*/ )
 				{
 					MyView = Vector(PlayerPawn(Owner).ViewRotation);
@@ -498,17 +517,7 @@ function MeleeAttack(float Range)
 					if ( (MyView dot YourView) < 0 )
 					{
 						// hit in front
-						if (Other.Health > Damage) 
-						{
-							// Pawn is not going to die as a result of this strike, player gets no health back
-							healthTaken = 0;
-						} 
-						else 
-						{
-							// Pawn is going to die as a result of this strike, player gets half the health the pawn has left
-							healthTaken = 0.5 * Other.Health;
-						}
-						
+						healthTaken = 0;	
 
 						// This is the limb hacking stuff
 						if ( Other.IsA('ScriptedPawn') )
@@ -542,6 +551,7 @@ function MeleeAttack(float Range)
 							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss )
 							{
 								// we now know that the creature is going to die
+								healthTaken = 0.5 * Other.Health;
 								HackLimb(SP, DInfo.JointName, SlashDir);
 							}
 						}
@@ -564,13 +574,7 @@ function MeleeAttack(float Range)
 					else 
 					{
 						// hit from behind
-						if (Other.Health > (Damage * 2.5)) {
-							// Pawn is not going to die as a result of this strike, player gets no health back
-							healthTaken = 0;
-						} else {
-							// Pawn is going to die as a result of this strike, player gets half the health the pawn has left
-							healthTaken = Other.Health * 0.5;
-						}
+						healthTaken = 0;
 
 						// This is the limb hacking stuff
 						if ( Other.IsA('ScriptedPawn') )
@@ -604,6 +608,7 @@ function MeleeAttack(float Range)
 							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss)
 							{
 								// we now know that the creature is going to die
+								healthTaken = Other.Health * 0.5;
 								HackLimb(SP, DInfo.JointName, SlashDir);
 							}
 						}
@@ -762,8 +767,17 @@ state Idle
 	simulated function Tick(float DeltaTime)
 	{
 		if ( PlayerPawn(Owner).Mana <= 1 )
-			Pawn(Owner).SwitchToBestWeapon();
-		
+		{
+			if (!bMad)
+			{
+				GotoState('BloodThirst');
+			}
+			else
+			{
+				Pawn(Owner).SwitchToBestWeapon();
+				bMad = false;
+			}
+		}
 		// Blood dripping from the blade
 		if (BloodDrip != none)
 		{
@@ -805,12 +819,15 @@ state Idle
 
 state AbsorbHealth
 {
-	ignores Fire, PutDown;
+	ignores Fire, PutDown, Berserk;
 	
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
 		SndID = PlaySound(AbsorbHealthSound);
+		
+		if (bBerserk)
+			Global.Berserk();
 	}
 
 	function EndState()
@@ -871,6 +888,162 @@ state AbsorbHealth
 		SetTimer(0.2, true);
 }
 
+state Mad
+{
+	ignores Fire, PutDown;
+	
+	function BeginState()
+	{
+		bMad = true;
+		PlayerPawn(Owner).bReloading = true;
+		SndID = PlaySound(MadSound);
+	}
+
+	function EndState()
+	{
+		PlayerPawn(Owner).bReloading = false;
+		StopSound(SndID);
+	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		
+	}
+	
+	function Timer()
+	{
+		local DamageInfo DInfo;
+		local vector hitloc;
+		
+		//PlayAnim('Awake');
+		if ( PlayerPawn(Owner) != None )
+		{
+			PlayerPawn(Owner).ShakeView(ShakeTime * 4, ShakeMag * 4, ShakeVert * 4);
+			
+			DInfo = getDamageInfo('Scythe');
+			DInfo.JointName = 'head';
+						
+			DInfo.Damage *= 0.5;
+			Owner.TakeDamage(Pawn(Owner), hitloc, hitloc, DInfo);
+			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
+			MakeNoise(1.0, 1280);
+		}
+	}
+
+	Begin:
+		PlayAnim('SelfDamage');
+		SetTimer(1.0, false);
+		Sleep(2.0);
+		if ( PlayerPawn(Owner) != None )
+		{
+			PlayerPawn(Owner).bReloading = false;
+		}
+		GotoState('Idle');
+		Finish();
+}
+
+function AddParticles()
+{
+	local int NumJoints, i;
+	local name JointName;
+	local Actor A;
+	local place P;
+
+	NumJoints = Self.NumJoints();
+	if ( NumJoints > 0 )
+	{
+		for (i=0; i<NumJoints; i++)
+		{
+			JointName = Self.JointName(i);
+			P = JointPlace(JointName);
+			A = Spawn(class 'BloodyMandorlaParticleFX', self,, P.pos);
+			A.SetBase(self,JointName, 'root');
+		}
+	}
+}
+
+function RemoveParticles()
+{
+	local Actor A;
+	
+	ForEach AllActors(class 'Actor', A)
+		if ( A.Owner == self )
+			if ( A.IsA('BloodyMandorlaParticleFX') )
+				ParticleFX(A).bShuttingDown = true;
+}
+
+state BloodThirst
+{
+	ignores PutDown;
+	
+	function BeginState()
+	{
+		bThirsty = true;
+		Berserk();
+		PlayerPawn(Owner).bReloading = false;
+		PlayerPawn(Owner).Mana = 100;
+		SndID = PlaySound(ThirstSound);
+		if (BloodDrip == none)
+		{
+			BloodDrip = Spawn(class 'ScytheWoundFX',,,JointPlace('Blade5').pos);
+			BloodDrip.SetBase(self,'Blade5','root');
+		}
+		AddParticles();
+	}
+
+	function EndState()
+	{
+		bThirsty = false;
+
+		StopSound(SndID);
+
+		BloodDrip.bShuttingDown = true;
+		BloodDrip = none;
+
+		RemoveParticles();
+	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		if ( PlayerPawn(Owner).Mana <= 1 )
+		{
+			GotoState('Mad');
+		}
+
+		//if ( AnimSequence != 'SelfDamage')
+			//LoopAnim('StrayCycle',RefireMult);
+
+		if (!bThirstyFiring)
+			LoopAnim('StrayCycle',RefireMult);
+	}
+	
+	function Timer()
+	{
+		GotoState('Mad');
+	}
+
+	function Fire(float F)
+	{
+		//PlayFiring();
+		if (!bThirstyFiring)
+			GotoState(, 'ThirstFire');
+	}
+
+	ThirstFire:
+		bThirstyFiring = true;
+		PlayFiring();
+		FinishAnim();
+		bThirstyFiring = false;
+
+	Begin:
+		bThirstyFiring = false;
+		SetTimer(60.0, false);
+		Disable('Tick');
+		PlayAnim('StartStray');
+		FinishAnim();
+		Enable('Tick');
+}
+
 defaultproperties
 {
      HardSounds(0)=Sound'Impacts.SurfaceSpecific.E_Wpn_ScyHitHard01'
@@ -885,6 +1058,8 @@ defaultproperties
      BerserkOFFSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyBigOff01'
      WindUpSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyBigWindup01'
      AbsorbHealthSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyEnergyLoop01'
+     MadSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_InvokeMine01'
+	 ThirstSound=Sound'CreatureSFX.Chanter.C_Chanter_AmbLoop'
      bWaterFire=True
      bAltWaterFire=True
      ExplosionDecal=Class'Aeons.ScytheDecal'

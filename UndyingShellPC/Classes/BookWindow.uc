@@ -628,6 +628,7 @@ function BeforePaint(Canvas C, float X, float Y)
 
 function Paint(Canvas C, float X, float Y)
 {
+	local float OldFov;
 	local int i;
 	local PlayerPawn P; 
 	local int SwirlX, SwirlY;
@@ -689,7 +690,7 @@ function Paint(Canvas C, float X, float Y)
 			if ( P != None ) 
 			{
 				OldFov = P.FOVAngle;
-				P.SetFOVAngle(90);
+				P.SetFOVAngle(book.BookFOV);
 				DrawClippedActor( C, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
 				P.SetFOVAngle(OldFov);
 			}

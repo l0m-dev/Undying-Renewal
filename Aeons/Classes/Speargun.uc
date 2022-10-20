@@ -187,11 +187,11 @@ state NewClip
 
 		if (AmmoType.AmmoAmount > 0)
 		{
-			PlayAnim('DownEmpty', RefireMult);
+			PlayAnim('DownEmpty', RefireMult / AeonsPlayer(Owner).refireMultiplier);
 			FinishAnim();
 			PlaySound(InsertSound,, 0.5);
-			sleep(reloadTime * (1.0 / RefireMult));
-			logactorstate("sleeping for "$ reloadTime * (1.0 / RefireMult) $" seconds");		
+			sleep(reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier));
+			logactorstate("sleeping for "$ reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier) $" seconds");		
 		}		
 		
 	    // Owner.PlaySound(Misc2Sound, SLOT_None,2.0);
@@ -203,7 +203,7 @@ state NewClip
 		if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) && !PlayerPawn(Owner).bNeverAutoSwitch ) 
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 		else {
-			PlayAnim('ReLoadEnd', RefireMult);
+			PlayAnim('ReLoadEnd', RefireMult / AeonsPlayer(Owner).refireMultiplier);
 			FinishAnim();
 			// Log("Speargun: state NewClip; FinishAnim is done with " $AnimSequence);
 		}
@@ -376,8 +376,8 @@ state ClientReload
 		{
 			//Log("Speargun: state ClientReload: setting timer to " $ RefireRate * AeonsPlayer(Owner).refireMultiplier );
 			//rb new
-			logactorstate("Setting Timer to " $ reloadTime * (1.0 / RefireMult));
-			SetTimer(reloadTime * (1.0 / RefireMult), false);
+			logactorstate("Setting Timer to " $ reloadTime * 1.0 * RefireMult);
+			SetTimer(reloadTime * 1.0 * RefireMult * AeonsPlayer(Owner).refireMultiplier, false);
 			//SetTimer(RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
 			return;
 		}

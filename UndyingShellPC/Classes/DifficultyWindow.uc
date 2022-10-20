@@ -36,6 +36,7 @@ struct MutatorInfo
 {
 	var string MutatorName;
 	var string MutatorClass;
+	var bool   bEnabled;
 };
 
 var config string Mutators;
@@ -49,10 +50,7 @@ var MutatorInfo MutatorList[250]; // complete list of available mutators
 var int CurrentRow; // current row in scrollable resolution list
 var ShellButton Down;
 var ShellButton Up;
-var string CurrentMutator;
-var string CurrentMutatorClass;
 var int NumberOfMutators;
-var bool MultipleSelection;
 
 function Created()
 {
@@ -191,7 +189,7 @@ function Created()
 
 	MutatorsLabel.Template=NewRegion(584, 100, 204, 54);
 	MutatorsLabel.Manager = Self;
-	MutatorsLabel.Text = "Select mutators";
+	MutatorsLabel.Text = "SELECT MUTATORS";
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -203,7 +201,7 @@ function Created()
 
 	MutatorsHintLabel.Template=NewRegion(584, 116, 204, 54);
 	MutatorsHintLabel.Manager = Self;
-	MutatorsHintLabel.Text = "(ctrl for multiple)";
+	MutatorsHintLabel.Text = "";
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -218,61 +216,6 @@ function Created()
 	Root.Console.bBlackout = True;
 
 	Resized();
-}
-
-
-function KeyDown(int Key, float X, float Y)
-{
-	local PlayerPawn P;
-
-	P = GetPlayerOwner();
-
-	switch (Key)
-	{
-		case P.EInputKey.IK_Ctrl:
-		case P.EInputKey.IK_Shift:
-			MultipleSelection = true;
-			break;
-		default:
-			Super.KeyDown(Key, X, Y);
-			break;
-	}
-}
-
-function KeyUp(int Key, float X, float Y)
-{
-	local PlayerPawn P;
-
-	P = GetPlayerOwner();
-
-	switch (Key)
-	{
-		case P.EInputKey.IK_Ctrl:
-		case P.EInputKey.IK_Shift:
-			MultipleSelection = false;
-			break;
-		default:
-			Super.KeyUp(Key, X, Y);
-			break;
-	}
-}
-
-function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
-{
-	switch(Msg) {
-	case WM_KeyDown:
-		if(HotKeyDown(Key, X, Y))
-			return;
-		KeyDown(Key, X, Y);
-		break;
-	case WM_KeyUp:
-		if(HotKeyUp(Key, X, Y))
-			return;
-		KeyUp(Key, X, Y);
-		break;
-	}
-
-	Super.WindowEvent(Msg, C, X, Y, Key);
 }
 
 function Message(UWindowWindow B, byte E)
@@ -306,11 +249,6 @@ function Message(UWindowWindow B, byte E)
 				case MutatorsButtons[2]:
 				case MutatorsButtons[3]:
 				case MutatorsButtons[4]:
-					if (!MultipleSelection)
-					{
-						CurrentMutator = "";
-						CurrentMutatorClass = "";
-					}
 					MutatorClicked(B);	
 					break;
 
@@ -366,8 +304,9 @@ function OverEffect(ShellButton B)
 
 function Paint(Canvas C, float X, float Y)
 {
-	local int i;
-
+	local int i, j;
+	local string mName;
+	
 	Super.Paint(C, X, Y);
 
 	for ( i = 0; i < 4; i++ )
@@ -376,16 +315,23 @@ function Paint(Canvas C, float X, float Y)
 	// mutator stuff
 	for ( i=0; i < NumberOfMutators; i++ )
 	{
-		if ( InStr(CurrentMutator, MutatorsButtons[i].Text) >= 0 )
+		for (j = 0; j < ArrayCount(MutatorList); j++)
 		{
-			//DrawStretchedTexture(C, MutatorsButtons[i].WinLeft, MutatorsButtons[i].WinTop, MutatorsButtons[i].WinWidth, MutatorsButtons[i].WinHeight, texture'Aeons.Particles.SOft_pfx');		
-			MutatorsButtons[i].UpTexture = texture'Video_resol_dn';
-			MutatorsButtons[i].DownTexture = texture'Video_resol_up';
-			MutatorsButtons[i].OverTexture = texture'Video_resol_dn';
-		} else {
-			MutatorsButtons[i].UpTexture =   texture'Video_resol_up';
-			MutatorsButtons[i].DownTexture = texture'Video_resol_dn';
-			MutatorsButtons[i].OverTexture = texture'Video_resol_ov';
+			if (MutatorList[j].MutatorName == MutatorList[CurrentRow + i].MutatorName)
+			{
+				if ( MutatorList[j].bEnabled )
+				{
+					//DrawStretchedTexture(C, MutatorsButtons[i].WinLeft, MutatorsButtons[i].WinTop, MutatorsButtons[i].WinWidth, MutatorsButtons[i].WinHeight, texture'Aeons.Particles.SOft_pfx');		
+					MutatorsButtons[i].UpTexture = texture'Video_resol_dn';
+					MutatorsButtons[i].DownTexture = texture'Video_resol_up';
+					MutatorsButtons[i].OverTexture = texture'Video_resol_dn';
+				} else {
+					MutatorsButtons[i].UpTexture =   texture'Video_resol_up';
+					MutatorsButtons[i].DownTexture = texture'Video_resol_dn';
+					MutatorsButtons[i].OverTexture = texture'Video_resol_ov';
+				}
+				break;
+			}
 		}
 	}
 }
@@ -393,10 +339,29 @@ function Paint(Canvas C, float X, float Y)
 function StartGame( int Difficulty )
 {
 	local string URL;
+	local string mutatorClassString;
+	local bool setFirstMutator;
+	local int i;
+	
+	for (i = 0; i < ArrayCount(MutatorList); i++)
+	{
+		if (MutatorList[i].bEnabled)
+		{
+			if (!setFirstMutator)
+			{
+				setFirstMutator = true;
+				mutatorClassString = MutatorList[i].MutatorClass;
+			}
+			else
+			{
+				mutatorClassString = mutatorClassString $ "," $ MutatorList[i].MutatorClass;
+			}
+		}
+	}
 	
 	PlayNewScreenSound();
 	
-	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ CurrentMutatorClass;
+	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ mutatorClassString;
 	//ParentWindow.Close();
 
 	Close();
@@ -477,15 +442,11 @@ function LoadMutators()
 	
 	//DynamicLoadObject(MutatorBaseClass, class'Class');
 	//DynamicLoadObject("QuakeMovement.MovementMutator", class'Class');
-	
-	MutatorList[0].MutatorClass = "None";
-	MutatorList[0].MutatorName = "None";
-	//NumMutatorClasses++;
-	
+		
 	GetPlayerOwner().GetNextIntDesc(MutatorBaseClass, 0, NextMutator, NextDesc);
 	while( NextMutator != "" && (NumMutatorClasses < 200) )
 	{		
-		MutatorList[NumMutatorClasses + 1].MutatorClass = NextMutator;
+		MutatorList[NumMutatorClasses].MutatorClass = NextMutator;
 
 		k = InStr(NextDesc, ",");
 		if(k == -1)
@@ -499,7 +460,7 @@ function LoadMutators()
 			HelpText = Mid(NextDesc, k+1);
 		}
 		
-		MutatorList[NumMutatorClasses + 1].MutatorName = MutatorName;
+		MutatorList[NumMutatorClasses].MutatorName = MutatorName;
 		
 		NumMutatorClasses++;
 		GetPlayerOwner().GetNextIntDesc(MutatorBaseClass, NumMutatorClasses, NextMutator, NextDesc);
@@ -556,7 +517,7 @@ function RefreshButtons()
 		if (mName != "")
 		{
 			MutatorsButtons[i].Text = mName;
-			MutatorsButtons[i].bDisabled = False;
+			MutatorsButtons[i].bDisabled = MutatorList[CurrentRow + i].bEnabled;
 		}
 	}
 	
@@ -591,20 +552,9 @@ function MutatorClicked(UWindowWindow B)
 	{
 		if (MutatorList[i].MutatorName == mName)
 		{
-			mClass = MutatorList[i].MutatorClass;
+			MutatorList[i].bEnabled = !MutatorList[i].bEnabled;
 			break;
 		}
-	}
-	
-	if (CurrentMutator == "")
-	{
-		CurrentMutator = mName;
-		CurrentMutatorClass = mClass;
-	}
-	else
-	{
-		CurrentMutator = CurrentMutator $ "," $ mName;
-		CurrentMutatorClass = CurrentMutatorClass $ "," $ mClass;
 	}
 }
 

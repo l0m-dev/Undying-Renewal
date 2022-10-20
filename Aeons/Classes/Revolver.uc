@@ -193,7 +193,7 @@ simulated function PlayIdleAnim()
 
 simulated function PlayReloading()
 {
-	PlayAnim('ReloadStart');
+	PlayAnim('ReloadStart', 1.0 / AeonsPlayer(Owner).refireMultiplier);
 }
 
 //=============================================================================
@@ -246,7 +246,7 @@ state NewClip
 		// Do we have any bullets to reload?
 		if (numToReload > 0)
 		{
-			PlayAnim('ReloadStart',RefireMult,,,0);
+			PlayAnim('ReloadStart',RefireMult / AeonsPlayer(Owner).refireMultiplier,,,0);
 			FinishAnim();
 		}
 
@@ -281,7 +281,7 @@ state NewClip
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 		else {
 
-			PlayAnim('ReloadEnd',RefireMult,,,0);
+			PlayAnim('ReloadEnd',RefireMult/AeonsPlayer(Owner).refireMultiplier,,,0);
 			FinishAnim();
 
 			if ( AmmoType.AmmoAmount >= ReloadCount )
@@ -487,7 +487,7 @@ state ClientReload
 		
 	ReloadEnd:
 		log("Revolver: ClientReload State: ReloadEnd...");
-		PlayAnim('ReloadEnd',,,,0);
+		PlayAnim('ReloadEnd',1.0/AeonsPlayer(Owner).refireMultiplier,,,0);
 		FinishAnim();
 		// Finish();
 */

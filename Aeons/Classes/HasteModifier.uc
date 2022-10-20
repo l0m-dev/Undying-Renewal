@@ -38,10 +38,10 @@ function PreBeginPlay()
 
 	RefireMult[0] = 1.0;
 	RefireMult[1] = 0.85;
-	RefireMult[2] = 0.85;
-	RefireMult[3] = 0.85;
-	RefireMult[4] = 0.75;
-	RefireMult[5] = 0.75;
+	RefireMult[2] = 0.75;
+	RefireMult[3] = 0.65;
+	RefireMult[4] = 0.5;
+	RefireMult[5] = 0.5;
 }
 
 //----------------------------------------------------------------------------
