@@ -58,8 +58,8 @@ function PickupFunction(Pawn Other)
 
 defaultproperties
 {
-     AmmoAmount=6
-     MaxAmmo=60
+     AmmoAmount=12
+     MaxAmmo=96
      InventoryGroup=111
      bActive=False
      PickupMessage="You picked up silver bullets"

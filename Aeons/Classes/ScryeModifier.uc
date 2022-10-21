@@ -73,15 +73,7 @@ state Activated
 		{
 			if (bGlowOn)
 			{
-				ForEach AllActors(class 'ScriptedPawn', P)
-				{
-					if ( P.bScryeGlow )
-					{
-						P.ScryeGlow.bHidden = true;
-					}
-				}
-				bGlowOn = false;
-				Owner.StopSound(ScryeSoundId);
+				gotoState('Deactivated');
 			}
 		} else {
 			if ( !bGlowOn )
@@ -94,7 +86,7 @@ state Activated
 					}
 				}
 				bGlowOn = true;
-				ScryeSoundId = Owner.PlaySound(ActiveLoopSound);
+				AmbientSound = ActiveLoopSound;
 			}
 		}
 
@@ -115,8 +107,8 @@ state Activated
 
 		if ( !bActive )
 		{
-			Owner.StopSound(ScryeSoundId);
-			ScryeSoundId = Owner.PlaySound(ActiveLoopSound);
+			SetBase(Owner, 'root', 'root');
+			AmbientSound = ActiveLoopSound;		
 		}
 
 		col = vect(233,196,255);	// hud change color
@@ -148,7 +140,7 @@ state Activated
 		MyScryeLight.setBase(Owner, 'pelvis', 'root');
 		AeonsPlayer(Owner).bScryeActive = true;
 		setTimer(0.25, true);
-		ScryeSoundId = Owner.PlaySound(ActiveLoopSound);
+		AmbientSound = ActiveLoopSound;	
 }
 
 //----------------------------------------------------------------------------
@@ -196,8 +188,8 @@ state Deactivated
 		col = vect(233,196,255);	// hud change color
 		AeonsPlayer(Owner).bScryeActive = false;
 
-		StopSound(ScryeSoundId);
-		Owner.PlaySound(EndSound);
+		SetBase(None);
+		AmbientSound = None;
 
 		str = 0.1;					// HUD change strength
 		PlayerPawn(Owner).ClientAdjustGlow( str, col );
@@ -223,4 +215,6 @@ defaultproperties
      EndEvent=EndScrye
      ActiveLoopSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ScryeLoop01'
      EndSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ScryeEnd01'
+	 SoundRadius=255
+     SoundVolume=96
 }

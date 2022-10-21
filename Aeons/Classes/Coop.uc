@@ -215,6 +215,8 @@ event playerpawn Login
 )
 {
 	local PlayerPawn NewPlayer;
+	local NavigationPoint StartSpot;
+
 	Log("DeathMatchGame - Login");
 	NewPlayer = Super.Login(Portal, Options, Error, SpawnClass );
 	if ( NewPlayer != None )
@@ -233,6 +235,23 @@ event playerpawn Login
 	{
 		Log("DeathMatchGame - Super.Login failed");
 	}
+
+	if ( !NewPlayer.IsA('Spectator') )
+		NumPlayers++;
+
+	// Find a start spot.
+	StartSpot = FindPlayerStart( None, 0, Portal );
+
+	if( StartSpot == None )
+	{
+		Error = FailedPlaceMessage;
+		return None;
+	}
+
+	if ( PlayerStart(StartSpot).bCutScene )
+		StartCutScene(NewPlayer);
+
+	//AeonsPlayer(NewPlayer).TriggerLevelBegin();
 
 	return NewPlayer;
 }
@@ -366,7 +385,7 @@ function Timer()
 /* FindPlayerStart()
 returns the 'best' player start for this player to start from.
 Re-implement for each game type
-*/
+
 function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
 {
 	local PlayerStart Dest, Candidate[8], Best;
@@ -424,6 +443,143 @@ function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, opt
 				
 	return Best;
 }
+*/
+
+function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
+{
+	local PlayerStart Dest, Candidate[4], Best;
+	local float Score[4], BestScore, NextDist;
+	local pawn OtherPlayer;
+	local int i, num;
+	local Teleporter Tel;
+	local NavigationPoint N;
+
+	if( incomingName!="" )
+		foreach AllActors( class 'Teleporter', Tel )
+			if( string(Tel.Tag)~=incomingName )
+				return Tel;
+
+	num = 0;
+	//choose candidates	
+	N = Level.NavigationPointList;
+	While ( N != None )
+	{
+		if ( N.IsA('PlayerStart') && !N.Region.Zone.bWaterZone )
+		{
+			if (num<4)
+				Candidate[num] = PlayerStart(N);
+			else if (Rand(num) < 4)
+				Candidate[Rand(4)] = PlayerStart(N);
+			num++;
+		}
+		N = N.nextNavigationPoint;
+	}
+
+	if (num == 0 )
+		foreach AllActors( class 'PlayerStart', Dest )
+		{
+			if (num<4)
+				Candidate[num] = Dest;
+			else if (Rand(num) < 4)
+				Candidate[Rand(4)] = Dest;
+			num++;
+		}
+
+	if (num>4) num = 4;
+	else if (num == 0)
+		return None;
+		
+	//assess candidates
+	for (i=0;i<num;i++)
+		Score[i] = 4000 * FRand(); //randomize
+		
+	for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
+		if ( OtherPlayer.bIsPlayer && (OtherPlayer.Health > 0) )
+			for (i=0;i<num;i++)
+				if ( OtherPlayer.Region.Zone == Candidate[i].Region.Zone )
+				{
+					NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
+					if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
+						Score[i] -= 1000000.0;
+					else if ( (NextDist < 2000) && OtherPlayer.LineOfSightTo(Candidate[i]) )
+						Score[i] -= 10000.0;
+				}
+	
+	BestScore = Score[0];
+	Best = Candidate[0];
+	for (i=1;i<num;i++)
+		if (Score[i] > BestScore)
+		{
+			BestScore = Score[i];
+			Best = Candidate[i];
+		}
+
+	return Best;
+}
+
+function StartCutScene(PlayerPawn Player)
+{
+	local MasterCameraPoint C, MasterPoint;
+
+	// log("..............................................Starting CutScene");
+
+	forEach AllActors(class 'MasterCameraPoint', C, Event)
+	{
+		MasterPoint = C;
+		break;
+	}
+
+	if ( MasterPoint != none )
+		setupCamera(MasterPoint, Player);
+	else
+		log("Aeons.SinglePlayer: Cutscene FAILED to start - no master Point class found!");
+
+}
+
+function setupCamera(MasterCameraPoint MasterPoint, PlayerPawn Player)
+{
+	local vector eyeHeight;
+	local CameraProjectile CamProj;
+
+	if ( !MasterPoint.bAnimatedCamera )
+	{
+		// realtime interpolating camera path
+		if ( MasterPoint.CutSceneLength <= 0 )
+			MasterPoint.CutSceneLength = 10;
+
+		// Hide Player
+		if ( MasterPoint.bHidePlayer )
+			Player.bRenderSelf = false;
+
+		// Lock Player Location
+		if ( MasterPoint.bHoldPlayer )
+			Player.LockPos();
+
+		Player.LetterBox(true);
+
+		// starting at the master point location.. interpolating to the next point
+		CamProj = spawn(class 'CameraProjectile',Player,,MasterPoint.Location,Player.ViewRotation);
+		MasterPoint.getNextPoint();
+		CamProj.ToPoint = MasterPoint.NextPoint;
+		CamProj.FromPoint = MasterPoint;
+		CamProj.MasterPoint = MasterPoint;
+		CamProj.TotalTime = MasterPoint.CutSceneLength;
+		Player.ViewTarget = CamProj;
+		CamProj.StartSequence();
+		//MasterPoint.SetLetterBox(Player);
+	} else {
+		// PreAnimated camera path
+
+		// log("...............................Generating camera projectile");
+		AeonsPlayer(Player).SetFOV(36);
+		CamProj = spawn(class 'CameraProjectile');//,,,MasterPoint.Location, masterPoint.Rotation);
+		CamProj.MasterPoint = MasterPoint;
+		CamProj.SetOwner(Player);
+		Player.DesiredFOV = MasterPoint.GetCamFOVs(0);
+		Player.ViewTarget = CamProj;
+		CamProj.gotoState('PlayCannedAnim');
+	}
+}
 
 /* AcceptInventory()
 Examine the passed player's inventory, and accept or discard each item
@@ -438,8 +594,8 @@ applicable weapon/item as current).
 */
 function AcceptInventory(pawn PlayerPawn)
 {
-	PlayerPawn.Weapon = None;
-	PlayerPawn.SelectedItem = None;
+	//PlayerPawn.Weapon = None;
+	//PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
 	PlayerPawn.ConsoleCommand("SetupInv");
 }

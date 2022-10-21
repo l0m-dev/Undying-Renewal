@@ -46,7 +46,7 @@ var UWindowWindow AdvVideo;
 
 var ShellButton Advanced;
 var ShellButton Resolutions[5]; // resolutions currently displayed in the scrollable list
-var string ResolutionList[18]; // complete list of available resolutions
+var string ResolutionList[31]; // complete list of available resolutions
 var int CurrentRow; // current row in scrollable resolution list
 var ShellButton OK;
 var ShellButton Cancel;
@@ -201,7 +201,6 @@ function Created()
 	ResolutionList[15] = "1600x1200";
 	ResolutionList[16] = "1440x1080";
 	ResolutionList[17] = "1920x1080";
-	/*
 	ResolutionList[18] = "1920x1200";
 	ResolutionList[19] = "1920x1440";
 	ResolutionList[20] = "2560x1080";
@@ -215,7 +214,6 @@ function Created()
 	ResolutionList[28] = "2800x2100";
 	ResolutionList[29] = "3200x2400";
 	ResolutionList[30] = "3840x2160";
-	*/
 	
 // Resolution scroll buttons
 	Up =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
@@ -562,9 +560,9 @@ function ResolutionClicked(UWindowWindow B)
 	local int i;
 	
 	if ( ColorDepth == 16 ) 
-		NewRes = ShellButton(b).Text @ "x16";
+		NewRes = ShellButton(b).Text $ "x16"; // @ added a space before so the check never worked
 	else
-		NewRes = ShellButton(b).Text @ "x32";
+		NewRes = ShellButton(b).Text $ "x32";
 
 
 	if ( OriginalRes != NewRes )
@@ -588,6 +586,9 @@ function ResolutionClicked(UWindowWindow B)
 function ScrolledUp()
 {
 	local int i;
+	
+	if ( (ChangeSound != none) && bInitialized ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
 
 	CurrentRow--;
 	if ( CurrentRow <= 0 ) 
@@ -608,7 +609,10 @@ function ScrolledUp()
 function ScrolledDown()
 {
 	local int i;
-
+	
+	if ( (ChangeSound != none) && bInitialized ) 
+		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
+	
 	CurrentRow++;
 	if ( CurrentRow + ArrayCount(Resolutions) >= ArrayCount(ResolutionList) ) 
 	{

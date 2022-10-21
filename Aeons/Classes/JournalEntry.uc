@@ -40,6 +40,7 @@ var int CurrCharOffset;
 var int NextCharOffset;
 
 var color FontColor;
+var transient bool bInitialized;
 
 //var const string CODE_NewLine;
 //var const string CODE_Image;
@@ -63,6 +64,26 @@ native(475) final function ReplaceTexture( Texture Tex );
 native(476) final function TextSize( string Text, out float XL, out float YL, Font Font );
 */
 
+function UpdateText()
+{
+	local int i;
+	
+	Text = "";
+	
+	Title = Localize(GetHumanName(), "Title", "Aeons");
+	Objectives = Localize(GetHumanName(), "Objectives", "Aeons");
+	for ( i=0; i<MAX_LINES; i++ )
+	{
+		Lines[i] = Localize(GetHumanName(), "Lines["$i$"]", "Aeons");
+		
+		if ( Lines[i] == "" || Left(Lines[i], 2) == "<?")
+			break;
+		log(Lines[i], 'Lines');
+		Text = Text $ Lines[i];	
+		Lines[i] = "";
+	}
+}
+
 function PostBeginPlay()
 {
 	local int i;
@@ -72,14 +93,24 @@ function PostBeginPlay()
 
 	Text = "";
 	
+	bInitialized = true;
+	FontColor = ParseColor(Localize( "FontColors",  "JournalColor", "Renewal"));
+	
 	for ( i=0; i<MAX_LINES; i++ )
 	{
 		if ( Lines[i] == "" )
-			return;
+			break;
 		
 		Text = Text $ Lines[i];	
 		Lines[i] = "";
 	}
+}
+
+event StartLevel()
+{
+	// needed for non ansi languages
+	if (!bInitialized)
+		UpdateText();
 }
 
 static function string GetWord(string SearchString)
@@ -139,7 +170,7 @@ function Repaginate( string Source, byte TopMargin, byte LeftMargin, int Width, 
 	//Log("repaginate: charoffsets[currentpage+1]=" $ charoffsets[currentpage+1]);
 }
 
-function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly, optional bool english )
+function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Width, int Height, ScriptedTexture Tex, Font SourceFont, bool FormatOnly, optional Font EnglishFont )
 {
 	local int y;
 	local float sizex, sizey;
@@ -151,7 +182,8 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 	local string temp;
 	local string texturename;
 	local int offset;
-
+	local bool white;
+	
 	y = TopMargin;
 	Width -= LeftMargin*2;
 	drawx = LeftMargin;
@@ -163,22 +195,22 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 
 		if ((Len(Line) > 0)&&(!FormatOnly)) 
 		{
-			class'JournalEntry'.static.EatLeadingWhitespace(Line);
+			EatLeadingWhitespace(Line);
 
 			token = InStr(Line, "&");
 			
 			Tex.bNoSmooth = false;
-			
+			white = FontColor.R == 255 && FontColor.G == 255 && FontColor.B == 255;
 			if ( token >= 0 )
 			{
-				if (english)
+				if (white)
 					Tex.DrawText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont );
 				else
 					Tex.DrawColoredText( LeftMargin, y-sizey, Left(Line, token-1), SourceFont, FontColor );
 			}
 			else
 			{
-				if (english)
+				if (white)
 					Tex.DrawText( LeftMargin, y-sizey, Line, SourceFont );
 				else
 					Tex.DrawColoredText( LeftMargin, y-sizey, Line, SourceFont, FontColor );
@@ -196,7 +228,11 @@ function string FillQuad( string Source, byte TopMargin, byte LeftMargin, int Wi
 			break;
 		}
 
-		Tex.TextSize( Line, sizex, sizey, SourceFont );	
+		Tex.TextSize( Line, sizex, sizey, SourceFont );
+		sizey = int(sizey / 2) * 2;		
+		//log("SizeX: "$sizex$", SizeY: "$sizey, 'Mod');
+		//Tex.TextSize( Line, sizex, sizey, EnglishFont );	
+		
 		y += sizey;
 
 		if ( Left(Line, 2) == "&i" )

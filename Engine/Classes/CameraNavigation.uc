@@ -149,6 +149,8 @@ function Trigger( Actor Other, Pawn EventInstigator )
 
 defaultproperties
 {
+	 bAlwaysRelevant=True
+	 RemoteRole=ROLE_SimulatedProxy
      LookWeight=1
      SpeedModifier=1
      DrawScale=0.25

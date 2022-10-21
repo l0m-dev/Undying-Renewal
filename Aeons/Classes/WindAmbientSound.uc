@@ -28,18 +28,17 @@ function PreBeginPlay()
 
 }
 
-/*
 function PostBeginPlay()
 {
-	local int p, v;
-
-//	Super.PreBeginPlay();
+	Super.PostBeginPlay();
 	
+	bInitialized = true;
+
 	InitialPitch = int(SoundPitch);
 	InitialVolume = int(SoundVolume);
 
-	p = int(SoundPitch);
-	v = int(SoundVolume);
+	SoundPitch=0;
+	SoundVolume=0;
 
 	Rate = RandRange((PitchPeriod - PitchPeriodVar), (PitchPeriod + PitchPeriodVar));
 	Rate = FClamp(Rate, 1, 9999);
@@ -47,105 +46,53 @@ function PostBeginPlay()
 	VRate = RandRange((VolPeriod - VolPeriodVar), (VolPeriod + VolPeriodVar));
 	VRate = FClamp(VRate, 1, 9999);
 	
-	RealPitch = RandRange( (p-PitchVar), (p+PitchVar) );
-	RealVol = RandRange( (v-VolVar), v );
+	RealPitch = RandRange( (InitialPitch-PitchVar), (InitialPitch+PitchVar) );
+	RealVol = RandRange( (InitialVolume-VolVar), InitialVolume );
 
-	NewPitchTarget = RandRange( (p-PitchVar), (p+PitchVar) );
-	NewVolTarget = RandRange( (v-VolVar), v );
-
-	SoundPitch = byte(RealPitch);
-	SoundVolume = byte(RealVol);
-
-	Diff = abs(NewPitchTarget - int(RealPitch));
-	VDiff = abs(NewVolTarget - int(RealVol));
-
-	// log("Real Pitch = "$RealPitch$" NewPitchTarget = "$NewPitchTarget$" Diff = "$Diff, 'Misc');
-
-	if ( RealPitch < NewPitchTarget )
-		Dir = 1.0;
-	else
-		Dir = -1.0;
-
-	if ( RealVol < NewVolTarget )
-		VDir = 1.0;
-	else
-		VDir = -1.0;
-
-	PitchTimer = Rate;
-	VolTimer = VRate;
-
-	log("WindAmbientSound: PostBeginPlay: SoundPitch=" $ SoundPitch $ " SoundVol=" $ SoundVolume);
+	NewPitchTarget = RandRange( (InitialPitch-PitchVar), (InitialPitch+PitchVar) );
+	NewVolTarget = RandRange( (InitialVolume-VolVar), InitialVolume );
 }
-*/
 
 function Tick(float DeltaTime)
 {
 	local int p, v;
 
-	// if first tick, just acknowledge we entered our first tick so we know next time.
-	if (!bInitialized)
-	{
-		bInitialized = true;
+	PitchLen += DeltaTime;
+	VolLen += DeltaTime;
 
-		InitialPitch = int(SoundPitch);
-		InitialVolume = int(SoundVolume);
-
-		SoundPitch=0;
-		SoundVolume=0;
-
-		Rate = RandRange((PitchPeriod - PitchPeriodVar), (PitchPeriod + PitchPeriodVar));
-		Rate = FClamp(Rate, 1, 9999);
-		
-		VRate = RandRange((VolPeriod - VolPeriodVar), (VolPeriod + VolPeriodVar));
-		VRate = FClamp(VRate, 1, 9999);
-		
-		RealPitch = RandRange( (InitialPitch-PitchVar), (InitialPitch+PitchVar) );
-		RealVol = RandRange( (InitialVolume-VolVar), InitialVolume );
-
-		NewPitchTarget = RandRange( (InitialPitch-PitchVar), (InitialPitch+PitchVar) );
-		NewVolTarget = RandRange( (InitialVolume-VolVar), InitialVolume );
-	}
-	// otherwise start all the dynamic pitch and vol calculations
+	if (RealPitch < NewPitchTarget)
+		Dir = 1.0;
 	else
+		Dir = -1.0;
+
+	if (RealVol < NewVolTarget)
+		VDir = 1.0;
+	else
+		VDir = -1.0;
+
+	RealPitch += Diff * ((DeltaTime / Rate) * Dir);
+	RealVol += VDiff * ((DeltaTime / VRate) * VDir);
+	
+	RealPitch = FClamp(RealPitch, 0, 255);
+	RealVol = FClamp(RealVol, 0, 255);
+
+	SoundPitch = byte(RealPitch) ;
+	SoundVolume = byte(RealVol) ;
+
+	//log("Sound Pitch = "$SoundPitch$" Real Pitch = "$RealPitch$" Rate = "$Rate$" Diff = "$Diff, 'Misc');
+	// log("Sound Volume = "$SoundVolume$" VRate = "$VRate$" VDiff = "$VDiff, 'Misc');
+
+	if ( PitchLen >= PitchTimer )
 	{
-		PitchLen += DeltaTime;
-		VolLen += DeltaTime;
-
-		if (RealPitch < NewPitchTarget)
-			Dir = 1.0;
-		else
-			Dir = -1.0;
-
-		if (RealVol < NewVolTarget)
-			VDir = 1.0;
-		else
-			VDir = -1.0;
-
-		RealPitch += Diff * ((DeltaTime / Rate) * Dir);
-		RealVol += VDiff * ((DeltaTime / VRate) * VDir);
-		
-		RealPitch = FClamp(RealPitch, 0, 255);
-		RealVol = FClamp(RealVol, 0, 255);
-
-		SoundPitch = byte(RealPitch) ;
-		SoundVolume = byte(RealVol) ;
-
-		//log("Sound Pitch = "$SoundPitch$" Real Pitch = "$RealPitch$" Rate = "$Rate$" Diff = "$Diff, 'Misc');
-		// log("Sound Volume = "$SoundVolume$" VRate = "$VRate$" VDiff = "$VDiff, 'Misc');
-
-		if ( PitchLen >= PitchTimer )
-		{
-			EvalPitch();
-			PitchLen = 0;
-		}
-
-		if ( VolLen >= VolTimer )
-		{
-			EvalVol();
-			VolLen = 0;
-		}
+		EvalPitch();
+		PitchLen = 0;
 	}
 
+	if ( VolLen >= VolTimer )
+	{
+		EvalVol();
+		VolLen = 0;
+	}
 }
 
 function EvalPitch()

@@ -166,9 +166,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 	local Inventory newItem;
 	local Spell newSpell;
 	local PlayerModifier newPM;
-	local BookJournalBase TempBook;
-	local class<BookJournalBase> BookJournalClass;
-	local JournalEntry TempEntry;
 
 	//Log("AddDefaultInventory");
 
@@ -314,35 +311,9 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 	// give the player all weapons and all spells
 	AeonsPlayer(PlayerPawn).GiveStartupWeapons();
-
+	
 	// give em somethin' to read
-	if ( AeonsPlayer(PlayerPawn).Book == None )
-	{
-		if (GetPlatform() == PLATFORM_PSX2)
-		{
-			TempBook = Spawn(class'Aeons.BookJournalPSX2', PlayerPawn);
-		}
-		else
-		{
-			//Log("We're on the PC, so give em a PC book.");
-			BookJournalClass = class<BookJournalBase>(DynamicLoadObject("Aeons.BookJournal", class'Class'));
-			if ( BookJournalClass != None )
-			{
-				//Log("BookJournalClass != None, it = "$BookJournalClass);
-				TempBook = Spawn(BookJournalClass, PlayerPawn);
-
-// The book spawns it's ObjectivesJournal in it's PostBeginPlay
-//				if ( TempBook != None )
-//				{
-//					AeonsPlayer(PlayerPawn).GiveJournal(class'ObjectivesJournal');
-//				}
-			}
-		}
-
-		TempBook.GiveTo(PlayerPawn);
-		AeonsPlayer(PlayerPawn).Book = TempBook;
-	}
-
+	AeonsPlayer(PlayerPawn).GiveBook();
 	
 	// default Defense/Misc Spell
 	/*

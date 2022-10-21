@@ -18,7 +18,21 @@ var travel JournalEntry Journals[150]; //fix travel  ?
 // someone wants us to display a specific JournalEntry class in the book.
 var Class<JournalEntry> RequestedEntryClass;
 
-function AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
+function bool HasEntry(JournalEntry NewEntry)
+{
+	local int i;
+	for ( i=0; i<ArrayCount(Journals); i++ )
+	{
+		if ( (Journals[i] != None) && (Journals[i].Class == NewEntry.Class) ) 
+		{
+			log("AddEntry: duplicate found: " $ NewEntry);
+			return true;
+		}
+	}
+	return false;
+}
+
+function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 {
 	local JournalEntry temp;
 	local int i;
@@ -26,9 +40,13 @@ function AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 	if ( NewEntry == None )
 	{
 		//log("AddEntry: NewEntry is NONE, returning early");
-		return;
+		return false;
 	}
-
+	
+	if (HasEntry(NewEntry))
+		return false;
+	
+	/*
 	for ( i=0; i<ArrayCount(Journals); i++ )
 	{
 		if ( (Journals[i] != None) && (Journals[i].Class == NewEntry.Class) ) 
@@ -37,7 +55,8 @@ function AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 			return;
 		}
 	}
-
+	*/
+	
 	// Refresh status of unread journals.
 	NumUnreadJournals = 0;
 	for (i = 0; i < NumJournals; i++)
@@ -60,6 +79,7 @@ function AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 		AeonsPlayer(Owner).ProcessObjectives( NewEntry.Objectives );
 
 //	RefreshPages();
+	return true;
 }
 
 function FindRequestedEntryClass()

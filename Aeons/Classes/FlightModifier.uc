@@ -23,13 +23,12 @@ replication
 function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	InitialVolume = Owner.SoundVolume;
+	InitialVolume = SoundVolume;
 }
 
 //=============================================================================
 state Active
 {
-
 	function Timer()
 	{
 		local float FuelNeeded;
@@ -77,11 +76,12 @@ state Active
 					else
 					{
 						Fuel -= FuelNeeded;					
+						
 						/*
 						if ( Fuel >= 30 )
-							Owner.AmbientSound = FlyingSound;
+							AmbientSound = FlyingSound;
 						else
-							Owner.AmbientSound = SputterSound;
+							AmbientSound = SputterSound;
 						*/
 					}
 				}								
@@ -116,15 +116,16 @@ state Active
 	function BeginState()
 	{
 		SetTimer(0.1, True);
-		Owner.AmbientSound = FlyingSound;
-		Owner.SoundVolume = InitialVolume;
+		AmbientSound = FlyingSound;
+		SetBase(Owner, 'root', 'root');
+		
+		SoundVolume = InitialVolume;
 	}
 	
 	function EndState()
 	{
 	}
 }
-
 
 //=============================================================================
 auto state Idle
@@ -141,11 +142,12 @@ auto state Idle
 			if ( (131072 & Flags) != 0 )
 				bNoPass = true;
 
-			if ( Owner.SoundVolume > 8 ) {
-				Owner.SoundVolume -= ( (2*InitialVolume) * DeltaTime );
+			if ( SoundVolume > 8 ) {
+				SoundVolume -= ( (8*InitialVolume) * DeltaTime );
 			} else {
-				Owner.AmbientSound = none;
-				Owner.SoundVolume = 0;
+				AmbientSound = none;
+				SetBase(None);
+				SoundVolume = 0;
 			}
 		} else {
 			Destroy();
@@ -176,7 +178,7 @@ auto state Idle
 	{
 		// we are not flying
 		bActive = false;
-		// Owner.AmbientSound = none;
+		//AmbientSound = none;
 	}
 	
 	function EndState()
@@ -194,4 +196,6 @@ defaultproperties
      SputterSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_FlyLoopEnd01'
      Fuel=60
      RemoteRole=ROLE_None
+	 SoundRadius=255
+     SoundVolume=96
 }

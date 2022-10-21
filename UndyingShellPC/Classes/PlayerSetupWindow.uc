@@ -312,7 +312,11 @@ function AnimEnd(MeshActor MyMesh)
 //	else
 //		MyMesh.PlayAnim('Walk');//, 0.4);
 
-
+	if ( MyMesh.AnimSequence == 'Breath3' )
+		MyMesh.TweenAnim('All', 0.4);
+	else
+		MyMesh.PlayAnim('Breath3', 0.4);
+		
 	PlayCount--;
 
 	//switch( int(FRand()*11) )

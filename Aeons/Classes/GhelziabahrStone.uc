@@ -24,7 +24,7 @@ function FellOutOfWorld()
 	super.FellOutOfWorld();
 }
 
-function FellOutOfEncroachedBy( actor Other )
+function EncroachedBy( actor Other )
 {
 	LogStack();
 	super.EncroachedBy( Other );
@@ -50,7 +50,6 @@ state HoundAnim
 		Owner.PlaySound(SpawnHoundSound);
 		PlayAnim('Hound',RefireMult);
 		FinishAnim();
-		UseMeter = 0;
 		GotoState('Idle');
 }
 
@@ -58,10 +57,13 @@ function addUse(int amt)
 {
 	useMeter += amt;
 	if ( useMeter > SpawnHoundLimit )
+	{
+		useMeter = 0;
 		if ( AeonsPlayer(Owner).SpawnHound() )
 		{
 			GotoState('HoundAnim');
 		}
+	}
 }
 
 function MeleeAttack(float Range)
@@ -147,7 +149,7 @@ state NormalFire
 	
 	Begin:
 		// log("Play Fire Animation");
-		PlayAnim('Fire');
+		PlayAnim('Fire', 1 / AeonsPlayer(Owner).refireMultiplier);
 		FinishAnim();
 		chargeCount=0;
 		bCanClientFire=true;
@@ -358,7 +360,7 @@ simulated function RenderOverlays( canvas Canvas )
 
 defaultproperties
 {
-     SpawnHoundLimit=100
+     SpawnHoundLimit=2000
      GlowTexture=WetTexture'FX.Gglow_wet'
      GlowFlashX=0.35
      GlowFlashY=0.677

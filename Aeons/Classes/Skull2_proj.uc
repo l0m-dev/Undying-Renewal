@@ -96,9 +96,12 @@ function PreBeginPlay()
 		Player = Pawn(Owner);
 		
 		// randomize the rotation rate
-		RotationRate.Yaw = RandRange(32768, 60000);
-		RotationRate.Pitch = RandRange(32768, 60000);
-		RotationRate.Roll = RandRange(32768, 60000);
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			RotationRate.Yaw = RandRange(32768, 60000);
+			RotationRate.Pitch = RandRange(32768, 60000);
+			RotationRate.Roll = RandRange(32768, 60000);
+		}
 		
 		// next time 
 		NextTimeCheck = Level.TimeSeconds + 15;

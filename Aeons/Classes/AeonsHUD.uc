@@ -15,9 +15,6 @@ class AeonsHUD expands HUD;
 
 //=============================================================================
 
-//fix take out
-var(Fonts) font MySmallFont, MyMediumFont, MyLargeFont;
-
 var float aX, aY; //updated with input when PlayerPawn is in ControlObject State
 
 var vector MouseBuffer[5];
@@ -253,7 +250,10 @@ simulated function UpdateSubtitles(Float DeltaTime)
 simulated function DrawSubtitles(Canvas canvas)
 {
 	local float X, Y;
-
+	local float W, H;
+	local float StartHeight, SubtitleHeight;
+	local int LineCount;
+	
 	// Check to see if there has been a level change. If so, zero out the current subtitle sequence.
 	if (Level.LevelAction != LEVACT_None)
 	{
@@ -266,12 +266,46 @@ simulated function DrawSubtitles(Canvas canvas)
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
+		
 		Canvas.Font = Canvas.MedFont;
-		Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.85);
+		
+		Canvas.TextSize(Subtitle.Text[Subtitle.Number], W, H);
+		//StartHeight = (Canvas.ClipY/2-LetterboxHeight/2);
+		StartHeight = LetterboxHeight;
+		LineCount = ceil(W / Canvas.ClipX);
+		SubtitleHeight = (H * LineCount);
+		
+		if (IsLetterBoxed())
+		{
+			Canvas.DrawColor.R = 252;
+			Canvas.DrawColor.G = 190;
+			Canvas.DrawColor.B = 17;
+			if (LetterboxHeight <= 0)
+				Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.90);
+			
+			Y = Canvas.SizeY - (StartHeight / 2) -  SubtitleHeight / 2;
+		}
+		else
+			Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.82);
+		
+		if (Y > Canvas.SizeY - SubtitleHeight)
+			Y = Canvas.SizeY - SubtitleHeight - 10;
 		Canvas.SetPos (Canvas.OrgX, Y);
 		Canvas.bCenter = true;
-		Canvas.DrawText (Subtitle.Text[Subtitle.Number], false);
+		Canvas.DrawText (Subtitle.Text[Subtitle.Number], true);
+		Canvas.bCenter = false;
+		Canvas.SetPos (Canvas.OrgX, Canvas.OrgY);
 	}
+}
+
+function int ceil(float num) {
+    local int inum;
+	inum = int(num);
+	
+    if (num == float(inum)) {
+        return inum;
+    }
+    return inum + 1;
 }
 
 exec function ShowArrow()
@@ -376,7 +410,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	if ( A != none )
 	{
 		// Player is NOT scrying and the crosshair is tracing a bScryeOnly Actor
-		if ( ((AeonsPlayer(Owner).ScryeTimer == 0) && A.bScryeOnly) || (AeonsPlayer(Owner).MindShatterMod.bActive) )
+		if ( ((AeonsPlayer(Owner).ScryeTimer == 0) && A.bScryeOnly) || (AeonsPlayer(Owner).MindShatterMod != None && AeonsPlayer(Owner).MindShatterMod.bActive) )
 		{
 			// do nothing .. the crosshair color is already defined.
 		}
@@ -468,20 +502,10 @@ simulated function PreRender( canvas Canvas )
 	if (PlayerPawn(Owner).Weapon != None)
 		PlayerPawn(Owner).Weapon.PreRender(Canvas);
 	
-	if (MyLargeFont == None)
-	{
-		MyLargeFont = Canvas.LargeFont;
-		MyMediumFont = Canvas.MedFont;
-		MySmallFont = Canvas.SmallFont;
-	}
-	
 	CanvasWidth  = Canvas.ClipX;
 	CanvasHeight = Canvas.ClipY;
 
 	//Log("AeonsHud: PreRender");
-	//Canvas.LargeFont = MyLargeFont;
-	//Canvas.MedFont = MyMediumFont;
-	//Canvas.SmallFont = MySmallFont;
 }
 
 simulated function DisplayMenu( canvas Canvas )
@@ -795,7 +819,6 @@ simulated function PostRender( canvas Canvas )
 
 	HUDSetup(canvas);
 
-
 	if ( IsLetterBoxed() )
 		bDrawHud = false;
 
@@ -808,14 +831,18 @@ simulated function PostRender( canvas Canvas )
 		if (Level.bSepiaOverlay)
 			DrawSepiaOverlay(Canvas);
 		
-		YDelta = Canvas.ClipY/2-LetterboxHeight/2;
+		if (LetterboxHeight > 0 && bEnableLetterBox)
+		{
+			//YDelta = Canvas.ClipY/2-LetterboxHeight/2;
+			YDelta = LetterboxHeight;
 
-		Canvas.SetPos(0,0);
-		Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
+			Canvas.SetPos(0,0);
+			Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
 
-		Canvas.SetPos(0,Canvas.ClipY - YDelta);
-		Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
-
+			Canvas.SetPos(0,Canvas.ClipY - YDelta);
+			Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
+		}
+		
 		// BURT: FIX 1
 		// force draw on screen messages during cutscenes
 		if (AeonsPlayer(Owner).OSMMod != none)
@@ -883,7 +910,7 @@ simulated function PostRender( canvas Canvas )
 				DrawWizardEyeOverlay(Canvas);
 			}
 		} else {
-			// DrawPhoenixOverlay(Canvas);
+			DrawPhoenixOverlay(Canvas);
 		}
 	
 		PlayerOwner = PlayerPawn(Owner);
@@ -962,7 +989,8 @@ simulated function PostRender( canvas Canvas )
 			DrawManaInfo(Canvas);		// mana maintenence values
 	
 		// Stealth Icons have been cut from the game 11/19/2000
-		//DrawStealthIcons(Canvas);
+		if (AeonsPlayer(Owner).bDrawStealth)
+			DrawStealthIcons(Canvas);
 	
 		DrawFlightMana(Canvas);
 		DrawCenterPiece(Canvas);
@@ -1716,9 +1744,9 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawColor.B = 255;
 
 
-		x = (Dir.x * 100);
-		y = (Dir.y * 100);
-		z = (Dir.z * 100);
+		//x = (Dir.x * 100);
+		//y = (Dir.y * 100);
+		//z = (Dir.z * 100);
 		
 		if (x<0)
 			xStr = ("-0."$int(abs(x)));
@@ -1739,7 +1767,7 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawText( ("Location: "$int(pos.x)$"  "$int(pos.y)$"  "$int(pos.z)), false);
 
 		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 24 + 48);
-		Canvas.DrawText( ("Dir:      "$xstr$"  "$yStr$"  "$zStr), false);
+		Canvas.DrawText( ("Dir:      "$Dir.x$"  "$Dir.y$"  "$Dir.z), false);
 
 		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 36 + 48);
 		Canvas.DrawText(("Speed:    "$int(VSize(Pawn(Owner).Velocity))), false);
@@ -1946,7 +1974,7 @@ simulated function Inventory GetNextInvItem(Inventory Inv)
 simulated function Inventory GetPrevInvItem(Inventory cInv)
 {
 	local Inventory Inv, LastItem;
-
+	
 	if ( cInv == None )
 	{
 		cInv = Pawn(Owner).Inventory.GetNext();
@@ -2008,6 +2036,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 
 	if ( Owner != None )
 		AP = AeonsPlayer(Owner);
+	
+	if (AP.Book == None)
+		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
 	if (((AP.Book.NewestUnread == None) && (AP.Book.NumUnreadJournals > 0)) || (AP.Book.NumUnreadJournals < 0))
@@ -2040,9 +2071,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 
 
 // Draws the held list of inventory items
+// Draws the held list of inventory items
 simulated function DrawHeldItems(Canvas Canvas)
 {
-	// crash
 	local inventory Inv, tempInv;
 	local int cnt, i, nextGroup, PrevGroup, nextIdx, PrevIdx, SelectedGroup;
 	local string InvName;
@@ -2058,31 +2089,29 @@ simulated function DrawHeldItems(Canvas Canvas)
 		if ( PlayerPawn(Owner).selectedItem == none )
 			PlayerPawn(Owner).Inventory.SelectNext();
 
-		
 		// must change window if on PSX2
-		if ( GetPlatform() != PLATFORM_PSX2 )
+		if ( GetPlatform() == PLATFORM_PSX2 )
 		{
+			// draw window texture all at once
 			Canvas.Style = 2;
 			Canvas.DrawColor = Canvas.Default.DrawColor;
-			Canvas.SetPos( -1, 86*Scale );
-			Canvas.DrawTileClipped( texture'InvWindow', 356*Scale/2, (256+16)*Scale/1.8, 0, 0, 128, 128);
+			Canvas.SetPos( 0, 64*Scale );
+			Canvas.DrawTileClipped( texture'InvWindow', 356*Scale, (256+16)*Scale, 0, 0, 128, 128);
 		}
 		else
 		{
 			// draw shadow behind inventory holder
-			/*
 			Canvas.Style = 4;
 			Canvas.DrawColor = Canvas.Default.DrawColor;
 			Canvas.SetPos( 0, (64+32)*Scale );
 			Canvas.DrawTileClipped( texture'HUD_Inv_Shad_Test', 178*Scale, (128+3)*Scale, 0, 0, 64, 64);
-			*/ // crash
-			
+
 			// draw top
 			Canvas.Style = 2;
-			//Canvas.DrawColor = Canvas.Default.DrawColor; //crash
+			Canvas.DrawColor = Canvas.Default.DrawColor;
 			Canvas.SetPos( 0, 64*Scale );
 			Canvas.DrawIcon(texture'Inv_Bar_Top', Scale);
-			
+
 			// draw right side
 			Canvas.SetPos( 149*Scale, (64+11)*Scale);
 			Canvas.DrawTileClipped( texture'Inv_Bar_Right', 64*Scale, 128*Scale, 0, 0, 64, 128);
@@ -2091,7 +2120,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			Canvas.SetPos( 0, (64+64+64)*Scale);
 			Canvas.DrawIcon(texture'Inv_Bar_Bottom', Scale);
 		}
-
+	
 		for (i=0; i<7; i++)
 			LuckySevenItems[i] = none;
 
@@ -2190,7 +2219,6 @@ simulated function DrawHeldItems(Canvas Canvas)
 			}
 			Canvas.DrawText( (""$InvName), false);
 		}
-		//Canvas.DrawText("Health: "$(Pickup(PlayerPawn(Owner).selectedItem).numCopies + 1), false);
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;				
@@ -2422,21 +2450,21 @@ simulated function DrawStealthIcons(Canvas Canvas)
 			Canvas.DrawColor.G = 100;
 			Canvas.DrawColor.B = 255;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 28, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 - 28 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*vi), 0, 16, 16);
 
 			Canvas.DrawColor.R = 100;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 8, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 - 8 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*ai), 0, 16, 16);
 
 			Canvas.DrawColor.R = 255;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 + 12, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 + 12 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*mi), 0, 16, 16);
 		}
 	}
@@ -2474,13 +2502,13 @@ simulated function DrawDefensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 				Canvas.DrawColor.B = 100;
 			}
 
-			Canvas.Style = 5;
+			Canvas.Style = 3;
 
 			for (i=0; i<6; i++)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9*ScaleX), Y);
+					Canvas.SetPos(X + (i*9) * Scale, Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);
@@ -2530,7 +2558,7 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			{
 				if ( Lvl >= i )
 				{
-					Canvas.SetPos(X + (i*9*ScaleX), Y);
+					Canvas.SetPos(X + (i*9) * Scale, Y);
 					if (bGhelz && (i == Lvl))
 					{
 						Canvas.DrawTileClipped( Texture'Aeons.dot_green', 8*Scale, 8*Scale, 0, 0, 8, 8);
@@ -3272,7 +3300,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 		MsgType = Console.GetMsgType(Console.TopLine);
 		if ( MsgType == 'Pickup' )
 		{
-			Canvas.Font = MyMediumFont;
+			Canvas.Font = Canvas.MedFont;
 			Canvas.bCenter = true;
 			//fix if ( Level.bHighDetailMode )
 				Canvas.Style = ERenderStyle.STY_Translucent;
@@ -4463,7 +4491,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 		WheelSelection = Owner.Inventory.FindItemInGroup(InventoryGroup);
 
 		// don't accept the molotov who hasn't had any ammo as valid
-		if (Weapon(WheelSelection).bSpecialIcon) 
+		if (Weapon(WheelSelection) != None && Weapon(WheelSelection).bSpecialIcon) 
 			WheelSelection = None;
 	}
 

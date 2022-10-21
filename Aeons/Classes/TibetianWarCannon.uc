@@ -26,7 +26,7 @@ var		Light		ChargeLight;
 var		float tmr;
 
 var() class<Projectile> ProjClass[4];
-
+//WaterSpoutDragon texture
 function PreBeginPlay()
 {
 	Super.PreBeginPlay();

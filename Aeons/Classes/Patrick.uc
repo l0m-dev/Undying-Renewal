@@ -183,7 +183,7 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 
 	GetAxes(ViewRotation, x, y, z);
 
-	if ( A != none && A.IsA('ScriptedPawn') && Pawn(A).Health <= 0 && ScriptedPawn(A).bHackable)
+	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss)
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
 		B.Velocity = (y + vect(0,0,0.25)) * 256;
@@ -745,10 +745,18 @@ state DialogScene expands PlayerWalking
 	exec function Fire( optional float F )
 	{
 		local ScriptedPawn	SP;
+		local bool Skipped;
 
-		if ( bAckClickThrough )
+		if ( bAckClickThrough ) {
 			foreach AllActors( class'ScriptedPawn', SP )
+			{
 				SP.FastScript( true );
+				if (SP.Script != none && SP.Script.bClickThrough)
+					Skipped = true;
+			}
+			if (Skipped)
+				AeonsHud(myHud).RemoveSubtitle();
+		}
 	}
 
 Begin:

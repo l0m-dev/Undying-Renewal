@@ -23,16 +23,18 @@ var bool	OutOfWater;
 function bool InflictNearDamage( actor Victim, int Damage, vector PushDir, int DamageNum, optional float EffectStrength )
 {
 	local DamageInfo	DInfo;
-
+	local float 		DamageMult;
+	
 	if ( ( Victim == none ) || ( Health <= 0 ) )
 		return false;
 
 	// Check if still in melee range.
 	if ( NearStrikeValid( Victim, DamageNum ) )
 	{	
+		DamageMult = 0.25;
 		DInfo = getDamageInfo( 'nearattack' );
-		DInfo.Damage = Damage;
-		DInfo.EffectStrength = EffectStrength;
+		DInfo.Damage = Damage * DamageMult;
+		DInfo.EffectStrength = EffectStrength * DamageMult;
 		if ( Victim.AcceptDamage( DInfo ) )
 			Victim.TakeDamage( self, Victim.Location + Normal(Location - Victim.Location), PushDir, DInfo );
 		return true;

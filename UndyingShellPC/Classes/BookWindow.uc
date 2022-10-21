@@ -628,6 +628,7 @@ function BeforePaint(Canvas C, float X, float Y)
 
 function Paint(Canvas C, float X, float Y)
 {
+	local float OldFov;
 	local int i;
 	local PlayerPawn P; 
 	local int SwirlX, SwirlY;
@@ -654,11 +655,11 @@ function Paint(Canvas C, float X, float Y)
 	//log("BookWindow: Paint");
 
 	Super.Paint(C, X, Y);
-	
-	if ( (book.CurrentJournalIndex >= 0) && (Book.FirstJournalId >= 0) && (Book.FirstJournalId-book.CurrentJournalIndex<=(MAX_VISIBLE_BOOKS-1)) ) 
-	{
-		JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
 
+	JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
+	
+	if ( (book.CurrentJournalIndex >= 0) && (Book.FirstJournalId >= 0) && (JournalDelta >= 0 && JournalDelta<=(MAX_VISIBLE_BOOKS-1)) ) 
+	{
 		SwirlX = JournalButtons[ JournalDelta ].WinLeft-10*RootScaleX;
 		SwirlY = JournalButtons[ JournalDelta ].WinTop-10*RootScaleY;
 
@@ -688,7 +689,10 @@ function Paint(Canvas C, float X, float Y)
 			
 			if ( P != None ) 
 			{
+				OldFov = P.FOVAngle;
+				P.SetFOVAngle(book.BookFOV);
 				DrawClippedActor( C, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
+				P.SetFOVAngle(OldFov);
 			}
 		}
 		else

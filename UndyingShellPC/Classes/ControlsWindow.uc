@@ -1267,7 +1267,9 @@ defaultproperties
      AliasNames(47)="PickAmplifier"
      AliasNames(48)="PickEtherTrap"
      AliasNames(49)="ShowBook"
-     AliasCount=50
+     AliasNames(50)="FireDefSpell"
+     AliasNames(51)="SelectDefSpell"
+     AliasCount=52
      LabelList(0)="Weapon Fire"
      LabelList(1)="Weapon Select"
      LabelList(2)="Spell Fire"
@@ -1318,6 +1320,8 @@ defaultproperties
      LabelList(47)="Amplifier"
      LabelList(48)="Ether Trap"
      LabelList(49)="Show Journal"
+     LabelList(50)="Defensive Spell Fire"
+     LabelList(51)="Defensive Spell Select"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

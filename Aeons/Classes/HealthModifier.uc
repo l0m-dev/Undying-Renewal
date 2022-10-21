@@ -71,7 +71,7 @@ auto state Activated
 			}
 		}
 
-		ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus + 0.5;
+		ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus;
 		
 		if (Level.Game.Difficulty == 0)
 		{

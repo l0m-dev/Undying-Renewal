@@ -39,7 +39,7 @@ var bool AnalogDown;	// is analog outside dead zone?
 var byte analogkey;	// which key analog is currently emulating
 var () float ShellAnalogThreshold;	// min displacement in shell
 var float EscapeDelay; // delay to keep holding escape from rapildly showing,hiding shell ( or pauing game in cutscene )
-
+var bool bInitialized;
 
 function ResetUWindow()
 {
@@ -119,7 +119,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 					}
 					return true;
 					break;
-
+/*
 				case EInputKey.IK_F4:
 					if (!bLocked)
 					{
@@ -132,6 +132,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 					}
 					return true;
 					break;
+*/
 			}
 		break;
 	}
@@ -160,7 +161,7 @@ function HideConsole()
 function ShowMod()
 {
 	bShowMod = true;
-	if(bCreatedRoot)
+	if(bCreatedRoot && ModWindow != None)
 		ModWindow.ShowWindow();
 }
 
@@ -190,8 +191,8 @@ event Tick( float Delta )
 	}
  
 
-	if ( ViewPort.Actor.Level.bLoadBootShellPSX2 && !IsInState('UWindow') )
-	{
+	if ( (ViewPort.Actor.Level.bLoadBootShellPSX2 || !bInitialized) && !IsInState('UWindow') )
+	{		
 		if ( GetPlatform() == PLATFORM_PSX2 )
 		{
 			// Check to see if boot shell is to be loaded immediately
@@ -236,9 +237,23 @@ state UWindow
 		if(Root != None)
 		{
 			Root.bUWindowActive = True;
-		
-			//fix
-			Root.SetupFonts();
+			
+			if (!bInitialized)
+			{
+				//fix
+				Root.SetupFonts(Canvas);
+				
+				if (!ViewPort.Actor.Level.bLoadBootShellPSX2)
+				{
+					if(Root != None)
+						Root.CloseActiveWindow();
+
+					if(bQuickKeyEnable)
+						CloseUWindow();
+				}
+				
+				bInitialized = True;
+			}
 		}
 
 		RenderUWindow( Canvas );
@@ -308,7 +323,7 @@ state UWindow
 					}
 				}
 				break;
-
+/*
 			case EInputKey.IK_F4:
 				if (bShowMod)
 				{
@@ -327,7 +342,7 @@ state UWindow
 					}
 				}
 				break;
-
+*/
 			case EInputKey.IK_Escape:
 				if (EscapeDelay > 0.0)
 					return true;
@@ -514,9 +529,9 @@ function CreateRootWindow(Canvas Canvas)
 	if(!bShowConsole)
 		HideConsole();
 		
-	ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
-	if(!bShowMod)
-		HideMod();
+	//ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
+	//if(!bShowMod)
+	//	HideMod();
 
 	//UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(" ");
 	//for (I=0; I<4; I++)

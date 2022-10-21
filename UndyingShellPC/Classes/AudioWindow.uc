@@ -9,7 +9,7 @@ class AudioWindow expands ShellWindow;
 //#exec Texture Import File=Audio_1.bmp Mips=Off
 //#exec Texture Import File=Audio_2.bmp Mips=Off
 //#exec Texture Import File=Audio_3.bmp Mips=Off
-//#exec Texture Import File=Audio_4.bmp Mips=Off
+#exec Texture Import File=Audio_4R.bmp Mips=Off
 //#exec Texture Import File=Audio_5.bmp Mips=Off
 
 
@@ -819,6 +819,6 @@ defaultproperties
      BackNames(1)="UndyingShellPC.Audio_1"
      BackNames(2)="UndyingShellPC.Audio_2"
      BackNames(3)="UndyingShellPC.Audio_3"
-     BackNames(4)="UndyingShellPC.Audio_4"
+     BackNames(4)="UndyingShellPC.Audio_4R"
      BackNames(5)="UndyingShellPC.Audio_5"
 }

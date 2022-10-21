@@ -125,7 +125,7 @@ simulated function PlayFiring()
 	bStillFiring = true;
 }
 
-function StartFiring()
+simulated function StartFiring()
 {
 	PlayAnim('EctoStart',1,,,0);
 }

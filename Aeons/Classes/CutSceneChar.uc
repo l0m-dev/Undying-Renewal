@@ -19,7 +19,14 @@ var sound foo;
 var vector InitialLoc;
 var Actor SceneCamera;
 
-function PreBeginPlay()
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		CutsceneID, CSSeqPlaySoundGlobal, CSSeqVolume, CSSeqStrength, CSDialogTimes, CSDialogSeq, CSSounds, AnimName,
+		bAnimOverrideHide, SceneCamera;
+}
+
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	InitialLoc = Location;
@@ -37,7 +44,7 @@ function Hide()
 	bHidden = true;
 }
 
-function PlayTake(int i)
+simulated function PlayTake(int i)
 {
 	SetupTake(CutsceneID,i);
 	Take = i;
@@ -68,12 +75,12 @@ function PlayTake(int i)
 	GotoState('PlayCSTake');
 }
 
-function Tick(float DeltaTime)	
+simulated function Tick(float DeltaTime)	
 {
 	Age += DeltaTime;
 }
 
-state PlayCSTake
+simulated state PlayCSTake
 {
 
 	function Tick(float DeltaTime)	
@@ -116,4 +123,7 @@ defaultproperties
      DrawType=DT_Mesh
      ShadowImportance=1
      bGroundMesh=False
+	 RemoteRole=ROLE_SimulatedProxy
+	 bAlwaysRelevant=True
+	 bNetInitial=True
 }

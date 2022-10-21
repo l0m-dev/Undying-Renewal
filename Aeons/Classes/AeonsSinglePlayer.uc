@@ -28,7 +28,8 @@ defaultproperties
      PI_BluntSound=(Sound_1=Sound'Impacts.GoreSpecific.E_Imp_FleshBlunt01',Sound_2=Sound'Impacts.GoreSpecific.E_Imp_FleshBlunt02')
      PI_BulletSound=(Sound_1=Sound'Impacts.GoreSpecific.E_Imp_FleshBullet01',Sound_2=Sound'Impacts.GoreSpecific.E_Imp_FleshBullet02')
      PI_RipSliceSound=(Sound_1=Sound'Impacts.GoreSpecific.E_Imp_FleshSlice01',Sound_2=Sound'Impacts.GoreSpecific.E_Imp_FleshSlice02')
-     AnimSequence=WalkSM
+     AnimSequence=Idle
      DrawType=DT_Mesh
      Style=STY_Normal
+	 bClientAnim=False
 }

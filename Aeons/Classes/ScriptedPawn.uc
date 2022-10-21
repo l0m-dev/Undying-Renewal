@@ -12182,11 +12182,20 @@ state AIRunScript
 		PlayAnimFromGroup( ScriptAnimGroup );
 	}
 
-	function int Mumble( sound ASound )
+		function int Mumble( sound ASound )
 	{
 		local int	sID;
+		local AeonsPlayer APlayer;
+		local bool near;
 
 		if ( bFastScript )
+			return 0;
+
+		ForEach RadiusActors(class 'AeonsPlayer', APlayer, 2048)
+		{
+			break;
+		}
+		if (APlayer == None)
 			return 0;
 		sID = 0;
 		if ( ( ASound != none ) && ( ASound != ScriptLastSound ) )
