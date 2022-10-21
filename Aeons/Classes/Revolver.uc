@@ -514,7 +514,7 @@ defaultproperties
      AmmoName=Class'Aeons.BulletAmmo'
      AltAmmoName=Class'Aeons.SilverBulletAmmo'
      ReloadCount=6
-     PickupAmmoCount=24
+     PickupAmmoCount=36
      FiringSpeed=0.25
      FireOffset=(Z=-20)
      ProjectileClass=Class'Aeons.Bullet_proj'

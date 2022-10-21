@@ -34,7 +34,10 @@ function Timer()
 	Super.Timer();
 
 	foreach AllActors(class'AeonsPlayer', aPlayer)
+	{
 		aPlayer.DefAll();
+		aPlayer.bDrawStealth = true;
+	}
 }
 
 function PostBeginPlay()

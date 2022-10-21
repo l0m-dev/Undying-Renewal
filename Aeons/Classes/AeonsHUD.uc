@@ -989,7 +989,8 @@ simulated function PostRender( canvas Canvas )
 			DrawManaInfo(Canvas);		// mana maintenence values
 	
 		// Stealth Icons have been cut from the game 11/19/2000
-		//DrawStealthIcons(Canvas);
+		if (AeonsPlayer(Owner).bDrawStealth)
+			DrawStealthIcons(Canvas);
 	
 		DrawFlightMana(Canvas);
 		DrawCenterPiece(Canvas);
@@ -2449,21 +2450,21 @@ simulated function DrawStealthIcons(Canvas Canvas)
 			Canvas.DrawColor.G = 100;
 			Canvas.DrawColor.B = 255;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 28, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 - 28 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*vi), 0, 16, 16);
 
 			Canvas.DrawColor.R = 100;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 8, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 - 8 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*ai), 0, 16, 16);
 
 			Canvas.DrawColor.R = 255;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 + 12, Canvas.ClipY - 18);
+			Canvas.SetPos(Canvas.ClipX * 0.5 + 12 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*mi), 0, 16, 16);
 		}
 	}

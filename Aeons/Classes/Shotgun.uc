@@ -581,7 +581,7 @@ defaultproperties
      AmmoName=Class'Aeons.ShotgunAmmo'
      AltAmmoName=Class'Aeons.PhosphorusShellAmmo'
      ReloadCount=2
-     PickupAmmoCount=18
+     PickupAmmoCount=24
      ProjectileClass=Class'Aeons.Pellet_proj'
      AltProjectileClass=Class'Aeons.Phosphorus_proj'
      Accuracy=1.8

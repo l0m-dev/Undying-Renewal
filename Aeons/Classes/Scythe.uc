@@ -1059,7 +1059,7 @@ defaultproperties
      WindUpSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyBigWindup01'
      AbsorbHealthSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyEnergyLoop01'
      MadSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_InvokeMine01'
-	 ThirstSound=Sound'CreatureSFX.Chanter.C_Chanter_AmbLoop'
+     ThirstSound=Sound'CreatureSFX.Chanter.C_Chanter_AmbLoop'
      bWaterFire=True
      bAltWaterFire=True
      ExplosionDecal=Class'Aeons.ScytheDecal'

@@ -50,8 +50,8 @@ state Deactivated
 
 defaultproperties
 {
-     AmmoAmount=4
-     MaxAmmo=20
+     AmmoAmount=6
+     MaxAmmo=30
      InventoryGroup=113
      bActive=False
      PickupMessage="You picked up phosphorus shells"

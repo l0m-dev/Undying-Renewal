@@ -4529,7 +4529,7 @@ exec function DefAll()
 			newSpell.CastingLevel = 4;
 		}
 	}
-	
+	/*
 	if (Inventory.FindItemInGroup(class'Aeons.Pyro'.default.InventoryGroup) == none)
 	{
 		newSpell = Spawn(class'Aeons.Pyro');
@@ -4540,6 +4540,7 @@ exec function DefAll()
 			newSpell.CastingLevel = 4;
 		}
 	}
+	*/
 }
 
 exec function GiveMe(name this, optional int Amplitude)
