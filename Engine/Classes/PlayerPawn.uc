@@ -5288,7 +5288,7 @@ defaultproperties
      Handedness=-1
      bAlwaysMouseLook=True
      bKeyboardLook=True
-	 bEnableSubtitles=False
+	 bEnableSubtitles=True
      bMessageBeep=True
      bCheatsEnabled=True
      bUpdateInventorySelect=True

@@ -119,7 +119,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 					}
 					return true;
 					break;
-
+/*
 				case EInputKey.IK_F4:
 					if (!bLocked)
 					{
@@ -132,6 +132,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 					}
 					return true;
 					break;
+*/
 			}
 		break;
 	}
@@ -160,7 +161,7 @@ function HideConsole()
 function ShowMod()
 {
 	bShowMod = true;
-	if(bCreatedRoot)
+	if(bCreatedRoot && ModWindow != None)
 		ModWindow.ShowWindow();
 }
 
@@ -322,7 +323,7 @@ state UWindow
 					}
 				}
 				break;
-
+/*
 			case EInputKey.IK_F4:
 				if (bShowMod)
 				{
@@ -341,7 +342,7 @@ state UWindow
 					}
 				}
 				break;
-
+*/
 			case EInputKey.IK_Escape:
 				if (EscapeDelay > 0.0)
 					return true;
@@ -528,9 +529,9 @@ function CreateRootWindow(Canvas Canvas)
 	if(!bShowConsole)
 		HideConsole();
 		
-	ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
-	if(!bShowMod)
-		HideMod();
+	//ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
+	//if(!bShowMod)
+	//	HideMod();
 
 	//UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(" ");
 	//for (I=0; I<4; I++)
