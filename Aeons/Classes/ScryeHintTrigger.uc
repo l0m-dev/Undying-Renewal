@@ -64,8 +64,8 @@ function Touch( actor Other )
 	{
 		if ( Other.IsA('AeonsPlayer') )
 		{
-			//if ( AeonsPlayer(Other).bShowScryeHint && AeonsPlayer(Other).Player.Console.bEnglish )
-			AeonsPlayer(Other).ScreenMessage(ScryeHintMessage, 5.0);
+			if ( AeonsPlayer(Other).bShowScryeHint )
+				AeonsPlayer(Other).ScreenMessage(ScryeHintMessage, 5.0);
 			
 			if ( AeonsPlayer(Other).ScryeMod.bActive )
 				AeonsPlayer(Other).bShowScryeHint = false;

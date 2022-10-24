@@ -95,7 +95,7 @@ auto state Activated
 		if ( Pawn(Owner) != none )
 		{
 			if (HealthSurplus == 0)
-				if ( Pawn(Owner).Health > (Pawn(Owner).default.Health + 0.5) )
+				if ( int(Pawn(Owner).Health) > int(Pawn(Owner).default.Health) )
 					Pawn(Owner).Health -= 1;
 		} else {
 			Destroy();

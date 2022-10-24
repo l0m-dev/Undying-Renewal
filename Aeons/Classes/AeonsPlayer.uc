@@ -453,8 +453,6 @@ event PreBeginPlay()
 	
 	bRenderWeapon = true;
 	
-	bShowScryeHint = true;
-
 	wind = spawn(class 'PlayerWind',self,,Location);
 	wind.setBase(self);
 
@@ -463,6 +461,16 @@ event PreBeginPlay()
 
 	//EMod = spawn(class 'EnvironmentModifier',self,,Location);
 	//EMod.setBase(self);
+}
+
+event PreClientTravel()
+{
+	// fix ambient sound playing when coming back to a level
+	// maybe even destroy the modifiers since they are recreated
+	if (ScryeMod != None)
+		ScryeMod.AmbientSound = None;
+	if (Flight != None)
+		Flight.AmbientSound = None;
 }
 
 event HeadZoneChange(ZoneInfo newHeadZone)

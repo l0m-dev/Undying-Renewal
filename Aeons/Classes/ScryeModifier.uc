@@ -23,6 +23,7 @@ function TravelPostAccept()
 	else {
 		PlayerPawn(Owner).ScryeTimer = 0;
 		GotoState( 'Idle' );
+		AmbientSound = None;
 	}
 }
 

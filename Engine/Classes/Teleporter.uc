@@ -75,7 +75,7 @@ function PostBeginPlay()
 		FindTriggerActor();
 	Super.PostBeginPlay();
 	
-	if (TransitionScreenName[0] == "UndyingShellPC.Main_Back_0")
+	if (TransitionScreenName[0] ~= "UndyingShellPC.Main_Back_0")
 		bUseTransitionScreen = false;
 }
 
@@ -370,7 +370,7 @@ defaultproperties
 {
      bChangesYaw=True
      bEnabled=True
-     bUseTransitionScreen=False
+     bUseTransitionScreen=True
      TransitionScreenName(0)="UndyingShellPC.Main_Back_0"
      TransitionScreenName(1)="UndyingShellPC.Main_Back_1"
      TransitionScreenName(2)="UndyingShellPC.Main_Back_2"

@@ -156,8 +156,10 @@ function TravelPostAccept()
 {
 	if( bActive )
 		GotoState( 'Activated', 'AlreadyActive' );
-	else
+	else {
 		GotoState( 'Idle' );
+		AmbientSound = None;
+	}
 }
 
 //----------------------------------------------------------------------------
