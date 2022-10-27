@@ -1947,10 +1947,10 @@ exec function ChangeHud()
 }
 
 // Crosshair
-exec function ChangeCrosshair()
+exec function ChangeCrosshair(int d)
 {
 	if ( myHud != None ) 
-		myHUD.ChangeCrosshair(1);
+		myHUD.ChangeCrosshair(d);
 	myHUD.SaveConfig();
 }
 

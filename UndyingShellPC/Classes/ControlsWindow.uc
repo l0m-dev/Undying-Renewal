@@ -52,6 +52,8 @@ var ShellButton		AltCommands[7];
 var ShellButton		Down;
 var ShellButton		Up;
 var ShellButton		CrossHairButton;
+var ShellButton		CrosshairLeft;
+var ShellButton		CrosshairRight;
 
 var ShellSlider		SensitivitySlider;
 
@@ -251,6 +253,40 @@ function Created()
 	Down.DownTexture = texture'Cntrl_dnbut_dn';
 	Down.OverTexture = texture'Cntrl_dnbut_ov';
 	Down.DisabledTexture = texture'Cntrl_dnbut_ds';
+
+	CrosshairLeft =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+	CrosshairRight =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+
+	CrosshairLeft.Style = 5;
+	CrosshairRight.Style = 5;
+
+	CrosshairLeft.Template =	NewRegion(710 - 90,500,88,51);
+	CrosshairRight.Template = NewRegion(710 + 30,495,88,51);
+
+	CrosshairLeft.TexCoords = NewRegion(0,0,88,51);
+	CrosshairRight.TexCoords = NewRegion(0,0,88,51);
+
+	CrosshairLeft.bRepeat = True;
+	CrosshairRight.bRepeat = True;
+
+	CrosshairLeft.key_interval = 0.08;
+	CrosshairRight.key_interval = 0.08;
+
+	
+
+	CrosshairLeft.Manager = Self;
+
+	CrosshairRight.Manager = Self;
+
+	CrosshairLeft.UpTexture =   texture'Book_Left_Up';
+	CrosshairLeft.DownTexture = texture'Book_Left_Dn';
+	CrosshairLeft.OverTexture = texture'Book_Left_Ov';
+	CrosshairLeft.DisabledTexture = texture'Book_Left_Ds';
+
+	CrosshairRight.UpTexture =   texture'Book_Right_Up';
+	CrosshairRight.DownTexture = texture'Book_Right_Dn';
+	CrosshairRight.OverTexture = texture'Book_Right_Ov';
+	CrosshairRight.DisabledTexture = texture'Book_Right_Ds';
 
 
 // OK Button
@@ -756,7 +792,7 @@ function Message(UWindowWindow B, byte E)
 					break;
 
 				case CrossHairButton:
-					CrossHairChanged();
+					CrossHairChanged(1);
 					break;
 
 				case Up:
@@ -765,6 +801,14 @@ function Message(UWindowWindow B, byte E)
 
 				case Down:
 					ScrolledDown();
+					break;
+
+				case CrosshairLeft:
+					CrossHairChanged(-1);
+					break;
+
+				case CrosshairRight:
+					CrossHairChanged(1);
 					break;
 
 				case OK:
@@ -874,12 +918,12 @@ function ResetDefaults()
 }
 
 
-function CrossHairChanged()
+function CrossHairChanged(int d)
 {
 	local int CrossHair;
 
 
-	GetPlayerOWner().ChangeCrossHair();
+	GetPlayerOWner().ChangeCrossHair(d);
 
 	CrossHair = GetPlayerOwner().MyHud.CrossHair;
 	
@@ -1092,6 +1136,12 @@ function Resized()
 
 	if ( Down != None ) 
 		Down.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( CrosshairLeft != None ) 
+		CrosshairLeft.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( CrosshairRight != None ) 
+		CrosshairRight.ManagerResized(RootScaleX, RootScaleY);
 
 	if ( SensitivitySlider != None )
 		SensitivitySlider.ManagerResized(RootScaleX, RootScaleY);

@@ -26,5 +26,8 @@ function Inventory SelectNext()
 
 defaultproperties
 {
+     M_Activated=""
+     M_Selected=""
+     M_Deactivated=""
      Physics=PHYS_Falling
 }
