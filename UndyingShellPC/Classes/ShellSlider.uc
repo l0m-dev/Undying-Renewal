@@ -134,7 +134,7 @@ function LMouseUp(float X, float Y)
 {
 	Super.LMouseUp(X, Y);
 
-	if(bNoSlidingNotify)
+	if(bNoSlidingNotify && bSliding)
 		Message(DE_Change);
 }
 

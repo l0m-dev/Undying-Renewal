@@ -120,6 +120,8 @@ function int Dispel( optional bool bCheck )
 //****************************************************************************
 function CastShield()
 {
+	if ( Shield != none )
+		return;
 	Shield = Spawn( class'SPShield', self,, Location, Rotation );
 	if ( Shield != none )
 		Shield.Offset = ShieldOffset;
