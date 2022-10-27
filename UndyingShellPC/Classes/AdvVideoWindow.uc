@@ -81,7 +81,7 @@ function Created()
 	SkinDetailSlider = ShellSlider(CreateWindow(class'ShellSlider', 255*RootScaleX, 215*RootScaleY, 216*RootScaleX, 26*RootScaleY));
 
 	SkinDetailSlider.TexCoords = NewRegion(0,0,32,32);
-	SkinDetailSlider.Template = NewRegion(223,184,237,29);
+	SkinDetailSlider.Template = NewRegion(223,180,250,29);
 	SkinDetailSlider.SetSlider(0,0,32,32);
 
 	SkinDetailSlider.SetRange(0.0, 2.0, 1.0);
@@ -99,10 +99,10 @@ function Created()
 
 
 	// WorldDetail Slider
-	WorldDetailSlider = ShellSlider(CreateWindow(class'ShellSlider', 375*RootScaleX, 215*RootScaleY, 216*RootScaleX, 26*RootScaleY));
+	WorldDetailSlider = ShellSlider(CreateWindow(class'ShellSlider', 255*RootScaleX, 215*RootScaleY, 216*RootScaleX, 26*RootScaleY));
 
 	WorldDetailSlider.TexCoords = NewRegion(0,0,32,32);
-	WorldDetailSlider.Template = NewRegion(238,249,227,29);
+	WorldDetailSlider.Template = NewRegion(223,249,250,29);
 	WorldDetailSlider.SetSlider(0,0,32,32);
 
 	WorldDetailSlider.SetRange(0.0, 2.0, 1.0);
@@ -120,10 +120,10 @@ function Created()
 
 
 	// MinFrameRate Slider
-	MinFrameRateSlider = ShellSlider(CreateWindow(class'ShellSlider', 515*RootScaleX, 386*RootScaleY, 228*RootScaleX, 26*RootScaleY));
+	MinFrameRateSlider = ShellSlider(CreateWindow(class'ShellSlider', 255*RootScaleX, 386*RootScaleY, 228*RootScaleX, 26*RootScaleY));
 
 	MinFrameRateSlider.TexCoords = NewRegion(0,0,32,32);
-	MinFrameRateSlider.Template = NewRegion(221,310,237,29);
+	MinFrameRateSlider.Template = NewRegion(223,310,250,29);
 	MinFrameRateSlider.SetSlider(0,0,32,32);
 
 	MinFrameRateSlider.SetRange(10.0, 90.0, 10.0);
@@ -145,13 +145,13 @@ function Created()
 
 
 	// MinQuality Slider
-	MinQualitySlider = ShellSlider(CreateWindow(class'ShellSlider', 515*RootScaleX, 465*RootScaleY, 228*RootScaleX, 26*RootScaleY));
+	MinQualitySlider = ShellSlider(CreateWindow(class'ShellSlider', 255*RootScaleX, 465*RootScaleY, 228*RootScaleX, 26*RootScaleY));
 
 	MinQualitySlider.TexCoords = NewRegion(0,0,32,32);
-	MinQualitySlider.Template = NewRegion(241,379,219,29);
+	MinQualitySlider.Template = NewRegion(223,379,250,29);
 	MinQualitySlider.SetSlider(0,0,32,32);
 
-	MinQualitySlider.SetRange(1.0, 10.0, 1.0);
+	MinQualitySlider.SetRange(0.0, 1.0, 0.1);
 
 	MinQualitySlider.Manager = Self;
 	MinQualitySlider.Style = 5;
@@ -240,7 +240,7 @@ function GetCurrentSettings()
 		Log("Detail setting isn't Low/Medium/High!");
 
 	MinFrameRateSlider.SetValue(float(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager MinDesiredFrameRate")));
-	MinQualitySlider.SetValue(10.0*float(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager MinQuality")));
+	MinQualitySlider.SetValue(float(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager MinQuality")));
 	CheckBoxes[0].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager ActorShadows"));
 	CheckBoxes[1].bChecked = bool(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.ViewportManager Decals"));
 
@@ -414,7 +414,7 @@ function SaveChanges()
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager ActorShadows " $ Checkboxes[0].bChecked );
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Decals " $ Checkboxes[1].bChecked );
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager MinDesiredFrameRate " $ MinFrameRateSlider.Value );
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager MinQuality " $ MinQualitySlider.Value/10.0 );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager MinQuality " $ MinQualitySlider.Value );
 	GetPlayerOwner().ConsoleCommand("FLUSH");
 }
 

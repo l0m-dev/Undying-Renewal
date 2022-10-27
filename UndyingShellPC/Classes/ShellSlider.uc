@@ -4,7 +4,7 @@ class ShellSlider extends ShellButton;
 var	float	MinValue;
 var	float	MaxValue;
 var	float	Value;
-var	int		Step;		// 0 = continuous
+var	float	Step;		// 0 = continuous
 
 
 var Region  Slider;
@@ -17,13 +17,14 @@ var float	TrackWidth;
 var bool	bSliding;
 var bool	bNoSlidingNotify;
 
+var float SlideOffset;
 
 function Created()
 {
 	Super.Created();
 }
 
-function SetRange(float Min, float Max, int NewStep)
+function SetRange(float Min, float Max, float NewStep)
 {
 	MinValue = Min;
 	MaxValue = Max;
@@ -64,7 +65,7 @@ function float CheckValue(float Test)
 	
 	NewValue = Test;
 	
-	if(Step != 0)
+	if(Step >= 0.01)
 	{
 		TempF = NewValue / Step;
 		NewValue = Int(TempF + 0.5) * Step;
@@ -144,23 +145,24 @@ function LMouseDown(float X, float Y)
 	if((X >= Slider.X) && (X <= Slider.X + Slider.W)) 
 	{
 		bSliding = True;
+		SlideOffset = X - Slider.X;
 		Root.CaptureMouse();
 	}
 
 	if(X < Slider.X && X > 0)
 	{
-		if(Step != 0)
+		if(Step >= 0.01)
 			SetValue(Value - Step);
 		else
-			SetValue(Value - 1);
+			SetValue(Value - 0.01);
 	}
 	
 	if(X > Slider.X + Slider.W && X < WinWidth)
 	{
-		if(Step != 0)
+		if(Step >= 0.01)
 			SetValue(Value + Step);
 		else
-			SetValue(Value + 1);
+			SetValue(Value + 0.01);
 	}
 	
 }
@@ -172,7 +174,7 @@ function MouseMove(float X, float Y)
 
 	if(bSliding && bMouseDown)
 	{
-		SetValue( (X / WinWidth) * (MaxValue - MinValue) + MinValue, bNoSlidingNotify);
+		SetValue( ((X - SlideOffset) / (WinWidth - Slider.W)) * (MaxValue - MinValue) + MinValue, bNoSlidingNotify);
 	}
 	else
 		bSliding = False;
@@ -188,17 +190,17 @@ function KeyDown(int Key, float X, float Y)
 	switch (Key)
 	{
 	case P.EInputKey.IK_Left:
-		if(Step != 0)
+		if(Step >= 0.01)
 			SetValue(Value - Step);
 		else
-			SetValue(Value - 1);
+			SetValue(Value - 0.01);
 
 		break;
 	case P.EInputKey.IK_Right:
-		if(Step != 0)
+		if(Step >= 0.01)
 			SetValue(Value + Step);
 		else
-			SetValue(Value + 1);
+			SetValue(Value + 0.01);
 
 		break;
 	case P.EInputKey.IK_Home:

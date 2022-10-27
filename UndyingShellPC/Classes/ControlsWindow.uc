@@ -260,8 +260,8 @@ function Created()
 	CrosshairLeft.Style = 5;
 	CrosshairRight.Style = 5;
 
-	CrosshairLeft.Template =	NewRegion(710 - 90,500,88,51);
-	CrosshairRight.Template = NewRegion(710 + 30,495,88,51);
+	CrosshairLeft.Template =	NewRegion(710 - 50, 506, 88 / 2, 51 / 1.5);
+	CrosshairRight.Template = NewRegion(710 + 25, 502, 88 / 2, 51 / 1.5);
 
 	CrosshairLeft.TexCoords = NewRegion(0,0,88,51);
 	CrosshairRight.TexCoords = NewRegion(0,0,88,51);
@@ -411,7 +411,7 @@ function Created()
 	SensitivitySlider.bNoSlidingNotify = true;
 
 	SensitivitySlider.SetRange(0.5, 8.0, 0.1);
-	SensitivitySlider.SetValue(3.0);
+	SensitivitySlider.SetValue(2.0);
 
 	SensitivitySlider.Manager = Self;
 	SensitivitySlider.Text = "";

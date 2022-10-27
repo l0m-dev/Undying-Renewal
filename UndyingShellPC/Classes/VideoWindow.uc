@@ -135,8 +135,8 @@ function Created()
 	BrightnessSlider.Template = NewRegion(515,386,228,26);
 	BrightnessSlider.SetSlider(0,0,32,32);
 
-	BrightnessSlider.SetRange(0.0, 10.0, 1.0);
-	BrightnessSlider.SetValue(8);
+	BrightnessSlider.SetRange(0.0, 1.0, 0.05);
+	BrightnessSlider.SetValue(0.5);
 
 	BrightnessSlider.Manager = Self;
 	BrightnessSlider.Style = 5;
@@ -647,7 +647,7 @@ function BrightnessChanged()
 	if ( (ChangeSound != none) && bInitialized )
 		GetPlayerOwner().PlaySound( ChangeSound,, 0.25, [Flags]482 );
 
-	Brightness = BrightnessSlider.Value / 10.0;
+	Brightness = BrightnessSlider.Value;
 
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Brightness " $ Brightness );
 
@@ -666,7 +666,7 @@ function GetCurrentSettings()
 	OrigBrightness = FClamp( OrigBrightness, 0.0, 1.0 );
 	
 	// link up shell components with variables
-	BrightnessSlider.SetValue(OrigBrightness*10);
+	BrightnessSlider.SetValue(OrigBrightness);
 
 	if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" && GetPlayerOwner().ConsoleCommand("GetCurrentDriver") != "3DFX")
 	{
