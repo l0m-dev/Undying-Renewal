@@ -143,6 +143,8 @@ var		HasteTrailFX			RightClawFX;
 var		HasteTrailFX			BodyHasteFX;
 var		GlowScriptedFX			BodyGlowFX;
 
+var LizHowler Howler;
+
 //****************************************************************************
 //****************************************************************************
 // <Begin> Animation trigger functions.
@@ -515,18 +517,39 @@ function Tick( float DeltaTime )
 
 function bool SpawnHowler()
 {
-	local LizHowler H;
 	local PlayerPawn Player;
 	
 	Player = PlayerPawn(FindPlayer());
 	
-	H = spawn(class 'LizHowler',,,FindPlayer().Location, rot(0,0,0));
+	if (Howler != None && Howler.Health <= 0)
+	{
+		Howler.Destroy();
+		Howler = None;
+	}
 	
-	H = Spawn( class 'LizHowler',,,Player.Location + FMax( class 'LizHowler'.default.CollisionRadius + Player.CollisionRadius + 50, 72 ) * Vector(Player.Rotation) + vect(0,0,1) * 15 );
-	//H.InitState(Player);
-	H.HatedEnemy = Player;
-	
-	//Spawn( class'HoundSpawnEffect',,, H.Location );
+	if (Howler == None)
+	{
+		Howler = spawn(class 'LizHowler',,,Player.Location, rot(0,0,0));
+		
+		if (Howler == None)
+		{
+			Howler = Spawn( class 'LizHowler',,,Player.Location + FMax( class 'LizHowler'.default.CollisionRadius + Player.CollisionRadius + 50, 72 ) * Vector(Player.Rotation) + vect(0,0,1) * 15 );
+		}
+		
+		if (Howler == None)
+		{
+			Howler = Spawn( class 'LizHowler',,,Player.Location - FMax( class 'LizHowler'.default.CollisionRadius + Player.CollisionRadius + 50, 72 ) * Vector(Player.Rotation) + vect(0,0,-1) * 15 );
+		}
+		
+		if (Howler != None)
+		{
+			//Howler.InitState(Player);
+			Howler.HatedEnemy = Player;
+			Howler.PlaySound_P( "howl" );
+		
+			Spawn( class'HoundSpawnEffect',,, Howler.Location );
+		}
+	}
 }
 
 //****************************************************************************
@@ -661,8 +684,6 @@ Resume:
 
 Begin:
 	DebugInfoMessage( ".LizbethBossFightFrenzy Begin." );
-	
-	SpawnHowler();
 	
 	Sleep(20);
 }

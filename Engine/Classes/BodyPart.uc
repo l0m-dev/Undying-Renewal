@@ -8,10 +8,17 @@ simulated function ProcessTouch(Actor Other, Vector HitLocation){}
 
 simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 {
+	local vector HitLocation, HitNormal2, start, end;
+	local int HitJoint;
+	
 	if (Physics == PHYS_None)
 		return;
 	
-	if (Velocity.Z < 2)
+	Start = Location;
+	End = Location + (vect(0,0,-1) * (CollisionHeight + 32));
+	
+	Trace(HitLocation, HitNormal2, HitJoint, end, start);
+	if (HitLocation != vect(0,0,0) && Velocity.Z < 2)
 	{
 		setPhysics(PHYS_None);
 	}

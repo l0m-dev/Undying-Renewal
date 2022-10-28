@@ -21,4 +21,6 @@ defaultproperties
 	 AttitudeToEnemy=ATTITUDE_Ignore
 	 AttitudeToPlayer=ATTITUDE_Hate
 	 bHasFarAttack=True
+	 bBlockPlayers=True
+	 bBlockActors=False
 }

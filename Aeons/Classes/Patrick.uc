@@ -210,8 +210,10 @@ exec function DestroyJoint()
 	
 	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
 
-	if ( A != none )
+	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss )
+	{
 		A.DestroyLimb(A.JointName(HitJoint));
+	}
 }
 
 

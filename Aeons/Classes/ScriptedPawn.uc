@@ -1705,8 +1705,13 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
 		
-	if (damageType == 'pellet' || damageType == 'Fire')
-		Patrick(Killer).DetachJoint();
+	if (damageType == 'pellet')
+	{
+		if (FRand() > 0.5)
+			Patrick(Killer).DetachJoint();
+		else
+			Patrick(Killer).DestroyJoint();
+	}
 
 	// Remove all non-persistent effectors.
 	KillEffectorList();

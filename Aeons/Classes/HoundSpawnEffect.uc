@@ -22,17 +22,18 @@ auto State GenEffect
 {
 	function Tick(float DeltaTime)
 	{
-		DrawScale += DeltaTime * 2;
+		DrawScale += 8 * DeltaTime;
+	
+		if (DrawScale > 4)
+			Destroy();
 	}
-
-	Begin:
-
 }
 
 defaultproperties
 {
      Rate=0.15
      DrawType=DT_Sprite
+	 Style=STY_AlphaBlend
      Texture=WetTexture'fxB.FX.HoundPortalWet'
-     DrawScale=3
+     DrawScale=1
 }

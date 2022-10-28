@@ -106,7 +106,10 @@ simulated function PlayFiring()
 {
 	log("PlayFiring Called within the Shotgun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
-	Patrick(Owner).DetachJoint(None, 200);
+	if (FRand() > 0.5)
+		Patrick(Owner).DetachJoint(None, 200);
+	else
+		Patrick(Owner).DestroyJoint();
 //new	if ( Role == ROLE_Authority )
 //		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
@@ -402,7 +405,7 @@ state NewClip
 			FinishSound(sndID);
 			ClipCount++;
 			
-			if (AeonsPlayer(Owner).refireMultiplier < 0.6)
+			if (AeonsPlayer(Owner).refireMultiplier < 0.6 && ClipCount < ReloadCount)
 				ClipCount++;
 		}
 		

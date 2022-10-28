@@ -5432,6 +5432,8 @@ function SpawnGibbedCarcass( vector Dir )
 	
 	for (i=0; i<NumJoints(); i++)
 	{
+		if (FRand() > 0.25)
+			continue;
 		//P = JointPlace( JointName(i) );
 		//Gib = Spawn(class 'MandorlaParticleFX', self,, P.pos);
 		//Vel = vect(FRand(), FRand(), 0.25) * 256;
