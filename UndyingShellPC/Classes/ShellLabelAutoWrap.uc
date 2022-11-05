@@ -3,6 +3,7 @@
 //=============================================================================
 class ShellLabelAutoWrap extends ShellLabel;
 
+// originally only used for book titles
 
 function Paint(Canvas C, float X, float Y)
 {
@@ -15,7 +16,8 @@ function Paint(Canvas C, float X, float Y)
 	local int CurrentWidth;
 	local string Remainder;
 	local int SpacePos;
-		
+	local int OldSpacePos;
+	
 	//Super.Paint(C, X, Y);
 	
 	C.Font = Root.Fonts[Font];
@@ -81,6 +83,7 @@ function Paint(Canvas C, float X, float Y)
 
 		DrawStretchedTextureSegment( C, 0, 0, WinWidth, WinHeight, 0, 0, 8, 8, Texture'UWindow.WhiteTexture' );
 */		
+		OldSpacePos=0;
 		while ( Remainder != "" )
 		{
 			//Token = InStr(Remainder, " ");
@@ -90,18 +93,19 @@ function Paint(Canvas C, float X, float Y)
 			NewWord="";
 			CurrentLine="";
 
-			while ( (W < WinWidth) && (!bFoundEnd) )
+			while ( /*(W < WinWidth) &&*/ (!bFoundEnd) ) // width check prevents wrapping when a word is too long, might want to make this a variable and do it on specific labels only
 			{
 				CurrentLine = CurrentLine $ NewWord;
 				
 				Remainder = Right( Remainder, Len(Remainder)-Len(NewWord) );
-
-				//Log("WidthLoop Top: CurrentLine=" $ CurrentLine $ " Remainder=" $ Remainder);
-				SpacePos = InStr(Remainder, " ");
 				
-				if ( SpacePos >= 0 ) 
+				SpacePos = InStr(Remainder, " ");
+				//Log("WidthLoop Top: CurrentLine=" $ CurrentLine $ " Remainder=" $ Remainder $ " SpacePos=" $ SpacePos);
+				
+				if ( SpacePos >= 0 && SpacePos != OldSpacePos) // we can also move this condition here instead of checking OldSpacePos: && (W < WinWidth) 
 				{
 					NewWord = Left(Remainder, SpacePos+1);
+					OldSpacePos = SpacePos;
 				}
 				else
 				{
