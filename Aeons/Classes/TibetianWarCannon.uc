@@ -83,7 +83,7 @@ state NormalFire
 		
 		if (tmr > 0.5)
 		{
-			if (ChargedMana < 4)
+			if (ChargedMana < 3) // ArrayCount(ProjClass) -1
 				ChargedMana += 1;
 			tmr = 0;
 		}

@@ -245,7 +245,7 @@ function Created()
 
 //screenshot
 	ScreenShot = ShellBitmap(CreateWindow(class'ShellBitmap', 10,10,10,10));
-	ScreenShot.T = None;//Dynamic texture'Black';//Screenshot3';
+	ScreenShot.T = Texture(DynamicLoadObject("Screens.Generic", class'texture'));;//Dynamic texture'Black';//Screenshot3';
 	ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
 	ScreenShot.Template = NewRegion(425,46,116,88);
 	ScreenShot.bStretch = true;

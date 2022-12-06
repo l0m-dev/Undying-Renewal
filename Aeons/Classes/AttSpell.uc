@@ -134,7 +134,7 @@ function Finish()
     } else if ( (Pawn(Owner).AttSpell != self) ) {
         //This shouldn't happen -immediate shutdown and reset
         PawnOwner.ClientMessage("Error: Immediate shutdown of "$ItemName);
-        bHideSpell = true;
+        //bHideSpell = true;
         bInControl = false;
         bSpellUp = false;
         bMuzzleFlash = 0;

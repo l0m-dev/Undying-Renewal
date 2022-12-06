@@ -789,13 +789,14 @@ function Resized()
 	if ( BrightnessSlider != None ) 
 		BrightnessSlider.ManagerResized(RootScaleX, RootScaleY);
 
+	ResLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentRes"); 
 }
 
 
 function Paint(Canvas C, float X, float Y)
 {
 	local int i;
-	local string res;
+	//local string res;
 	local color textcolor;
 
 	Super.Paint(C, X, Y);
@@ -804,12 +805,12 @@ function Paint(Canvas C, float X, float Y)
 	Super.PaintSmoke(C, Advanced, SmokingWindows[1], SmokingTimers[1]);
 	Super.PaintSmoke(C, Cancel, SmokingWindows[2], SmokingTimers[2]);
 
-	res = GetPlayerOwner().ConsoleCommand("GetCurrentRes");
-	reslabel.text = res;
+	//res = GetPlayerOwner().ConsoleCommand("GetCurrentRes");
+	//reslabel.text = res;
 
 	for ( i=0; i<ArrayCount(Resolutions); i++ )
 	{
-		if ( res ~= Resolutions[i].Text )
+		if ( ResLabel.Text ~= Resolutions[i].Text )
 		{
 			//DrawStretchedTexture(C, Resolutions[i].WinLeft, Resolutions[i].WinTop, Resolutions[i].WinWidth, Resolutions[i].WinHeight, texture'Aeons.Particles.SOft_pfx');		
 			Resolutions[i].UpTexture = texture'Video_resol_dn';
