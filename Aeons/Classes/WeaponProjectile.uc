@@ -37,19 +37,57 @@ function DamageInfo getDamageInfo(optional name DamageType)
 
 simulated function name CheckJoint()
 {
-	local vector HitLocation, HitNormal, Dir;
-	local int HitJoint;
-	local Actor A;
-	local name JointName;
-	
-	Dir = Normal(Velocity);
-	
-	A = Trace(HitLocation, HitNormal, HitJoint, Location, OldLocation, true, true);
+	local vector HitLocation, HitNormal;
+	local int HitJoint, FirstHitJoint;
+	local Actor A, FirstHitActor;
+	local name FirstHitJointName;
 
-	if (A != none)
-		return A.JointName(HitJoint);
+	FirstHitActor = Trace(HitLocation, HitNormal, FirstHitJoint, Location, OldLocation, true, true);
 
+	if (FirstHitActor != none)
+	{
+		FirstHitJointName = FirstHitActor.JointName(FirstHitJoint);
+
+		// disable the first joint we hit and see if behind it is a headshot joint
+		if (!CheckHeadShotJoint(FirstHitJointName))
+		{
+			// Disable collision on a limb or limb tree.
+			// native(417) exec final function SetLimbTangible( name Joint, bool tangible, optional bool all );
+
+			// do the trace again after disabling collision for the first hit joint
+			FirstHitActor.SetLimbTangible(FirstHitJointName, false, false);
+			A = Trace(HitLocation, HitNormal, HitJoint, Location + Normal(Location - OldLocation) * 16, OldLocation, true, true);
+			FirstHitActor.SetLimbTangible(FirstHitJointName, true, false);
+
+			if (A != none && HitJoint != -1 && CheckHeadShotJoint(A.JointName(HitJoint)))
+			{
+				return A.JointName(HitJoint);
+			}
+		}
+
+		return FirstHitJointName;
+	}
 	return 'None';
+}
+
+function bool CheckHeadShotJoint(name JointName)
+{
+	switch (JointName)
+	{
+		case 'Neck':
+		case 'Head':
+		case 'Hair1':
+		case 'Hair2':
+		case 'Hair3':
+		case 'Hair4':
+		case 'Hair5':
+		case 'L_Ear':
+		case 'R_Ear':
+		case 'Jaw':
+		case 'Mouth':
+			return true;
+	}
+	return false;
 }
 
 /*

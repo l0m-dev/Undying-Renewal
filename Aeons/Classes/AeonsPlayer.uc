@@ -3070,11 +3070,29 @@ simulated state PlayerCutScene
 
 	exec function Fire( optional float F )
 	{
+		local CameraProjectile Cam;
+		local ScriptedPawn SP;
+
 		if ( MasterCamPoint != none && (MasterCamPoint.bEscapable || MasterCamPoint.URL != "") )
 		{
 			log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
 			MasterCamPoint.CompleteCutscene(self);
 			MasterCamPoint.Teleport(self);
+		}
+		else if (GetRenewalConfig().bMoreSkippableCutscenes)
+		{
+			ForEach AllActors(class 'CameraProjectile', Cam)
+			{
+				Cam.SkipIt();
+			}
+
+			foreach AllActors( class'ScriptedPawn', SP )
+			{
+				SP.Script.bClickThrough = true;
+				SP.FastScript( true );
+			}
+			
+			AeonsHud(myHud).RemoveSubtitle();
 		}
 	}
 

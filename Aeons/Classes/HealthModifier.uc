@@ -108,6 +108,7 @@ auto state Activated
 
 defaultproperties
 {
+	 ProjectedHealthTarget=100 // fixes picking up health before we tick (custom maps that give us health packs on start)
      bTimedTick=True
      MinTickTime=0.15
      RemoteRole=ROLE_None

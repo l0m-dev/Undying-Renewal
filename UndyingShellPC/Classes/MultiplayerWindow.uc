@@ -27,7 +27,7 @@ class MultiplayerWindow expands ShellWindow;
 #exec Texture Import File=create_game_dn.bmp	Mips=Off Flags=2
 
 var UWindowWindow PlayerSetupWindow;
-//var UWindowWindow FindGameWindow;
+var UWindowWindow FindGameWindow;
 var UWindowWindow CreateGameWindow;
 
 var ShellButton FindGame, CreateGame, PlayerSetup, Back;
@@ -147,7 +147,7 @@ function Created()
 	Back.bBurnable = true;
 	Back.OverSound=sound'Aeons.Shell_Blacken01';
 
-	//Root.Console.bBlackout = True; // comment out idk
+	//Root.Console.bBlackout = True;
 
 	Resized();
 }
@@ -247,26 +247,15 @@ function CreateGamePressed()
 function FindGamePressed()
 {
 	// 50, 30, 500, 300 from ut
-	//if ( FindGameWindow == None )
-	//	FindGameWindow = ManagerWindow(Root.CreateWindow(class'FindGameMainWindow', 100, 100, 200, 200, Root, True));
-	//else {
-	//	FindGameWindow.ShowWindow();
-	//}
+	if ( FindGameWindow == None )
+		FindGameWindow = ManagerWindow(Root.CreateWindow(class'UBrowser.UBrowserMainWindow', 100, 100, 200, 200, Root, True));
+	else
+		FindGameWindow.ShowWindow();
 	
-	AeonsRootWindow(Root).FindMenu.NextSiblingWindow = none;
-	//AeonsRootWindow(Root).FindMenu.PrevSiblingWindow = MainMenuWindow(AeonsRootWindow(Root).MainMenu).Multiplayer;
-	AeonsRootWindow(Root).FindMenu.PrevSiblingWindow = none;
-	//AeonsRootWindow(Root).FindMenu.bWindowVisible = True;
-
-	AeonsRootWindow(Root).FindMenu.BringToFront();
-	
-	AeonsRootWindow(Root).MainMenu.HideWindow();
-	
-	//FindGameWindow.ShowOpenWindow();
-	//FindGameWindow.SelectInternet();
+	FindGameWindow.BringToFront();
 		
 	PlayNewScreenSound();
-	HideWindow();
+	//HideWindow();
 	//GetPlayerOwner().ConsoleCommand("start 127.0.0.1");	
 }
 
@@ -306,8 +295,8 @@ function Resized()
 		RootScaleY = AeonsRoot.ScaleY;
 	}
 		
-	if ( AeonsRootWindow(Root).FindMenu != None )
-		AeonsRootWindow(Root).FindMenu.Resized();
+	if ( FindGameWindow != None )
+		FindGameWindow.Resized();
 		
 	if ( CreateGameWindow != None )
 		CreateGameWindow.Resized();

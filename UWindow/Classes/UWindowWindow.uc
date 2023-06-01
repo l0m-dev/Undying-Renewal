@@ -1244,7 +1244,22 @@ final function DrawClippedActor( Canvas C, float X, float Y, Actor A, bool WireF
 	A.SetRotation(RotOffset);
 	A.SetLocation(MeshLoc + LocOffset);
 
-	C.DrawClippedActor(A, WireFrame, ClippingRegion.W * Root.GUIScale, ClippingRegion.H * Root.GUIScale, C.OrgX + ClippingRegion.X * Root.GUIScale, C.OrgY + ClippingRegion.Y * Root.GUIScale, True);
+	C.DrawClippedActorFixedFov(A, 90, WireFrame, ClippingRegion.W * Root.GUIScale, ClippingRegion.H * Root.GUIScale, C.OrgX + ClippingRegion.X * Root.GUIScale, C.OrgY + ClippingRegion.Y * Root.GUIScale, True);
+}
+
+final function DrawClippedActorFixedFov( Canvas C, float Fov, float X, float Y, Actor A, bool WireFrame, rotator RotOffset, vector LocOffset )
+{
+	//fix !!!!!!!!!!!!!!!!!!!!!     X,Y are not even used.
+	local vector MeshLoc;
+	
+	MeshLoc.X = 4 / tan((GetPlayerOwner().FOVAngle * Pi / 180) / 2);
+	MeshLoc.Y = 0;
+	MeshLoc.Z = 0;
+
+	A.SetRotation(RotOffset);
+	A.SetLocation(MeshLoc + LocOffset);
+
+	C.DrawClippedActorFixedFov(A, Fov, WireFrame, ClippingRegion.W * Root.GUIScale, ClippingRegion.H * Root.GUIScale, C.OrgX + ClippingRegion.X * Root.GUIScale, C.OrgY + ClippingRegion.Y * Root.GUIScale, True);
 }
 
 final function DrawUpBevel( Canvas C, float X, float Y, float W, float H, Texture T)

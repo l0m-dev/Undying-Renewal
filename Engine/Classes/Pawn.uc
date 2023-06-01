@@ -615,14 +615,14 @@ function PlayEffectAtJoint(name JointName, name JointType)
 					break;
 			}
 		} else {
-			if ( !IsA('PlayerPawn') || (IsA('PlayerPawn') && !bIsWalking) )
+			if ( !IsA('PlayerPawn') || (!bIsWalking) )
 				PlayFootSound( 3, HitTexture, 0, HitLocation, VolumeMultiplier );
 		}
 		
 		if ( IsA('PlayerPawn') )
 		{
 			if (bIsWalking)
-				MakeNoise(0.5 * VolumeMultiplier, (0.5 * 1280) * VolumeMultiplier);
+				MakeNoise(0.5 * VolumeMultiplier, 640 * VolumeMultiplier);
 			else
 				MakeNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
 		}
@@ -1288,8 +1288,8 @@ function ClientDying(name DamageType, vector HitLocation, DamageInfo DInfo)
 function ClientReStart()
 {
 	//log("client restart");
-	Velocity = vect(0,0,0);
-	Acceleration = vect(0,0,0);
+	//Velocity = vect(0,0,0);
+	//Acceleration = vect(0,0,0);
 	BaseEyeHeight = Default.BaseEyeHeight;
 	EyeHeight = BaseEyeHeight;
 	PlayLocomotion( vect(0,0,0) );
@@ -2470,6 +2470,10 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 			actualDamage = actualDamage * (1 - ReducedDamagePct);
 	
 		// adjust the damage points, based on hit location
+		if( DInfo.DamageLocation == vect(0,0,0) )
+		{
+			DInfo.DamageLocation = HitLocation;
+		}
 		actualDamage = (AdjustDamageByLocation( DInfo )).Damage;
 
 		intDamage = int(actualDamage);
@@ -2554,13 +2558,13 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 
 				if ( bIsPlayer )
 				{
-					//HidePlayer();
+					HidePlayer();
 					GotoState('Dying');
 				}
 				else
 				{
 					gibbedBy( InstigatedBy );
-					//Destroy();
+					Destroy();
 				}
 			} else {
 				// Not Gibbed
@@ -2601,13 +2605,13 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 
 					if ( bIsPlayer )
 					{
-						//HidePlayer();
+						HidePlayer();
 						GotoState('Dying');
 					}
 					else
 					{
 						gibbedBy( InstigatedBy );
-						//Destroy();
+						Destroy();
 					}
 				}
 			}
@@ -3026,16 +3030,16 @@ ignores SeePlayer, EnemyNotVisible, HearNoise, KilledBy, Trigger, Bump, HitWall,
 		AddVelocity( momentum ); 
 		if ( !bHidden && Gibbed( DInfo.DamageType ) )
 		{
-			//bHidden = true;
+			bHidden = true;
 			if (DInfo.ImpactForce == vect(0,0,0))
 				SpawnGibbedCarcass(HitLocation-Location);
 			else
 				SpawnGibbedCarcass(DInfo.ImpactForce);
 
-			//if ( bIsPlayer )
-			//	HidePlayer();
-			//else
-			//	Destroy();
+			if ( bIsPlayer )
+				HidePlayer();
+			else
+				Destroy();
 		}
 	}
 
@@ -3043,12 +3047,12 @@ ignores SeePlayer, EnemyNotVisible, HearNoise, KilledBy, Trigger, Bump, HitWall,
 	{
 		if ( !bHidden )
 		{
-			//bHidden = true;
+			bHidden = true;
 			SpawnCarcass();
-			//if ( bIsPlayer )
-			//	HidePlayer();
-			//else
-			//	Destroy();
+			if ( bIsPlayer )
+				HidePlayer();
+			else
+				Destroy();
 		}
 	}
 

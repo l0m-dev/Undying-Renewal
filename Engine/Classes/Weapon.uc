@@ -216,7 +216,7 @@ simulated event RenderOverlays( canvas Canvas )
 
 	setRotation(newRot);
 
-	Canvas.DrawActor(self, false);
+	Canvas.DrawActorFixedFov(self, 90, false);
 }
 
 //-------------------------------------------------------
@@ -981,7 +981,7 @@ function BringUp()
 		//PlayerPawn(Owner).EndZoom();
 	}	
 	bWeaponUp = false;
-	PlaySelect();
+	//PlaySelect();
 	GotoState('Active');
 }
 
@@ -1023,6 +1023,7 @@ function PlayPostSelect()
 
 function PlayIdleAnim()
 {
+	LoopAnim('StillIdle');
 }
 
 defaultproperties

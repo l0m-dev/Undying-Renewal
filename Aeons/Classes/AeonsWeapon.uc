@@ -130,6 +130,18 @@ simulated function ClientPutDown(weapon NextWeapon)
 
 //----------------------------------------------------------------------------
 
+simulated function BringUp()
+{
+	Super.BringUp();
+	bForceFire = false;
+	bCanClientFire = false;
+	if ( !IsAnimating() && !Level.bIsCutsceneLevel)
+		PlayIdleAnim();
+	Owner.PlaySound(SelectSound, SLOT_Misc, 1.0);	
+}
+
+//----------------------------------------------------------------------------
+
 simulated function TweenToStill()
 {
 	//LogActor("AeonsWeapon: TweenToStill");
@@ -410,13 +422,13 @@ Begin:
 	
 	// eh! mek mi sum pi!
 	//PlaySelect();
-	FinishAnim();
+	//FinishAnim();
 
 	if ( bChangeWeapon )
 		GotoState('DownWeapon');
 	bWeaponUp = True;
 	PlayPostSelect();
-	FinishAnim();
+	//FinishAnim();
 	bCanClientFire = true;
 	
 	if ( (Level.Netmode != NM_Standalone) && Owner.IsA('AeonsPlayer')

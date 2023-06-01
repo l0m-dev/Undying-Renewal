@@ -94,7 +94,7 @@ function PostBeginPlay()
 	Text = "";
 	
 	bInitialized = true;
-	FontColor = ParseColor(Localize( "FontColors",  "JournalColor", "Renewal"));
+	FontColor = ParseColor(GetRenewalConfig().JournalColor);
 	
 	for ( i=0; i<MAX_LINES; i++ )
 	{

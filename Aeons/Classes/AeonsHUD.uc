@@ -15,6 +15,9 @@ class AeonsHUD expands HUD;
 
 //=============================================================================
 
+// these are only needed for backwards compatibility (loading renewal saves in original undying)
+var(Fonts) font MySmallFont, MyMediumFont, MyLargeFont;
+
 var float aX, aY; //updated with input when PlayerPawn is in ControlObject State
 
 var vector MouseBuffer[5];
@@ -182,6 +185,40 @@ simulated function PostBeginPlay()
 
 	DigitInfo.Offset[9] = 225;
 	DigitInfo.Width[9] = 21;
+
+	MyLargeFont =	Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
+	MyMediumFont =	Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
+	MySmallFont =	Font(DynamicLoadObject("Comic.Comic10", class'Font'));
+
+	// original weapon order
+	/*
+	Con_InvGroup[0] = 1;
+	Con_InvGroup[1] = 2;
+	Con_InvGroup[2] = 5;
+	Con_InvGroup[3] = 4;
+	Con_InvGroup[4] = 3;
+	Con_InvGroup[5] = 6;
+	Con_InvGroup[6] = 28;
+	Con_InvGroup[7] = 8;
+
+	Off_InvGroup[0] = 7;
+	Off_InvGroup[1] = 11;
+	Off_InvGroup[2] = 14;
+	Off_InvGroup[3] = 21;
+	Off_InvGroup[4] = 12;
+	Off_InvGroup[5] = 24;
+	Off_InvGroup[6] = 25;
+	Off_InvGroup[7] = 18;
+
+	Def_InvGroup[0] = 16;
+	Def_InvGroup[1] = 22;
+	Def_InvGroup[2] = 13;
+	Def_InvGroup[3] = 23;
+	Def_InvGroup[4] = 17;
+	Def_InvGroup[5] = 27;
+	Def_InvGroup[6] = 26;
+	Def_InvGroup[7] = 15;
+	*/
 }
 
 simulated function PreBeginPlay()
@@ -800,7 +837,8 @@ simulated function PostRender( canvas Canvas )
 	local string url;
 	local string TempString;
 	local int Token;
-	
+	local float WeaponX;
+
 	url = Level.GetLocalURL();
 
 	i=instr(url, "?");
@@ -982,8 +1020,16 @@ simulated function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		DrawHealth(Canvas, 265*ScaleX, 532*ScaleY);
-		DrawMana(Canvas, 484*ScaleX, 532*ScaleY);
+		if (Owner.GetRenewalConfig().bNewHud)
+		{
+			DrawHealth(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY - 69*Scale);
+			DrawMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 69*Scale);
+		}
+		else
+		{
+			DrawHealth(Canvas, 317*ScaleX - 55*ScaleY, 532*ScaleY);
+			DrawMana(Canvas, 426*ScaleX + 64*ScaleY, 532*ScaleY);
+		}
 	
 		if (Level.bDebugMessaging)
 			DrawManaInfo(Canvas);		// mana maintenence values
@@ -1003,22 +1049,37 @@ simulated function PostRender( canvas Canvas )
 			if ( AeonsPlayer(Owner).bDrawDebugHUD )
 			{
 				DrawGhelzUse(Canvas, Canvas.sizeX - 50, 30);
-				DrawInvCount(Canvas, 104*Scale, Canvas.ClipY-88*Scale);
+				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*Scale);
 			}
 	
-			DrawInventoryItem(Canvas, 104*ScaleX, Canvas.ClipY-72*Scale);		
+			if (Owner.GetRenewalConfig().bNewHud)
+				DrawInventoryItem(Canvas, 1*ScaleX, 1*Scale);
+			else
+				DrawInventoryItem(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY-72*Scale);
+			
+			WeaponX = 5*ScaleX;
+			if (Owner.GetRenewalConfig().bNewHud)
+			{
+				if (AeonsPlayer(Owner).DefSpell != none)
+					WeaponX = Canvas.ClipX - 208*ScaleY;
+				else
+					WeaponX = Canvas.ClipX - 144*ScaleY;
+			}
+			
 			if ( !AeonsPlayer(Owner).Weapon.IsA('Scythe') && !AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-				DrawAmmo(Canvas, 16*ScaleX, Canvas.ClipY-80*Scale);
+			{
+				DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-80*Scale);
+			}
 
-			DrawConventionalWeapon(Canvas, 16*Scale, Canvas.ClipY - 72*Scale );		
+			DrawConventionalWeapon(Canvas, WeaponX, Canvas.ClipY - 72*Scale );
 		}
 	
-		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - 79*Scale, Canvas.ClipY - 84*Scale);
-		DrawOffensiveSpell(Canvas, Canvas.ClipX - 80*Scale, Canvas.ClipY - 72*Scale );	
+		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - 78*ScaleY, Canvas.ClipY - 84*Scale);
+		DrawOffensiveSpell(Canvas, Canvas.ClipX - 80*ScaleY, Canvas.ClipY - 72*Scale );	
 	
-		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - 140*Scale, Canvas.ClipY - 84*Scale );	
-		DrawDefensiveSpell(Canvas, Canvas.ClipX - 140*Scale, Canvas.ClipY - 72*Scale );
-			
+		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 84*Scale );	
+		DrawDefensiveSpell(Canvas, Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 72*Scale );
+		
 		DrawActiveSpells(Canvas);
 
 		// if their are any unread entries in the book, draw the hud icon
@@ -1574,6 +1635,8 @@ simulated function DrawWeaponStateInfo(Canvas Canvas)
 
 simulated function DrawManaInfo(Canvas Canvas)
 {
+	local float ManaInfoX;
+	
 	if ( (AeonsPlayer(Owner).ManaMod == None) )
 		return;
 
@@ -1584,11 +1647,15 @@ simulated function DrawManaInfo(Canvas Canvas)
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 100;
+		
+		ManaInfoX = 550 * ScaleX;
+		if (Owner.GetRenewalConfig().bNewHud)
+			ManaInfoX = 245 * ScaleX;
 
-		Canvas.SetPos(550*Scale, 550*Scale);
+		Canvas.SetPos(ManaInfoX, 550*ScaleY);
 		Canvas.DrawText(("+"$ManaModifier(AeonsPlayer(Owner).ManaMod).ManaPerSec), false);
 
-		Canvas.SetPos(550*Scale, 570*Scale);
+		Canvas.SetPos(ManaInfoX, 570*ScaleY);
 		Canvas.DrawText(("-"$(ManaModifier(AeonsPlayer(Owner).ManaMod).ManaMaint + ManaModifier(AeonsPlayer(Owner).ManaMod).ScytheMaint)), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2037,7 +2104,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 	if ( Owner != None )
 		AP = AeonsPlayer(Owner);
 	
-	if (AP.Book == None)
+	if (AP.Book == None || Owner.GetRenewalConfig().bNewHud) // don't draw this hud element with new hud
 		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
@@ -2058,7 +2125,17 @@ simulated function DrawBookInfo(Canvas Canvas)
 			Canvas.DrawColor.B = 255;
 			Canvas.DrawColor.A = 255;
 			//Canvas.SetPos( 10, 10 );
-			Canvas.SetPos( Canvas.ClipX - 200*Scale, Canvas.ClipY - 72*Scale );
+			if (Owner.GetRenewalConfig().bNewHud)
+			{
+				Canvas.SetPos( 1 * ScaleY, Canvas.ClipY - 136*ScaleY );
+			}
+			else
+			{
+				if (AeonsPlayer(Owner).DefSpell != none)
+					Canvas.SetPos( Canvas.ClipX - 208*ScaleY, Canvas.ClipY - 72*ScaleY );
+				else
+					Canvas.SetPos( Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 72*ScaleY );
+			}
 			
 			if ( AP.Book.NewestUnread.HUDIcon != None ) 
 				Canvas.DrawTileClipped( AP.Book.NewestUnread.HUDIcon, 64*Scale, 64*Scale, 0, 0, 64, 64);
@@ -2070,7 +2147,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 }
 
 
-// Draws the held list of inventory items
+// Draws the held list of inventory itemswww
 // Draws the held list of inventory items
 simulated function DrawHeldItems(Canvas Canvas)
 {
@@ -3032,7 +3109,7 @@ simulated function DrawGhelzUse( canvas Canvas, int X, int Y )
 
 simulated function DrawCenterpiece( canvas Canvas )
 {
-
+	local float ManaX;
 	if ( HudMode == 0 ) 
 		return;
 
@@ -3042,24 +3119,29 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.DrawColor.a = 255;
 
 	Canvas.bNoSmooth = false;
-
-	Canvas.Style = ERenderStyle.STY_Masked;
 	
+	if (Owner.GetRenewalConfig().bNewHud)
+		Canvas.SetPos( 5*ScaleX, 532*ScaleY);
+	else
+		Canvas.SetPos( 317*ScaleX, 532*ScaleY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 317*ScaleX, 532*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Health', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
+	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 
+	ManaX = 426 * ScaleX;
+	if (Owner.GetRenewalConfig().bNewHud)
+		ManaX = 120 * ScaleX;
+	
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
+		Canvas.SetPos( ManaX, 534*ScaleY);
 		Canvas.Style = ERenderStyle.STY_Translucent;
-		Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
-		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
+		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 	}
 
+	Canvas.SetPos( ManaX, 534*ScaleY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.SetPos( 426*ScaleX, 534*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleX, 64*ScaleY, 0, 0, 64, 64);
+	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 }
 
 
@@ -3107,8 +3189,8 @@ simulated function DrawFlightMana( canvas Canvas )
 	Height = 30 * FuelRatio;
   
 	Canvas.Style = ERenderStyle.STY_Masked;
-	Canvas.SetPos( 381*ScaleX, Canvas.ClipY - (Height+21)*ScaleY); 
-	Canvas.DrawTileClipped( Texture'FlightBar_Icon_Fixed', 40*ScaleX, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
+	Canvas.SetPos( 383*ScaleX, Canvas.ClipY - (Height+21)*ScaleY); 
+	Canvas.DrawTileClipped( Texture'FlightBar_Icon_Fixed', 40*ScaleY, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
 
 	Canvas.DrawColor.r = 192;
 	Canvas.DrawColor.g = 192;
@@ -3117,8 +3199,8 @@ simulated function DrawFlightMana( canvas Canvas )
 
 	Canvas.Style = 5;
 
-	Canvas.SetPos( 329*ScaleX, Canvas.ClipY - 75.0*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Flight_Icon', 150*ScaleX, 64*ScaleY, 0, 0, 150, 64);
+	Canvas.SetPos( 381*ScaleX - 51 * ScaleY, Canvas.ClipY - 75.0*ScaleY); 
+	Canvas.DrawTileClipped( Texture'Flight_Icon', 150*ScaleY, 64*ScaleY, 0, 0, 150, 64);
 }
 
 simulated function DrawMana(Canvas Canvas, int X, int Y)
@@ -3159,36 +3241,32 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 */
 		iTempMana = AeonsPlayer(Owner).Mana;
 	
-		/*if ( iTempHealth > 50 )
+		if (false)
 		{
-			Canvas.DrawColor.r = 10;
-			Canvas.DrawColor.g = 255;
-			Canvas.DrawColor.b = 10;
-		}
-		else if ( iTempHealth > 25 )
-		{
-			Canvas.DrawColor.r = 255;
-			Canvas.DrawColor.g = 255;
-			Canvas.DrawColor.b = 10;	
-		}
-		else
-		{
-			Canvas.DrawColor.r = 255;
-			Canvas.DrawColor.g = 30;
-			Canvas.DrawColor.b = 30;	
-		}*/
-
-		if (false)// iTempMana <= Pawn(Owner).Manacapacity )
-		{
-			Canvas.DrawColor.r = 192;
-			Canvas.DrawColor.g = 64;
-			Canvas.DrawColor.b = 64;
+			if ( iTempMana > 50 )
+			{
+				Canvas.DrawColor.r = 10;
+				Canvas.DrawColor.g = 255;
+				Canvas.DrawColor.b = 10;
+			}
+			else if ( iTempMana > 25 )
+			{
+				Canvas.DrawColor.r = 255;
+				Canvas.DrawColor.g = 255;
+				Canvas.DrawColor.b = 10;	
+			}
+			else
+			{
+				Canvas.DrawColor.r = 255;
+				Canvas.DrawColor.g = 30;
+				Canvas.DrawColor.b = 30;	
+			}
 		}
 		else
 		{
-			Canvas.DrawColor.r = 192;
-			Canvas.DrawColor.g = 192;
-			Canvas.DrawColor.b = 192;
+			Canvas.DrawColor.r = 255;
+			Canvas.DrawColor.g = 255;
+			Canvas.DrawColor.b = 255;	
 		}
 
 		Canvas.CurX = X;	
@@ -3235,10 +3313,6 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 		//Canvas.CurX = X+2;
 		//if (HudMode!=1 && HudMode!=2 && HudMode!=4) 
 		//	Canvas.DrawTile(Texture'HudLine',FMin(27.0*(float(Pawn(Owner).Health)/float(Pawn(Owner).Default.Health)),27),2.0,0,0,32.0,2.0);	
-
-		Canvas.DrawColor.r = 255;
-		Canvas.DrawColor.g = 255;
-		Canvas.DrawColor.b = 255;	
 		
 		Canvas.Style = ERenderStyle.STY_Normal;
 
@@ -3824,9 +3898,9 @@ simulated function DrawMOTD(Canvas Canvas)
 
 simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent)
 {
-	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
+	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
 	
-	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleX, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
+	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
 }
 
 

@@ -685,14 +685,9 @@ function Paint(Canvas C, float X, float Y)
 	{	
 		if(book.bDisplay3D)
 		{
-			//P = GetPlayerOwner();
-			
 			if ( P != None ) 
 			{
-				OldFov = P.FOVAngle;
-				P.SetFOVAngle(book.BookFOV);
-				DrawClippedActor( C, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
-				P.SetFOVAngle(OldFov);
+				DrawClippedActorFixedFov( C, book.BookFOV, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
 			}
 		}
 		else

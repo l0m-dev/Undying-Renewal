@@ -57,7 +57,32 @@ native(480) final function DrawPortal( int X, int Y, int Width, int Height, acto
 native(481) final function vector DeProject( vector v );
 native(482) final function vector Project( vector v );
 
+function DrawActorFixedFov( Actor A, float Fov, bool WireFrame, optional bool ClearZ )
+{
+	// used by inventory, weapons, spells
+	// changing fov for DrawActor does nothing, leave this as a wrapper
+	// only DrawActor has special logic for attached actors
+	DrawActor(A, WireFrame, ClearZ);
+}
 
+function DrawClippedActorFixedFov( Actor A, float Fov, bool WireFrame, int X, int Y, int XB, int YB, optional bool ClearZ )
+{
+	local float OldFov;
+	local PlayerPawn P;
+	
+	P = ViewPort.Actor;
+	if (P != None)
+	{
+		OldFov = P.FOVAngle;
+		P.SetFOVAngle(Fov);
+	}
+	DrawClippedActor(A, WireFrame, X, Y, XB, YB, ClearZ);
+	if (P != None)
+	{
+		OldFov = P.FOVAngle;
+		P.SetFOVAngle(OldFov);
+	}
+}
 
 // UnrealScript functions.
 event Reset()

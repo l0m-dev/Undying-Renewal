@@ -723,7 +723,7 @@ state DialogScene expands PlayerWalking
 			WindowConsole(Player.Console).bShellPauses = true;
 		Level.bDontAllowSavegame = true;
 		bAckClickThrough = false;
-		SetTimer( 1.5, false );		// delay until Fire() will cause click-though
+		SetTimer( 0.75, false );		// delay until Fire() will cause click-though
 	}
 	
 	function EndState()
@@ -747,14 +747,30 @@ state DialogScene expands PlayerWalking
 	exec function Fire( optional float F )
 	{
 		local ScriptedPawn	SP;
+		//local LockPlayerTrigger LPT;
 		local bool Skipped;
 
 		if ( bAckClickThrough ) {
+			/*
+			// this would work for the first aaron cutscene but there are dispatchers with their own delays we can't speed up
+			foreach AllActors( class'LockPlayerTrigger', LPT )
+			{
+				if (LPT.bLocked)
+					LPT.ReleasePlayer();
+			}
+			*/
 			foreach AllActors( class'ScriptedPawn', SP )
 			{
-				SP.FastScript( true );
+				// hack, LockPlayerTrigger doesn't use letterbox for the first aaron cutscene
+				// we don't want players to skip it
+				if (myHud.bLetterBox && GetRenewalConfig().bMoreSkippableCutscenes)
+					SP.Script.bClickThrough = true;
+				
 				if (SP.Script != none && SP.Script.bClickThrough)
+				{
+					SP.FastScript( true );
 					Skipped = true;
+				}
 			}
 			if (Skipped)
 				AeonsHud(myHud).RemoveSubtitle();
@@ -1316,6 +1332,7 @@ defaultproperties
      ManaRefreshTime=0.2
      bRunMode=True
      BaseEyeHeight=55
+     EyeHeight=55 // fixes view moving on level start
      FootSoundClass=Class'Aeons.DefaultFootSoundSet'
      bClientAnim=True
      Physics=PHYS_Walking

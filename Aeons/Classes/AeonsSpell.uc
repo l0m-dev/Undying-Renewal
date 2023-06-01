@@ -120,7 +120,7 @@ function FireSpell()
 	if ( AeonsPlayer(Owner).bMagicSound )
 	{
 		Owner.PlaySound(FireSound,, 1);
-		AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
+		AeonsPlayer(Owner).MakePlayerNoise(1.0, 1280);
 	}
 	//Enable('FireAttSpell');:TODO
 	//Enable('FireDefSpell');:TODO
@@ -137,7 +137,7 @@ function FirePyro()
 	if ( AeonsPlayer(Owner).bMagicSound )
 	{
 		Owner.PlaySound(FireSound,, 1);
-		AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
+		AeonsPlayer(Owner).MakePlayerNoise(1.0, 1280);
 	}
 	//Enable('FireAttSpell');:TODO
 	//Enable('FireDefSpell');:TODO

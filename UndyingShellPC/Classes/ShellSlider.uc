@@ -65,7 +65,7 @@ function float CheckValue(float Test)
 	
 	NewValue = Test;
 	
-	if(Step >= 0.01)
+	if(Step != 0.0)
 	{
 		TempF = NewValue / Step;
 		NewValue = Int(TempF + 0.5) * Step;
@@ -151,7 +151,7 @@ function LMouseDown(float X, float Y)
 
 	if(X < Slider.X && X > 0)
 	{
-		if(Step >= 0.01)
+		if(Step != 0.0)
 			SetValue(Value - Step);
 		else
 			SetValue(Value - 0.01);
@@ -159,7 +159,7 @@ function LMouseDown(float X, float Y)
 	
 	if(X > Slider.X + Slider.W && X < WinWidth)
 	{
-		if(Step >= 0.01)
+		if(Step != 0.0)
 			SetValue(Value + Step);
 		else
 			SetValue(Value + 0.01);

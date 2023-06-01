@@ -404,13 +404,13 @@ function SetupFonts(optional Canvas C)
 	Fonts[5] =			Font(DynamicLoadObject("dauphin.Dauphin16",class'Font'));
 	*/
 	
-	LargeFont = Font(DynamicLoadObject(Localize("Fonts", "LargeFont", "Renewal"), class'Font'));
-	MedFont = Font(DynamicLoadObject(Localize("Fonts", "MediumFont", "Renewal"), class'Font'));
+	LargeFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().LargeFont, class'Font'));
+	MedFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().MediumFont, class'Font'));
 	
 	Fonts[F_Large] =	LargeFont;
 	Fonts[F_LargeBold]= LargeFont;
 	Fonts[4] =			MedFont;
-	Fonts[5] = Font(DynamicLoadObject(Localize("Fonts", "SaveNameFont", "Renewal"), class'Font'));
+	Fonts[5] = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SaveNameFont, class'Font'));
 	UpdateSmallFont(C);
 	
 	if (C != None)
@@ -423,27 +423,13 @@ function SetupFonts(optional Canvas C)
 
 function UpdateSmallFont(optional Canvas C)
 {
-	Fonts[F_Normal] = GetSmallFont();
+	Fonts[F_Normal] = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SmallFont, class'Font'));
 	Fonts[F_Bold] = Fonts[F_Normal];
 	
 	if (C != None)
 	{
 		C.SmallFont = Fonts[F_Normal];
 	}
-}
-
-function Font GetSmallFont()
-{
-	local font Font;
-	
-	if (WinHeight < 720)
-		Font = Font(DynamicLoadObject(Localize( "Fonts",  "SmallFont", "Renewal"), class'Font'));
-	else if (WinHeight < 800)
-		Font = Font(DynamicLoadObject(Localize( "Fonts",  "SmallFont2", "Renewal"), class'Font'));
-	else
-		Font = Font(DynamicLoadObject(Localize( "Fonts",  "SmallFont3", "Renewal"), class'Font'));
-	
-	return Font;
 }
 
 function ChangeLookAndFeel(string NewLookAndFeel)

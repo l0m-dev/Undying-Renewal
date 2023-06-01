@@ -3,7 +3,7 @@ class UWindowHSliderControl extends UWindowDialogControl;
 var	float	MinValue;
 var	float	MaxValue;
 var	float	Value;
-var	int		Step;		// 0 = continuous
+var	float	Step;		// 0 = continuous
 
 var	float	SliderWidth;
 var	float	SliderDrawX, SliderDrawY;
@@ -20,7 +20,7 @@ function Created()
 	TrackWidth = 4;
 }
 
-function SetRange(float Min, float Max, int NewStep)
+function SetRange(float Min, float Max, float NewStep)
 {
 	MinValue = Min;
 	MaxValue = Max;
@@ -56,7 +56,7 @@ function float CheckValue(float Test)
 	
 	NewValue = Test;
 	
-	if(Step != 0)
+	if(Step != 0.0)
 	{
 		TempF = NewValue / Step;
 		NewValue = Int(TempF + 0.5) * Step;
@@ -145,7 +145,7 @@ function LMouseDown(float X, float Y)
 
 	if(X < TrackStart && X > SliderDrawX)
 	{
-		if(Step != 0)
+		if(Step != 0.0)
 			SetValue(Value - Step);
 		else
 			SetValue(Value - 1);
@@ -153,7 +153,7 @@ function LMouseDown(float X, float Y)
 	
 	if(X > TrackStart + TrackWidth && X < SliderDrawX + SliderWidth)
 	{
-		if(Step != 0)
+		if(Step != 0.0)
 			SetValue(Value + Step);
 		else
 			SetValue(Value + 1);

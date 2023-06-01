@@ -74,6 +74,13 @@ simulated function PlayFiring()
 		// PlayOwnedSound(FireSound, SLOT_None, 2.0);
 	}
 }
+simulated function PlayIdleAnim()
+{
+	if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
+		loopAnim('IdleMove',RefireMult);
+	else
+		loopAnim('IdleStill',RefireMult);
+}
 function SmallExplosion()
 {
 	local vector Loc;
@@ -312,10 +319,7 @@ state Idle
         if ( bChangeWeapon )
             GotoState('DownWeapon');
 
-		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-			loopAnim('IdleMove',RefireMult);
-		else
-			loopAnim('IdleStill',RefireMult);
+		PlayIdleAnim();
 	}
 
 	Begin:

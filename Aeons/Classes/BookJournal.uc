@@ -49,7 +49,6 @@ var() bool bCapsOnly;
 var() bool bDisplay3D;
 
 var() Font TextFont;
-var() Font TextFontEnglish;
 
 var() float		BookFOV;
 var() vector	BookOffset;
@@ -181,7 +180,7 @@ function PreBeginPlay()
 	//TextFont = Font(DynamicLoadObject("Aeons.DauphinFont", class'Font'));
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin_Book_pad", class'Font'));
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin16_pad", class'Font'));
-	TextFont = Font(DynamicLoadObject(Localize( "Fonts",  "JournalFont", "Renewal"), class'Font'));
+	TextFont = Font(DynamicLoadObject(GetRenewalConfig().JournalFont, class'Font'));
 	
 	Textures[0].NotifyActor = Self;
 	Textures[1].NotifyActor = Self;

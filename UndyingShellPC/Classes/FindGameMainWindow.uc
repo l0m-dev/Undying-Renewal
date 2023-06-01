@@ -20,6 +20,10 @@ function Created()
 	local AeonsRootWindow AeonsRoot;
 	
 	Super.Created();
+	bAlwaysOnTop = True;
+	
+	SetAcceptsFocus();
+	FocusWindow();
 	
 	AeonsRoot = AeonsRootWindow(Root);
 
@@ -78,4 +82,5 @@ function Paint(Canvas C, float X, float Y)
 function ShowWindow()
 {
 	Super.ShowWindow();
+	BringToFront();
 }

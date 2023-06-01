@@ -103,6 +103,11 @@ simulated function Touch( actor Other )
 
 function Timer()
 {
+	ReleasePlayer();
+}
+
+function ReleasePlayer()
+{
 	// return the player to the state they were in when triggered.
 	AeonsPlayer(P).bRenderWeapon = true;
 	P.GotoState(InState);

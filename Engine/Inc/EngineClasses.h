@@ -124,10 +124,6 @@ AUTOGENERATE_NAME(PlayerReady)
 AUTOGENERATE_NAME(PostLoadGame)
 AUTOGENERATE_NAME(StartLevel)
 AUTOGENERATE_NAME(AddSubtitle)
-AUTOGENERATE_NAME(ReplicateAnimSound)
-AUTOGENERATE_NAME(ReplicateTweenAnim)
-AUTOGENERATE_NAME(ReplicateAnim)
-AUTOGENERATE_NAME(ReplicateLoopAnim)
 
 #ifndef NAMES_ONLY
 
@@ -820,46 +816,6 @@ struct AActor_eventSpawned_Parms
 struct AActor_eventAnimEnd_Parms
 {
 };
-struct AActor_eventReplicateTweenAnim_Parms
-{
-    FName Sequence;
-    FLOAT Time;
-    BITFIELD bCheckNotifys;
-};
-struct AActor_eventReplicateLoopAnim_Parms
-{
-    FName Sequence;
-    FLOAT Rate;
-    BYTE Move;
-    BYTE combine;
-    FLOAT TweenTime;
-    FName JointName;
-    BITFIELD AboveJoint;
-    BITFIELD OverrideTarget;
-};
-struct AActor_eventReplicateAnimSound_Parms
-{
-    FName Sequence;
-    class USound* Voice;
-    FLOAT Amplitude;
-    BYTE slot;
-    FLOAT Volume;
-    BITFIELD bNoOverride;
-    FLOAT Radius;
-    FLOAT Pitch;
-    INT flags;
-};
-struct AActor_eventReplicateAnim_Parms
-{
-    FName Sequence;
-    FLOAT Rate;
-    BYTE Move;
-    BYTE combine;
-    FLOAT TweenTime;
-    FName JointName;
-    BITFIELD AboveJoint;
-    BITFIELD OverrideTarget;
-};
 class ENGINE_API AActor : public UObject
 {
 public:
@@ -1454,54 +1410,6 @@ public:
     {
         ProcessEvent(FindFunctionChecked(ENGINE_AnimEnd),NULL);
     }
-    void eventReplicateTweenAnim(FName Sequence, FLOAT Time, BITFIELD bCheckNotifys)
-    {
-        AActor_eventReplicateTweenAnim_Parms Parms;
-        Parms.Sequence=Sequence;
-        Parms.Time=Time;
-        Parms.bCheckNotifys=bCheckNotifys;
-        ProcessEvent(FindFunctionChecked(ENGINE_ReplicateTweenAnim),&Parms);
-    }
-    void eventReplicateLoopAnim(FName Sequence, FLOAT Rate, BYTE Move, BYTE combine, FLOAT TweenTime, FName JointName, BITFIELD AboveJoint, BITFIELD OverrideTarget)
-    {
-        AActor_eventReplicateLoopAnim_Parms Parms;
-        Parms.Sequence=Sequence;
-        Parms.Rate=Rate;
-        Parms.Move=Move;
-        Parms.combine=combine;
-        Parms.TweenTime=TweenTime;
-        Parms.JointName=JointName;
-        Parms.AboveJoint=AboveJoint;
-        Parms.OverrideTarget=OverrideTarget;
-        ProcessEvent(FindFunctionChecked(ENGINE_ReplicateLoopAnim),&Parms);
-    }
-    void eventReplicateAnimSound(FName Sequence, class USound* Voice, FLOAT Amplitude, BYTE slot, FLOAT Volume, BITFIELD bNoOverride, FLOAT Radius, FLOAT Pitch, INT flags)
-    {
-        AActor_eventReplicateAnimSound_Parms Parms;
-        Parms.Sequence=Sequence;
-        Parms.Voice=Voice;
-        Parms.Amplitude=Amplitude;
-        Parms.slot=slot;
-        Parms.Volume=Volume;
-        Parms.bNoOverride=bNoOverride;
-        Parms.Radius=Radius;
-        Parms.Pitch=Pitch;
-        Parms.flags=flags;
-        ProcessEvent(FindFunctionChecked(ENGINE_ReplicateAnimSound),&Parms);
-    }
-    void eventReplicateAnim(FName Sequence, FLOAT Rate, BYTE Move, BYTE combine, FLOAT TweenTime, FName JointName, BITFIELD AboveJoint, BITFIELD OverrideTarget)
-    {
-        AActor_eventReplicateAnim_Parms Parms;
-        Parms.Sequence=Sequence;
-        Parms.Rate=Rate;
-        Parms.Move=Move;
-        Parms.combine=combine;
-        Parms.TweenTime=TweenTime;
-        Parms.JointName=JointName;
-        Parms.AboveJoint=AboveJoint;
-        Parms.OverrideTarget=OverrideTarget;
-        ProcessEvent(FindFunctionChecked(ENGINE_ReplicateAnim),&Parms);
-    }
     DECLARE_CLASS(AActor,UObject,0|CLASS_NativeReplication,Engine)
     NO_DEFAULT_CONSTRUCTOR(AActor)
 };
@@ -1646,7 +1554,6 @@ public:
     FVector RealPosition;
     FRotator RealRotation;
     INT ClientUpdate;
-    BITFIELD bCanOpen:1 GCC_PACK(4);
     DECLARE_CLASS(AMover,ABrush,0|CLASS_NativeReplication,Engine)
     NO_DEFAULT_CONSTRUCTOR(AMover)
 };
@@ -2311,6 +2218,7 @@ public:
     class UClass* StatLogClass;
     INT DemoBuild;
     INT DemoHasTuts;
+    class ARenewalConfig* RenewalConfig;
     DECLARE_FUNCTION(execParseKillMessage);
     DECLARE_FUNCTION(execGetNetworkNumber);
     void eventAcceptInventory(class APawn* PlayerPawn)
@@ -2623,6 +2531,7 @@ public:
     class AMutator* HUDMutator;
     class APlayerPawn* PlayerOwner;
     BITFIELD bLetterbox:1 GCC_PACK(4);
+    BITFIELD bEnableLetterBox:1;
     FLOAT LetterboxAspectRatio GCC_PACK(4);
     FLOAT LetterboxFadeRate;
     FLOAT LetterboxFadeTime;
@@ -2630,6 +2539,7 @@ public:
     INT LastDamageInflicted;
     FStringNoInit ReplayMessage;
     FSubtitleInfo Subtitle;
+    FLOAT ratio;
     void eventAddSubtitle(const FString& NewSubtitle, const FString& SoundName)
     {
         AHUD_eventAddSubtitle_Parms Parms;
@@ -3056,7 +2966,6 @@ public:
     BYTE bSnapLevel;
     BYTE bStrafe;
     BYTE bFire;
-    BYTE bAltFire;
     BYTE bFreeLook;
     BYTE bFireAttSpell;
     BYTE bFireDefSpell;

@@ -25,6 +25,10 @@ class MainMenuWindow expands ShellWindow;
 #exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
 #exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
 
+#exec Texture Import File=renewal_up.bmp		Mips=Off
+#exec Texture Import File=renewal_ov.bmp		Mips=Off
+#exec Texture Import File=renewal_dn.bmp		Mips=Off
+
 //#exec Texture Import File=Main_audio_up.bmp		Mips=Off
 //#exec Texture Import File=Main_audio_ov.bmp		Mips=Off
 //#exec Texture Import File=Main_audio_dn.bmp		Mips=Off
@@ -62,6 +66,7 @@ class MainMenuWindow expands ShellWindow;
 var ShellButton Buttons[8];
 var ShellButton BackToGame;
 var ShellButton Disconnect;
+var ShellButton RenewalButton;
 
 var UWindowWindow Single;
 var UWindowWindow Audio;
@@ -71,6 +76,7 @@ var UWindowWindow Quit; //fix messagebox ?
 var UWindowWindow Website;
 var UWindowWindow LoadSave;
 var UWindowWindow Multiplayer;
+var UWindowWindow Renewal;
 var UWindowWindow Video;
 var UWindowWindow Console;
 
@@ -79,8 +85,8 @@ var UWindowWindow Confirm;
 //var UWindowMessageBox ConfirmJoin;
 //var() sound NewScreenSound;
 //var sound ExitSound;
-var int		SmokingWindows[10];
-var float	SmokingTimers[10];
+var int		SmokingWindows[11];
+var float	SmokingTimers[11];
 
 var int AmbientSoundID;
 
@@ -212,6 +218,23 @@ function Created()
 
 	Disconnect.bBurnable = true;
 	Disconnect.OverSound=sound'Aeons.Shell_Blacken01';
+	
+// renewal button
+	RenewalButton = ShellButton(CreateWindow(class'ShellButton', 600*RootScaleX, 30*RootScaleY, 160*RootScaleX, 64*RootScaleY));
+
+	RenewalButton.TexCoords = NewRegion(0,0,160,64);
+
+	RenewalButton.Template = NewRegion( 600, 30, 160, 64);
+
+	RenewalButton.Manager = Self;
+	RenewalButton.Style=5;
+
+	RenewalButton.UpTexture   = texture'renewal_up';
+	RenewalButton.DownTexture = texture'renewal_dn';
+	RenewalButton.OverTexture = texture'renewal_ov';
+
+	RenewalButton.bBurnable = true;
+	RenewalButton.OverSound=sound'Aeons.Shell_Blacken01';
 
 //	ExitSound = Sound(DynamicLoadObject("Aeons.Shell_Select01", class'Sound'));
 
@@ -291,6 +314,9 @@ function Message(UWindowWindow B, byte E)
 				case Disconnect:
 					DisconnectPressed();
 					break;
+				case RenewalButton:
+					RenewalButtonPressed();
+					break;
 			}
 			break;
 
@@ -354,10 +380,15 @@ function OverEffect(ShellButton B)
 			SmokingWindows[8] = 1;
 			SmokingTimers[8] = 90;
 			break;
-			
+
 		case Disconnect:
 			SmokingWindows[9] = 1;
 			SmokingTimers[9] = 90;
+			break;	
+
+		case RenewalButton:
+			SmokingWindows[10] = 1;
+			SmokingTimers[10] = 90;
 			break;
 	}
 }
@@ -550,6 +581,20 @@ function DisconnectPressed()
 	//Close(); 
 }
 
+function RenewalButtonPressed()
+{
+	SmokingTimers[10] = 0;
+	//GetPlayerOwner().ConsoleCommand("start http://undying.ea.com");
+	
+	if ( Renewal == None )
+		Renewal = RenewalWindow(Root.CreateWindow(class'RenewalWindow', 100, 100, 200, 200));
+	else
+		Renewal.ShowWindow();
+	
+	PlayNewScreenSound(); //PlayExitSound();
+	//Close(); 
+}
+
 //----------------------------------------------------------------------------
 
 function StopShellAmbient()
@@ -632,6 +677,7 @@ function Paint(Canvas C, float X, float Y)
 
 	Super.PaintSmoke(C, BackToGame, SmokingWindows[8], SmokingTimers[8]);
 	Super.PaintSmoke(C, Disconnect, SmokingWindows[9], SmokingTimers[9]);
+	Super.PaintSmoke(C, RenewalButton, SmokingWindows[10], SmokingTimers[10]);
 	for ( i=0; i<8; i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
 
@@ -717,6 +763,9 @@ function Resized()
 	if ( Multiplayer != None )
 		Multiplayer.Resized();
 
+	if ( Renewal != None )
+		Renewal.Resized();
+
 	if ( LoadSave != None )
 		LoadSave.Resized();
 
@@ -737,9 +786,12 @@ function Resized()
 
 	if ( BackToGame != None )
 		BackToGame.ManagerResized(RootScaleX, RootScaleY);
-		
+
 	if ( Disconnect != None )
-		Disconnect.ManagerResized(RootScaleX, RootScaleY);
+		Disconnect.ManagerResized(RootScaleX, RootScaleY);	
+
+	if ( RenewalButton != None )
+		RenewalButton.ManagerResized(RootScaleX, RootScaleY);
 
 	for ( i=0; i<8; i++ )
 	{

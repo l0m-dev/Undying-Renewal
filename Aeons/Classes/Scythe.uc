@@ -79,7 +79,7 @@ function AddMomentum()
 	End = Owner.Location + (vect(0,0,-1) * (Owner.CollisionHeight + 32));
 
 	Trace(HitLocation, HitNormal, HitJoint, end, start);
-	if (HitLocation != vect(0,0,0))
+	if (HitLocation != vect(0,0,0) || Owner.Physics == PHYS_Walking)
 	{
 		GetAxes(PlayerPawn(Owner).ViewRotation, X, Y, Z);
 		x.z = 0;

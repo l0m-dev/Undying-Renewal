@@ -12187,21 +12187,25 @@ state AIRunScript
 		PlayAnimFromGroup( ScriptAnimGroup );
 	}
 
-		function int Mumble( sound ASound )
+	function int Mumble( sound ASound )
 	{
 		local int	sID;
-		local AeonsPlayer APlayer;
+		local actor PlayerTarget;
 		local bool near;
 
 		if ( bFastScript )
 			return 0;
-
-		ForEach RadiusActors(class 'AeonsPlayer', APlayer, 2048)
-		{
-			break;
-		}
-		if (APlayer == None)
+		
+		PlayerTarget = FindPlayer();
+		if (PlayerTarget == None)
 			return 0;
+			
+		if (PlayerPawn(PlayerTarget).ViewTarget != none)
+			PlayerTarget = PlayerPawn(PlayerTarget).ViewTarget;
+		
+		if (VSize(Location - PlayerTarget.Location) > 2048.0)
+			return 0;
+		
 		sID = 0;
 		if ( ( ASound != none ) && ( ASound != ScriptLastSound ) )
 		{

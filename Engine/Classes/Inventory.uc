@@ -160,7 +160,7 @@ simulated event RenderOverlays( canvas Canvas )
 		return;
 	SetLocation( Owner.Location + CalcDrawOffset() );
 	SetRotation( Pawn(Owner).ViewRotation );
-	Canvas.DrawActor(self, false);
+	Canvas.DrawActorFixedFov(self, 90, false);
 }
 
 function String GetHumanName()

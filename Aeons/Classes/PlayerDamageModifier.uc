@@ -18,6 +18,7 @@ function PreBeginPlay()
 
 function TakeHit(float Strength)
 {
+	Strength *= GetRenewalConfig().DamageScreenShakeScale;
 	str = 100;
 	if (FRand() > 0.5)
 		y = RotStrength * Strength;

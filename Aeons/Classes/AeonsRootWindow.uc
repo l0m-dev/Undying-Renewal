@@ -12,7 +12,6 @@ var float ScaleX;
 var float ScaleY;
 
 var UWindowWindow MainMenu;
-var UWindowWindow FindMenu;
 var UWindowWindow Book;
 
 var texture			Light;
@@ -42,15 +41,9 @@ function Created()
 	MainWindowClass = Class<UWindowWindow>(DynamicLoadObject("UndyingShellPC.MainMenuWindow", class'Class'));
 	if ( MainWindowClass != None ) 
 		MainMenu = CreateWindow(MainWindowClass,5,5,400,300);
-		
-	FindWindowClass = Class<UWindowWindow>(DynamicLoadObject("UBrowser.UBrowserMainWindow", class'Class'));
-	if ( FindWindowClass != None ) 
-		FindMenu = CreateWindow(FindWindowClass,5,5,400,300,MainMenu,True);
 
 	if ( AeonsConsole(Console).bRequestedBook )
 		MainMenu.HideWindow();
-	
-	FindMenu.HideWindow();
 	
 	Resized();
 	
@@ -95,9 +88,6 @@ function Resized()
 	
 	if ( MainMenu != None )
 		MainMenu.Resized();
-		
-	if ( FindMenu != None )
-		FindMenu.Resized();
 
 	if ( Book != None ) 
 		Book.Resized();
@@ -216,7 +206,9 @@ function DrawMouse(Canvas C)
 		CursorFx.SetRotation( rot(16400,0,0));
 		CursorFX.SetLocation( Loc );
 
-		C.DrawActor(CursorFX, false, true);
+		// only DrawClippedActor calls ComputeRenderSize which calls SetSceneNode where we correct the fov
+		// ex. with ScreenFlashes=False main menu cursor would be in the wrong position
+		C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX, C.SizeY, 0, 0, true);
 	}
 
 }

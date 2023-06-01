@@ -9,7 +9,8 @@
 //=============================================================================
 class LevelInfo extends ZoneInfo
 	native
-	nativereplication;
+	nativereplication
+	config(user);
 
 // Textures.
 //#exec Texture Import File=Textures\DefaultTexture.pcx

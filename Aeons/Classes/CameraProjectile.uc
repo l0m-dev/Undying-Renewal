@@ -20,6 +20,7 @@ var ScriptedPawn GPawn;
 var CutSceneChar C;
 var float dt[60];
 var int iDt;
+var bool bSkipped;
 
 function PreBeginPlay()
 {
@@ -474,7 +475,7 @@ simulated state PathInterpolation
 			for ( i=0; i<4; i++ )
 			{
 				if (Events[i] != 'none')
-					if (pDist >= EventTimes[i])
+					if (pDist >= EventTimes[i] || bSkipped)
 					{
 						foreach AllActors( class 'Actor', A, Events[i] )
 						{
@@ -598,7 +599,7 @@ simulated state PathInterpolation
 					MasterPoint.Teleport(PlayerPawn(Owner));
 				}
 
-			if ( pDist >= 1.0 )
+			if ( pDist >= 1.0 || bSkipped )
 			{
 				log ("pDist reached .... ", 'Misc');
 				bHolding = false;
@@ -610,7 +611,7 @@ simulated state PathInterpolation
 			// FromPoint.bHold = false;
 			HoldLen -= DeltaTime;
 			
-			if ( HoldLen <= 0 )
+			if ( HoldLen <= 0 || bSkipped )
 			{
 				// log ("Hold Timer reached .... ", 'Misc');
 				pDist = 0;
@@ -659,7 +660,7 @@ simulated state PathInterpolation
 		if (MasterPoint.bHoldPlayer)
 			PlayerPawn(Owner).UnFreeze();
 
-		if (ToPoint.bEndCutScene && (pDist > 0.5))
+		if (ToPoint.bEndCutScene && (pDist > 0.5 || bSkipped))
 			PlayerPawn(Owner).bRenderSelf = true;
 	}
 
@@ -704,6 +705,10 @@ simulated state PathInterpolation
 		bFirstTick = false;
 }
 
+function SkipIt()
+{
+	bSkipped = true;
+}
 function EndIt()
 {
 	// log ("Attempting to End the Cutscene", 'Misc');

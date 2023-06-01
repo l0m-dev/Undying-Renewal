@@ -63,8 +63,8 @@ function Created()
 	PlayCount = 3 ; 
 
 // 3D Model view
-//	Model = GetEntryLevel().Spawn(class'MeshActor', GetEntryLevel());
-	Model = GetPlayerOwner().Spawn(class'MeshActor', GetEntryLevel());
+	Model = GetEntryLevel().Spawn(class'MeshActor', GetEntryLevel());
+//	Model = GetPlayerOwner().Spawn(class'MeshActor', GetEntryLevel());
 	Model.Mesh = GetPlayerOwner().Mesh;
 	Model.Skin = GetPlayerOwner().Skin;
 	Model.NotifyClient = Self;
@@ -238,8 +238,6 @@ function Tick(float Delta)
 
 function Paint(Canvas C, float X, float Y) 
 {
-	local float OldFov;
-
 	C.Style = GetPlayerOwner().ERenderStyle.STY_Modulated;
 	DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
 	C.Style = GetPlayerOwner().ERenderStyle.STY_Normal;
@@ -249,13 +247,10 @@ function Paint(Canvas C, float X, float Y)
 
 	if (Model != None)
 	{
-		OldFov = GetPlayerOwner().FOVAngle;
-		GetPlayerOwner().SetFOVAngle(30);
 	    if (bFace)
-			DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset + vect(-40, 0, 0 ));
+			DrawClippedActorFixedFov( C, 30, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset + vect(-40, 0, 0 ));
 		else
-			DrawClippedActor( C, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset);
-		GetPlayerOwner().SetFOVAngle(OldFov);
+			DrawClippedActorFixedFov( C, 30, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset);
 	}
 }
 
@@ -407,6 +402,7 @@ function AnimEnd(MeshActor MyMesh)
 function ShowWindow()
 {
 	Super.ShowWindow();
+	AnimEnd(Model);
 }
 
 //----------------------------------------------------------------------------

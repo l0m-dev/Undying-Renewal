@@ -167,7 +167,7 @@ simulated event RenderOverlays( canvas Canvas )
 	// newRot += default.Rotation;
 	setRotation(newRot);
 
-    Canvas.DrawActor(self, false);
+    Canvas.DrawActorFixedFov(self, 90, false);
 }
 
 simulated function bool ClientFire( float Value )

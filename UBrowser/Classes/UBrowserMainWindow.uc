@@ -34,6 +34,7 @@ function Created()
 	bSizable = False;
 	bStatusBar = True;
 	bMovable = False;
+	bAlwaysOnTop = True;
 	
 	Super.Created();
 

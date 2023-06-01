@@ -122,6 +122,9 @@ var class<StatLog>				StatLogClass;
 var globalconfig int DemoBuild;
 var globalconfig int DemoHasTuts;
 
+// Settings
+var RenewalConfig RenewalConfig;
+
 //------------------------------------------------------------------------------
 // Admin
 
@@ -205,7 +208,8 @@ function PostBeginPlay()
 	// later make this a console command so we can turn it off or on ?
 	//InitShame();
 
-
+	RenewalConfig = Spawn(class'RenewalConfig');
+	
 	Super.PostBeginPlay();
 }
 /*
@@ -906,7 +910,7 @@ event playerpawn Login
 			&& !ClassIsChildOf(SpawnClass, class'Spectator') )
 			SpawnClass = DefaultPlayerClass;
 
-		NewPlayer = Spawn(SpawnClass,,,StartSpot.Location,StartSpot.Rotation);
+		NewPlayer = Spawn(SpawnClass,,,AdjustSpawnLocation(StartSpot.Location, SpawnClass.Default.CollisionHeight),StartSpot.Rotation);
 		if( NewPlayer!=None )
 			NewPlayer.ViewRotation = StartSpot.Rotation;
 	}
@@ -1010,6 +1014,10 @@ event PostLogin( playerpawn NewPlayer )
 				}						
 			}
 	}
+	// RenewalConfig is transient to keep backwards compatibility so spawn it if it's None
+	// don't spawn anything on Login, StartCutscene does that and it duplicates inventory when loading a save (not fixing this for speedrunning purposes)
+	if (RenewalConfig == None)
+		RenewalConfig = Spawn(class'RenewalConfig');
 }
 
 //
@@ -1125,6 +1133,28 @@ function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, opt
 			return Dest;
 	log( "No single player start found" );
 	return None;
+}
+
+//
+// Prevents a player from spawning slightly above or under the ground
+//
+function vector AdjustSpawnLocation(vector InitialLocation, float CollisionHeight)
+{
+	local vector Start, End, HitLocation, HitNormal;
+	local int HitJoint;
+		
+	start = InitialLocation;
+	End = InitialLocation + vect(0,0,-64);
+
+	Trace(HitLocation, HitNormal, HitJoint, End, Start, false);
+	
+	if (HitLocation != vect(0,0,0))
+	{
+		InitialLocation.Z = HitLocation.Z + (CollisionHeight) + 4;
+		return InitialLocation;
+	}
+		
+	return InitialLocation;
 }
 
 //
