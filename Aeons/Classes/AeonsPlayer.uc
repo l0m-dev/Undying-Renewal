@@ -411,6 +411,7 @@ var travel byte			Objectives[100];
 var localized string	ObjectivesText[100];
 
 var savable travel bool bShowScryeHint;
+var savable travel bool bDrawRico;
 
 replication
 {

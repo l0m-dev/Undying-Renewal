@@ -143,6 +143,13 @@ var() bool bDrawLevelInfo;
 var() bool bDrawBuildInfo;
 var bool bShowArrow;
 
+var float LastMana;
+var float UsedManaFlashTime;
+var float UsedMana;
+
+var Actor RicochetArrows[3];
+var Rotator SavedView1;
+
 // Message Struct
 Struct MessageStruct
 {
@@ -352,6 +359,49 @@ exec function ShowArrow()
 		Arrow.bHidden = false;
 	else
 		Arrow.bHidden = true;
+}
+
+exec function ShowRico()
+{
+	local int i;
+	
+	if (Owner == None)
+		return;
+	
+	AeonsPlayer(Owner).bDrawRico = !AeonsPlayer(Owner).bDrawRico;
+	if (!AeonsPlayer(Owner).bDrawRico)
+	{
+		for (i = 0; i < ArrayCount(RicochetArrows); i++)
+		{
+			if (RicochetArrows[i] != None)
+				RicochetArrows[i].bHidden = true;
+		}
+	}
+}
+
+exec function SaveView1()
+{
+	SavedView1 = AeonsPlayer(Owner).ViewRotation;
+}
+
+exec function LoadView1()
+{
+	AeonsPlayer(Owner).ViewRotation = SavedView1;
+}
+
+exec function rico1()
+{
+	AeonsPlayer(Owner).ViewTarget = RicochetArrows[0];
+}
+
+exec function rico2()
+{
+	AeonsPlayer(Owner).ViewTarget = RicochetArrows[1];
+}
+
+exec function rico3()
+{
+	AeonsPlayer(Owner).ViewTarget = RicochetArrows[2];
 }
 
 exec function EnemyCrosshair()
@@ -825,6 +875,70 @@ function DrawCutsceneDebug(Canvas Canvas)
 
 }
 
+simulated function DrawRicochet(canvas Canvas)
+{
+	local vector HitLocation, HitNormal, StartTrace, EndTrace, ShotNormal;
+	local int HitJoint, i;
+	local Vector X,Y,Z, EyeHeight;
+	local vector barrelPlace, prevLoc;
+	local actor Other;
+	
+	local int Flags;
+	local Texture HitTexture;
+	
+	EyeHeight.z = Pawn(Owner).EyeHeight;
+	
+	GetAxes(Pawn(Owner).ViewRotation,X,Y,Z);
+	
+	barrelPlace = Owner.Location + EyeHeight + (X*Owner.CollisionRadius); // fire from your eye
+	
+	StartTrace = barrelPlace;
+	ShotNormal = vector(Pawn(Owner).ViewRotation);
+	
+	for (i = 0; i < ArrayCount(RicochetArrows); i++)
+	{
+		RicochetArrows[i].bHidden = true;
+	}
+	
+	for ( i=0; i < 3; i++ ) // maxWallHits + 1
+	{
+		EndTrace = StartTrace + ShotNormal * 4096.0;
+
+		Other = Owner.Trace(HitLocation, HitNormal, HitJoint, EndTrace, StartTrace, false, true); // bTraceActors, bIgnorePermeable,
+		
+		if (HitLocation == vect(0, 0, 0))
+			break;
+			
+		HitTexture = Owner.TraceTexture(HitLocation - HitNormal * 64, HitLocation + HitNormal * 64 , flags );
+		
+		prevLoc = StartTrace;
+		StartTrace = HitLocation;
+		ShotNormal = reflect(-ShotNormal, HitNormal);
+		
+		if (i > 0)
+		{
+			Canvas.Draw3DLine( WhiteColor, prevLoc, HitLocation);
+		}
+		
+		if (HitTexture == None || (Flags & 134217728) != 0)
+			break;
+		
+		if (HitTexture.ImpactID != TID_Stone && HitTexture.ImpactID != TID_Metal)
+			break;
+		
+		if (RicochetArrows[i] == None)
+			RicochetArrows[i] = spawn(class 'DebugArrow');
+		
+		RicochetArrows[i].bHidden = false;
+		RicochetArrows[i].SetLocation(HitLocation);
+		RicochetArrows[i].SetRotation(Rotator(ShotNormal));
+	}
+	
+	//native(480) final function DrawPortal( int X, int Y, int Width, int Height, actor CamActor, vector CamLocation, rotator CamRotation, optional int FOV, optional bool ClearZ );
+	///if (!RicochetArrows[0].bHidden)
+	//	Canvas.DrawPortal(Pawn(Owner).Health, 480, Pawn(Owner).Health, 480, RicochetArrows[0], RicochetArrows[0].Location, RicochetArrows[0].Rotation, 90, true );
+}
+
 simulated function PostRender( canvas Canvas )
 {
 	local float XOffset, YOffset;
@@ -838,6 +952,7 @@ simulated function PostRender( canvas Canvas )
 	local string TempString;
 	local int Token;
 	local float WeaponX;
+	local bool bNewHud;
 
 	url = Level.GetLocalURL();
 
@@ -849,7 +964,8 @@ simulated function PostRender( canvas Canvas )
 		LevelName = url;
 	
 	bDrawHUD = true;
-
+	bNewHud = Owner.GetRenewalConfig().bNewHud;
+	
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
 	Scale = Canvas.ClipY / 600.0;
 	ScaleX = Canvas.ClipX / 800.0;
@@ -1013,6 +1129,11 @@ simulated function PostRender( canvas Canvas )
 	
 		//if (AeonsPlayer(Owner).bDrawStealth || AeonsPlayer(Owner).bDrawDebugHUD )
 		//	DrawStealth(Canvas);
+		
+		if (AeonsPlayer(Owner).bDrawRico)
+		{
+			DrawRicochet(Canvas);
+		}
 	
 		if ( AeonsPlayer(Owner).bDrawDebugHUD )
 		{
@@ -1020,7 +1141,7 @@ simulated function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		if (Owner.GetRenewalConfig().bNewHud)
+		if (bNewHud)
 		{
 			DrawHealth(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY - 69*Scale);
 			DrawMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 69*Scale);
@@ -1041,6 +1162,18 @@ simulated function PostRender( canvas Canvas )
 		DrawFlightMana(Canvas);
 		DrawCenterPiece(Canvas);
 		
+		if (Owner.GetRenewalConfig().bShowUsedMana)
+		{
+			if (bNewHud)
+			{
+				DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*Scale);
+			}
+			else
+			{
+				DrawUsedMana(Canvas, 426*ScaleX + 64*ScaleY, 505*ScaleY);
+			}
+		}
+		
 		if ( bShowArrow )
 			MoveDebugArrow();
 		
@@ -1052,13 +1185,13 @@ simulated function PostRender( canvas Canvas )
 				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*Scale);
 			}
 	
-			if (Owner.GetRenewalConfig().bNewHud)
+			if (bNewHud)
 				DrawInventoryItem(Canvas, 1*ScaleX, 1*Scale);
 			else
 				DrawInventoryItem(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY-72*Scale);
 			
 			WeaponX = 5*ScaleX;
-			if (Owner.GetRenewalConfig().bNewHud)
+			if (bNewHud)
 			{
 				if (AeonsPlayer(Owner).DefSpell != none)
 					WeaponX = Canvas.ClipX - 208*ScaleY;
@@ -1657,6 +1790,12 @@ simulated function DrawManaInfo(Canvas Canvas)
 
 		Canvas.SetPos(ManaInfoX, 570*ScaleY);
 		Canvas.DrawText(("-"$(ManaModifier(AeonsPlayer(Owner).ManaMod).ManaMaint + ManaModifier(AeonsPlayer(Owner).ManaMod).ScytheMaint)), false);
+		
+		if ( UsedManaFlashTime > Level.TimeSeconds )
+		{
+			Canvas.SetPos(ManaInfoX, 530*ScaleY);
+			Canvas.DrawText(("-"$UsedMana), false);
+		}
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -1981,7 +2120,10 @@ simulated function DrawActiveSpells(Canvas canvas)
 			//fix SphereofCold has no states ?
 			Canvas.SetPos( OffsetX, 8 );
 			//Canvas.DrawTileClipped( Texture'HUDIcons', 32, 32, 128, 64, 32, 32);
-			Canvas.DrawTile( Icons[6], 32*Scale, 32*Scale, 0, 0, 64, 64 );
+			//Canvas.DrawTile( Icons[6], 32*Scale, 32*Scale, 0, 0, 64, 64 );
+			Canvas.Style = ERenderStyle.STY_Modulated;
+			Canvas.DrawTile(Texture'Aeons.Trails.sphereOfCold_projTex', 32*Scale, 32*Scale, 0, 0, 128, 128 );
+			Canvas.Style = ERenderStyle.STY_Normal;
 			OffsetX -= (32 + 8)*Scale;
 		}
 
@@ -3321,6 +3463,73 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 
 }
 
+simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
+{
+	local int MainHUDX, MainHUDY, iTempMana, iWidth, iFound;
+	local float fTempMana;
+
+	if (AeonsPlayer(Owner) == none)
+		return;
+
+	fTempMana = AeonsPlayer(Owner).Mana;
+	
+	if (LastMana - fTempMana >= 5)
+	{
+		// draw mana use
+		UsedManaFlashTime = Level.TimeSeconds + 1;
+		UsedMana = LastMana - fTempMana;
+	}
+	LastMana = fTempMana;
+	
+	if ( UsedManaFlashTime <= Level.TimeSeconds || HudMode <= 0 )
+		return;
+	
+	Canvas.bNoSmooth = false;
+	Canvas.Style = ERenderStyle.STY_AlphaBlend;
+	Canvas.bCenter = false;
+	iTempMana = UsedMana;
+	
+	// - sign outline
+	Canvas.CurX = X - 1;	
+	Canvas.CurY = Y + 15 * ScaleY;
+	Canvas.DrawColor.r = 0;
+	Canvas.DrawColor.g = 0;
+	Canvas.DrawColor.b = 0;
+	Canvas.DrawTileClipped(Texture'Aeons.Meshes.White', 16*ScaleY*0.5 + 2, 5*ScaleY*0.5 + 2, 0, 0, 8, 8);
+	
+	// - sign
+	Canvas.CurX = X;	
+	Canvas.CurY = Y + 16 * ScaleY;
+	Canvas.DrawColor.r = 200;
+	Canvas.DrawColor.g = 5;
+	Canvas.DrawColor.b = 5;
+	Canvas.DrawTileClipped(Texture'Aeons.Meshes.White', 16*ScaleY*0.5, 5*ScaleY*0.5, 0, 0, 8, 8);
+	
+	Canvas.CurX += 2 * ScaleX;
+	Canvas.CurY = Y;
+	
+	// 100's digit
+	
+	if ( iTempMana > 99 )
+		DrawDigitScaled( Canvas, iTempMana / 100, 0.5);
+	
+	// 10's digit
+	iTempMana = iTempMana % 100;
+
+	if ( iTempMana > 9 )
+		DrawDigitScaled( Canvas, iTempMana / 10, 0.5);
+	
+	
+	// 1's digit
+	iTempMana = iTempMana % 10;
+	DrawDigitScaled( Canvas, iTempMana, 0.5);
+	
+	//Canvas.DrawText(("-"$UsedMana), false);
+
+	Canvas.Style = ERenderStyle.STY_Normal;
+	Canvas.bCenter = false;
+}
+
 simulated function DrawTypingPrompt( canvas Canvas, console Console )
 {
 	local string TypingPrompt;
@@ -3896,11 +4105,16 @@ simulated function DrawMOTD(Canvas Canvas)
 }
 
 
-simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent)
+simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent, optional float DigitScale)
 {
 	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
 	
 	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
+}
+
+simulated function DrawDigitScaled(canvas Canvas, int iDigit, float DigitScale)
+{
+	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleY*DigitScale, 64*ScaleY*DigitScale, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
 }
 
 

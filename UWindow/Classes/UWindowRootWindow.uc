@@ -26,7 +26,7 @@ var float				OldMouseX, OldMouseY;
 var WindowConsole		Console;
 var UWindowWindow		FocusedWindow;
 var UWindowWindow		KeyFocusWindow;		// window with keyboard focus
-var MouseCursor			NormalCursor, MoveCursor, DiagCursor1, HandCursor, HSplitCursor, VSplitCursor, DiagCursor2, NSCursor, WECursor, WaitCursor;
+var MouseCursor			DefaultNormalCursor, NormalCursor, MoveCursor, DiagCursor1, HandCursor, HSplitCursor, VSplitCursor, DiagCursor2, NSCursor, WECursor, WaitCursor;
 var bool				bQuickKeyEnable;
 var UWindowHotkeyWindowList	HotkeyWindows;
 var config float		GUIScale;
@@ -74,7 +74,11 @@ function Created()
 	LookAndFeel = GetLookAndFeel(LookAndFeelClass);
 	//SetupFonts();
 
-	//NormalCursor.tex = Texture'MouseCursor';
+	DefaultNormalCursor.tex = Texture'MouseCursor';
+	DefaultNormalCursor.HotX = 0;
+	DefaultNormalCursor.HotY = 0;
+	DefaultNormalCursor.WindowsCursor = Console.Viewport.IDC_ARROW;
+
 	NormalCursor.tex = Texture'ShellCursor';
 	NormalCursor.HotX = 0;
 	NormalCursor.HotY = 0;

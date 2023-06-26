@@ -89,10 +89,14 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 
 auto state Flying
 {
-
+	function Timer()
+	{
+		bCanHitInstigator = True;
+	}
+	
 	Begin:
 		Velocity = Vector(Rotation) * Speed;
-		setTimer(0.1, true);
+		setTimer(0.2, true);
 }
 
 simulated function Landed(vector HitNormal)

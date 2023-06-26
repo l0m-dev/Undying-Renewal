@@ -25,6 +25,8 @@ var UWindowDialogControl	TabPrev;
 
 function Created()
 {
+	Cursor = Root.DefaultNormalCursor;
+
 	if(!bNoKeyboard)
 		SetAcceptsFocus();
 }

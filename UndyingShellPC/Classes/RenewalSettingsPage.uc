@@ -6,6 +6,7 @@ var bool bInitialized;
 var UWindowEditControl ServerNameEdit;
 var UWindowCheckbox AutoUseHealthVialsCheck;
 var UWindowCheckbox NewHudCheck;
+var UWindowCheckbox ShowUsedManaCheck;
 var UWindowHSliderControl DamageScreenShakeScaleSlider;
 var UWindowCheckbox MoreSkippableCutscenesCheck;
 
@@ -17,6 +18,8 @@ var localized string AutoUseHealthVialsText;
 var localized string AutoUseHealthVialsHelp;
 var localized string NewHudText;
 var localized string NewHudHelp;
+var localized string ShowUsedManaText;
+var localized string ShowUsedManaHelp;
 var localized string DamageScreenShakeScaleText;
 var localized string DamageScreenShakeScaleHelp;
 var localized string MoreSkippableCutscenesText;
@@ -32,11 +35,13 @@ function Created()
 	local int ControlWidth, ControlLeft, ControlRight;
 	local int CenterWidth, CenterPos;
 	local Color ExperimentalColor;
+
+	Cursor = Root.DefaultNormalCursor;
 	
 	ScaleX = Root.WinWidth / 800.0;
 	ScaleY = Root.WinHeight / 600.0;
 
-	ControlOffset = 20 * ScaleY;
+	ControlOffset = 10 * ScaleY;
 	bInitialized = False;
 
 	Super.Created();
@@ -48,6 +53,7 @@ function Created()
 	CenterWidth = (WinWidth/4)*3;
 	CenterPos = (WinWidth - CenterWidth)/2;
 
+	/*
 	ServerNameEdit = UWindowEditControl(CreateControl(class'UWindowEditControl', CenterPos, ControlOffset, CenterWidth, 1));
 	ServerNameEdit.SetText(ServerNameText);
 	ServerNameEdit.SetHelpText(ServerNameHelp);
@@ -56,6 +62,7 @@ function Created()
 	ServerNameEdit.SetMaxLength(205);
 	ServerNameEdit.SetDelayedNotify(True);
 	ControlOffset += 20 * ScaleY;
+	*/
 
 	AutoUseHealthVialsCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
 	AutoUseHealthVialsCheck.SetText(AutoUseHealthVialsText);
@@ -70,6 +77,15 @@ function Created()
 	DamageScreenShakeScaleSlider.SetFont(F_Normal);
 	DamageScreenShakeScaleSlider.SetRange(0.0, 1.0, 0.1);
 	ControlOffset += 20 * ScaleY;
+	
+	ShowUsedManaCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
+	ShowUsedManaCheck.SetText(ShowUsedManaText);
+	ShowUsedManaCheck.SetHelpText(ShowUsedManaHelp);
+	ShowUsedManaCheck.SetFont(F_Normal);
+	ShowUsedManaCheck.Align = TA_Left;
+	ControlOffset += 20 * ScaleY;
+	
+	// Experimental settings
 	
 	ExperimentalColor.R = 15;
 	ExperimentalColor.G = 90;
@@ -99,9 +115,10 @@ function Created()
 
 function GetSettings()
 {
-	ServerNameEdit.SetValue(class'Engine.GameReplicationInfo'.default.ServerName);
+	//ServerNameEdit.SetValue(class'Engine.GameReplicationInfo'.default.ServerName);
 	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
 	NewHudCheck.bChecked = RenewalConfig.bNewHud;
+	ShowUsedManaCheck.bChecked = RenewalConfig.bShowUsedMana;
 	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
 	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
 }
@@ -122,13 +139,16 @@ function Notify(UWindowDialogControl C, byte E)
 		switch(C)
 		{
 		case ServerNameEdit:
-			class'Engine.GameReplicationInfo'.default.ServerName = ServerNameEdit.GetValue();
+			//class'Engine.GameReplicationInfo'.default.ServerName = ServerNameEdit.GetValue();
 			break;
 		case AutoUseHealthVialsCheck:
 			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
 			break;
 		case NewHudCheck:
 			RenewalConfig.bNewHud = NewHudCheck.bChecked;
+			break;
+		case ShowUsedManaCheck:
+			RenewalConfig.bShowUsedMana = ShowUsedManaCheck.bChecked;
 			break;
 		case DamageScreenShakeScaleSlider:
 			RenewalConfig.DamageScreenShakeScale = DamageScreenShakeScaleSlider.GetValue();
@@ -137,7 +157,16 @@ function Notify(UWindowDialogControl C, byte E)
 			RenewalConfig.bMoreSkippableCutscenes = MoreSkippableCutscenesCheck.bChecked;
 			break;
 		}
+		break;
+	case DE_MouseMove:
+		if (Root.WinHeight <= 1080)
+			ParentWindow.ToolTip(C.HelpText);
+		break;
+	case DE_MouseLeave:
+		ParentWindow.ToolTip("");
+		break;
 	}
+
 	Super.Notify(C, E);
 	RenewalConfig.SaveConfig();
 }
@@ -186,33 +215,38 @@ function BeforePaint(Canvas C, float X, float Y)
 	
 	EditWidth = ControlRight;
 
-	ServerNameEdit.SetSize(CenterWidth, 1);
-	ServerNameEdit.WinLeft = CenterPos;
-	ServerNameEdit.EditBoxWidth = EditWidth;
+	//ServerNameEdit.SetSize(CenterWidth, 1);
+	//ServerNameEdit.WinLeft = CenterPos;
+	//ServerNameEdit.EditBoxWidth = EditWidth;
 
 	AutoUseHealthVialsCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	AutoUseHealthVialsCheck.WinLeft = CenterPos;
 
 	NewHudCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	NewHudCheck.WinLeft = CenterPos;
-	
+
+	ShowUsedManaCheck.SetSize(CenterWidth-EditWidth+16, 1);
+	ShowUsedManaCheck.WinLeft = CenterPos;
+
 	DamageScreenShakeScaleSlider.SetSize(CenterWidth, 1);
 	DamageScreenShakeScaleSlider.WinLeft = CenterPos;
-	
+
 	MoreSkippableCutscenesCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	MoreSkippableCutscenesCheck.WinLeft = CenterPos;
 }
 
 defaultproperties
 {
-     ServerNameText="Server Name"
+     ServerNameText="Server name"
      ServerNameHelp="Enter the full description for your server, to appear in query tools such as UBrowser or GameSpy."
      AutoUseHealthVialsText="Auto use health vials"
-     AutoUseHealthVialsHelp="If checked, you won't be able to carry health vials."
+     AutoUseHealthVialsHelp="If checked, you won't be able to carry health vials"
 	 NewHudText="Use new HUD"
-     NewHudHelp="If checked, use the new HUD"
-	 DamageScreenShakeScaleText="Damage Screen Shake Scale"
-	 DamageScreenShakeScaleHelp="Scales screenshake that happens when you take damage"
-	 MoreSkippableCutscenesText="Skip More Cutscenes"
+     NewHudHelp="Use the new HUD"
+	 ShowUsedManaText="Show used mana"
+     ShowUsedManaHelp="Shows used mana in the HUD"
+	 DamageScreenShakeScaleText="Damage screen shake"
+	 DamageScreenShakeScaleHelp="Scales screen shake that happens when you take damage"
+	 MoreSkippableCutscenesText="Skip more cutscenes"
 	 MoreSkippableCutscenesHelp="Makes more cutscenes skippable"
 }

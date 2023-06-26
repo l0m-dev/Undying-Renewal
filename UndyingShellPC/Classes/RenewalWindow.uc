@@ -72,5 +72,5 @@ function Close(optional bool bByParent)
 defaultproperties
 {
      ClientClass=Class'UndyingShellPC.RenewalSettingsPage'
-     WindowTitle="Renewal Menu"
+     WindowTitle=""
 }

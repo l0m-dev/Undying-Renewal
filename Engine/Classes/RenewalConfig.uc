@@ -5,6 +5,7 @@ class RenewalConfig expands Info config(RenewalSettings) transient;
 
 var config bool bAutoUseHealthVials;
 var config bool bNewHud;
+var config bool bShowUsedMana;
 
 var config string LargeFont;
 var config string MediumFont;
@@ -31,6 +32,7 @@ defaultproperties
 {
      bAutoUseHealthVials=True
      bNewHud=False
+	 bShowUsedMana=False
 	 JournalFont="Aeons.Dauphin16_Skinny"
 	 LargeFont="Aeons.MorpheusFont"
 	 MediumFont="Aeons.Dauphin_Grey"

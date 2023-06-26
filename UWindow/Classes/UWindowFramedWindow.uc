@@ -158,7 +158,7 @@ function MouseMove(float X, float Y)
 		bMoving = False;
 
 
-	Cursor = Root.NormalCursor;
+	Cursor = Root.DefaultNormalCursor;
 
 	if(bSizable && !bMoving)
 	{

@@ -192,7 +192,8 @@ function DrawMouse(Canvas C)
 	{
 		lightscale = FClamp(CursorFX.ParticlesPerSec.Base / 20.0, 1.0, 2.5);
 		C.SetPos(MouseX * GUIScale - MouseWindow.Cursor.HotX - LightScale*32.0 , MouseY * GUIScale - MouseWindow.Cursor.HotY - LightScale*32.0);
-		C.DrawIcon(Light, lightscale); 
+		if (MouseWindow.Cursor == NormalCursor)
+			C.DrawIcon(Light, lightscale); 
 	}
 
 	if ( CursorFX != None )
@@ -208,7 +209,8 @@ function DrawMouse(Canvas C)
 
 		// only DrawClippedActor calls ComputeRenderSize which calls SetSceneNode where we correct the fov
 		// ex. with ScreenFlashes=False main menu cursor would be in the wrong position
-		C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX, C.SizeY, 0, 0, true);
+		if (MouseWindow.Cursor == NormalCursor)
+			C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX, C.SizeY, 0, 0, true);
 	}
 
 }

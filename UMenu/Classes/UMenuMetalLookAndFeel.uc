@@ -73,6 +73,7 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 {
 	local Texture T;
 	local Region R, Temp;
+	local float TW, TH;
 
 	C.DrawColor.r = 255;
 	C.DrawColor.g = 255;
@@ -154,7 +155,7 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 		C.Font = W.Root.Fonts[W.F_Normal];
 	}
 
-
+	W.TextSize(C, "A", TW, TH);
 	W.ClipTextWidth(C, FrameTitleX, FrameTitleY, 
 					W.WindowTitle, W.WinWidth - 22);
 
@@ -165,7 +166,7 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 		C.DrawColor.g = 0;
 		C.DrawColor.b = 0;
 
-		W.ClipTextWidth(C, 6, W.WinHeight - 13, W.StatusBarText, W.WinWidth - 22);
+		W.ClipTextWidth(C, 6, W.WinHeight - TH, W.StatusBarText, W.WinWidth - 22);
 
 		C.DrawColor.r = 255;
 		C.DrawColor.g = 255;
@@ -964,7 +965,7 @@ defaultproperties
      FrameInactiveTitleColor=(R=255,G=255,B=255)
      HeadingInActiveTitleColor=(R=255,G=255,B=255)
      FrameTitleX=6
-     FrameTitleY=2
+     FrameTitleY=1
      BevelUpTL=(X=4,Y=16,W=2,H=2)
      BevelUpT=(X=10,Y=16,W=1,H=2)
      BevelUpTR=(X=18,Y=16,W=2,H=2)

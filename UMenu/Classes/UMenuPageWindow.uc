@@ -12,16 +12,14 @@ function Notify(UWindowDialogControl C, byte E)
 
 	if(E == DE_MouseMove)
 	{
-		//if(UMenuRootWindow(Root) != None)
-		//	if(UMenuRootWindow(Root).StatusBar != None)
-		//		UMenuRootWindow(Root).StatusBar.SetHelp(C.HelpText);		
+		if(UMenuRootWindow(Root) != None)
+				UMenuRootWindow(Root).ToolTip(C.HelpText);		
 	}
 
 	if(E == DE_MouseLeave)
 	{
-		//if(UMenuRootWindow(Root) != None)
-		//	if(UMenuRootWindow(Root).StatusBar != None)
-		//		UMenuRootWindow(Root).StatusBar.SetHelp("");		
+		if(UMenuRootWindow(Root) != None)
+				UMenuRootWindow(Root).ToolTip("");		
 	}
 }
 
