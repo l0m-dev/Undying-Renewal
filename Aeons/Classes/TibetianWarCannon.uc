@@ -3,6 +3,11 @@
 //=============================================================================
 class TibetianWarCannon expands AeonsWeapon;
 
+//#exec MESH IMPORT MESH=TibetianWarCannon1st_m SKELFILE=TibetianWarCannon1st\TibetianWarCannon1st.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=TibetianWarCannon1st_m YAW=128
+
+//#exec MESH IMPORT MESH=Cannon3rd_m SKELFILE=TibetianWarCannon3rd\CannonPat.ngf MOVERELATIVE=0
+
 // User vars
 var() 	float 		PawnSpeedMultiplier[5];
 var() 	float 		ProjectileSpeedMultiplier[5];
@@ -26,7 +31,7 @@ var		Light		ChargeLight;
 var		float tmr;
 
 var() class<Projectile> ProjClass[4];
-//WaterSpoutDragon texture
+
 function PreBeginPlay()
 {
 	Super.PreBeginPlay();
@@ -230,7 +235,7 @@ state Idle
 		{
 			PlaySound(SnortSound);
 			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('RWhiskerBase').pos, PlayerPawn(Owner).ViewRotation);
-			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('LWhiskerBase').pos, PlayerPawn(Owner).ViewRotation);
+			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('LWhiskerBse').pos, PlayerPawn(Owner).ViewRotation); // yep, "LWhiskerBse" and "RWhiskerBase"
 		}
 
 		if ( VSize(PlayerPawn(Owner).Velocity) < 300 )

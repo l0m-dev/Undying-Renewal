@@ -7,6 +7,7 @@ function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 	HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo(DamageType) );
+	GibRadius(DamageRadius, Location, getDamageInfo(DamageType), Instigator);
 	spawn (class 'HotExplosionFX'    ,,,Location);
 	spawn (class 'SmokyExplosionFX'  ,,,Location);
 	spawn (class 'ParticleExplosion' ,,,Location);

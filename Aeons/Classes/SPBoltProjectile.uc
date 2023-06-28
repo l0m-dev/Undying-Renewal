@@ -3,6 +3,16 @@
 //=============================================================================
 class SPBoltProjectile expands Crossbow_Bolt;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		Speed = 12000;
+		MaxSpeed = 12000;
+		SetCollisionSize(60, 42);
+	}
+}
 
 function DamageInfo getDamageInfo( optional name DamageType )
 {
@@ -23,8 +33,4 @@ function DamageInfo getDamageInfo( optional name DamageType )
 defaultproperties
 {
      LifeSpan=10
-	 Speed=12000
-     MaxSpeed=12000
-	 CollisionRadius=60
-     CollisionHeight=42
 }

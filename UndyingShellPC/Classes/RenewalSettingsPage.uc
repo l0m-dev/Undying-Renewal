@@ -4,6 +4,8 @@ var int ControlOffset;
 var bool bInitialized;
 
 var UWindowEditControl ServerNameEdit;
+var UWindowCheckbox GameplayChangesCheck;
+var UWindowCheckbox GoreCheck;
 var UWindowCheckbox AutoUseHealthVialsCheck;
 var UWindowCheckbox NewHudCheck;
 var UWindowCheckbox ShowUsedManaCheck;
@@ -12,18 +14,22 @@ var UWindowCheckbox MoreSkippableCutscenesCheck;
 
 var UWindowLabelControl ExperimentalLabel;
 
-var localized string ServerNameText;
-var localized string ServerNameHelp;
-var localized string AutoUseHealthVialsText;
-var localized string AutoUseHealthVialsHelp;
-var localized string NewHudText;
-var localized string NewHudHelp;
-var localized string ShowUsedManaText;
-var localized string ShowUsedManaHelp;
-var localized string DamageScreenShakeScaleText;
-var localized string DamageScreenShakeScaleHelp;
-var localized string MoreSkippableCutscenesText;
-var localized string MoreSkippableCutscenesHelp;
+var string ServerNameText;
+var string ServerNameHelp;
+var string GameplayChangesText;
+var string GameplayChangesHelp;
+var string GoreText;
+var string GoreHelp;
+var string AutoUseHealthVialsText;
+var string AutoUseHealthVialsHelp;
+var string NewHudText;
+var string NewHudHelp;
+var string ShowUsedManaText;
+var string ShowUsedManaHelp;
+var string DamageScreenShakeScaleText;
+var string DamageScreenShakeScaleHelp;
+var string MoreSkippableCutscenesText;
+var string MoreSkippableCutscenesHelp;
 
 var float ScaleX;
 var float ScaleY;
@@ -35,6 +41,23 @@ function Created()
 	local int ControlWidth, ControlLeft, ControlRight;
 	local int CenterWidth, CenterPos;
 	local Color ExperimentalColor;
+	
+	ServerNameText = Localize(string(class), "ServerNameText", "Renewal");
+	ServerNameHelp = Localize(string(class), "ServerNameHelp", "Renewal");
+	GameplayChangesText = Localize(string(class), "GameplayChangesText", "Renewal");
+	GameplayChangesHelp = Localize(string(class), "GameplayChangesHelp", "Renewal");
+	GoreText = Localize(string(class), "GoreText", "Renewal");
+	GoreHelp = Localize(string(class), "GoreHelp", "Renewal");
+	AutoUseHealthVialsText = Localize(string(class), "AutoUseHealthVialsText", "Renewal");
+	AutoUseHealthVialsHelp = Localize(string(class), "AutoUseHealthVialsHelp", "Renewal");
+	NewHudText = Localize(string(class), "NewHudText", "Renewal");
+	NewHudHelp = Localize(string(class), "NewHudHelp", "Renewal");
+	ShowUsedManaText = Localize(string(class), "ShowUsedManaText", "Renewal");
+	ShowUsedManaHelp = Localize(string(class), "ShowUsedManaHelp", "Renewal");
+	DamageScreenShakeScaleText = Localize(string(class), "DamageScreenShakeScaleText", "Renewal");
+	DamageScreenShakeScaleHelp = Localize(string(class), "DamageScreenShakeScaleHelp", "Renewal");
+	MoreSkippableCutscenesText = Localize(string(class), "MoreSkippableCutscenesText", "Renewal");
+	MoreSkippableCutscenesHelp = Localize(string(class), "MoreSkippableCutscenesHelp", "Renewal");
 
 	Cursor = Root.DefaultNormalCursor;
 	
@@ -63,6 +86,20 @@ function Created()
 	ServerNameEdit.SetDelayedNotify(True);
 	ControlOffset += 20 * ScaleY;
 	*/
+
+	GameplayChangesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
+	GameplayChangesCheck.SetText(GameplayChangesText);
+	GameplayChangesCheck.SetHelpText(GameplayChangesHelp);
+	GameplayChangesCheck.SetFont(F_Normal);
+	GameplayChangesCheck.Align = TA_Left;
+	ControlOffset += 20 * ScaleY;
+	
+	GoreCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
+	GoreCheck.SetText(GoreText);
+	GoreCheck.SetHelpText(GoreHelp);
+	GoreCheck.SetFont(F_Normal);
+	GoreCheck.Align = TA_Left;
+	ControlOffset += 20 * ScaleY;
 
 	AutoUseHealthVialsCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
 	AutoUseHealthVialsCheck.SetText(AutoUseHealthVialsText);
@@ -116,6 +153,8 @@ function Created()
 function GetSettings()
 {
 	//ServerNameEdit.SetValue(class'Engine.GameReplicationInfo'.default.ServerName);
+	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
+	GoreCheck.bChecked = RenewalConfig.bGore;
 	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
 	NewHudCheck.bChecked = RenewalConfig.bNewHud;
 	ShowUsedManaCheck.bChecked = RenewalConfig.bShowUsedMana;
@@ -140,6 +179,12 @@ function Notify(UWindowDialogControl C, byte E)
 		{
 		case ServerNameEdit:
 			//class'Engine.GameReplicationInfo'.default.ServerName = ServerNameEdit.GetValue();
+			break;
+		case GameplayChangesCheck:
+			RenewalConfig.bGameplayChanges = GameplayChangesCheck.bChecked;
+			break;
+		case GoreCheck:
+			RenewalConfig.bGore = GoreCheck.bChecked;
 			break;
 		case AutoUseHealthVialsCheck:
 			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
@@ -219,6 +264,12 @@ function BeforePaint(Canvas C, float X, float Y)
 	//ServerNameEdit.WinLeft = CenterPos;
 	//ServerNameEdit.EditBoxWidth = EditWidth;
 
+	GameplayChangesCheck.SetSize(CenterWidth-EditWidth+16, 1);
+	GameplayChangesCheck.WinLeft = CenterPos;
+
+	GoreCheck.SetSize(CenterWidth-EditWidth+16, 1);
+	GoreCheck.WinLeft = CenterPos;
+
 	AutoUseHealthVialsCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	AutoUseHealthVialsCheck.WinLeft = CenterPos;
 
@@ -237,16 +288,4 @@ function BeforePaint(Canvas C, float X, float Y)
 
 defaultproperties
 {
-     ServerNameText="Server name"
-     ServerNameHelp="Enter the full description for your server, to appear in query tools such as UBrowser or GameSpy."
-     AutoUseHealthVialsText="Auto use health vials"
-     AutoUseHealthVialsHelp="If checked, you won't be able to carry health vials"
-	 NewHudText="Use new HUD"
-     NewHudHelp="Use the new HUD"
-	 ShowUsedManaText="Show used mana"
-     ShowUsedManaHelp="Shows used mana in the HUD"
-	 DamageScreenShakeScaleText="Damage screen shake"
-	 DamageScreenShakeScaleHelp="Scales screen shake that happens when you take damage"
-	 MoreSkippableCutscenesText="Skip more cutscenes"
-	 MoreSkippableCutscenesHelp="Makes more cutscenes skippable"
 }

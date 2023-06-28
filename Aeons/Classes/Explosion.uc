@@ -30,6 +30,9 @@ function GibRadius( float DamageRadius, vector HitLocation, DamageInfo DInfo, pa
 {
 	local actor Victims;
 
+	if (!RGORE())
+		return;
+
 	if( DInfo.DamageRadius == 0.0 )
 		DInfo.DamageRadius = DamageRadius;
 

@@ -29,8 +29,9 @@ function Created()
 	local class<UWindowWindow> FindWindowClass;
 	local class<UWindowWindow> BookWindowClass;
 	
-	local int I;
+	local int i;
 	local string KeyName;
+	local bool bFoundBookKey;
 	
 	Super.Created();
 
@@ -47,20 +48,23 @@ function Created()
 	
 	Resized();
 	
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice OutputRate 44100Hz");
-	
-	for (I=0; I<255; I++)
+	// since F3 is no longer hard coded for the book we need to bind it	
+	for (i=0; i<255; i++)
 	{
 		KeyName = GetPlayerOwner().ConsoleCommand( "KEYNAME "$i );
 
 		if ( KeyName != "" )
 		{
 			if ( GetPlayerOwner().ConsoleCommand( "KEYBINDING "$KeyName ) == "ShowBook" )
-				return;
+			{
+				bFoundBookKey = true;
+				break;
+			}
 		}
 	}
 
-	GetPlayerOwner().ConsoleCommand("SET Input"@"F3"@"ShowBook");
+	if ( !bFoundBookKey )
+		GetPlayerOwner().ConsoleCommand("SET Input"@"F3"@"ShowBook");
 }
 
 function NotifyBeforeLevelChange()

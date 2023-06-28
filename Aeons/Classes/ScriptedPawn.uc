@@ -1296,7 +1296,7 @@ function TakeDamage( pawn Instigator, vector HitLocation, vector Momentum, Damag
 		 ( DInfo.Damage < ( InitHealth * DamageAcknowledge ) ) ||
 		 HandleSpecialDamage( Instigator, HitLocation, Momentum, DInfo ) )
 		return;
-	
+
 //	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " from " $ Instigator.name $ " at joint " $ DInfo.JointName );
 	DebugInfoMessage( ".TakeDamage(), calling super.TakeDamage() with " $ DInfo.Damage $ " HP damage " $ DInfo.DamageType $ " at joint " $ DInfo.JointName );
 	super.TakeDamage( Instigator, HitLocation, Momentum, DInfo );
@@ -1685,7 +1685,7 @@ function CleanUp()
 
 // Just died.
 function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )
-{	
+{
 	DebugInfoMessage( ".Died(), Killer is " $ Killer.name $ " damage is " $ damageType );
 
 	ClearAnims();
@@ -1705,7 +1705,7 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
 		
-	if (damageType == 'pellet')
+	if (RGORE() && damageType == 'pellet')
 	{
 		if (FRand() > 0.5)
 			Patrick(Killer).DetachJoint();
@@ -1753,36 +1753,41 @@ function SpawnGibbedCarcass( vector Dir )
 	local vector Vel;
 	local float damageScale, DamageRadius, dist;
 	
-	DamageRadius = 640;
-	//dir = Victims.Location - HitLocation;
-	dist = FMax(1,VSize(Dir));
-	Dir = Dir/dist;
-	damageScale = FMax(0, 1 - FMax(0,(dist - CollisionRadius)/DamageRadius));
-	
-	if (Health <= 0 && bHackable)
+	if (RGORE())
 	{
-		for (i=0; i<NumJoints(); i++)
+		DamageRadius = 640;
+		//dir = Victims.Location - HitLocation;
+		dist = FMax(1,VSize(Dir));
+		Dir = Dir/dist;
+		damageScale = FMax(0, 1 - FMax(0,(dist - CollisionRadius)/DamageRadius));
+		
+		if (Health <= 0 && bHackable)
 		{
-			//P = JointPlace( JointName(i) );
-			Vel = VRand() * 512;
-			if (Dir == vect(0, 0, 0))
-				return;
-			Gib = DetachLimb(JointName(i), Class 'BodyPart');
-			//	Gib.Velocity = Vel;
-			//else
-			//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
-			Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
-			Gib.Velocity.Z = 64;
-			Gib.DesiredRotation = RotRand();
-			Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
-			
-			//SetBase(self, JointName(i));
+			for (i=0; i<NumJoints(); i++)
+			{
+				//P = JointPlace( JointName(i) );
+				Vel = VRand() * 512;
+				if (Dir == vect(0, 0, 0))
+					return;
+				Gib = DetachLimb(JointName(i), Class 'BodyPart');
+				//	Gib.Velocity = Vel;
+				//else
+				//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
+				Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
+				Gib.Velocity.Z = 64;
+				Gib.DesiredRotation = RotRand();
+				Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+				
+				//SetBase(self, JointName(i));
+			}
 		}
 	}
+	else
+	{
+		// km - this is a bit temp :)
+		Spawn( class'Gibs',,, Location, Rotator(Dir) );
+	}
 	
-	// km - this is a bit temp :)
-	//Spawn( class'Gibs',,, Location, Rotator(Dir) );
-
 	PlaySound( GibbedSound );
 	if ( CarcassClass != none )
 		Spawn( CarcassClass,,, Location );

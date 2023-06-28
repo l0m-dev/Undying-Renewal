@@ -3,6 +3,32 @@
 //=============================================================================
 class Revolver expands AeonsWeapon;
 
+// ============================================================================
+// Pickup Mesh
+//#exec MESH IMPORT MESH=Revolver_Half_m SKELFILE=Revolver_Half.ngf
+
+//#exec MESH IMPORT MESH=Revolver_m SKELFILE=Revolver_m.ngf
+
+// Notifys
+
+
+// ============================================================================
+// 1st Person View Mesh
+//#exec MESH IMPORT MESH=Revolver1st_m SKELFILE=Revolver1st\Revolver1st_m.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=Revolver1st_m YAW=64
+
+// Notifys
+//#exec MESH NOTIFY SEQ=Fire TIME=0.143 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=ReloadEnd TIME=0.5 FUNCTION=PlayClose
+//#exec MESH NOTIFY SEQ=ReloadStart TIME=0.382 FUNCTION=PlayOpen
+
+// ============================================================================
+// 3rd Person view mesh
+//#exec MESH IMPORT MESH=Revolver3rd_m SKELFILE=Revolver3rd.ngf
+//#exec MESH IMPORT MESH=RevolverPat_m SKELFILE=Revolver_Pat.ngf
+
+// ============================================================================
+
 var sound LoadShellSound, LoadAltShellSound;
 
 // reloading

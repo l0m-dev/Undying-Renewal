@@ -3,6 +3,12 @@
 //=============================================================================
 class SPRevolver expands SPWeapon;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+		Accuracy = 1.0;
+}
 
 //****************************************************************************
 // New class functions.
@@ -17,7 +23,7 @@ defaultproperties
      ReloadTime=2
      ReloadCount=6
      SpoolUpTime=0.1
-     Accuracy=1.0
+     Accuracy=0.5
      AimAnim=attack_revolver_idle
      RecoilAnim=attack_revolver_cycle
      FireSoundRadius=5000

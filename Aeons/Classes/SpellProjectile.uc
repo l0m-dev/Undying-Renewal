@@ -13,6 +13,7 @@ var		float	seekWeight[6];	// seek weights for firefly interaction
 var()	int		DamagePerLevel[6];
 var()	int		AltDamagePerLevel[6];
 
+/*
 function PreBeginPlay()
 {
 	seekWeight[0] = 0;
@@ -22,6 +23,7 @@ function PreBeginPlay()
 	seekWeight[4] = 0.60;
 	seekWeight[5] = 0.60;
 }
+*/
 
 simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 {
@@ -202,4 +204,5 @@ defaultproperties
      seekWeight(2)=0.3
      seekWeight(3)=0.6
      seekWeight(4)=0.6
+     seekWeight(5)=0.6
 }

@@ -389,39 +389,18 @@ function bool IsVulnerableJoint( name Joint )
 {
 	local int i;
 
+	return true; // make all joints vulnerable
+
 	for( i=0; i < NumVulnerableJoints; ++i )
 		if( Joint == VulnerableJoint[i] )
 			return true;
-	return true;
-}
-
-function name NearestJoint( vector HitLocation )
-{
-	local int j, bestJoint;
-	local float dist, bestDist;
-
-	bestJoint = 0;
-	bestDist = VSize(JointPlace( JointName(0) ).pos - HitLocation);
-	
-	for (j=1; j<NumJoints(); j++)
-	{
-		dist = VSize(JointPlace( JointName(j)).pos - HitLocation);
-		if( dist < bestDist )
-		{
-			bestDist = dist;
-			bestJoint = j;
-		}
-	}
-	
-	return JointName(j);
+	return false;
 }
 
 function name NearestVulnerableJoint( vector HitLocation )
 {
 	local int j, bestJoint;
 	local float dist, bestDist;
-	
-	return NearestJoint(HitLocation);
 	
 	bestJoint = 0;
 	bestDist = VSize(JointPlace( VulnerableJoint[0] ).pos - HitLocation);
@@ -829,7 +808,7 @@ defaultproperties
      PhysicalScalar=0.15
      ReactToDamageThreshold=15
      MeleeRange=1000
-     Health=1000
+     Health=1500
      SoundSet=Class'Aeons.KingSoundSet'
      Style=STY_AlphaBlend
      Mesh=SkelMesh'Aeons.Meshes.King_Body_m'

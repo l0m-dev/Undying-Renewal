@@ -5,6 +5,16 @@ class SilverBulletAmmo expands BulletAmmo;
 
 //#exec MESH IMPORT MESH=SilverBullets_m SKELFILE=SilverBullets.ngf
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		AmmoAmount = 12;
+		MaxAmmo = 96;
+	}
+}
+
 function PostBeginPlay()
 {
 	PickupViewMesh = SkelMesh'Aeons.Meshes.SilverBullets_m';
@@ -58,8 +68,8 @@ function PickupFunction(Pawn Other)
 
 defaultproperties
 {
-     AmmoAmount=12
-     MaxAmmo=96
+     AmmoAmount=6
+     MaxAmmo=60
      InventoryGroup=111
      bActive=False
      PickupMessage="You picked up silver bullets"

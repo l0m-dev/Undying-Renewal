@@ -103,7 +103,6 @@ var() sound HowlSounds[2];
 var bool					bGetThrown;
 
 var bool	bMeleeAttackFail;	// used to hack howler's freezing during near attacks
-var NavigationPoint			LastSpclNavPoint;	// Last navigation point where special action was performed.
 
 //****************************************************************************
 // Animation trigger functions.
@@ -185,6 +184,14 @@ function C_BareFS()
 function PreBeginPlay()
 {
 	super.PreBeginPlay();
+	
+	if (RGC())
+	{
+		DamageRadius = 130;
+		MeleeRange = 100;
+		GroundSpeed = 600;
+		Health = 600;
+	}
 }
 
 function BeginPlay()
@@ -202,6 +209,9 @@ function PreSetMovement()
 function bool DoFarAttack()
 {
 	local float		dist;
+	
+	if (!RGC())
+		return Super.DoFarAttack();
 
 	dist = DistanceTo( Enemy );
 	if ( ( dist > ( MeleeRange * 2.5 ) ) &&
@@ -211,44 +221,6 @@ function bool DoFarAttack()
 	else
 		return false;
 }
-
-function bool SpecialNavChoiceAction( NavigationPoint navPoint )
-{
-	if ( navPoint.IsA('AeonsNavChoicePoint') && ( navPoint != LastSpclNavPoint ) )
-		return true;
-	else
-		return false;
-}
-
-function SpecialNavChoiceActing( NavigationPoint navPoint )
-{
-	LastSpclNavPoint = navPoint;
-}
-
-function bool SpecialNavTargetAction( NavChoiceTarget NavTarget )
-{
-	return ( FRand() < 0.10 );
-}
-
-function WorldEventAlert( actor Alerter )
-{
-	DebugInfoMessage( ".WorldEventAlert() from " $ Alerter.name );
-	super.WorldEventAlert( Alerter );
-	if ( FRand() < 0.25 )
-	{
-		PushState( GetStateName(), 'RESUME' );
-		GotoState( 'AIAlertReaction' );
-	}
-}
-
-function bool AcknowledgeDamageFrom( pawn Damager )
-{
-	if ( Damager.IsA('PlayerPawn') )
-		return false;
-	else
-		return super.AcknowledgeDamageFrom( Damager );
-}
-
 
 // Near damage is applied based on specific joints.
 function bool NearStrikeValid( actor Victim, int DamageNum )
@@ -416,6 +388,10 @@ Begin:
 	Destroy();
 }
 
+//****************************************************************************
+// AINearAttack
+// attack near enemy (melee)
+//****************************************************************************
 state AINearAttack
 {
 	// *** ignored functions ***
@@ -428,6 +404,10 @@ state AINearAttack
 	// *** overridden functions ***
 	function BeginState()
 	{
+		if ( Enemy != none )
+			DebugBeginState( " Enemy is " $ Enemy.name );
+		else
+			DebugBeginState( " Enemy is NONE" );
 		StopTimer();
 		bPendingBump = false;
 	}
@@ -436,15 +416,18 @@ state AINearAttack
 	{
 		if( bMeleeAttackFail )
 		{
+			DebugInfoMessage( ".AINearAttack.AnimEnd(), going to BEGIN" );
 			GotoState( , 'BEGIN' );
 		}
 
 		if ( !bDidMeleeAttack )
 		{
+			DebugInfoMessage( ".AINearAttack.AnimEnd(), going to DOATTACK" );
 			GotoState( , 'DOATTACK' );
 		}
 		else
 		{
+			DebugInfoMessage( ".AINearAttack.AnimEnd(), going to ATTACKED" );
 			GotoState( , 'ATTACKED' );
 		}
 	}
@@ -453,10 +436,12 @@ state AINearAttack
 	{
 		if ( !bDidMeleeAttack )
 		{
+			DebugInfoMessage( ".AINearAttack.Timer(), going to DOATTACK" );
 			GotoState( , 'DOATTACK' );
 		}
 		else
 		{
+			DebugInfoMessage( ".AINearAttack.Timer(), going to ATTACKED" );
 			GotoState( , 'ATTACKED' );
 		}
 	}
@@ -493,84 +478,91 @@ RESUME:
 
 // Default entry point
 BEGIN:
-
-	//StopMovement();
-	//PlayWait();
-
-
-	if( DistanceTo( Enemy ) > DamageRadius )
+	if (RGC())
 	{
-		bDidMeleeAttack = false;
+		StopMovement();
+		PlayWait();
 
-		if( (FRand()>0.75 || VSize( Location-Enemy.Location ) > 2.5*DamageRadius) && bHasFarAttack )
+		if( DistanceTo( Enemy ) > DamageRadius )
 		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
-			{
-			case 0:	// Easy
-				sleep( FVariant( 1.0, 0.5 ) );
-				break;
-			case 1:	// Normal
-				sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 2: // Hard
-				sleep( FVariant( 0.2, 0.1 ) );
-				break;
-			}		// Very Hard will no wait
+			bDidMeleeAttack = false;
 
-			bMeleeAttackFail = false;
-			GotoState( 'AIFarAttack' );
-		}
-		else
-		{
-			// check difficulty
-			switch( Level.Game.Difficulty )
+			if( FRand() < 0.25 * (Level.Game.Difficulty + 1) || DistanceTo( Enemy ) > 2.5*DamageRadius )
 			{
-			case 0:	// Easy
-				sleep( FVariant( 0.5, 0.25 ) );
-				break;
-			case 1:	// Normal
-				sleep( FVariant( 0.2, 0.1 ) );
-				break;
+				bMeleeAttackFail = false;
+				GotoState( 'AIFarAttack' );
 			}
+			else
+			{
+				PlayRun();
+				MoveToward( Enemy, FullSpeedScale );
 
-			PlayRun();
-			MoveToward( Enemy, FullSpeedScale );
-
-			bMeleeAttackFail = true;	// if not set previously, helps to avoid second TurnToward
-			goto 'BEGIN';
+				bMeleeAttackFail = true;	// if not set previously, helps to avoid second TurnToward
+				goto 'BEGIN';
+			}
 		}
-	}
 
-	if ( VSize(Enemy.Velocity) < 10.0 )
-	{
-		bDidMeleeAttack = false;
-		SetTimer( 2.0, false );
-
-		if( !bMeleeAttackFail ) // if there was no previous attack
+		if ( VSize(Enemy.Velocity) < 10.0 )
 		{
+			bDidMeleeAttack = false;
+			SetTimer( 2.0, false );
+
+			if( !bMeleeAttackFail ) // if there was no previous attack
+			{
+				TurnToward( Enemy, TurnTowardThreshold( 20 * DEGREES ) );
+			}
+		}
+
+		bMeleeAttackFail = false;
+	}
+	else
+	{
+		if ( !bCanFly || ( VSize(Enemy.Velocity) < 10.0 ) )
+		{
+			StopMovement();
+			PlayWait();
+			bDidMeleeAttack = false;
+			SetTimer( 2.0, false );
 			TurnToward( Enemy, TurnTowardThreshold( 20 * DEGREES ) );
 		}
 	}
-
-	bMeleeAttackFail = false;
-
 DOATTACK:
 	bDidMeleeDamage = false;
 	bDidMeleeAttack = true;
+	DebugInfoMessage( " playing near attack" );
 	PlayNearAttack();
 	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
 
 INATTACK:
-	if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
+	if (RGC())
 	{
-		PostAttack();
-		bMeleeAttackFail = true;
-		StopTimer();
-		TweenAnim( 'Idle_Alert', FVariant(0.15,0.05) );
-		//StopMovement();
-		//PlayWait();
-		goto 'BEGIN';
+		if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
+		{
+			//StopTimer();
+			//GotoState( 'AIFarAttack' );
+			
+			//PostAttack();
+			bMeleeAttackFail = true;
+			StopTimer();
+			//TweenAnim( 'Idle_Alert', FVariant(0.15,0.05) );
+			goto 'BEGIN';
+		}
+	}
+	else
+	{
+		if ( MoveInAttack() )
+		{
+			MoveTarget = Enemy;
+			if ( VSize(Enemy.Velocity) < 10.0 )
+				MoveToward( Enemy, FullSpeedScale * 0.70 );
+			else
+				MoveToward( Enemy, FullSpeedScale );
+		}
+		else
+		{
+			MoveTarget = Enemy;
+			//TurnToward( Enemy );
+		}
 	}
 	Sleep( 0.1 );
 	goto 'INATTACK';
@@ -581,8 +573,6 @@ ATTACKED:
 		CreatureBump( BumpedPawn );
 	PostAttack();
 } // state AINearAttack
-
-// END OF VVA 20.12.04
 
 //****************************************************************************
 // AIFarAttackAnim
@@ -721,9 +711,38 @@ state AIJumpAtEnemy
 	// *** overridden functions ***
 	function bool PlayJumpAttackLanding()
 	{
-		return true;
+		if (RGC())
+			return true;
+		return PlayLanding();
 	}
-
+	
+	// trigger the jump toward the enemy
+	function TriggerJump()
+	{
+		local vector EnemyVelocity;
+		local vector EnemyAdjustedLoc;
+		
+		if (RGC())
+		{
+			EnemyVelocity = Enemy.Velocity; // * GetJumpAttackTime()
+			EnemyVelocity.Z *= 0.1;
+			
+			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
+			// don't add velocity if player is coming towards us
+			if (Normal(EnemyAdjustedLoc + EnemyVelocity - Location) dot Normal(EnemyAdjustedLoc - Location) > 0.0)
+				AddVelocity( EnemyVelocity );
+			
+			AirSpeed = 999999;
+			JumpTo( EnemyAdjustedLoc );
+			AirSpeed = default.AirSpeed;
+			GotoState( , 'JUMPED' );
+		}
+		else
+		{
+			JumpTo( Enemy.Location + ( Enemy.Velocity * GetJumpAttackTime() ) - ( vect(0,0,1) * Enemy.CollisionHeight ) );
+			GotoState( , 'JUMPED' );
+		}
+	}
 } // state AIJumpAtEnemy
 
 //****************************************************************************
@@ -741,7 +760,7 @@ defaultproperties
      MeleeInfo(0)=(Damage=25,EffectStrength=0.35,Method=Bite)
      MeleeInfo(1)=(Damage=25,EffectStrength=0.35,Method=RipSlice)
      MeleeInfo(2)=(Damage=25,EffectStrength=0.35,Method=Blunt)
-     DamageRadius=130
+     DamageRadius=120
      SK_PlayerOffset=(X=95)
      bHasSpecialKill=True
      HearingEffectorThreshold=0.4
@@ -752,14 +771,14 @@ defaultproperties
      FireScalar=0
      ConcussiveScalar=0.5
      FallDamageScalar=0.2
-     MeleeRange=100
-     GroundSpeed=600
+     MeleeRange=80
+     GroundSpeed=700
      AirSpeed=1200
      AccelRate=3000
      MaxStepHeight=50
      SightRadius=1000
      BaseEyeHeight=54
-     Health=600
+     Health=500
      SoundSet=Class'Aeons.HoundSoundSet'
      FootSoundClass=Class'Aeons.BareFootSoundSet'
      Style=STY_AlphaBlend

@@ -46,7 +46,6 @@ var const int RenderPtr;	 // Render device pointer, only valid during UGameEngin
 native(463) final function Draw3DLine( Color Color, Vector Start, Vector End);
 native(464) final function StrLen( coerce string String, out float XL, out float YL );
 native(465) final function DrawText( coerce string Text, optional bool CR );
-native(474) final function DrawColoredText( float X, float Y, string Text, Font Font, color FontColor );
 native(466) final function DrawTile( texture Tex, float XL, float YL, float U, float V, float UL, float VL );
 native(467) final function DrawActor( Actor A, bool WireFrame, optional bool ClearZ );
 native(468) final function DrawTileClipped( texture Tex, float XL, float YL, float U, float V, float UL, float VL );

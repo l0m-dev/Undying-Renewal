@@ -47,7 +47,6 @@ function PreBeginPlay()
 	
 	// bBloodyFootprints = true;
 	
-	/*
 	EnableLog('Spell');
 	EnableLog('Weapon');
 	EnableLog('Trigger');
@@ -63,21 +62,15 @@ function PreBeginPlay()
 	EnableLog('GameState');
 	EnableLog('GameEvents');
 	EnableLog('Pickups');
-	*/
-	
-	ClientAdjustGlow( 0.0, vect(1,0,0) );
 }
 	
 simulated function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	ServerReStartPlayer();
 	
 	if (Player != None)
 		WindowConsole(Player.Console).bShellPauses = false;
 	Level.bDontAllowSavegame = false;
-	
-	ReplicateAnimations();
 }
 
 function bool IsAlert()
@@ -413,6 +406,9 @@ state Dying
 			TimeMargin = 0;
 			Enemy = None;
 			Level.Game.StartPlayer(self);
+			if ( Mesh != None )
+				PlayLocomotion( vect(0,0,0) );	//PlayWaiting();
+			ClientReStart();
 		}
 		else
 			log("Restartplayer failed");
@@ -433,8 +429,17 @@ state Dying
 	{
 		if ( (Level.NetMode == NM_Standalone) || (Level.Game.IsA('Coop') && !Coop(Level.Game).bForceRespawn) )
 		{
-			ServerReStartPlayer();
+			//E3 hack.. should go back to shell, to load menu? 
+			ServerRestartPlayer();
+				return;
+
+			if ( bFrozen )
+				return;
+
+			ShowLoadMenu();
 		}
+		else if ( !bFrozen )
+			ServerReStartPlayer();
 	}
 
 	
@@ -630,10 +635,22 @@ state Dying
 			HasteMod.GotoState('Deactivated');
 		Level.bDontAllowSavegame = true;
 		WindowConsole(Player.Console).bShellPauses = true;
-		//SpawnCarcass();
+		bHidden = true;
 		AttSpell.OwnerDead();
 		DefSpell.OwnerDead();
-		
+		ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
+		BaseEyeheight = Default.BaseEyeHeight;
+		EyeHeight = BaseEyeHeight;
+//		if ( Carcass(ViewTarget) == None )
+	//		bBehindView = true;
+		bFrozen = true;
+		bPressedJump = false;
+		bJustFired = false;
+		// FindGoodView();
+		if ( (Role == ROLE_Authority) && !bHidden )
+			Super.Timer(); 
+		SetTimer(1.0, false);
+
 		// clean out saved moves
 		while ( SavedMoves != None )
 		{
@@ -645,25 +662,6 @@ state Dying
 			PendingMove.Destroy();
 			PendingMove = None;
 		}
-		
-		//if singleplayer
-		if (Level.NetMode == NM_Standalone) {
-			ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
-			bHidden = true;
-		} else {
-			PlayAnim( 'death_gun_back' );
-		}
-		BaseEyeheight = Default.BaseEyeHeight;
-		EyeHeight = BaseEyeHeight;
-		if ( Carcass(ViewTarget) == None )
-			bBehindView = true;
-		bFrozen = true;
-		bPressedJump = false;
-		bJustFired = false;
-		// FindGoodView();
-		if ( (Role == ROLE_Authority) && bHidden )
-			Super.Timer(); 
-		SetTimer(1.0, false);
 	}
 	
 	function EndState()
@@ -841,7 +839,18 @@ state FallingDeath expands Dying
 
 	function EndSpecialKill()
 	{
-		ServerRestartPlayer();
+		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
+		{
+			//E3 hack.. should go back to shell, to load menu? 
+			ServerRestartPlayer();
+				return;
+
+			if ( bFrozen )
+				return;
+			ShowLoadMenu();
+		}
+		else if ( !bFrozen || (FRand() < 0.2) )
+			ServerReStartPlayer();
 	}
 	
 	function PressedEnter()
@@ -909,8 +918,8 @@ state FallingDeath expands Dying
 		Health = 0;
 		sleep(2);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -958,10 +967,10 @@ state FadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1.0,vect(0,0,0));
-		sleep(4);
+		sleep(2);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 // ========================================================================
@@ -1006,10 +1015,10 @@ state InstantFadingDeath expands Dying
 	
 	Begin:
 		ClientAdjustGlow(-1000.0,vect(0,0,0));
-		sleep(1);
+		sleep(0);
 		SetPhysics(PHYS_None);
-		ClientAdjustGlow( 1.0, vect(1,0,0) );
 		ServerRestartPlayer();
+		// ClientAdjustGlow( 1000, vect(1,0,0) );
 }
 
 exec function KillNPC()
@@ -1041,24 +1050,7 @@ exec function SetLocTag(name NewTag)
 	}
 }
 
-simulated function ReplicateAnimations()
-{	
-	if ( Role == ROLE_Authority || Level.NetMode == NM_DedicatedServer )
-		return;
-	
-	SetTimer( 1.0/60, true );
-}
 
-simulated function Timer()
-{
-	local Actor A;
-	
-	ForEach AllActors(class 'Actor', A)
-	{
-		A.bClientAnim = true;
-		A.PlayAnim(A.AnimSequence);
-	}
-}
 
 /*
 exec function CS()
@@ -1334,7 +1326,6 @@ defaultproperties
      BaseEyeHeight=55
      EyeHeight=55 // fixes view moving on level start
      FootSoundClass=Class'Aeons.DefaultFootSoundSet'
-     bClientAnim=True
      Physics=PHYS_Walking
      LODBias=5
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'

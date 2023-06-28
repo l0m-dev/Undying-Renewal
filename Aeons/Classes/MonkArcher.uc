@@ -3,6 +3,15 @@
 //=============================================================================
 class MonkArcher expands MonkSoldier;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		 WeaponAccuracy = 1.0;
+	}
+}
+
 //****************************************************************************
 // Animation sequence notifications.
 //****************************************************************************
@@ -48,12 +57,11 @@ defaultproperties
 {
      MyPropInfo(0)=(Prop=None)
      LongRangeDistance=1000
-     SK_PlayerOffset=(X=100)
      bHasNearAttack=False
      bHasFarAttack=True
      WeaponClass=Class'Aeons.SPCrossbow'
      WeaponJoint=Handposition
      WeaponAttachJoint=Handle
-     WeaponAccuracy=1.0
+     WeaponAccuracy=0.5
      FarAttackBias=1
 }

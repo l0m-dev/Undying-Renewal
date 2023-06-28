@@ -13,9 +13,15 @@ var() int HealingAmount;
 var AeonsPlayer AP;
 var bool bHealthVial;
 var bool bHealingRoot;
+var float inc;
 var vector InitialLocation;
 var ParticleFX pfx;
-var localized string MaxHealthMessage;
+var string MaxHealthMessage;
+
+function PreBeginPlay()
+{
+	MaxHealthMessage = Localize(string(class), "MaxHealthMessage", "Renewal");
+}
 
 function BecomeHealthVial()
 {
@@ -71,6 +77,10 @@ function Tick(float DeltaTime)
 			r.yaw += (4096 * deltaTime);
 
 			SetRotation(r);
+
+			inc += DeltaTime;
+			
+			PrePivot.z = cos(inc) * 4;
 		}
 	}
 }
@@ -106,13 +116,11 @@ auto state Pickup
 			} else {
 				if ((Level.Game.Difficulty == 0 && HealthPacks < 15) ||
 				    (Level.Game.Difficulty == 1 && HealthPacks < 10) ||
-				    (Level.Game.Difficulty == 2 && HealthPacks < 5)) {
+				    (Level.Game.Difficulty == 2 && HealthPacks < 5) || !RGC()) {
 					bContinue = true;
 				} else {
 					Pawn(Other).ClientMessage(MaxHealthMessage, 'Pickup');
 				}
-					
-				//Other.ConsoleCommand("say " $ HealthPacks);
 			}
 		}
 		if ( bContinue && ValidTouch(Other) )
@@ -220,7 +228,6 @@ defaultproperties
      bDisplayableInv=True
      bAmbientGlow=False
      PickupMessage="You gained a Health Pack"
-	 MaxHealthMessage="You cannot carry any more Health"
      ItemName="Health"
      PickupViewMesh=SkelMesh'Aeons.Meshes.health_m'
      PickupSound=Sound'Aeons.Inventory.I_HealthPU01'

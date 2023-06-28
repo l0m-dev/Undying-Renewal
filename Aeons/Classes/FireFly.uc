@@ -3,7 +3,11 @@
 //=============================================================================
 class FireFly expands DefSpell;
 
-// BURT - All exec imports were ripped since it is just an update
+// Sounds
+// #exec AUDIO IMPORT FILE="E_Spl_FireFly01.wav" NAME="E_Spl_FireFly01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_FireFlyLoop01.wav" NAME="E_Spl_FireFlyLoop01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_FireFlyHit01.wav" NAME="E_Spl_FireFlyHit01" GROUP="Spells"
+//#exec AUDIO IMPORT FILE="E_Spl_FireFlyGen01.wav" NAME="E_Spl_FireFlyGen01" GROUP="Spells"
 
 var 	FireFly_proj ff;
 

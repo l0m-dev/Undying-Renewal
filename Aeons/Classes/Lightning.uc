@@ -3,6 +3,19 @@
 //=============================================================================
 class Lightning expands AttSpell;
 
+var int SpeargunChargeManaCost;
+
+function PreBeginPlay()
+{
+	Super.PreBeginPlay();
+	if (RGC())
+	{
+		MaxTargetRange = 4096;
+		RefireRate = 0.5;
+		SpeargunChargeManaCost = 50;
+	}
+}
+
 // ============================================================================
 // Sounds
 //#exec AUDIO IMPORT FILE="E_Spl_LightningStart01.wav" NAME="E_Spl_LightningStart01" GROUP="Spells"
@@ -88,7 +101,7 @@ function FireAttSpell( float Value )
 			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
 			{
 				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-					if ( PawnOwner.useMana(50) )
+					if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 						ChargeSpear();
 			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {
 				PlayFiring();
@@ -116,7 +129,6 @@ state NormalFire
 }
 
 /*
-
 struct Pulse
 {
 	var float 	Index;			// Current index of the pulse
@@ -243,7 +255,7 @@ function FireSpell()
 	{
 		// is the speargun charged?
 		if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-			if ( PawnOwner.useMana(50) )
+			if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 				Speargun(PlayerPawn(Owner).Weapon).Charge();
 		else
 			// normal lightning behavior
@@ -875,7 +887,7 @@ function FireAttSpell( float Value )
 			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
 			{
 				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-					if ( PawnOwner.useMana(50) )
+					if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 						ChargeSpear();
 			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {
 				gotoState('NormalFire');
@@ -904,10 +916,10 @@ defaultproperties
      damagePerLevel(3)=30
      damagePerLevel(4)=40
      damagePerLevel(5)=50
-     MaxTargetRange=4096
+     MaxTargetRange=512
      FireOffset=(Y=16,Z=-10)
      ProjectileClass=Class'Aeons.LtngBlast_proj'
-     RefireRate=0.5
+     RefireRate=2
      FireSound=Sound'Aeons.Spells.E_Spl_LightningStart01'
      ItemType=SPELL_Offensive
      InventoryGroup=14
@@ -919,4 +931,5 @@ defaultproperties
      Rotation=(Yaw=16384)
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     SpeargunChargeManaCost=100
 }

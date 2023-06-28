@@ -67,7 +67,8 @@ function CreateExplosion(Pawn Instigator)
 	
 	// Wind
 	Spawn(class 'ExplosionWind',,,Location);
-	
+
+	// Sound
 	PlayEffectSound();
 }
 

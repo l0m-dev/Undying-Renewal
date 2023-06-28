@@ -3,6 +3,15 @@
 //=============================================================================
 class Phoenix expands AeonsWeapon;
 
+//#exec MESH IMPORT MESH=PhoenixHand_m SKELFILE=PhoenixHand.ngf
+//#exec MESH ORIGIN MESH=PhoenixHand_m YAW=64
+
+//#exec MESH NOTIFY SEQ=Fire TIME=0.3548 FUNCTION=ReleaseEgg
+//#exec MESH NOTIFY SEQ=Fire TIME=0.6 FUNCTION=SmallExplosion
+//#exec MESH NOTIFY SEQ=Fire TIME=0.7 FUNCTION=FireWeapon
+
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+
 //=============================================================================
 var Phoenix_Proj GuidedShell;
 var int Scroll;

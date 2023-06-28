@@ -3,6 +3,48 @@
 //=============================================================================
 class Scythe expands AeonsWeapon;
 
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+
+//=============================================================================
+//					Meshes
+//=============================================================================
+// 3rd Person Mesh
+//#exec MESH IMPORT MESH=Scythe_m SKELFILE=Scythe.ngf
+
+//=============================================================================
+// 1st person Mesh
+//#exec MESH IMPORT MESH=Scythe1st_m SKELFILE=Scythe1st\Scythe1st.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=Scythe1st_m YAW=64
+
+// Notifys
+//#exec MESH NOTIFY SEQ=Select TIME=0.350 FUNCTION=PlaySelectSound
+
+//#exec MESH NOTIFY SEQ=Fire TIME=0.261 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=Fire TIME=0.280 FUNCTION=PreSurfaceStrike
+//#exec MESH NOTIFY SEQ=Fire TIME=0.304 FUNCTION=SurfaceStrike
+
+//#exec MESH NOTIFY SEQ=Fire TIME=0.1 FUNCTION=StartBlur		// motion blur for the blade (start)
+//#exec MESH NOTIFY SEQ=Fire TIME=0.65 FUNCTION=EndBlur			// motion blur for the blade (end)
+
+// regular fire anim
+//#exec MESH NOTIFY SEQ=Fire_Normal TIME=0.233 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=Fire_Normal TIME=0.235 FUNCTION=PreSurfaceStrike
+//#exec MESH NOTIFY SEQ=Fire_Normal TIME=0.240 FUNCTION=SurfaceStrike
+
+//#exec MESH NOTIFY SEQ=Fire_Normal TIME=0.186 FUNCTION=StartBlur		// motion blur for the blade (start)
+//#exec MESH NOTIFY SEQ=Fire_Normal TIME=0.400 FUNCTION=EndBlur			// motion blur for the blade (end)
+
+// berserk fire anim
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.458 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.465 FUNCTION=PreSurfaceStrike
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.475 FUNCTION=SurfaceStrike
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.400 FUNCTION=AddMomentum
+
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.407 FUNCTION=StartBlur		// motion blur for the blade (start)
+//#exec MESH NOTIFY SEQ=Fire_Slow TIME=0.576 FUNCTION=EndBlur			// motion blur for the blade (end)
+
+//=============================================================================
 var() sound HardSounds[3];
 var() sound SoftSounds[3];
 var() sound WaterSound;
@@ -39,7 +81,7 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	//AmmoType.AmmoAmount = 9999;
+	AmmoType.AmmoAmount = 9999;
 }
 
 function Berserk()
@@ -402,7 +444,8 @@ function MeleeAttack(float Range)
 	if ( (AeonsPlayer(Owner).GetStateName() == 'DialogScene') || (AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene') || (AeonsPlayer(Owner).GetStateName() == 'SpecialKill'))
 		return;
 	
-	Patrick(Owner).DetachJoint(PawnImpactSound, Range);
+	if (RGORE())
+		Patrick(Owner).DetachJoint(PawnImpactSound, Range);
 	
 	BladeLocB = jointPlace('Blade5').pos;
 	
@@ -768,14 +811,21 @@ state Idle
 	{
 		if ( PlayerPawn(Owner).Mana <= 1 )
 		{
-			if (!bMad)
+			if (RGC())
 			{
-				GotoState('BloodThirst');
+				if (!bMad)
+				{
+					GotoState('BloodThirst');
+				}
+				else
+				{
+					Pawn(Owner).SwitchToBestWeapon();
+					bMad = false;
+				}
 			}
 			else
 			{
 				Pawn(Owner).SwitchToBestWeapon();
-				bMad = false;
 			}
 		}
 		// Blood dripping from the blade

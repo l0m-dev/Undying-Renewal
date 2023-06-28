@@ -3,15 +3,153 @@
 //=============================================================================
 class AeonsHUD expands HUD;
 
-// BURT - All exec imports were ripped since it is just an update
+//=============================================================================
+// Resources
+//=============================================================================
+//#exec TEXTURE IMPORT NAME=ShieldOverlay FILE=ShieldOverlay.PCX GROUP="HUD" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=InvWindow		FILE=InvWindow.bmp	MIPS=OFF FLAGS=2
+
+//----------------------------------------------------------------------------
+//			Conventional Weapon
+//----------------------------------------------------------------------------
+//#exec Texture Import File=Molotov_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Dynamite_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Cannon_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Revolver_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Shotgun_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=DoubleShotgun_Icon.bmp Group=Icons Mips=Off
+//#exec Texture Import File=Scythe_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Scythe_Icon_Glow.pcx	Group=Icons	Mips=Off
+//#exec Texture Import File=Speargun_Glow_Icon.pcx Group=Icons Mips=Off
+//#exec Texture Import File=Speargun_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Ghelz_Icon.bmp		Group=Icons	Mips=Off
+
+//----------------------------------------------------------------------------
+//			Offensive Spells
+//----------------------------------------------------------------------------
+//#exec Texture Import File=Ectoplasm_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=SkullStorm_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Lightning_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Mindshatter_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Phoenix_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=PowerWord_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Ward_Icon.bmp			Group=Icons	Mips=Off
+//#exec Texture Import File=Invoke_Icon.bmp		Group=Icons	Mips=Off
+
+//----------------------------------------------------------------------------
+//			Defensive Spells
+//----------------------------------------------------------------------------
+//#exec Texture Import File=Dispel_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Scrye_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Haste_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Shalas_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Shield_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Silence_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=FireFly_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Phase_Icon.bmp		Group=Icons	Mips=Off
+
+//----------------------------------------------------------------------------
+//			Inventory / Misc.
+//----------------------------------------------------------------------------
+//#exec Texture Import File=Mana_Icon.bmp 		Group=HUD	Mips=Off
+//#exec Texture Import File=Mana_Icon_glow.pcx	Group=HUD	Mips=Off 
+//#exec Texture Import File=FlightBar_Icon.bmp 	Group=HUD	Mips=Off
+//#exec Texture Import File=Flight_Icon.bmp 		Group=HUD	Mips=Off
+//#exec Texture Import File=null_Icon.bmp			Group=Icons	Mips=Off
+//#exec Texture Import File=Book_Icon.bmp			Group=Icons	Mips=Off
+//#exec Texture Import File=WizardEye_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Bullet_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Bullet_Silver_Icon.bmp Group=Icons Mips=Off
+//#exec Texture Import File=Shells_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Shells_Phos_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=EtherTrap_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Flask_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=HealingRoot_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Health.bmp			Group=Icons	Mips=Off
+//#exec Texture Import File=Health_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=Key_Icon.bmp			Group=Icons	Mips=Off
+//#exec Texture Import File=Lantern_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=MistFlute_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=MontoHeart_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Phosphors_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=PuzzlePiece_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Scroll_Icon.bmp		Group=Icons	Mips=Off
+//#exec Texture Import File=SilverBullet_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=SirenPowder_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=SleedSeed_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=StalkerLure_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=TransScroll_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=VeragoInk_Icon.bmp	Group=Icons	Mips=Off
+//#exec Texture Import File=Amplifier_Icon.bmp	Group=Icons	Mips=Off
+
+//#exec Texture Import File=HUD_Numbers.bmp Mips=Off	Group=HUD
+
+//#exec Texture Import File=Inv_bar_bottom.bmp Mips=Off	Group=HUD FLAGS=2
+//#exec Texture Import File=Inv_bar_right.bmp Mips=Off	Group=HUD FLAGS=2
+//#exec Texture Import File=Inv_bar_top.bmp Mips=Off		Group=HUD FLAGS=2
+//#exec Texture Import File=HUD_Inv_Shad_Test.bmp Flags=4 Mips=Off	Group=HUD
+
+//#exec Texture Import File=dot.bmp Name=dot Mips=Off 			Group=HUD
+//#exec Texture Import File=dot_green.bmp Name=dot_green Mips=Off	Group=HUD
+
+//#exec Texture Import File=StealthIcon.pcx Name=StealthIcon Mips=Off	Group=HUD
+
+//#exec Texture Import File=SepiaTone.pcx Mips=Off Group=HUD
+
+//#exec Texture Import File=scrnspry1.bmp Mips=Off
+//#exec Texture Import File=scrnspry2.bmp Mips=Off
+//#exec Texture Import File=scrnspry3.bmp Mips=Off
+
+//#exec TEXTURE IMPORT FILE=CrossHair0.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair1.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair2.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair3.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair4.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair5.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair6.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair7.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair8.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair9.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair10.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair11.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair12.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair13.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair14.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair15.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair16.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair17.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair18.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair19.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair20.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair21.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair22.bmp	GROUP=Icons MIPS=OFF
+//#exec TEXTURE IMPORT FILE=CrossHair23.bmp	GROUP=Icons MIPS=OFF
+
+//#exec TEXTURE IMPORT FILE=Ghelz_Glow.pcx	GROUP=MuzzleFlashes MIPS=OFF
+//#exec TEXTURE IMPORT FILE=Ghelz_Glow2.pcx	GROUP=MuzzleFlashes MIPS=OFF
+
+//#exec TEXTURE IMPORT FILE=MuzzleFlash0.pcx	GROUP=MuzzleFlashes MIPS=OFF
+
+//#exec TEXTURE IMPORT Name=ShieldCrack0 FILE=ShieldCrack0.pcx GROUP=HUD MIPS=OFF
+//#exec TEXTURE IMPORT Name=ShieldCrack1 FILE=ShieldCrack1.pcx GROUP=HUD MIPS=OFF
+//#exec TEXTURE IMPORT Name=ShieldCrack2 FILE=ShieldCrack2.pcx GROUP=HUD MIPS=OFF
+//#exec Texture Import File=zeta.pcx Group=Icons Mips=Off
+
+//#exec Font Import File=MorpheusFont.bmp Mips=Off	Group=Fonts
+//#exec Font Import File=Dauphin10_pad2.bmp Mips=Off	Group=Fonts
+
+//#exec Audio Import File=HUD_Favorite01.WAV
+//#exec Audio Import File=HUD_Mvmt01.WAV
+//#exec Audio Import File=HUD_Select01.WAV
+
+//#exec OBJ LOAD FILE=\Aeons\Textures\fxB2.utx PACKAGE=fxB2
+//#exec OBJ LOAD FILE=\Aeons\Textures\fxB.utx PACKAGE=fxB
+//#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
 
 #exec Texture Import File=Revolver_Icon_Silver.bmp		Mips=Off
 #exec Texture Import File=FlightBar_Icon_Fixed.bmp		Mips=Off FLAGS=2
 #exec Texture Import File=HUD_Numbers_HD.bmp
 
-//#exec OBJ LOAD FILE=\Textures\fxB2.utx PACKAGE=fxB2
-//#exec OBJ LOAD FILE=\Textures\fxB.utx PACKAGE=fxB
-//#exec OBJ LOAD FILE=\textures\FX.utx PACKAGE=FX
 
 //=============================================================================
 
@@ -2024,6 +2162,11 @@ simulated function DrawActiveSpells(Canvas canvas)
 		{
 			Canvas.SetPos( OffsetX, 8*Scale );
 			Canvas.DrawTile( Icons[15], 32*Scale, 32*Scale, 0, 0, 64, 64 );
+			if ( Level.bDebugMessaging )
+			{
+				Canvas.SetPos( OffsetX, 8*Scale );
+				Canvas.DrawText(""$int(HasteModifier(Player.HasteMod).TimeLeft), false);
+			}
 			OffsetX -= (32 + 8)*Scale;
 		}
 
@@ -3492,7 +3635,7 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	// - sign outline
 	Canvas.CurX = X - 1;	
 	Canvas.CurY = Y + 15 * ScaleY;
-	Canvas.DrawColor.r = 0;
+	Canvas.DrawColor.r = 30;
 	Canvas.DrawColor.g = 0;
 	Canvas.DrawColor.b = 0;
 	Canvas.DrawTileClipped(Texture'Aeons.Meshes.White', 16*ScaleY*0.5 + 2, 5*ScaleY*0.5 + 2, 0, 0, 8, 8);
@@ -3516,9 +3659,8 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	// 10's digit
 	iTempMana = iTempMana % 100;
 
-	if ( iTempMana > 9 )
+	if ( iTempMana > 9 || UsedMana > 99 )
 		DrawDigitScaled( Canvas, iTempMana / 10, 0.5);
-	
 	
 	// 1's digit
 	iTempMana = iTempMana % 10;
@@ -5067,7 +5209,7 @@ defaultproperties
      magicFrameRate=20
      IdentifyName="Name"
      IdentifyHealth="Health"
-     VersionMessage="Build 282 01/26/2001"
+     VersionMessage="Build 06/29/2023"
      RedColor=(R=255,G=64,B=64)
      GreenColor=(R=64,G=255,B=64)
      WhiteColor=(R=255,G=255,B=255)

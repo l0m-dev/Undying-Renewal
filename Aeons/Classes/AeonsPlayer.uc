@@ -28,7 +28,7 @@ class AeonsPlayer expands PlayerPawn
 //#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
 
 // Misc
-#exec AUDIO IMPORT FILE="P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
+#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
 
 // Take Hits
 //#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
@@ -335,6 +335,7 @@ var() bool bDrawDebugHUD;		// Draw debug items in the hud
 var float NoManaFlashTime;
 
 var globalconfig bool bAllowSelectionHUD;
+var bool bAllowSpellSelectionHUD;
 var enum ESelectMode
 {
     SM_None,
@@ -425,6 +426,9 @@ replication
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
 		bDoubleShotgun, bDrawInvList, bShowScryeHint;
 
+	reliable if ( Role==ROLE_Authority )
+		SendClientFire, RealWeapon;
+
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
 		ClientPlayTakeHit, bRenderWeapon, GiveBook, GiveJournal;
@@ -462,6 +466,7 @@ event PreBeginPlay()
 
 	//EMod = spawn(class 'EnvironmentModifier',self,,Location);
 	//EMod.setBase(self);
+	bAllowSpellSelectionHUD = true;
 }
 
 event PreClientTravel()
@@ -987,7 +992,6 @@ exec function FireAttSpell( optional float F )
 			bJustFiredAttSpell = true;
 			AttSpell.FireAttSpell(F);
 		}
-		
 	}
 }
 
@@ -1130,7 +1134,7 @@ exec function SelectWeapon( optional float F )
 
 exec function SelectAttSpell( optional float F )
 {
-	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || bShowMenu  || (Level.Pauser!="") )
+	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || !bAllowSpellSelectionHUD || bShowMenu  || (Level.Pauser!="") )
 		return;
 
 //	Log("Select AttSpell called");
@@ -1436,13 +1440,6 @@ exec function Bring( string ClassName )
 }
 */
 
-exec function skip()
-{
-	//bForceSkip = !bForceSkip;
-	log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
-	MasterCamPoint.CompleteCutscene(self);
-	MasterCamPoint.Teleport(self);
-}
 
 //-----------------------------------------------------------------------------
 // Sound functions
@@ -2754,7 +2751,7 @@ ignores SeePlayer, HearNoise, Bump;
 //		log( "in ProcessMove, OldAccel is <" $ OldAccel $ "> (" $ OldVSize $ "), NewAccel is <" $ NewAccel $ "> (" $ NewVSize $ ")" );
 
 		Acceleration = NewAccel;
-		bIsTurning = ( Abs(RawDeltaRotation(DeltaTime).Yaw) > 5000 );
+		bIsTurning = ( Abs(DeltaRot.Yaw/DeltaTime) > 5000 );
 
 		if ( bPressedJump )
 			DoJump();
@@ -3062,8 +3059,6 @@ simulated state PlayerCutScene
 				UnLock();
 				GotoState('Dying');
 			}
-			if (bLanternOn)
-				useLantern2();
 		}
 		//ViewFade(DeltaTime, 4);
 		ViewFlash(DeltaTime);
@@ -5367,7 +5362,6 @@ function SendFire(Weapon W)
 function UpdateRealWeapon(Weapon W)
 {
 	Log("AeonsPlayer: UpdateRealWeapon");
-	log("AeonsPlayer: UpdateRealWeapon Client", 'Misc');
 	WeaponUpdate++;
 	RealWeapon(W,WeaponUpdate);
 	AttachWeapon();
@@ -5518,16 +5512,8 @@ exec function useLantern()
 	local Inventory Inv;
 	
 	Inv = Inventory.FindItemInGroup(105);
-	if ( Inv != none && MasterCamPoint == none)
+	if ( Inv != none && viewTarget == none)
 		Inv.Activate();
-}
-
-exec function useLantern2()
-{
-	local Inventory Inv;
-		
-	Inv = Inventory.FindItemInGroup(105);
-	Inv.Activate();
 }
 
 // a direct function to use the Powder of the Siren
@@ -7826,7 +7812,7 @@ exec function QuickSave()
 	{
 		//dynamic ConsoleCommand("SaveShot ..\\save\\0\\save.bmp");
 
-		//ScreenMessage(QuickSaveString, 3.0);
+		ClientMessage(QuickSaveString);
 		ConsoleCommand("SaveGame 0");
 	}
 }

@@ -17,6 +17,16 @@ var Pawn SeekPawn;
 var() float DamageMult;
 var() sound ChainSound;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		Range = 4096;
+		Speed = 6000;
+	}
+}
+
 auto state flying
 {
 	function BeginState()
@@ -182,7 +192,7 @@ auto state flying
 
 defaultproperties
 {
-     Range=4096
+     Range=1280
      ChainRange=384
      DamageMult=1
      ChainSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_LightningChain01'
@@ -192,7 +202,7 @@ defaultproperties
      damagePerLevel(3)=80
      damagePerLevel(4)=80
      damagePerLevel(5)=100
-     Speed=6000
+     Speed=3000
      MaxSpeed=10000
      Damage=20
      bMagical=True

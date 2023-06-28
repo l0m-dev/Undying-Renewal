@@ -16,9 +16,15 @@ var sound ScryeHintSounds[5];
 var() bool bDisableAfterPlayerScrye;
 var() float Vol1, Vol2, Vol3;
 
-var localized string ScryeHintMessage;
+var string ScryeHintMessage;
 
 //=============================================================================
+
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	ScryeHintMessage = Localize(string(class), "ScryeHintMessage", "Renewal");
+}
 
 function PassThru(Actor Other)
 {
@@ -128,5 +134,4 @@ defaultproperties
      Vol3=1
      Texture=Texture'Aeons.System.TrigScryeHint'
      DrawScale=0.5
-	 ScryeHintMessage="Use Scrye to reveal the past when you hear whispering"
 }

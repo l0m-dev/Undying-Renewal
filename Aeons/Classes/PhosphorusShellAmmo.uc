@@ -5,6 +5,16 @@ class PhosphorusShellAmmo expands ShotgunAmmo;
 
 //#exec MESH IMPORT MESH=PhosShells_m SKELFILE=PhosphorusShells.ngf
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		AmmoAmount = 6;
+		MaxAmmo = 30;
+	}
+}
+
 state Activated
 {
 	function Activate()
@@ -50,8 +60,8 @@ state Deactivated
 
 defaultproperties
 {
-     AmmoAmount=6
-     MaxAmmo=30
+     AmmoAmount=4
+     MaxAmmo=20
      InventoryGroup=113
      bActive=False
      PickupMessage="You picked up phosphorus shells"

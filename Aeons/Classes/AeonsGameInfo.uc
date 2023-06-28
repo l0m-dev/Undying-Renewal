@@ -335,6 +335,18 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newSpell.Instigator = PlayerPawn;
 		// force assign it to player's AttSpell or DefSpell vars?
 	}
+
+	newWeapon = Spawn(class'Aeons.hand');
+	if( newWeapon != None )
+	{
+		newWeapon.BecomeItem();
+		PlayerPawn.AddInventory(newWeapon);
+		newWeapon.BringUp();
+		newWeapon.Instigator = PlayerPawn;
+		newWeapon.GiveAmmo(PlayerPawn);
+		newWeapon.SetSwitchPriority(PlayerPawn);
+		newWeapon.WeaponSet(PlayerPawn);
+	}
 	*/
 }
 

@@ -7,6 +7,19 @@ class Shield expands AttSpell;
 
 //----------------------------------------------------------------------------
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	if (RGC())
+	{
+		manaCostPerLevel[0] = 60;
+		manaCostPerLevel[1] = 60;
+		manaCostPerLevel[2] = 60;
+		manaCostPerLevel[3] = 60;
+		manaCostPerLevel[4] = 60;
+	}
+}
+
 state NormalFire
 {
 	ignores FireAttSpell;
@@ -36,11 +49,11 @@ state Idle
 defaultproperties
 {
      HandAnim=Shield
-     manaCostPerLevel(0)=60
-     manaCostPerLevel(1)=60
-     manaCostPerLevel(2)=60
-     manaCostPerLevel(3)=60
-     manaCostPerLevel(4)=60
+     manaCostPerLevel(0)=15
+     manaCostPerLevel(1)=15
+     manaCostPerLevel(2)=15
+     manaCostPerLevel(3)=15
+     manaCostPerLevel(4)=15
      FireSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ShldLaunch01'
      ItemType=SPELL_Offensive
      InventoryGroup=17

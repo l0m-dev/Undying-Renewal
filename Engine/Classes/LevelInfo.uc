@@ -226,5 +226,6 @@ defaultproperties
      Brightness=1
      DefaultTexture=Texture'Engine.DefaultTexture'
      bCheckWalkSurfaces=True
+     bStatic=False
      bHiddenEd=True
 }

@@ -146,6 +146,10 @@ function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	OpacityEffector.FlickerRate = 0.05;
+	if (RGC())
+	{
+		HasteScalar = 6;
+	}
 	SpeedFast();
 }
 
@@ -460,7 +464,7 @@ state AISpecialKill
 defaultproperties
 {
      BiteManaDrain=20
-     HasteScalar=6
+     HasteScalar=4
      HasteFrequency=4
      HasteVariance=0.5
      HoverAltitude=400

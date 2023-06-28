@@ -36,6 +36,9 @@ simulated function PostBeginPlay()
  	trail = spawn(class 'SphereOfCold_particles',,,Location);
  	trail.setBase(self);
 	trail.RemoteRole = ROLE_None;
+
+	if (!RGC())
+		Speed = 1200;
 }
 
 

@@ -19,7 +19,7 @@ defaultproperties
      AlphaDelay=1
      Textures(0)=Texture'fxB.Spells.ecto2B'
      RenderPrimitive=PPRIM_Liquid
-     bTrailerSameRotation=False
+     bTrailerSameRotation=True
      Physics=PHYS_Trailer
      RemoteRole=ROLE_None
      LifeSpan=2

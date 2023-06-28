@@ -286,10 +286,9 @@ replication
 		PrevItem, ActivateItem, ShowInventory, ServerFeignDeath, ServerSetWeaponPriority,
 		ChangeName, ChangeTeam, Eh, ViewClass, ViewPlayerNum, ViewSelf, ViewPlayer, ServerSetSloMo, ServerAddBots,
 		PlayersOnly, ServerRestartPlayer, NeverSwitchOnPickup, BehindView, ServerNeverSwitchOnPickup, 
-		PrevWeapon, NextWeapon, NextAttSpell, Arm, ServerReStartGame, ServerUpdateWeapons, ServerTaunt, ServerChangeSkin,
+		PrevWeapon, NextWeapon, Arm, ServerReStartGame, ServerUpdateWeapons, ServerTaunt, ServerChangeSkin,
 		SwitchLevel, SwitchCoopLevel, Kick, KickBan, SnuffAll, Bring, Admin, AdminLogin, AdminLogout, Typing, Mutate;
-	
-	//ProcessMove, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon
+
 	unreliable if( Role<ROLE_Authority )
 		ServerMove, Aerial, Walk, Astral;
 
@@ -310,6 +309,10 @@ replication
 		ClientPlaySound;
 	unreliable if( RemoteRole==ROLE_AutonomousProxy )//***
 		ClientAdjustPosition;
+
+	// Rendering.
+	unreliable if( DrawType==DT_Mesh && Role==ROLE_Authority )
+		MultiSkins;
 }
 
 //
@@ -1738,82 +1741,8 @@ exec function NextWeapon()
 	Weapon.PutDown();
 }
 
-exec function NextAttSpell()
-{
-	local int nextGroup;
-	local Inventory inv;
-	local Spell realAttSpell, s, Prev;
-	local bool bFoundAttSpell;
-
-	if( bShowMenu || Level.Pauser!="" )
-		return;
-	if ( AttSpell == None )
-	{
-		// SwitchToBestWeapon();
-		return;
-	}
-
-	nextGroup = 100;
-	realAttSpell = AttSpell;
-	if ( PendingAttSpell != None )
-		AttSpell = PendingAttSpell;
-	PendingAttSpell = None;
-
-	for (inv=Inventory; inv!=None; inv=inv.Inventory)
-	{
-		s = Spell(inv);
-		if ( s != None )
-		{
-			if ( s.InventoryGroup == AttSpell.InventoryGroup )
-			{
-				if ( s == AttSpell )
-					bFoundAttSpell = true;
-				else if ( bFoundAttSpell )
-				{
-					PendingAttSpell = s;
-					break;
-				}
-			}
-			else if ( (s.InventoryGroup > AttSpell.InventoryGroup) && (s.InventoryGroup < nextGroup) )
-			{
-				nextGroup = s.InventoryGroup;
-				PendingAttSpell = s;
-			}
-		}
-	}
-
-	bFoundAttSpell = false;
-	nextGroup = AttSpell.InventoryGroup;
-	if ( PendingAttSpell == None )
-		for (inv=Inventory; inv!=None; inv=inv.Inventory)
-		{
-			s = Spell(Inv);
-			if ( s != None )
-			{
-				if ( s.InventoryGroup == AttSpell.InventoryGroup )
-				{
-					if ( s == AttSpell )
-					{
-						bFoundAttSpell = true;
-						if ( Prev != None )
-							PendingAttSpell = Prev;
-					}
-					else if ( !bFoundAttSpell && (PendingAttSpell == None) )
-						Prev = s;
-				}
-				else if ( s.InventoryGroup < nextGroup ) 
-				{
-					nextGroup = s.InventoryGroup;
-					PendingAttSpell = s;
-				}
-			}
-		}
-
-	if ( PendingAttSpell != None ) 
-		AttSpell = PendingAttSpell;
-}
-
-
+// for renewal backwards compatibility
+exec function NextAttSpell();
 
 exec function Mutate(string MutateString)
 {
@@ -3325,11 +3254,6 @@ event PreBeginPlay()
 	Super.PreBeginPlay();
 }
 
-event PostNetBeginPlay()
-{
-	//if (Role == ROLE_Authority)
-	//	TriggerLevelBegin();
-}
 event PostBeginPlay()
 {
 	local Actor A;

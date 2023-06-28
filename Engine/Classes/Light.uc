@@ -6,15 +6,6 @@ class Light extends Invisible
 
 //#exec Texture Import File=Textures\S_Light.pcx  Name=S_Light Mips=On Flags=2
 
-function PostBeginPlay()
-{
-	//Super.PreBeginPlay();
-	//LightBrightness = LightBrightness / 4;
-	//bCorona = False;
-	//bActorShadows = True;
-	//bDarkLight= True;
-}
-
 defaultproperties
 {
      bStatic=True

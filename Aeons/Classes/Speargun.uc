@@ -3,6 +3,29 @@
 //=============================================================================
 class Speargun expands AeonsWeapon;
 
+//=============================================================================
+// 1st person view mesh
+//#exec MESH IMPORT MESH=Speargun1st_m SKELFILE=Speargun1st\Speargun1st.ngf MOVERELATIVE=0
+//#exec MESH ORIGIN MESH=Speargun1st_m YAW=64
+
+//#exec MESH NOTIFY SEQ=Fire TIME=0.077 FUNCTION=FireWeapon
+//#exec MESH NOTIFY SEQ=ReloadEnd TIME=0.5 FUNCTION=PlayReloadSound
+
+//=============================================================================
+// Pickup Mesh
+//#exec MESH IMPORT MESH=spear_m SKELFILE=spear_m.ngf
+//#exec MESH IMPORT MESH=Spear_proj_m SKELFILE=Spear_proj.ngf
+//#exec MESH IMPORT MESH=Spear_Tribesman_m SKELFILE=Spear_Tribesman.ngf
+//#exec MESH IMPORT MESH=Speargun_Jemaas_m SKELFILE=Speargun_Jemaas.ngf
+
+//#exec MESH IMPORT MESH=speargun_m SKELFILE=speargun_m.ngf
+
+
+//=============================================================================
+// 3rd Person mesh
+//#exec MESH IMPORT MESH=Speargun3rd_m SKELFILE=Speargun3rd\SpeargunPat.ngf
+
+//=============================================================================
 var() float ChargeTimer;
 var float ChargeLen;
 
@@ -441,7 +464,7 @@ defaultproperties
      ReloadSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_SpeargunReload01'
      ChargedSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_SpeargunElecLp01'
      bWaterFire=True
-     ReloadTime=0.1
+     ReloadTime=0.75
      ThirdPersonJointName=SpeargunAtt
      AmmoName=Class'Aeons.SpearAmmo'
      ReloadCount=1
@@ -452,7 +475,7 @@ defaultproperties
      shakemag=1200
      shaketime=0.3
      AIRating=0.5
-     RefireRate=0.1
+     RefireRate=1
      FireSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_Speargunfire01'
      AltFireSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_SpearElecFire01'
      SelectSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_SpeargunPU1'

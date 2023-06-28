@@ -53,6 +53,14 @@ function PreBeginPlay ()
 	PawnOwner = Pawn(Owner);
 	PlayerPawnOwner = PlayerPawn(Owner);
 
+	if (RGC())
+	{
+		seekWeight[1] = 0.7;
+		seekWeight[2] = 0.8;
+		seekWeight[3] = 0.9;
+		seekWeight[4] = 1.0;
+		seekWeight[5] = 1.0;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +108,8 @@ function bool processCastingLevel()
 simulated function PlayFiring()
 {
 	//logTime("Ectoplasm: PlayFiring");
-
+// / * we need to put this back in the appropriate places. 
+	// Some of it only happens clientside
 	if ( effectLight == none )
 	{
 		log("Creating Ecto Effect Light", 'Spell');
@@ -119,8 +128,9 @@ simulated function PlayFiring()
 	if ( AeonsPlayer(Owner).bMagicSound )
 	{
 		Owner.PlaySound(SpawnSounds[Rand(3)]);
-		Owner.MakeNOise(3.0, 1280*3);
+		Owner.MakeNOise(3.0, 1280);
 	}
+// * /
 	LoopAnim('EctoCycle',2);
 	bStillFiring = true;
 }
@@ -321,11 +331,11 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 
 	ecto.ectoTrail.AlphaStart.Base = currentAlpha;
 */
-	local Vector X,Y,Z, Start, HitLocation, HitNormal;
+	local Vector X,Y,Z, Start; //, HitLocation;
 	local rotator Dir;
 	local Ectoplasm_proj ecto;
 	local PlayerPawn Player;
-	local int HitJoint;
+
 	Player = PlayerPawn(Owner);
 	AeonsPlayer(Owner).MakePlayerNoise(1.0);
 
@@ -335,11 +345,10 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 		GetAxes(AutoAimDir,X,Y,Z);
 	else
 		GetAxes(Pawn(owner).ViewRotation,X,Y,Z);
-		
+
 	Start = Owner.Location + CalcDrawOffset() + FireOffset.X * X + FireOffset.Y * Y + FireOffset.Z * Z;
-	
-	PlayerPawn(Owner).EyeTrace(HitLocation, HitNormal, HitJoint, 8192, true);
-	Dir = Rotator(Normal(HitLocation - Start));
+
+	Dir = Rotator(Normal(Player.EyeTraceLoc - Start));
 
 	ecto = Spawn(class 'Ectoplasm_proj', PlayerPawn(Owner),, Start, Dir);
 	
@@ -416,10 +425,11 @@ defaultproperties
      SpawnSounds(0)=Sound'Aeons.Spells.E_Spl_EctoSpawn01'
      SpawnSounds(1)=Sound'Aeons.Spells.E_Spl_EctoSpawn02'
      SpawnSounds(2)=Sound'Aeons.Spells.E_Spl_EctoSpawn03'
-     seekWeight(1)=0.7
-     seekWeight(2)=0.8
-     seekWeight(3)=0.9
-     seekWeight(4)=1.0
+     seekWeight(1)=0.3
+     seekWeight(2)=0.3
+     seekWeight(3)=0.7
+     seekWeight(4)=0.7
+     seekWeight(5)=0.7
      SightRadius=2048
      manaCostPerLevel(0)=8
      manaCostPerLevel(1)=6

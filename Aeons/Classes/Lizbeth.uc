@@ -21,22 +21,22 @@ class Lizbeth expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=attack3 TIME=0.583 FUNCTION=DoNearDamage			//
 //#exec MESH NOTIFY SEQ=attack3 TIME=0.611 FUNCTION=DoNearDamage			//
 
-//#exec MESH NOTIFY SEQ=dervish1 TIME=0.378 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish1 TIME=0.433 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish1 TIME=0.489 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=dervish1 TIME=0.778 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish1 TIME=0.833 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish1 TIME=0.889 FUNCTION=DoNearDamage2			//
 
-//#exec MESH NOTIFY SEQ=dervish2 TIME=0.300 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish2 TIME=0.350 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish2 TIME=0.400 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish2 TIME=0.450 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=dervish2 TIME=0.700 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish2 TIME=0.750 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish2 TIME=0.800 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish2 TIME=0.850 FUNCTION=DoNearDamage2			//
 
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.160 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.200 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.240 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.280 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.400 FUNCTION=DoNearDamageReset		//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.440 FUNCTION=DoNearDamage			//
-//#exec MESH NOTIFY SEQ=dervish3 TIME=0.480 FUNCTION=DoNearDamage			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.560 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.600 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.640 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.680 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.800 FUNCTION=DoNearDamage2Reset		//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.840 FUNCTION=DoNearDamage2			//
+//#exec MESH NOTIFY SEQ=dervish3 TIME=0.880 FUNCTION=DoNearDamage2			//
 
 //#exec MESH NOTIFY SEQ=jump_attack TIME=0.125 FUNCTION=TriggerJump		//
 //#exec MESH NOTIFY SEQ=jump_attack TIME=0.271 FUNCTION=DoNearDamage		//
@@ -240,6 +240,12 @@ function PreBeginPlay()
 	OriginalHealth = Health;
 	HealthDelta = 0.2*(OriginalHealth - MinimumHealth);
 	SetLimbTangible( 'cloth', false );
+	if (RGC())
+	{
+		FrenzyGroundSpeed = 600;
+		DamageRadius = 160;
+		MeleeRange = 200;
+	}
 }
 
 //
@@ -613,11 +619,13 @@ state LizbethBossFightFrenzy expands AIScriptedState
 	{
 		super.BeginState();
 		
-		SpawnHowler();
+		if (RGC())
+			SpawnHowler();
 		
 		if( FrenzyTime <= 0.0 )
 		{
-		    //HatedClass=Class'Aeons.DecayedSaint';
+			if (!RGC())
+				HatedClass=Class'Aeons.DecayedSaint';
 			AmbientSound = Sound'CreatureSFX.Lizbeth.C_Lizbeth_HasteLp1';
 
 			DamageThresholdState = '';	// Don't go to any other states when damage threshold reached.
@@ -684,8 +692,6 @@ Resume:
 
 Begin:
 	DebugInfoMessage( ".LizbethBossFightFrenzy Begin." );
-	
-	Sleep(20);
 }
 
 //****************************************************************************
@@ -927,14 +933,14 @@ state AIAttack
 		if ( TriggerSwitchToMelee() )
 		{
 			PushState( GetStateName(), 'RESUME' );
-			//StopMovement();
+			StopMovement();
 			GotoState( 'AISwitchToMelee' );
 			return;
 		}
 		else if ( TriggerSwitchToRanged() )
 		{
 			PushState( GetStateName(), 'RESUME' );
-			//StopMovement();
+			StopMovement();
 			GotoState( 'AISwitchToRanged' );
 			return;
 		}
@@ -1127,7 +1133,7 @@ defaultproperties
      DamageThresholdState=AIRetreat
      FrenzyTimer=15
      WeakenedTimer=10
-     FrenzyGroundSpeed=600
+     FrenzyGroundSpeed=450
      ClawTrailWidth=(Base=12)
      ClawTrailLength=(Base=24)
      BodyTrailWidth=(Base=32)
@@ -1145,13 +1151,13 @@ defaultproperties
      bHasFarAttack=True
      MeleeInfo(0)=(Damage=30,Method=RipSlice)
      MeleeInfo(1)=(Damage=50,Method=RipSlice)
-     DamageRadius=160
+     DamageRadius=110
      SK_PlayerOffset=(X=60)
      bHasSpecialKill=True
      JumpScalar=1.15
      MaxJumpZ=2500
      LostCounter=0
-     MeleeRange=200
+     MeleeRange=80
      AirSpeed=600
      AccelRate=1800
      Intelligence=BRAINS_Human

@@ -15,6 +15,9 @@ var Shield3rdPerson shieldMesh;
 var travel AeonsPlayer Player;
 var int i;
 
+var int ShieldHealthPerLevel[6];
+var float OverlayStrPerLevel[6];
+
 /*----------------------------------------------------------------------------
 	Replication
 ----------------------------------------------------------------------------*/
@@ -36,6 +39,16 @@ function PreBeginPlay()
 	
 	col = vect(0.5,0.5,1) * 200;	// hud change color
 	str = 0.05;					// HUD change strength
+	
+	if (RGC())
+	{
+		ShieldHealthPerLevel[0] = 15;
+		ShieldHealthPerLevel[1] = 25;
+		ShieldHealthPerLevel[2] = 35;
+		ShieldHealthPerLevel[3] = 45;
+		ShieldHealthPerLevel[4] = 55;
+		ShieldHealthPerLevel[5] = 65;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -158,24 +171,9 @@ state Activated
 		if( shieldMesh == none )
 			shieldMesh = spawn(class 'Shield3rdPerson',Pawn(Owner),,Owner.Location + (Vector(PlayerPawn(Owner).ViewRotation) * 16), PlayerPawn(Owner).ViewRotation );
 
-		if ( castingLevel == 0 ) {
-			shieldHealth = 15;
-			OverlayStr = 0.15;
-		} else if ( castingLevel == 1 ) {
-			shieldHealth = 25;
-			OverlayStr = 0.3;
-		} else if ( castingLevel == 2 ) {
-			shieldHealth = 35;
-			OverlayStr = 0.45;
-		} else if ( castingLevel == 3 ) {
-			shieldHealth = 45;
-			OverlayStr = 0.6;
-		} else if ( castingLevel == 4 ) {
-			shieldHealth = 55;
-			OverlayStr = 1.0;
-		} else if ( castingLevel == 5 ) {
-			shieldHealth = 65;
-			OverlayStr = 1.0;
+		if ( castingLevel < 6 ) {
+			shieldHealth = ShieldHealthPerLevel[castingLevel];
+			OverlayStr = OverlayStrPerLevel[castingLevel];
 		} else {
 			log("CastingLevel is invalid!!!");
 			gotoState('Deactivated');	// bail out
@@ -249,4 +247,16 @@ defaultproperties
 {
      DeactivateSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ShldDestroy01'
      EffectSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ShldDeflect01'
+     ShieldHealthPerLevel(0)=15
+     ShieldHealthPerLevel(1)=30
+     ShieldHealthPerLevel(2)=45
+     ShieldHealthPerLevel(3)=60
+     ShieldHealthPerLevel(4)=100
+     ShieldHealthPerLevel(5)=125
+     OverlayStrPerLevel(0)=0.15
+     OverlayStrPerLevel(1)=0.3
+     OverlayStrPerLevel(2)=0.45
+     OverlayStrPerLevel(3)=0.6
+     OverlayStrPerLevel(4)=1.0
+     OverlayStrPerLevel(5)=1.0
 }

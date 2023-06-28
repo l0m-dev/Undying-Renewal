@@ -743,8 +743,7 @@ replication
 		Location;
 	unreliable if( !bCarriedItem && (DrawType==DT_Mesh || DrawType==DT_Brush || DrawType==DT_Particles) && (bNetInitial || bSimulatedPawn || RemoteRole<ROLE_SimulatedProxy) && Role==ROLE_Authority )
 		Rotation;
-	
-	unreliable if( RemoteRole==ROLE_SimulatedProxy)
+	unreliable if( RemoteRole==ROLE_SimulatedProxy )
 		Base, BaseJoint, BasePlace;
 
 	// Velocity.
@@ -755,20 +754,10 @@ replication
 	unreliable if( bSimFall || (RemoteRole==ROLE_SimulatedProxy && bNetInitial && !bSimulatedPawn) )
 		Physics, bBounce;
 	unreliable if( RemoteRole==ROLE_SimulatedProxy && Physics==PHYS_Rotating && bNetInitial )
-		bFixedRotationDir, bRotateToDesired, RotationRate, DesiredRotation;
-		
-	// Animation. 
-	unreliable if( DrawType==DT_Mesh && ((RemoteRole<=ROLE_SimulatedProxy && (!bNetOwner || !bClientAnim)) || bDemoRecording) )
-		AnimSequence;
+		bFixedRotationDir, bRotateToDesired;
+	unreliable if( RemoteRole==ROLE_SimulatedProxy && Physics==PHYS_Rotating && bNetInitial )
+		RotationRate, DesiredRotation;
 
-	//reliable if( Role<ROLE_Authority )
-	//	PlayAnim, LoopAnim;
-	
-	//unreliable if( DrawType==DT_Mesh && (RemoteRole<=ROLE_SimulatedProxy && (!bNetOwner || !bClientAnim)) )
-	//	AnimSequence;
-	
-	
-	
 	// Rendering.
 	unreliable if( Role==ROLE_Authority )
 		bHidden, bOnlyOwnerSee;
@@ -850,16 +839,14 @@ native(415) final function vector StaticJointDir( name BodyLoc, vector Dir );
 native(416) final function int JointParent( int iJoint );
 
 // Animation functions.
-native(259) final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
+native(259) exec final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
 native(274) exec final function int PlayAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags );
 native(260) exec final function bool LoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
 native(294) exec final function bool TweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys );
-
 final function ClearAnims()
 {
 	PlayAnim('');
 }
-
 native(282) final function bool IsAnimating();
 native(292) final function bool IsAnimResting();
 native(293) final function name GetAnimGroup( name Sequence );
@@ -1652,6 +1639,16 @@ function RenewalConfig GetRenewalConfig()
 	return Level.Game.RenewalConfig;
 }
 
+function bool RGC()
+{
+	return GetRenewalConfig().bGameplayChanges;
+}
+
+function bool RGORE()
+{
+	return GetRenewalConfig().bGore;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //	Default Properties
 //////////////////////////////////////////////////////////////////////////////
@@ -1659,6 +1656,7 @@ function RenewalConfig GetRenewalConfig()
 defaultproperties
 {
      bSpawned=True
+     Priority=10
      Role=ROLE_Authority
      RemoteRole=ROLE_DumbProxy
      LODBias=1

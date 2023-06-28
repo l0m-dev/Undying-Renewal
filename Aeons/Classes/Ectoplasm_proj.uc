@@ -180,11 +180,18 @@ auto state Flying
 		local float deviation, MagnitudeVel;
 		local vector currentDir, randomDir;
 		
-		if (FRand() < majorDeviationProbability[CastingLevel])
-			deviation = majDev[CastingLevel];
+		if (RGC())
+		{
+			if (FRand() < majorDeviationProbability[CastingLevel])
+				deviation = majDev[CastingLevel];
+			else
+				deviation = stdDev[CastingLevel];
+		}
 		else
-			deviation = stdDev[CastingLevel];
-	
+		{
+			deviation = 0.5;
+		}
+		
 		if ( SeekPawn == none )
 		{
 			seekPawn = getLitPawn(seekPawn, 4096, Location);
@@ -247,12 +254,12 @@ defaultproperties
      stdDev(3)=0.2
      stdDev(4)=0.1
      stdDev(5)=0.05
-     majDev(0)=0.5
-     majDev(1)=0.4
-     majDev(2)=0.3
-     majDev(3)=0.2
-     majDev(4)=0.1
-     majDev(5)=0.05
+     majDev(0)=1.0
+     majDev(1)=0.8
+     majDev(2)=0.6
+     majDev(3)=0.4
+     majDev(4)=0.2
+     majDev(5)=0.1
      EnterWallSound=Sound'Aeons.Spells.E_Spl_EctoThruWall01'
      damagePerLevel(0)=10
      damagePerLevel(1)=10

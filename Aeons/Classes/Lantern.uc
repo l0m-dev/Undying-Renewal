@@ -15,9 +15,18 @@ var() class<Light> LanternLocalLight;
 var Light mainLight, PlayerLight;
 var() Sound FlickerSound;
 
+var savable travel bool bPlaySounds;
+
+event TravelPreAccept()
+{
+	bPlaySounds = false;
+	Super.TravelPreAccept();
+}
+
 function Activate()
 {
 	gotoState('Activated');
+	Owner.PlaySound(ActivateSound,, 0.5);
 }
 
 function bool AngleCheck(vector Loc, vector A, Actor Other, float angleThreshold)
@@ -50,6 +59,17 @@ state Activated
 		MainLight.setRotation(Pawn(Owner).ViewRotation);
 		MainLight.setLocation((Pawn(Owner).Location + eyeHeight) + Vector(Pawn(Owner).ViewRotation) * 48);
 		PlayerLight.setLocation( Pawn(Owner).Location );
+		
+		if ( AeonsPlayer(Owner).viewTarget != none )
+		{
+			MainLight.LightBrightness = 0;
+			PlayerLight.LightBrightness = 0;
+		} else {
+			MainLight.LightBrightness = 255;
+			PlayerLight.LightBrightness = 255;
+			//MainLight.LightBrightness = class'Aeons.LanternSpotlight'.default.LightBrightness;
+			//PlayerLight.LightBrightness = class'Aeons.LanternLight'.default.LightBrightness;
+		}
 	}
 
 
@@ -94,9 +114,11 @@ state Activated
 
 		if ( Pawn(Owner) != None )
 		{
-			if ((mainLight == none) && !Owner.Region.Zone.bWaterZone)
+			if (mainLight == none && !Owner.Region.Zone.bWaterZone && PlayerPawn(Owner).viewTarget == None)
 			{
-				Owner.PlaySound(ActivateSound,, 0.5);
+				if (bPlaySounds)
+					Owner.PlaySound(ActivateSound,, 0.5);
+				bPlaySounds = true;
 
 				setTimer(0.25,true);
 				bActive = true;
@@ -106,7 +128,7 @@ state Activated
 				spawnLocation = (Pawn(Owner).Location + eyeHeight) + Vector(Pawn(Owner).ViewRotation) * 20;
 				mainLight = spawn(LanternSpot,Pawn(Owner),,SpawnLocation, Pawn(Owner).ViewRotation);
 				PlayerLight = spawn(LanternLocalLight,Pawn(Owner),,SpawnLocation, Pawn(Owner).ViewRotation);
-			} else {
+			} else if (AeonsPlayer(Owner).bLanternOn) {
 				gotoState('Deactivated');
 			}
 		}
@@ -126,7 +148,8 @@ state Deactivated
 	}
 
 	Begin:
-		Owner.PlaySound(DeactivateSound,, 0.5);
+		if (bPlaySounds)
+			Owner.PlaySound(DeactivateSound,, 0.5);
 		setTimer(0,false);
 		bActive = false;
 		AeonsPlayer(Owner).bLanternOn = false;
@@ -157,4 +180,5 @@ defaultproperties
      LightSaturation=103
      LightRadius=16
      LightRadiusInner=14
+	 bPlaySounds=False
 }

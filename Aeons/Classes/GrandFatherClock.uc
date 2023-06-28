@@ -2,7 +2,7 @@
 // GrandFatherClock.
 //=============================================================================
 class GrandFatherClock expands Furniture;
-#exec MESH IMPORT MESH=GrandFatherClock_m SKELFILE=GrandFatherClock.ngf 
+//#exec MESH IMPORT MESH=GrandFatherClock_m SKELFILE=GrandFatherClock.ngf 
 
 
 function PostBeginPlay()

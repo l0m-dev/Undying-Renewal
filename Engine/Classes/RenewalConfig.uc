@@ -3,6 +3,9 @@
 //=============================================================================
 class RenewalConfig expands Info config(RenewalSettings) transient;
 
+var config bool bGameplayChanges;
+var config bool bGore;
+
 var config bool bAutoUseHealthVials;
 var config bool bNewHud;
 var config bool bShowUsedMana;
@@ -30,6 +33,8 @@ function PostBeginPlay()
 
 defaultproperties
 {
+     bGameplayChanges=True
+     bGore=True
      bAutoUseHealthVials=True
      bNewHud=False
 	 bShowUsedMana=False

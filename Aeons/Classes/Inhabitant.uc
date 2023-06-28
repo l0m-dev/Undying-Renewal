@@ -150,6 +150,15 @@ function PreBeginPlay()
 	super.PreBeginPlay();
 	if ( SPMindshatter(RangedWeapon) != none )
 		SPMindshatter(RangedWeapon).ProjAmplitude = 3;
+	
+	if (RGC())
+	{
+		FollowDistance = 310;
+		GreetDistance = 80;
+		MeleeInfo[0].Damage = 35;
+		DamageRadius = 70;
+		MeleeRange = 70;
+	}
 }
 
 function bool DoEncounterAnim()
@@ -388,15 +397,15 @@ INHABSTART:
 
 defaultproperties
 {
-     FollowDistance=310
-     GreetDistance=80
+     FollowDistance=300
+     GreetDistance=60
      JumpDownDistance=350
      Aggressiveness=1
      bHasFarAttack=True
-     MeleeInfo(0)=(Damage=35,EffectStrength=0.15,Method=RipSlice)
+     MeleeInfo(0)=(Damage=25,EffectStrength=0.15,Method=RipSlice)
      WeaponClass=Class'Aeons.SPMindshatter'
      WeaponAccuracy=0.5
-     DamageRadius=70
+     DamageRadius=50
      SK_PlayerOffset=(X=250)
      bHasSpecialKill=True
      HearingEffectorThreshold=0.4
@@ -404,7 +413,7 @@ defaultproperties
      WalkSpeedScale=0.85
      bGiveScytheHealth=True
      FallDamageScalar=0.2
-     MeleeRange=70
+     MeleeRange=60
      GroundSpeed=500
      AirSpeed=700
      AccelRate=2000

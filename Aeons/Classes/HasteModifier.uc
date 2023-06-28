@@ -106,7 +106,11 @@ state Activated
 			// The player gets a faster mana refresh rate above amplitude 3 ( Casting Level 2 internally )
 			if ( CastingLevel >= 2 )
 			{
-				ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.2;		// refresh mana faster
+				// refresh mana faster
+				if (RGC())
+					ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.2;
+				else
+					ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.5;
 				ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 			} else {
 				// no extra mana refresh

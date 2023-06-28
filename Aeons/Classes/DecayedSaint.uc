@@ -719,5 +719,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.DecayedSaint_m'
      CollisionRadius=18
      CollisionHeight=60
-	 bHackable=False
+     bHackable=False
 }

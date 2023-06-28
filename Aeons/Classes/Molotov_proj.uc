@@ -82,7 +82,18 @@ simulated function PostBeginPlay()
 		}
 	}
 
-	maxSkips = 0;
+	if (RGC())
+	{
+		maxSkips = 0;
+		Speed = 1200;
+		Damage = 50;
+	}
+	else
+	{
+		maxSkips = 4;
+		Speed = 800;
+		Damage = 40;
+	}
 	numSkips = 0;
 }
 
@@ -371,8 +382,8 @@ defaultproperties
      ColSoftSounds(1)=Sound'Impacts.SurfaceSpecific.E_Wpn_MoltBounceSoft02'
      ColSoftSounds(2)=Sound'Impacts.SurfaceSpecific.E_Wpn_MoltBounceSoft03'
      HeadShotMult=1
-     Speed=1200
-     Damage=50
+     Speed=800
+     Damage=40
      ProjImpactSound=Sound'Aeons.Weapons.E_Wpn_MoltBounce01'
      MiscSound=Sound'Aeons.Weapons.E_Wpn_MoltExpl01'
      ImpactSound(0)=Sound'Impacts.SurfaceSpecific.E_Wpn_MoltBounceHard01'

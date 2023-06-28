@@ -23,18 +23,16 @@ var bool	OutOfWater;
 function bool InflictNearDamage( actor Victim, int Damage, vector PushDir, int DamageNum, optional float EffectStrength )
 {
 	local DamageInfo	DInfo;
-	local float 		DamageMult;
-	
+
 	if ( ( Victim == none ) || ( Health <= 0 ) )
 		return false;
 
 	// Check if still in melee range.
 	if ( NearStrikeValid( Victim, DamageNum ) )
 	{	
-		DamageMult = 0.25;
 		DInfo = getDamageInfo( 'nearattack' );
-		DInfo.Damage = Damage * DamageMult;
-		DInfo.EffectStrength = EffectStrength * DamageMult;
+		DInfo.Damage = Damage;
+		DInfo.EffectStrength = EffectStrength;
 		if ( Victim.AcceptDamage( DInfo ) )
 			Victim.TakeDamage( self, Victim.Location + Normal(Location - Victim.Location), PushDir, DInfo );
 		return true;
@@ -102,6 +100,14 @@ function PreBeginPlay()
 	OutOfWater = true;
 	DelayTimer = 0.0;
 	bHidden = true;
+	
+	if (RGC())
+	{
+		DrawScale = 1.25;
+		StayOutOfWaterTime = 15;
+		MeleeRange = 1500;
+		MeleeInfo[0].Damage = 250;
+	}
 }
 
 function PlayNearAttack()
@@ -219,8 +225,7 @@ Attacked:
 
 defaultproperties
 {
-	 DrawScale=1.25
-     StayOutOfWaterTime=15
+     StayOutOfWaterTime=5
      MaxSinePitch=2
      MinSinePitch=-2
      MaxTanYaw=1024
@@ -228,7 +233,7 @@ defaultproperties
      RootJointName=Tent01
      MeleeInfo(0)=(Damage=1000,EffectStrength=1,Method=RipSlice)
      DamageRadius=150
-     MeleeRange=1500
+     MeleeRange=1250
      SoundSet=Class'Aeons.KingSoundSet'
      Style=STY_Masked
      Mesh=SkelMesh'Aeons.Meshes.King_Tentacle_m'
