@@ -7,7 +7,7 @@ class WaterWorm expands Effects;
 //#exec MESH IMPORT MESH=WaterWorm_m SKELFILE=WaterWorm.ngf 
 
 var() Texture NewTexture;
-var savable bool bActive;
+var bool bActive;
 
 function StartLevel()
 {

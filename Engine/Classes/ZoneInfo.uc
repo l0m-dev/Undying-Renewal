@@ -22,18 +22,18 @@ var(ZoneWeather) enum EWeather
 //-----------------------------------------------------------------------------
 // Zone properties.
 
-var() savable name   SkyZoneTag;
-var() savable name   ZoneTag;
-var() savable vector ZoneGravity;
-var() savable vector ZoneVelocity;
+var() name   SkyZoneTag;
+var() name   ZoneTag;
+var() vector ZoneGravity;
+var() vector ZoneVelocity;
 var() float  ZoneGroundFriction;
 var() float  ZoneFluidFriction;
 var() float	 ZoneTerminalVelocity;
 var() name   ZonePlayerEvent;
-var   savable int    ZonePlayerCount;
-var   savable int	 NumCarcasses;
-var() savable int	 DamagePerSec;
-var() savable name	 DamageType;
+var   int    ZonePlayerCount;
+var   int	 NumCarcasses;
+var() int	 DamagePerSec;
+var() name	 DamageType;
 var() localized string DamageString;
 var(LocationStrings) localized string ZoneName;
 var LocationID LocationID;	
@@ -42,18 +42,18 @@ var() sound  EntrySound;	//only if waterzone
 var() sound  ExitSound;		// only if waterzone
 var() class<actor> EntryActor;	// e.g. a splash (only if water zone)
 var() class<actor> ExitActor;	// e.g. a splash (only if water zone)
-var savable skyzoneinfo SkyZone; // Optional sky zone containing this zone's sky.
+var skyzoneinfo SkyZone; // Optional sky zone containing this zone's sky.
 
 //-----------------------------------------------------------------------------
 // Zone flags.
 
 var()		bool   bSkyZone;   	 // Zone is a Sky Zone.
-var()		savable bool   bWaterZone;   // Zone is water-filled.
+var()		bool   bWaterZone;   // Zone is water-filled.
 var() const bool   bFogZone;     // Zone is fog-filled.
-var()		savable bool   bKillZone;    // Zone instantly kills those who enter.
+var()		bool   bKillZone;    // Zone instantly kills those who enter.
 var()		bool   bNeutralZone; // Players can't take damage in this zone.
 var()		bool   bGravityZone; // Use ZoneGravity.
-var()		savable bool   bPainZone;	 // Zone causes pain.
+var()		bool   bPainZone;	 // Zone causes pain.
 var()		bool   bDestructive; // Destroys carcasses.
 var()		bool   bNoInventory;
 var()		bool   bMoveProjectiles;	// this velocity zone should impart velocity to projectiles and effects
@@ -63,13 +63,13 @@ var() 		bool   bMagicalDamage;	// if a pain zone, should deliver damage of a mag
 //-----------------------------------------------------------------------------
 // Zone light.
 
-var(ZoneLight) savable byte AmbientBrightness, AmbientHue, AmbientSaturation;
-var(ZoneLight) savable color FogColor;
-var(ZoneLight) savable float FogDistance;
+var(ZoneLight) byte AmbientBrightness, AmbientHue, AmbientSaturation;
+var(ZoneLight) color FogColor;
+var(ZoneLight) float FogDistance;
 
 var(ZoneLight) const texture EnvironmentMap;
 var(ZoneLight) float TexUPanSpeed, TexVPanSpeed;
-var(ZoneLight) savable vector ViewFlash, ViewFog;
+var(ZoneLight) vector ViewFlash, ViewFog;
 
 //-----------------------------------------------------------------------------
 // Reverb.

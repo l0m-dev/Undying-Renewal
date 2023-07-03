@@ -144,7 +144,7 @@ enum EAmbroseBossFightState
 	ABF_Weakened
 };
 
-var savable EAmbroseBossFightState	BossFightState;
+var EAmbroseBossFightState	BossFightState;
 var Hound					AmbroseHound;
 var SPDrawScaleEffector		DrawScaleEffector;
 var(BossFight) float		HoundTimer;
@@ -152,7 +152,7 @@ var(BossFight) vector		HoundBitePoint;
 var(BossFight) float		GiantGroundSpeed;
 var GhelziabahrStone		GhelzStone;
 var AmbroseAxe				MyAxe;
-var savable bool			StoneInAxe;
+var bool			StoneInAxe;
 
 var GhelzTrailFX			GhelzStoneTrail;
 var GhelzSmallGlowScriptedFX	GhelzStoneGlow;

@@ -83,8 +83,8 @@ var travel float ScryeTimer;
 var() float ScryeFullTime;
 var() float ScryeRampTime;
 var(Pawn) class<carcass> CarcassType;
-var savable travel globalconfig float MyAutoAim;
-var savable travel globalconfig float Handedness;
+var travel globalconfig float MyAutoAim;
+var travel globalconfig float Handedness;
 var(Sounds) sound JumpSound[2];
 
 // Player control flags

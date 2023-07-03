@@ -23,7 +23,7 @@ class GhelziabahrStone expands AeonsWeapon;
 
 //-----------------------------------------------------------------------------
 
-var savable travel int useMeter;		// Use Meter for the ghelzibahar Stone
+var travel int useMeter;		// Use Meter for the ghelzibahar Stone
 var int chargeCount;
 var int Damage;
 var() int SpawnHoundLimit;

@@ -16,7 +16,7 @@ class AeonsWeapon extends Weapon;
 //////////////////////////////////////////////////////////////////////////////
 var() int   NumRicoSounds;
 var() sound RicoSounds[8];
-var travel savable int ClipCount;
+var travel int ClipCount;
 var() bool  bReloadable;
 var() int   hitdamage;
 var() float MomentumTransfer; //For instant hit weapons

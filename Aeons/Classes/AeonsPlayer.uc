@@ -114,177 +114,177 @@ var OnScreenMessageModifier OSMMod;		// OnScreen Message Modifier
 
 // Game Events	-------------------------------------------------------------------------------
 
-var savable travel bool bLizbethDead;
-var savable travel bool bAmbroseDead;
-var savable travel bool bJeremiahTalk1;
-var savable travel bool bJeremiahTalk2;
-var savable travel bool bJeremiahDead;
-var savable travel bool bAaronDead;
-var savable travel bool bBethanyDead;
-var savable travel bool bKeisingerDead;
-var savable travel bool bReturnfromPiratesCove;
-var savable travel bool bReturnfromOneiros;
-var savable travel bool bRevenant;
-var savable travel bool bInnercourtyard_silverbullets1;
-var savable travel bool bInnercourtyard_silverbullets2;
-var savable travel bool bInnercourtyard_phosphorus1;
-var savable travel bool bInnercourtyard_phosphorus2;
-var savable travel bool bInnercourtyard_phosphorus3;
-var savable travel bool bInnercourtyard_health1;
-var savable travel bool bInnercourtyard_health2;
-var savable travel bool bInnercourtyard_manawell;
-var savable travel bool bInnercourtyard_arcanewhorl;
-var savable travel bool bNorthwinglower_kitchen_health;
-var savable travel bool bNorthwinglower_brewery_health;
-var savable travel bool bNorthwinglower_diningroom_amplifier;
-var savable travel bool bNorthwinglower_basement_amplifier;
-var savable travel bool bNorthwinglower_basement_bullets1;
-var savable travel bool bNorthwinglower_basement_bullets2;
-var savable travel bool bNorthwinglower_basement_phosphorus1;
-var savable travel bool bNorthwinglower_basement_phosphorus2;
-var savable travel bool bNorthwinglower_basement_molotov1;
-var savable travel bool bNorthwinglower_basement_molotov2;
-var savable travel bool bNorthwinglower_basement_molotov3;
-var savable travel bool bNorthwinglower_basement_molotov4;
-var savable travel bool bNorthwinglower_dayroom_health;
-var savable travel bool bNorthwingupper_servantsq_health;
-var savable travel bool bNorthwingupper_servantsq_bullets;
-var savable travel bool bNorthwingupper_servantsq_shotgunammo;
-var savable travel bool bNorthwingupper_servantsq_molotov1;
-var savable travel bool bNorthwingupper_servantsq_molotov2;
-var savable travel bool bNorthwingupper_aaronsroom_health;
-var savable travel bool bNorthwingupper_aaronsroom_molotov1;
-var savable travel bool bNorthwingupper_aaronsroom_molotov2;
-var savable travel bool bNorthwingupper_aaronsroom_molotov3;
-var savable travel bool bNorthwingupper_aaronsroom_molotov4;
-var savable travel bool bNorthwingupper_aaronsroom_molotov5;
-var savable travel bool bWestWing_Conservatory_Health;
-var savable travel bool bWestWing_Conservatory_ServantKey1;
-var savable travel bool bWestWing_Conservatory_Amplifier;
-var savable travel bool bWestWing_SmokingRoom_Health;
-var savable travel bool bWestWing_HuntingRoom_Bullets1;
-var savable travel bool bWestWing_HuntingRoom_Bullets2;
-var savable travel bool bWestWing_Jeremiah_Silver1;
-var savable travel bool bWestWing_Jeremiah_Silver2;
-var savable travel bool bWestWing_Jeremiah_Silver3;
-var savable travel bool bWestWing_Jeremiah_Silver4;
-var savable travel bool bWestWing_Jeremiah_bullets;
-var savable travel bool bWestWing_Jeremiah_health;
-var savable travel bool bGreatHall_attic_amplifier;
-var savable travel bool bCentralUpper_Lizbeth_Health;
-var savable travel bool bCentralUpper_Lizbeth_Poetry;
-var savable travel bool bCentralUpper_Bethany_Diary;
-var savable travel bool bCentralUpper_Study_JoeNotes;
-var savable travel bool bCentralUpper_Study_EtherTrap1;
-var savable travel bool bCentralUpper_Study_EtherTrap2;
-var savable travel bool bCentralUpper_TowerStairs_Gate;
-var savable travel bool bCentralLower_SunRoom_BethsLetters;
-var savable travel bool bCentralLower_Tower_amplifier;
-var savable travel bool bZagnutz;
-var savable travel bool bCentralLower_TowerAccess;
-var savable travel bool bEastWingLower_Nursery_Health;
-var savable travel bool bEastWingLower_Nursery_ServantDiary;
-var savable travel bool bEastWingLower_BackStairs_Amplifier;
-var savable travel bool bEastWingUpper_UpperBackAccess;
-var savable travel bool bWidowsWatch_SmallGardenAccess;
-var savable travel bool bGardens_ToolShop_Health1;
-var savable travel bool bGardens_ToolShop_Health2;
-var savable travel bool bGardens_ToolShop_Dynamite1;
-var savable travel bool bGardens_ToolShop_Dynamite2;
-var savable travel bool bGardens_ToolShop_Dynamite3;
-var savable travel bool bGardens_ToolShop_Dynamite4;
-var savable travel bool bGardens_ToolShop_Dynamite5;
-var savable travel bool bGardens_ToolShop_Dynamite6;
-var savable travel bool bGardens_Greenhouse_phosphorus1;
-var savable travel bool bGardens_Greenhouse_phosphorus2;
-var savable travel bool bGardens_Greenhouse_phosphorus3;
-var savable travel bool bGardens_Greenhouse_phosphorus4;
-var savable travel bool bGardens_Greenhouse_phosphorus5;
-var savable travel bool bGardens_Greenhouse_phosphorus6;
-var savable travel bool bGardens_Greenhouse_phosphorus7;
-var savable travel bool bGardens_Greenhouse_Health;
-var savable travel bool bGardens_Greenhouse_BethanyKey;
-var savable travel bool bGardens_Well_Amplifier;
-var savable travel bool bInnercourtyard_BalconyDoorAccess;
-var savable travel bool bGreatHall_attic_bullets1;
-var savable travel bool bGreatHall_attic_bullets2;
-var savable travel bool bGreatHall_Shotgunshells1;
-var savable travel bool bGreatHall_Shotgunshells2;
-var savable travel bool bGreatHall_Health1;
-var savable travel bool bGreatHall_Health2;
-var savable travel bool bGreatHall_Molotov1;
-var savable travel bool bGreatHall_Molotov2;
-var savable travel bool bGreatHall_Molotov3;
-var savable travel bool bGreatHall_Molotov4;
-var savable travel bool bGreatHall_AtticAccess;
-var savable travel bool bInnercourtyard_amplifier;
-var savable travel bool bInnercourtyard_AaronsRoomKey;
-var savable travel bool bInnercourtyard_molotov1;
-var savable travel bool bInnercourtyard_molotov2;
-var savable travel bool bInnercourtyard_molotov3;
-var savable travel bool bTowerRun_Inhabitants_amplifier;
-var savable travel bool bTowerRun_dynamite1;
-var savable travel bool bTowerRun_dynamite2;
-var savable travel bool bTowerRun_dynamite3;
-var savable travel bool bTowerRun_dynamite4;
-var savable travel bool bTowerRun_Health;
-var savable travel bool bTowerRun_Amplifier;
-var savable travel bool bTowerRun_TowerAccess;
-var savable travel bool bChapel_etherTrap1;
-var savable travel bool bChapel_etherTrap2;
-var savable travel bool bChapel_Health1;
-var savable travel bool bChapel_Health2;
-var savable travel bool bChapel_Paper;
-var savable travel bool bChapel_Tome;
-var savable travel bool bChapel_amplifier;
-var savable travel bool bChapel_PriestKey;
-var savable travel bool bSedgewickConversation;
-var savable travel bool bKiesingerConversation;
-var savable travel bool bEastWingUpper_Guest_Health1;
-var savable travel bool bEastWingUpper_Guest_Health2;
-var savable travel bool bEastWingUpper_Ambrose_Health;
-var savable travel bool bEastWingUpper_Ambrose_Journal;
-var savable travel bool bEastWingUpper_Ambrose_Pirate;
-var savable travel bool bEastWingUpper_Ambrose_Phosphorus1;
-var savable travel bool bEastWingUpper_Ambrose_Phosphorus2;
-var savable travel bool bEastWingUpper_Ambrose_Phosphorus3;
-var savable travel bool bEastWingUpper_Keisinger_Journal;
-var savable travel bool bEastWingUpper_Office_Evaline;
-var savable travel bool bEastWingUpper_ReadingRoom_Health1;
-var savable travel bool bEastWingUpper_ReadingRoom_Health2;
-var savable travel bool bEastWingUpper_Bar_molotov1;
-var savable travel bool bEastWingUpper_Bar_molotov2;
-var savable travel bool bEastWingUpper_Bar_molotov3;
-var savable travel bool bEastWingUpper_Lounge_ShotgunShells;
-var savable travel bool bEastWingUpper_Hallway_Amplifier;
-var savable travel bool bVisitAaronsStudio;
-var savable travel bool bCentralUpper_WidowsWatchKey;
-var savable travel bool bCentralUpper_Josephsconcern;
-var savable travel bool bEntranceHall_JoesRoom_Joenotes;
-var savable travel bool bEntranceHall_EvasRoom_EvalinesDiary;
-var savable travel bool bNorthWIngUpper_Aaron_amplifier;
-var savable travel bool bLearnofPiratesCove;
-var savable travel bool bWestWing_Jeremiah_StudyKey;
-var savable travel bool bNorthWIngUpper_Aaron_BethanyGate;
-var savable travel bool bCentralUpper_Study_Health;
-var savable travel bool bMonasteryPastFinished;
-var savable travel bool bAmbrosesRoom;
-var savable travel bool bVisitStandingStones;
-var savable travel bool bFlightEnabled;
-var savable travel bool bAfterChapel;
-var savable travel bool bKiesingerDead;
-var savable travel bool bChandelierFell;
-var savable travel bool bBethanyTransformed;
-var savable travel bool bAmplifierFound;
-var savable travel bool bOracleReturn;
-var savable travel bool bWhorlFound;
-var savable travel bool bEtherFound;
-var savable travel bool bPostShrine;
-var savable travel bool bManaWellFound;
-var savable travel bool bChapel_EtherTrap3;
-var savable travel bool bChapel_EtherTrap4;
-var savable travel bool bChapel_Bullets;
-var savable travel bool bEnteredJeremiahsRoom;
+var travel bool bLizbethDead;
+var travel bool bAmbroseDead;
+var travel bool bJeremiahTalk1;
+var travel bool bJeremiahTalk2;
+var travel bool bJeremiahDead;
+var travel bool bAaronDead;
+var travel bool bBethanyDead;
+var travel bool bKeisingerDead;
+var travel bool bReturnfromPiratesCove;
+var travel bool bReturnfromOneiros;
+var travel bool bRevenant;
+var travel bool bInnercourtyard_silverbullets1;
+var travel bool bInnercourtyard_silverbullets2;
+var travel bool bInnercourtyard_phosphorus1;
+var travel bool bInnercourtyard_phosphorus2;
+var travel bool bInnercourtyard_phosphorus3;
+var travel bool bInnercourtyard_health1;
+var travel bool bInnercourtyard_health2;
+var travel bool bInnercourtyard_manawell;
+var travel bool bInnercourtyard_arcanewhorl;
+var travel bool bNorthwinglower_kitchen_health;
+var travel bool bNorthwinglower_brewery_health;
+var travel bool bNorthwinglower_diningroom_amplifier;
+var travel bool bNorthwinglower_basement_amplifier;
+var travel bool bNorthwinglower_basement_bullets1;
+var travel bool bNorthwinglower_basement_bullets2;
+var travel bool bNorthwinglower_basement_phosphorus1;
+var travel bool bNorthwinglower_basement_phosphorus2;
+var travel bool bNorthwinglower_basement_molotov1;
+var travel bool bNorthwinglower_basement_molotov2;
+var travel bool bNorthwinglower_basement_molotov3;
+var travel bool bNorthwinglower_basement_molotov4;
+var travel bool bNorthwinglower_dayroom_health;
+var travel bool bNorthwingupper_servantsq_health;
+var travel bool bNorthwingupper_servantsq_bullets;
+var travel bool bNorthwingupper_servantsq_shotgunammo;
+var travel bool bNorthwingupper_servantsq_molotov1;
+var travel bool bNorthwingupper_servantsq_molotov2;
+var travel bool bNorthwingupper_aaronsroom_health;
+var travel bool bNorthwingupper_aaronsroom_molotov1;
+var travel bool bNorthwingupper_aaronsroom_molotov2;
+var travel bool bNorthwingupper_aaronsroom_molotov3;
+var travel bool bNorthwingupper_aaronsroom_molotov4;
+var travel bool bNorthwingupper_aaronsroom_molotov5;
+var travel bool bWestWing_Conservatory_Health;
+var travel bool bWestWing_Conservatory_ServantKey1;
+var travel bool bWestWing_Conservatory_Amplifier;
+var travel bool bWestWing_SmokingRoom_Health;
+var travel bool bWestWing_HuntingRoom_Bullets1;
+var travel bool bWestWing_HuntingRoom_Bullets2;
+var travel bool bWestWing_Jeremiah_Silver1;
+var travel bool bWestWing_Jeremiah_Silver2;
+var travel bool bWestWing_Jeremiah_Silver3;
+var travel bool bWestWing_Jeremiah_Silver4;
+var travel bool bWestWing_Jeremiah_bullets;
+var travel bool bWestWing_Jeremiah_health;
+var travel bool bGreatHall_attic_amplifier;
+var travel bool bCentralUpper_Lizbeth_Health;
+var travel bool bCentralUpper_Lizbeth_Poetry;
+var travel bool bCentralUpper_Bethany_Diary;
+var travel bool bCentralUpper_Study_JoeNotes;
+var travel bool bCentralUpper_Study_EtherTrap1;
+var travel bool bCentralUpper_Study_EtherTrap2;
+var travel bool bCentralUpper_TowerStairs_Gate;
+var travel bool bCentralLower_SunRoom_BethsLetters;
+var travel bool bCentralLower_Tower_amplifier;
+var travel bool bZagnutz;
+var travel bool bCentralLower_TowerAccess;
+var travel bool bEastWingLower_Nursery_Health;
+var travel bool bEastWingLower_Nursery_ServantDiary;
+var travel bool bEastWingLower_BackStairs_Amplifier;
+var travel bool bEastWingUpper_UpperBackAccess;
+var travel bool bWidowsWatch_SmallGardenAccess;
+var travel bool bGardens_ToolShop_Health1;
+var travel bool bGardens_ToolShop_Health2;
+var travel bool bGardens_ToolShop_Dynamite1;
+var travel bool bGardens_ToolShop_Dynamite2;
+var travel bool bGardens_ToolShop_Dynamite3;
+var travel bool bGardens_ToolShop_Dynamite4;
+var travel bool bGardens_ToolShop_Dynamite5;
+var travel bool bGardens_ToolShop_Dynamite6;
+var travel bool bGardens_Greenhouse_phosphorus1;
+var travel bool bGardens_Greenhouse_phosphorus2;
+var travel bool bGardens_Greenhouse_phosphorus3;
+var travel bool bGardens_Greenhouse_phosphorus4;
+var travel bool bGardens_Greenhouse_phosphorus5;
+var travel bool bGardens_Greenhouse_phosphorus6;
+var travel bool bGardens_Greenhouse_phosphorus7;
+var travel bool bGardens_Greenhouse_Health;
+var travel bool bGardens_Greenhouse_BethanyKey;
+var travel bool bGardens_Well_Amplifier;
+var travel bool bInnercourtyard_BalconyDoorAccess;
+var travel bool bGreatHall_attic_bullets1;
+var travel bool bGreatHall_attic_bullets2;
+var travel bool bGreatHall_Shotgunshells1;
+var travel bool bGreatHall_Shotgunshells2;
+var travel bool bGreatHall_Health1;
+var travel bool bGreatHall_Health2;
+var travel bool bGreatHall_Molotov1;
+var travel bool bGreatHall_Molotov2;
+var travel bool bGreatHall_Molotov3;
+var travel bool bGreatHall_Molotov4;
+var travel bool bGreatHall_AtticAccess;
+var travel bool bInnercourtyard_amplifier;
+var travel bool bInnercourtyard_AaronsRoomKey;
+var travel bool bInnercourtyard_molotov1;
+var travel bool bInnercourtyard_molotov2;
+var travel bool bInnercourtyard_molotov3;
+var travel bool bTowerRun_Inhabitants_amplifier;
+var travel bool bTowerRun_dynamite1;
+var travel bool bTowerRun_dynamite2;
+var travel bool bTowerRun_dynamite3;
+var travel bool bTowerRun_dynamite4;
+var travel bool bTowerRun_Health;
+var travel bool bTowerRun_Amplifier;
+var travel bool bTowerRun_TowerAccess;
+var travel bool bChapel_etherTrap1;
+var travel bool bChapel_etherTrap2;
+var travel bool bChapel_Health1;
+var travel bool bChapel_Health2;
+var travel bool bChapel_Paper;
+var travel bool bChapel_Tome;
+var travel bool bChapel_amplifier;
+var travel bool bChapel_PriestKey;
+var travel bool bSedgewickConversation;
+var travel bool bKiesingerConversation;
+var travel bool bEastWingUpper_Guest_Health1;
+var travel bool bEastWingUpper_Guest_Health2;
+var travel bool bEastWingUpper_Ambrose_Health;
+var travel bool bEastWingUpper_Ambrose_Journal;
+var travel bool bEastWingUpper_Ambrose_Pirate;
+var travel bool bEastWingUpper_Ambrose_Phosphorus1;
+var travel bool bEastWingUpper_Ambrose_Phosphorus2;
+var travel bool bEastWingUpper_Ambrose_Phosphorus3;
+var travel bool bEastWingUpper_Keisinger_Journal;
+var travel bool bEastWingUpper_Office_Evaline;
+var travel bool bEastWingUpper_ReadingRoom_Health1;
+var travel bool bEastWingUpper_ReadingRoom_Health2;
+var travel bool bEastWingUpper_Bar_molotov1;
+var travel bool bEastWingUpper_Bar_molotov2;
+var travel bool bEastWingUpper_Bar_molotov3;
+var travel bool bEastWingUpper_Lounge_ShotgunShells;
+var travel bool bEastWingUpper_Hallway_Amplifier;
+var travel bool bVisitAaronsStudio;
+var travel bool bCentralUpper_WidowsWatchKey;
+var travel bool bCentralUpper_Josephsconcern;
+var travel bool bEntranceHall_JoesRoom_Joenotes;
+var travel bool bEntranceHall_EvasRoom_EvalinesDiary;
+var travel bool bNorthWIngUpper_Aaron_amplifier;
+var travel bool bLearnofPiratesCove;
+var travel bool bWestWing_Jeremiah_StudyKey;
+var travel bool bNorthWIngUpper_Aaron_BethanyGate;
+var travel bool bCentralUpper_Study_Health;
+var travel bool bMonasteryPastFinished;
+var travel bool bAmbrosesRoom;
+var travel bool bVisitStandingStones;
+var travel bool bFlightEnabled;
+var travel bool bAfterChapel;
+var travel bool bKiesingerDead;
+var travel bool bChandelierFell;
+var travel bool bBethanyTransformed;
+var travel bool bAmplifierFound;
+var travel bool bOracleReturn;
+var travel bool bWhorlFound;
+var travel bool bEtherFound;
+var travel bool bPostShrine;
+var travel bool bManaWellFound;
+var travel bool bChapel_EtherTrap3;
+var travel bool bChapel_EtherTrap4;
+var travel bool bChapel_Bullets;
+var travel bool bEnteredJeremiahsRoom;
 
 // --------------------------------------------------------------------------------------------
 
@@ -322,7 +322,7 @@ var float CrossHairOffsetX, CrossHairOffsetY, crossHairScale;	// offsets for the
 var bool bDrawCrosshair;
 
 // book item
-var savable travel BookJournalBase Book;
+var travel BookJournalBase Book;
 
 // debug HUD flags
 var bool bDrawPawnName;		// draw the name of the Pawn the cross hair is over
@@ -344,7 +344,7 @@ var enum ESelectMode
     SM_DefSpell
 } SelectMode;
 
-var	savable travel	  float SelectTimer; // max double click interval for select object
+var	travel	  float SelectTimer; // max double click interval for select object
 var(Movement) globalconfig float	SelectTime;
 var(Movement) globalconfig float	SelectTimePSX2;
 var bool      bTryingSelect;
@@ -363,33 +363,33 @@ var int WeaponUpdate;
 
 // main mana vars moved to pawn
 var	bool	bUseMana;	// for debugging - set to false to not decrement mana
-var   savable travel int ManaWellsFound;    //For selecting anim for spell hand
-var   savable travel int ManaWhorlsFound;   //For selecting anim for spell hand
+var   travel int ManaWellsFound;    //For selecting anim for spell hand
+var   travel int ManaWhorlsFound;   //For selecting anim for spell hand
 
 /////////////////////////////////////////////////////////////
-var savable travel int    FavWeapon1;    //favorite weapon #1
-var savable travel int    FavWeapon2;
-var savable travel bool   FavWeaponToggle;   //decides next favorite to be overwritten
-var savable travel int    FavAttSpell1;  //favorite attack spell #1
-var savable travel int    FavAttSpell2;
-var savable travel bool   FavAttSpellToggle; //decides next favorite to be overwritten
-var savable travel int    FavDefSpell1;  //favorite defense spell #1
-var savable travel int    FavDefSpell2;
-var savable travel bool   FavDefSpellToggle; //decides next favorite to be overwritten
+var travel int    FavWeapon1;    //favorite weapon #1
+var travel int    FavWeapon2;
+var travel bool   FavWeaponToggle;   //decides next favorite to be overwritten
+var travel int    FavAttSpell1;  //favorite attack spell #1
+var travel int    FavAttSpell2;
+var travel bool   FavAttSpellToggle; //decides next favorite to be overwritten
+var travel int    FavDefSpell1;  //favorite defense spell #1
+var travel int    FavDefSpell2;
+var travel bool   FavDefSpellToggle; //decides next favorite to be overwritten
 
 /////////////////////////////////////////////////////////////
 var bool	bTryingScroll;	// like bTryingSelect, except for the PS2 scrolling
 var bool	bScrollObject;	// have we actually entered the PS2 scrolling phase
 var Inventory SelectedInvPSX2;
 
-var savable struct	DefUserSettingsPSX2// saves settings from the options screen
+var struct	DefUserSettingsPSX2// saves settings from the options screen
 {
-	var() savable byte SoundVolumePSX2;
-	var() savable byte MusicVolumePSX2;
-	var() savable byte ControllerConfigPSX2;
-	var() savable bool EasyAimPSX2;
-	var() savable bool InvertLookPSX2;
-	var() savable bool VibrationPSX2;
+	var() byte SoundVolumePSX2;
+	var() byte MusicVolumePSX2;
+	var() byte ControllerConfigPSX2;
+	var() bool EasyAimPSX2;
+	var() bool InvertLookPSX2;
+	var() bool VibrationPSX2;
 } UserSettingsPSX2;
 
 var float ScrollTimerPSX2;	// times scrolling for repetition
@@ -411,8 +411,8 @@ var wind wind;
 var travel byte			Objectives[100];
 var localized string	ObjectivesText[100];
 
-var savable travel bool bShowScryeHint;
-var savable travel bool bDrawRico;
+var travel bool bShowScryeHint;
+var travel bool bDrawRico;
 
 replication
 {
@@ -5228,7 +5228,7 @@ exec function DumpActorStats()
 	local int StaticCount, MovableCount, BothCount;
 
 	Log("===============================");
-	Log("==  Savable Actor Stat Dump  ==");
+	Log("==  Actor Stat Dump  ==");
 	Log("===============================");
 
 	foreach AllActors( class 'Actor', A )

@@ -32,8 +32,8 @@ var() enum EBumpType
 
 //-----------------------------------------------------------------------------
 // Keyframe numbers.
-var() savable byte       KeyNum;           // Current or destination keyframe.
-var savable byte         PrevKeyNum;       // Previous keyframe.
+var() byte       KeyNum;           // Current or destination keyframe.
+var byte         PrevKeyNum;       // Previous keyframe.
 var() const byte NumKeys;          // Number of keyframes in total (0-3).
 var() const byte WorldRaytraceKey; // Raytrace the world with the brush here.
 var() const byte BrushRaytraceKey; // Raytrace the brush here.
@@ -55,9 +55,9 @@ var() bool       bDynamicLightMover; // Apply dynamic lighting to mover.
 var() bool       bTossPlayer;			// toss the player when you hit him.
 var() name       PlayerBumpEvent;  // Optional event to cause when the player bumps the mover.
 var() name       BumpEvent;			// Optional event to cause when any valid bumper bumps the mover.
-var savable actor	SavedTrigger;      // Who we were triggered by.
+var actor	SavedTrigger;      // Who we were triggered by.
 var() float		 DamageThreshold;	// minimum damage to trigger
-var	  savable int		 numTriggerEvents;	// number of times triggered ( count down to untrigger )
+var	  int		 numTriggerEvents;	// number of times triggered ( count down to untrigger )
 var	  Mover		 Leader;			// for having multiple movers return together
 var	  Mover		 Follower;
 var() name		 ReturnGroup;		// if none, same as tag
@@ -83,34 +83,34 @@ var(MoverSounds) sound      MoveAmbientSound; // Optional ambient sound when mov
 // Internal.
 var vector       KeyPos[32];
 var rotator      KeyRot[32];
-var savable vector		BasePos;
-var savable vector		OldPos;
-var savable vector		OldPrePivot;
-var savable vector		SavedPos;
+var vector		BasePos;
+var vector		OldPos;
+var vector		OldPrePivot;
+var vector		SavedPos;
 
-var savable rotator		BaseRot;
-var savable rotator		OldRot;
-var savable rotator		SavedRot;
+var rotator		BaseRot;
+var rotator		OldRot;
+var rotator		SavedRot;
 
 // AI related
 var       NavigationPoint  myMarker;
 var		  Actor			TriggerActor;
 var		  Actor         TriggerActor2;
-var	savable Pawn		WaitingPawn;
-var	savable	bool		bOpening;
-var savable bool		bDelaying;
+var	Pawn		WaitingPawn;
+var	bool		bOpening;
+var bool		bDelaying;
 var			bool		bClientPause;
 
 var		  bool			bPlayerOnly;
 var		  Trigger		RecommendedTrigger;
 
 // for client side replication
-var		savable vector			SimOldPos;
-var		savable int				SimOldRotPitch, SimOldRotYaw, SimOldRotRoll;
-var		savable vector			SimInterpolate;
-var		savable vector			RealPosition;
-var     savable rotator			RealRotation;
-var		savable int				ClientUpdate;
+var		vector			SimOldPos;
+var		int				SimOldRotPitch, SimOldRotYaw, SimOldRotRoll;
+var		vector			SimInterpolate;
+var		vector			RealPosition;
+var     rotator			RealRotation;
+var		int				ClientUpdate;
 
 replication
 {

@@ -7,7 +7,7 @@ class InventoryTrigger expands Trigger;
 
 var() class<Inventory> InventoryType;
 var() bool bDeleteInv;
-var() savable bool bSelected;
+var() bool bSelected;
 var() sound	InvFoundSound;
 var() sound	InvNotFoundSound;
 var() name FailEvent;

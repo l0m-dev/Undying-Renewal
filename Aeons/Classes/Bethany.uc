@@ -48,7 +48,7 @@ var(AICombat) float			StalkerManaCost;
 var(AICombat) float			WardManaCost;
 var FlickeringStalker		Stalkers[2];
 var Monto					Montos;
-var savable ESummonedCreature		SummonedCreature;
+var ESummonedCreature		SummonedCreature;
 var(AICombat) float			MomentumTransfer;	// Coefficient used for "push back" attack.
 var AeonsHomeBase 			Home;
 var(AICombat) float			HomeDistance;

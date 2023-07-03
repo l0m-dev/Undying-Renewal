@@ -29,7 +29,7 @@ var() bool bPassThru;
 // var() bool bFireFrameOne;
 
 // For triggers that are activated/deactivated by other triggers.
-var() savable bool bInitiallyActive;
+var() bool bInitiallyActive;
 var bool bFirstTick;
 
 var() class<actor> ClassProximityType;
@@ -37,7 +37,7 @@ var() class<actor> ClassProximityType;
 var() float	RepeatTriggerTime; // if > 0, repeat trigger message at this interval is still touching other
 var() float RepeatRandomTime;  // added to RepeatTriggerTime - random value between 0 and itself.
 var() float ReTriggerDelay; //minimum time before trigger can be triggered again
-var	  savable float TriggerTime;
+var	  float TriggerTime;
 var() float DamageThreshold; //minimum damage to trigger if TT_Shoot
 var() name ConditionalGameEvent;
 var() bool Condition;

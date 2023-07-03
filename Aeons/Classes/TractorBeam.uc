@@ -14,7 +14,7 @@ var() float					ForceVariance;		//
 var() bool					bNeedLOS;			// Line of sight required.
 var() float					TriggerTime;		// How long to remain active when triggered, 0.0 == forever.
 var() bool					bInvertMagnitude;	//
-var savable float			TriggerDelay;		//
+var float			TriggerDelay;		//
 
 
 //****************************************************************************

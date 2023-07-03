@@ -8,8 +8,8 @@ class Ammo extends Pickup
 
 //#exec Texture Import File=Textures\Ammo.pcx Name=S_Ammo Mips=On Flags=2
 
-var() travel savable int AmmoAmount;
-var() travel savable int MaxAmmo;
+var() travel int AmmoAmount;
+var() travel int MaxAmmo;
 var() class<ammo> ParentAmmo;    // Class of ammo to be represented in inventory
 var() byte UsedInWeaponSlot[10];
 var() sound ExplodeSound;

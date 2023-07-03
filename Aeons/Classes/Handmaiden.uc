@@ -33,10 +33,10 @@ var(AICombat) float		VortexRecastTimer;
 var(AICombat) float		VortexTimer;
 
 var float						PWDeathTimer;		//
-var savable float				VortexRecastTime;
-var savable bool				VortexActive;
+var float				VortexRecastTime;
+var bool				VortexActive;
 
-var savable SPRechargeBolt		RechargeBolt;
+var SPRechargeBolt		RechargeBolt;
 
 var Bethany					pBethany;
 var AeonsHomeBase 			Home;

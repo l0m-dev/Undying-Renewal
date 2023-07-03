@@ -3,8 +3,8 @@
 //=============================================================================
 class ManaModifier expands PlayerModifier;
 
-var savable travel int manaPerSec;		// mana per sec refresh rate
-var savable travel int manaMaint;		// Maintenance per sec
+var travel int manaPerSec;		// mana per sec refresh rate
+var travel int manaMaint;		// Maintenance per sec
 var float timerLen;
 var bool bNegMana;				// mana refresh amount is negative.
 var travel float fHaste;				// modification by the haste modifier

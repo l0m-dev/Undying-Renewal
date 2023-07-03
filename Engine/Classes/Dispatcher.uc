@@ -12,8 +12,8 @@ class Dispatcher extends Triggers;
 var() bool	bFireOnceOnly;
 var() name  OutEvents[8]; // Events to generate.
 var() float OutDelays[8]; // Relative delays before generating events.
-var savable int i;                // Internal counter.
-var savable Actor Other;
+var int i;                // Internal counter.
+var Actor Other;
 var() bool bInterruptable;
 var bool bDisabled;
 

@@ -10,8 +10,8 @@ class SequenceDispatcher expands Triggers;
 var() bool	bLoopList;		// loop back to the start of the seq.
 var() name  Events[16];		// Events to generate.
 var() int	NumEvents;		// total number of events
-var savable int i;					// Internal counter.
-var savable Actor Other;
+var int i;					// Internal counter.
+var Actor Other;
 
 function PreBeginPlay()
 {

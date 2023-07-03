@@ -9,7 +9,7 @@ var() Texture BaseTexture;
 var() Texture TextureList[8];
 var() int numTextures;
 var 	Texture 	Original;
-var savable int CurrentTexture;
+var int CurrentTexture;
 
 function PreBeginPlay()
 {

@@ -25,7 +25,7 @@ struct ImpactSoundParams
 };
 
 // General flags.
-var savable travel bool bBehindView;    // Outside-the-player view.
+var travel bool bBehindView;    // Outside-the-player view.
 var bool        bIsPlayer;      // Pawn is a player or a player-bot.
 var bool		bJustLanded;	// used by eyeheight adjustment
 var bool		bUpAndOut;		// used by swimming 
@@ -151,24 +151,24 @@ var travel Weapon       Weapon;        // The pawn's current weapon.
 var Weapon				PendingWeapon;	// Will become weapon once current weapon is put down
 var travel Inventory	SelectedItem;	// currently selected inventory item
 
-var savable travel bool bAcceptDamage;		// accept conventional attack damage
-var savable travel bool bAcceptMagicDamage; // accept magical attack damage
+var travel bool bAcceptDamage;		// accept conventional attack damage
+var travel bool bAcceptMagicDamage; // accept magical attack damage
 var bool				bWetFeet;			// My feet are wet
 
-var savable travel Spell AttSpell; //currently selected attack spell
-var savable travel Spell DefSpell; //currently selected defense spell
+var travel Spell AttSpell; //currently selected attack spell
+var travel Spell DefSpell; //currently selected defense spell
 var Spell PendingAttSpell;
 var Spell PendingDefSpell;
 
-var(Mana) savable travel int Mana;              //Current Mana amount
-var(Mana) savable travel int ManaCapacity;      //Total Mana Capacity
-var(Mana) savable travel int ManaRefreshAmt;    //Mana refreshed per ManaRefreshTime
-var(Mana) savable travel float ManaRefreshTime;
+var(Mana) travel int Mana;              //Current Mana amount
+var(Mana) travel int ManaCapacity;      //Total Mana Capacity
+var(Mana) travel int ManaRefreshAmt;    //Mana refreshed per ManaRefreshTime
+var(Mana) travel float ManaRefreshTime;
 
-var savable travel bool	bRunMode;
+var travel bool	bRunMode;
 
 // Movement.
-var savable rotator     	ViewRotation;  	// View rotation.
+var rotator     	ViewRotation;  	// View rotation.
 var vector			WalkBob;
 var() float      	BaseEyeHeight; 	// Base eye height above collision center.
 var float        	EyeHeight;     	// Current eye height, adjusted for bobbing and stairs.
@@ -189,7 +189,7 @@ var rotator		 BehindViewOffset;	// offset for behind view
 var int			DieCount, ItemCount, KillCount, SecretCount, Spree;
 
 //Health
-var() savable travel float      Health;          // Health: 100 = normal maximum
+var() travel float      Health;          // Health: 100 = normal maximum
 
 // Joint effects
 var() class<ParticleFX> OnFireParticles;	// Particle system I use when I'm on fire.

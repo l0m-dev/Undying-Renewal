@@ -62,18 +62,18 @@ var() PropInfo				MyPropInfo[4];		//
 var HeldProp				MyProp[4];			//
 
 // AI.
-var savable bool			bEnemyIsPlayer;		//
-var savable pawn			HatedEnemy;			// Hated enemy (will attack regardless of attitude).
-var savable actor			PathObject;			// Intermediate pathing point.
+var bool			bEnemyIsPlayer;		//
+var pawn			HatedEnemy;			// Hated enemy (will attack regardless of attitude).
+var actor			PathObject;			// Intermediate pathing point.
 var actor					LastPathObject;		// The object formerly known as PathObject.
-var savable actor			TargetActor;		// Primary target actor, context-dependent based on AI state.
-var savable vector			TargetPoint;		// Primary target coordinates for movement.
+var actor			TargetActor;		// Primary target actor, context-dependent based on AI state.
+var vector			TargetPoint;		// Primary target coordinates for movement.
 var vector					FlankPoint;			// Intermediate point we're going to on our way to the target.
 var float					FlankMagnitude;		// Indicates how much this pawn should flank.
 var bool					FlankPointReset;	// Indicates whether to reset our flank magnitude.
 var bool					FlankDirection;		// True == right, False == left.
-var savable actor			SensedActor;		// Actor that has been sensed.
-var savable vector			SensedPoint;		// Location that sense came from.
+var actor			SensedActor;		// Actor that has been sensed.
+var vector			SensedPoint;		// Location that sense came from.
 var name					SensedSense;		// TEMP: sensor that detected stimulus.
 var(AI) float				ReactionBase;		// Base reaction delay
 var(AI) float				ReactionRand;		// Amount of randomization in reaction delay;
@@ -99,7 +99,7 @@ var(AI) bool				bTryStepForward;	// Set to have creature attempt forward step wh
 var(AI) bool				bTrySeekAlternate;	// Set to have creature attempt seeking alternate point when can't reach enemy.
 var float					OutDamageScalar;	// Scale damage that I'm applying by this factor.
 var float					OutEffectScalar;	// Scale effect that I'm applying by this factor.
-var savable float			InitHealth;			// Initial health, adjusted for difficulty level.
+var float			InitHealth;			// Initial health, adjusted for difficulty level.
 
 // AI state control.
 var name					LastState;			// Last state.
@@ -121,8 +121,8 @@ var() bool					bIsBoss;			// Actor is a level boss.
 
 // Combat, general behavior.
 var(AICombat) float			Aggressiveness;		// Likelihood [0,1] of attacking.
-var savable bool			bHasNearAttack;		// Can melee attack.
-var(AICombat) savable bool	bHasFarAttack;		// Can attack from distance.
+var bool			bHasNearAttack;		// Can melee attack.
+var(AICombat) bool	bHasFarAttack;		// Can attack from distance.
 var(AICombat) bool			bUseCoverPoints;	// Will try to advance using cover points.
 var(AICombat) MeleeAttackInfo	MeleeInfo[6];	// Melee attack damage information.
 var name					NearAttackVerb;		// Past tense near damage verb.
@@ -154,9 +154,9 @@ var(AICombat) float			WeaponAttackFOV;	// (Cosine of) Maximum angle of deviation
 
 // Special Kill
 var(AISpecialKill) vector	SK_PlayerOffset;	// this is in player's local space
-var savable vector			SK_WorldLoc;		// location in the world I need to go to to start my special kill.
-var savable pawn			SK_TargetPawn;		// Pawn I am going to kill.
-var savable bool			SK_Ready;			// Flags when ready to do special kill.
+var vector			SK_WorldLoc;		// location in the world I need to go to to start my special kill.
+var pawn			SK_TargetPawn;		// Pawn I am going to kill.
+var bool			SK_Ready;			// Flags when ready to do special kill.
 var(AISpecialKill) bool		bHasSpecialKill;	// Set if creature has a special kill.
 var(AISpecialKill) float	SK_WalkDelay;		// Max. delay when walking to special kill point.
 // Movement.
@@ -172,7 +172,7 @@ var ZoneInfo				AnimZone;			// Zone used for animation checks.
 // Orders.
 var(AIOrders) name			OrderState;			// Initial AI state, actor will attempt to return to this state.
 var(AIOrders) name			OrderTag;			// Tag associated with orders.
-var savable actor			OrderObject;		// The object of my desires.
+var actor			OrderObject;		// The object of my desires.
 var actor					FirstPoint;			// Marks the first object of a cycle.
 
 // Senses and effectors.
@@ -196,8 +196,8 @@ var AeonsCoverPoint			CoverPoint;			// My cover point.
 
 // Misc.
 var() bool					bCanCrouch;			// Creature can crouch.
-var savable bool			bInCrouch;			// Creature is crouched.
-var savable bool			bGenerated;			// Set if spawned by generator.
+var bool			bInCrouch;			// Creature is crouched.
+var bool			bGenerated;			// Set if spawned by generator.
 var() class<Carcass>		CarcassClass;		// Actor's carcass class.
 var(Movement) float			WalkSpeedScale;		// (Fractional) multiplier for walking speed.
 var(Movement) float			FullSpeedScale;		// Multiplier for full speed, usually 1.0 but can be overridden on a per creature basis.
@@ -220,9 +220,9 @@ var(Events) name			TriggerTag;			// Tag associated with TriggerState.
 var(Events) name			AlertEvent;			// Fire this event when alerted.
 var() float					FadeOutDelay;
 var() float					FadeOutTime;		// Dead and fading time.
-var savable float			FadeOutCount;		//
-var savable StateInfo		StateStack[20];		// State stack.
-var savable int				StateIndex;			// StateStack index.
+var float			FadeOutCount;		//
+var StateInfo		StateStack[20];		// State stack.
+var int				StateIndex;			// StateStack index.
 var() class<Decal>			GoreDecal;			// Decal to lay under self when killed.
 var bool					bDidMeleeDamage;	// Flags if melee damage was successful.
 var bool					bDidMeleeAttack;	//
@@ -237,24 +237,24 @@ var() bool					bUseLooking;		// Enable/disable looking.
 var() bool					bNoBloodPool;		// Set if not to leave a pool of blood.
 var() bool					bNoScytheTarget;	// Set if scythe is not to target.
 var() bool					bIsEthereal;		// Set if creature is ethereal -- vulnerable to EtherTraps, etc.
-var savable actor			PowderPending;		// Set when notified of Powder of Siren.
-var savable float			PowderEffect;		//
-var savable float			LastScriptTime;		//
-var savable int				ScriptCounter;		//
+var actor			PowderPending;		// Set when notified of Powder of Siren.
+var float			PowderEffect;		//
+var float			LastScriptTime;		//
+var int				ScriptCounter;		//
 var() int					LostCounter;		//
 var() int					DispelAmplitude;	// Amplitude required to dispel.
-var savable bool			InitCollideActors;	//
-var savable bool			InitBlockActors;	//
-var savable bool			InitBlockPlayers;	//
+var bool			InitCollideActors;	//
+var bool			InitBlockActors;	//
+var bool			InitBlockPlayers;	//
 var(Sounds) float			AttackVocalDelay;	// Delay between allowable attack vocals.
 var(Sounds) float			AttackVocalChance;	// Chance that a vocal is played when allowable.
 var(Sounds) float			RetreatVocalDelay;	// Delay between allowable retreat vocals.
 var float					FallTimer;
 var() class<ScriptedPawn>	DeathCommClass;		// Class to send death message.
 var() localized string		DeathCommMessage;	// Death message.
-var() savable bool			bSpecialInvoke;		// Handle Invoke in a special way.
-var savable bool			bIsInvoked;			//
-var savable bool			bHacked;			//
+var() bool			bSpecialInvoke;		// Handle Invoke in a special way.
+var bool			bIsInvoked;			//
+var bool			bHacked;			//
 var() bool					bHackable;			//
 var() bool					bSpecialTurret;		//
 var() bool					bIllumCrosshair;	// Illuminates the player's crosshair - default=TRUE
@@ -277,33 +277,33 @@ var PlayerModifier			FireFlyMod;			// Firefly Modifier.
 // -------------------------------------------------------------------------------------------
 
 // Script following properties.
-var savable NarratorScript	Script;				// Current script.
+var NarratorScript	Script;				// Current script.
 var(AIScript) name			ScriptTag;			// Tag of initial script.
-var(AIScript) savable int	ScriptAction;		// First/current action within script.
+var(AIScript) int	ScriptAction;		// First/current action within script.
 var(AIScript) name			TriggerScriptTag;	// Tag of script to run when triggered (use current if '')
 var(AIScript) int			TriggerScriptAction;// First action of trigger script.
-var savable bool			bIsRunAction;		// Set if in a running action.
-var savable int				ScriptSoundID;		// ID returned from PlaySound.
-var savable float			ScriptSoundLen;		// Length of sound the player is playing.
-var savable actor			ScriptTriggerer;	// Actor responsible for triggering.
-var savable pawn			ScriptPlayer;		// The player.
-var savable int				ScriptAnimGroup;	// Which animation group to play sequences from.
-var savable bool			bIgnoreBump;		// Set if should ignore bumps.
+var bool			bIsRunAction;		// Set if in a running action.
+var int				ScriptSoundID;		// ID returned from PlaySound.
+var float			ScriptSoundLen;		// Length of sound the player is playing.
+var actor			ScriptTriggerer;	// Actor responsible for triggering.
+var pawn			ScriptPlayer;		// The player.
+var int				ScriptAnimGroup;	// Which animation group to play sequences from.
+var bool			bIgnoreBump;		// Set if should ignore bumps.
 var vector					PastLocation[15];	// Last buffered positions.
 var int						PastIndex;			// Current index into PastLocation table.
 var TractorBeam		PlayerLeash;		// Tractor beam used to drag the player around.
-var savable bool			bIsLeashed;			// Set when player is leashed.
+var bool			bIsLeashed;			// Set when player is leashed.
 var(AIScript) int			LeashIndex;			// How close the leash point is to the narrator.
 var(AIScript) float			ScriptSoundAmp;		//
 var(AIScript) name			MouthAnim;			//
-var savable bool			bDetectPlayer;		// Enable/disable player detection in script
-var savable int				ScriptIndex;		// Position in script stack.
+var bool			bDetectPlayer;		// Enable/disable player detection in script
+var int				ScriptIndex;		// Position in script stack.
 var ScriptInfo		ScriptStack[5];		//
 var int						ScriptWaitCount;	//
 var sound					ScriptLastSound;	//
-var savable bool			bScriptTurret;		// Turret toward player.
-var savable bool			bFastScript;		//
-var savable int				LastScriptSound;	//
+var bool			bScriptTurret;		// Turret toward player.
+var bool			bFastScript;		//
+var int				LastScriptSound;	//
 
 // TEMP
 var actor					Marker;				// TEMP

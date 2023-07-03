@@ -107,7 +107,7 @@ class AeonsParticleFX expands ParticleFX;
 //	Variables
 //----------------------------------------------------------------------------
 var() float ChangeTime;
-var() savable bool bInitiallyOn;
+var() bool bInitiallyOn;
 var() bool  bDelayFullOn;      // Delay then go full-on.
 var() class<ParticleFX> EndFX;
 var() sound TurnOnSound;

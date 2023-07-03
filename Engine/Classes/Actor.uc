@@ -41,7 +41,7 @@ Voiceover								= 497
 
 // Flags.
 var(Advanced) const bool  bStatic;       // Does not move or change over time.
-var(Advanced) savable bool        bHidden;       // Is hidden during gameplay.
+var(Advanced) bool        bHidden;       // Is hidden during gameplay.
 var(Advanced) const bool  bNoDelete;     // Cannot be deleted during play.
 var const bool            bDeleteMe;     // About to be deleted.
 var transient const bool  bAssimilated;  // Actor dynamics are assimilated in world geometry.
@@ -50,7 +50,7 @@ var transient bool		  bIsAMovingBrush;	// Flag is true if the actor is a moving 
 var transient bool		  bIsRenderable;	// Flag is true if the actor can be rendered.
 var transient bool        bLightChanged; // Recalculate this light's lighting now.
 var bool                  bDynamicLight; // Temporarily treat this as a dynamic light.
-var savable bool			bTimerLoop;		// Timer loops (else is one-shot).
+var bool			bTimerLoop;		// Timer loops (else is one-shot).
 var bool				  bSpawned;		 // Whether this actor was spawned in this level or not
 
 // Other flags.
@@ -78,7 +78,7 @@ var(Advanced) int		Priority;		 // The priority this actor has to be ticked.
 
 // Priority Parameters
 // Actor's current physics mode.
-var(Movement) savable const enum EPhysics
+var(Movement) const enum EPhysics
 {
 	PHYS_None,
 	PHYS_Walking,
@@ -131,9 +131,9 @@ var(Object) name InitialState;
 var(Object) name Group;
 
 // Execution and timer variables.
-var savable float			TimerRate;		// Timer event, 0=no timer.
-var savable const float		TimerCounter;	// Counts up until it reaches TimerRate.
-var(Advanced) savable float		  LifeSpan;      // How old the object lives before dying, 0=forever.
+var float			TimerRate;		// Timer event, 0=no timer.
+var const float		TimerCounter;	// Counts up until it reaches TimerRate.
+var(Advanced) float		  LifeSpan;      // How old the object lives before dying, 0=forever.
 
 // Animation variables.
 var(Display) name         AnimSequence;  // Animation sequence we're playing.
@@ -206,8 +206,8 @@ struct PointRegion
 // Scriptable.
 var       const LevelInfo Level;         // Level this actor is on.
 var transient const Level XLevel;        // Level object.
-var(Events) savable name  Tag;			 // Actor's tag name.
-var(Events) savable name  Event;         // The event this actor causes.
+var(Events) name  Tag;			 // Actor's tag name.
+var(Events) name  Event;         // The event this actor causes.
 var Actor                 Target;        // Actor we're aiming at (other uses as well).
 var Pawn          Instigator;    // Pawn responsible for damage.
 var(Sound) sound          AmbientSound;  // Ambient sound effect.
@@ -235,13 +235,13 @@ var const transient color	IncidentLight;	// Color (and intensity) of light reach
 											// Only updated if actor drawn.
 
 // The actor's position and rotation.
-var(Movement) const savable vector Location;     // Actor's location; use Move to set.
-var(Movement) const savable rotator Rotation;    // Rotation.
-var       const savable vector    OldLocation;   // Actor's old location one tick ago.
-var(Movement) savable vector      Velocity;      // Velocity.
+var(Movement) const vector Location;     // Actor's location; use Move to set.
+var(Movement) const rotator Rotation;    // Rotation.
+var       const vector    OldLocation;   // Actor's old location one tick ago.
+var(Movement) vector      Velocity;      // Velocity.
 
-var(Movement) savable rotator	  RotationRate;    // Change in rotation per second.
-var(Movement) savable rotator     DesiredRotation; // Physics will rotate pawn to this if bRotateToDesired.
+var(Movement) rotator	  RotationRate;    // Change in rotation per second.
+var(Movement) rotator     DesiredRotation; // Physics will rotate pawn to this if bRotateToDesired.
 
 
 
@@ -316,7 +316,7 @@ var transient float		BoundRenderRadius;	 // Rendering radius of the object. Calc
 var transient float		BoundRenderDistance; // Max distance the object can be viewed at. Calculated and adjusted on the fly.
 											// Slot 0 is main state, 1 is alt. state.
 var const export model  Brush;           // Brush if DrawType=DT_Brush.
-var(Display) savable float      DrawScale;		 // Scaling factor, 1.0=normal size.
+var(Display) float      DrawScale;		 // Scaling factor, 1.0=normal size.
 var	transient float		PrevDrawScale;	 // For tracking scaling changes.
 var			 vector		PrePivot;		 // Offset from box center for drawing.
 var(Display) float      ScaleGlow;		 // Multiplies lighting.
@@ -365,8 +365,8 @@ var(Sound) bool			bSoundPositional;	// whether or not the sounds appears to be c
 var(Sound) bool			bSoundLocked;		// This sound will not be overriden, when true, glxStartSample will use GLX_LOCKED
 var(Sound) byte         SoundRadius;		// OuterRadius of ambient sound.  If InnerRadius specified, Falloff will be linear from Radius to RadiusInner
 var(Sound) byte			SoundRadiusInner;	// InnerRadius of ambient sound.  Full Volume
-var(Sound) savable byte         SoundVolume;		// Volume of amient sound.
-var(Sound) savable byte         SoundPitch;			// Sound pitch shift, 64.0=none.
+var(Sound) byte         SoundVolume;		// Volume of amient sound.
+var(Sound) byte         SoundPitch;			// Sound pitch shift, 64.0=none.
 var(Sound) int			SoundFlags;			// Used to hold specialized flag values that will get detected internally
 
 // Regular sounds.
@@ -471,11 +471,11 @@ enum EActEffects
 // Collision.
 
 // Collision size.
-var(Collision) savable const float CollisionRadius; // Radius of collision cyllinder.
-var(Collision) savable const float CollisionHeight; // Half-height cyllinder.
+var(Collision) const float CollisionRadius; // Radius of collision cyllinder.
+var(Collision) const float CollisionHeight; // Half-height cyllinder.
 
 // Collision flags.
-var(Collision) savable const bool bCollideActors;   // Collides with other actors.
+var(Collision) const bool bCollideActors;   // Collides with other actors.
 var(Collision) bool	      bCollideJoints;   // If bCollideActors, collides with joints, not collision cyl.
 var(Collision) bool		  bCollideSkeleton;	// If bCollideSkeleton is true, collision checks resolve against skeleton, not 
 											// collision cylinder.  Difference from bCollideJoints is that bCollideJoints only
@@ -484,8 +484,8 @@ var(Collision) bool		  bCollideSkeleton;	// If bCollideSkeleton is true, collisi
 var(Collision) bool       bCollideWorld;    // Collides with the world.
 var(Collision) bool       bGroundMesh;		// If bCollideWorld also true, mesh and collision cylinder bottoms 
 											// are synced, rather than centers. Should be true for most actors.
-var(Collision) savable bool       bBlockActors;	    // Blocks other nonplayer actors.
-var(Collision) savable bool       bBlockPlayers;    // Blocks other player actors.
+var(Collision) bool       bBlockActors;	    // Blocks other nonplayer actors.
+var(Collision) bool       bBlockPlayers;    // Blocks other player actors.
 var(Collision) bool       bProjTarget;      // Projectiles should potentially target this actor.
 
 //-----------------------------------------------------------------------------
@@ -532,7 +532,7 @@ var(Lighting) enum ELightEffect
 } LightEffect;
 
 // Lighting info.
-var(LightColor) savable byte
+var(LightColor) byte
 	LightBrightness,
 	LightHue,
 	LightSaturation;
@@ -568,13 +568,13 @@ var(Lighting) enum ELightSource
 var(Movement) bool        bBounce;           // Bounces when hits ground fast.
 var(Movement) bool		  bFixedRotationDir; // Fixed direction of rotation.
 var(Movement) bool		  bRotateToDesired;  // Rotate to DesiredRotation.
-var           savable bool        bInterpolating;    // Performing interpolating.
+var           bool        bInterpolating;    // Performing interpolating.
 var			  const bool  bJustTeleported;   // Used by engine physics - not valid for scripts.
 
 // Physics properties.
 var(Movement) float       Mass;            // Mass of this actor.
-var savable   float       PhysAlpha;       // Interpolating position, 0.0-1.0.
-var savable   float       PhysRate;        // Interpolation rate per second. Used in renewal to scale turn animation speed.
+var   float       PhysAlpha;       // Interpolating position, 0.0-1.0.
+var   float       PhysRate;        // Interpolation rate per second. Used in renewal to scale turn animation speed.
 
 //-----------------------------------------------------------------------------
 // Networking.

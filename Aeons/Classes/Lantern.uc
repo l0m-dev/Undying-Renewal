@@ -15,7 +15,7 @@ var() class<Light> LanternLocalLight;
 var Light mainLight, PlayerLight;
 var() Sound FlickerSound;
 
-var savable travel bool bPlaySounds;
+var travel bool bPlaySounds;
 
 event TravelPreAccept()
 {

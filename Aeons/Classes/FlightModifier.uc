@@ -8,7 +8,7 @@ class FlightModifier expands PlayerModifier;
 //=============================================================================
 var() sound FlyingSound;
 var() sound SputterSound;
-var() savable travel  float Fuel;
+var() travel  float Fuel;
 
 var travel byte InitialVolume;
 

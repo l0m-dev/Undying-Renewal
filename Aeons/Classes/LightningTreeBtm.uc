@@ -5,7 +5,7 @@ class LightningTreeBtm expands Decoration;
 //#exec MESH IMPORT MESH=LightningTreeBtm_m SKELFILE=LightningTreeBtm.ngf 
 
 var Actor Top;
-var savable bool bTopFallen;
+var bool bTopFallen;
 var() float AnimRate;
 
 function PostBeginPlay()

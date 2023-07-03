@@ -8,7 +8,7 @@ class Spell extends Inventory
 // Share Weapon icon for now.
 //#exec Texture Import File=Textures\Weapon.pcx Name=S_Weapon Mips=On Flags=2
 
-var savable travel int castingLevel;	// casting level of the spell - the base casting level of the spell
+var travel int castingLevel;	// casting level of the spell - the base casting level of the spell
 var int LocalCastingLevel;				// casting level of the spell after modifications from the ghelziabahr stone.
 
 var int amplitudeBonus;			// amplitude bunus to the castingLevel (i.e. from the Ghelzibahar Stone)

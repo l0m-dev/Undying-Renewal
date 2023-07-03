@@ -22,11 +22,11 @@ var() enum EItemType
 //-----------------------------------------------------------------------------
 // Information relevant to Active/Inactive state.
 
-var() travel savable byte AutoSwitchPriority; // Autoswitch value, 0=never autoswitch.
+var() travel byte AutoSwitchPriority; // Autoswitch value, 0=never autoswitch.
 var() byte        InventoryGroup;     // The weapon/inventory set, 1-9 (0=none).
 var() bool        bActivatable;       // Whether item can be activated.
 var() bool	 	  bDisplayableInv;	  // Item displayed in HUD.
-var	travel savable bool   bActive;			  // Whether item is currently activated.
+var	travel bool   bActive;			  // Whether item is currently activated.
 var	  bool		  bSleepTouch;		  // Set when item is touched when leaving sleep state.
 var	  bool		  bHeldItem;		  // Set once an item has left pickup state.
 var	  bool		  bTossedOut;		  // true if weapon was tossed out (so players can't cheat w/ weaponstay)
@@ -76,7 +76,7 @@ var() texture     StatusIcon;         // Icon used with ammo/charge/power count.
 
 var() name		  ProtectionType1;	  // Protects against DamageType (None if non-armor).
 var() name		  ProtectionType2;	  // Secondary protection type (None if non-armor).
-var() travel savable int  Charge;			  // Amount of armor or charge if not an armor (charge in time*10).
+var() travel int  Charge;			  // Amount of armor or charge if not an armor (charge in time*10).
 var() int		  ArmorAbsorption;	  // Percent of damage item absorbs 0-100.
 var() bool		  bIsAnArmor;		  // Item will protect player.
 var() int		  AbsorptionPriority; // Which items absorb damage first (higher=first).

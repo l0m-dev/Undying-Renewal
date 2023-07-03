@@ -3,7 +3,7 @@
 //=============================================================================
 class HealthModifier expands PlayerModifier;
 
-var savable travel int HealthSurplus, NumHealths, SuperHealthSurplus, ProjectedHealthTarget;
+var travel int HealthSurplus, NumHealths, SuperHealthSurplus, ProjectedHealthTarget;
 var float t;
 
 function int Dispel(optional bool bCheck)

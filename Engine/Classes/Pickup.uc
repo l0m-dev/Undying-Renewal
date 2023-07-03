@@ -7,7 +7,7 @@ class Pickup extends Inventory
 	nativereplication;
 
 var inventory Inv;
-var savable travel int NumCopies;
+var travel int NumCopies;
 var() bool bCanHaveMultipleCopies;  // if player can possess more than one of this
 var() bool bCanActivate;			// Item can be selected and activated
 var() localized String ExpireMessage; // Messages shown when pickup charge runs out

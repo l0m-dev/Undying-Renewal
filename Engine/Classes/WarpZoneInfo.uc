@@ -8,7 +8,7 @@ class WarpZoneInfo extends ZoneInfo
 //-----------------------------------------------------------------------------
 // Information set by the level designer.
 
-var() savable string     OtherSideURL;
+var() string     OtherSideURL;
 var() name       ThisTag;
 var() bool		 bNoTeleFrag;
 

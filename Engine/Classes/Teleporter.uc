@@ -36,7 +36,7 @@ var() bool    bReversesY;       // Reverses Y-component of velocity.
 var() bool    bReversesZ;       // Reverses Z-component of velocity.
 
 // Teleporter flags
-var() savable bool	  bEnabled;			// Teleporter is turned on;
+var() bool	  bEnabled;			// Teleporter is turned on;
 var() bool	  bForcePlayerTouch; // force a player touch() event on trigger
 
 // Transition screen flags

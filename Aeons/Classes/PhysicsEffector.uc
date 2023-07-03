@@ -8,7 +8,7 @@ class PhysicsEffector expands Invisible
 //****************************************************************************
 // Member vars.
 //****************************************************************************
-var() savable bool			bIsActive;			// On/Off state.
+var() bool			bIsActive;			// On/Off state.
 var() bool					bAffectLockedPlayer;// Set if OK to affect locked player.
 var() bool					bAffectAI;			// Set if affects AI also
 

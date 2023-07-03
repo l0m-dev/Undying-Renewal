@@ -33,8 +33,8 @@ var() name SatelliteTag;
 
 var int MyZoneID;
 var bool bTriggered, bWaterSounds;
-var() savable bool bActive;
-var savable bool bTrue, bUpdateActors, bFootTrue, bHeadTrue, bForceUpdate;
+var() bool bActive;
+var bool bTrue, bUpdateActors, bFootTrue, bHeadTrue, bForceUpdate;
 var() bool bTriggerable;
 
 simulated function PreBeginPlay()
