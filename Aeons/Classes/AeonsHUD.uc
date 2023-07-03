@@ -288,6 +288,11 @@ var float UsedMana;
 var Actor RicochetArrows[3];
 var Rotator SavedView1;
 
+var vector IncreasedMouseBuffer[30];
+var string NoWheelSelectionText;
+
+var float DisplayObjectivesTime;
+
 // Message Struct
 Struct MessageStruct
 {
@@ -1356,6 +1361,31 @@ simulated function PostRender( canvas Canvas )
 		// if their are any unread entries in the book, draw the hud icon
 		DrawBookInfo(Canvas);
 		
+		// display objectives
+		if (Level.TimeSeconds < DisplayObjectivesTime)
+		{
+			Canvas.DrawColor = WhiteColor;
+			Canvas.Font = Canvas.SmallFont;
+
+			for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
+			{
+				if (bNewHud)
+					Canvas.SetPos( 64, 64+25*i );
+				else
+					Canvas.SetPos( 50, 25+25*i );
+				
+				TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
+				Token = InStr(TempString, ",");
+				
+				if (Token >= 0)
+				{
+					TempString = Right(TempString, Len(TempString)-Token-1);	
+				}
+				
+				Canvas.DrawText( "" $ TempString, false );
+			}
+		}
+		
 		if (AeonsPlayer(Owner).bDrawInvList)
 			DrawHeldItems(Canvas);
 	
@@ -1472,27 +1502,6 @@ simulated function PostRender( canvas Canvas )
 			
 			AeonsPlayer(Owner).SavePath = "";
 		}
-	}
-	*/
-	
-	// objectives debugging
-	/*
-	Canvas.DrawColor = WhiteColor;
-	Canvas.Font = Canvas.SmallFont;
-
-	for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
-	{
-		Canvas.SetPos( 50, 25+25*i );
-		
-		TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
-		Token = InStr(TempString, ",");
-		
-		if (Token >= 0)
-		{
-			TempString = Right(TempString, Len(TempString)-Token-1);	
-		}
-		
-		Canvas.DrawText( "" $ TempString, false );
 	}
 	*/
 	
@@ -2289,6 +2298,11 @@ simulated function DrawActiveSpells(Canvas canvas)
 		
 
 	}
+}
+
+exec function DisplayObjectives()
+{
+	DisplayObjectivesTime = Level.TimeSeconds + 5;
 }
 
 // Returns the next item in the inventory list
@@ -4423,12 +4437,16 @@ simulated function InitSelectMode()
 	
 //	local Actor D;
 	
-	for ( i=0; i<5; i++ )
+	/*
+	for ( i=0; i<ArrayCount(MouseBuffer); i++ )
 	{
 		MouseBuffer[i].X = 0;
 		MouseBuffer[i].Y = 0;
 		MouseBuffer[i].Z = 0;
 	}
+	*/
+	
+	BufferSlot = 0;
  
 	aX = 0;
 	aY = 0;
@@ -4586,7 +4604,7 @@ simulated function DrawShieldOverlay(Canvas Canvas)
 			Canvas.DrawColor.R = 100 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
 			Canvas.DrawColor.G = 100 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
 			Canvas.DrawColor.B = 128 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
-			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(P.ShieldMod).CrackID[1]], 128 * 1.2, 128 * 1.2, 0, 0, 128, 128);
+			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(P.ShieldMod).CrackID[i]], 128 * 1.2, 128 * 1.2, 0, 0, 128, 128);
 		}
 	}
 
@@ -4763,7 +4781,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	// If on PSX2, must handle things a little differently
 	if (GetPlatform() == PLATFORM_PSX2)
 	{
-		if ( Delta > RadiusThresholdPSX2 )
+		if ( Delta > RadiusThresholdPSX2 * PPawn.MouseSensitivity )
 		{
 			if ( Abs(aX) < 0.01 )
 				aX = 0.01;
@@ -4785,6 +4803,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 			if ( SelectedSector != LastSector ) 
 			{
 				LastSector = SelectedSector;
+				WheelTextTimer = 1.5;
 				PlayerPawn(Owner).PlaySound( sound'Aeons.HUD_Mvmt01',SLOT_Misc,0.25 );
 			}
 		}
@@ -4792,25 +4811,30 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	else
 	{
 		//	some sort of threshold is necessary so minute movement doesn't corrupt data
-		if ( Delta > RadiusThreshold )
+		if ( Delta > RadiusThreshold * PPawn.MouseSensitivity )
 		{
+			IncreasedMouseBuffer[BufferSlot].X = aX; //UnitX;
+			IncreasedMouseBuffer[BufferSlot].Y = aY; //UnitY;
+			IncreasedMouseBuffer[BufferSlot].Z = 0;
 			BufferSlot++;
-			
-			if ( BufferSlot > 4 )
+		}
+		else
+		{
+			// stopped moving mouse, reset
 				BufferSlot = 0;
-
-			MouseBuffer[BufferSlot].X = aX; //UnitX;
-			MouseBuffer[BufferSlot].Y = aY; //UnitY;
-			MouseBuffer[BufferSlot].Z = 0;
-
+		}
+		if ( BufferSlot >= ArrayCount(IncreasedMouseBuffer) )
+		{
 			AveragedMouseMove.X = 0;
 			AveragedMouseMove.Y = 0;
 			AveragedMouseMove.Z = 0;
 			
-			for ( i=0; i<5; i++ )
+			for ( i=0; i<ArrayCount(IncreasedMouseBuffer) ; i++ )
 			{
-				AveragedMouseMove += MouseBuffer[i];
+				AveragedMouseMove += IncreasedMouseBuffer[i];
 			}
+
+			BufferSlot = 0;
 
 			Delta = Sqrt(AveragedMouseMove.X*AveragedMouseMove.X + AveragedMouseMove.Y*AveragedMouseMove.Y);
 			AveragedMouseMove /= Delta;	
@@ -4836,7 +4860,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 			if ( SelectedSector != LastSector ) 
 			{
 				LastSector = SelectedSector;
-				
+				WheelTextTimer = 1.5;
 				PlayerPawn(Owner).PlaySound( sound'Aeons.HUD_Mvmt01',SLOT_Misc,0.25 );
 			}
 		}
@@ -4950,16 +4974,16 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 		if (InventoryGroup>0)
 		{
 			// WheelSelection = Owner.Inventory.FindItemInGroup(InventoryGroup);
-
 			if ( WheelSelection != None )
 			{
-			
 				if ( SelectedName != WheelSelection.ItemName )
-				{
 					SelectedName = WheelSelection.ItemName;
-					WheelTextTimer = 1.5;
 				}
-				
+			else
+			{
+				if ( SelectedName != NoWheelSelectionText )
+					SelectedName = NoWheelSelectionText;
+			}
 				if ( WheelTextTimer > 0.0 ) 
 				{
 					Canvas.Font = Canvas.MedFont;
@@ -4974,38 +4998,12 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 						Canvas.DrawColor.r = 511.0 * WheelTextTimer;
 						Canvas.DrawColor.g = 511.0 * WheelTextTimer;
 						Canvas.DrawColor.b = 511.0 * WheelTextTimer;
-					}
+				}
 
 					Canvas.SetPos( Canvas.ClipX/2 - TextWidth/2, Canvas.ClipY/2 - TextHeight/2 );
 
 					Canvas.DrawText( SelectedName );
 				}
-
-			}
-		}
-		else
-		{
-				if ( SelectedName != "?" )
-				{
-					SelectedName = "?";
-					WheelTextTimer = 1.5;
-				}
-				
-				if ( WheelTextTimer > 0.0 ) 
-				{
-					Canvas.Font = Canvas.MedFont;
-
-					Canvas.TextSize( SelectedName, TextWidth, TextHeight );
-				
-					Canvas.DrawColor.r = 511.0 * FClamp( WheelTextTimer, 0.0, 0.5 );
-					Canvas.DrawColor.g = 511.0 * FClamp( WheelTextTimer, 0.0, 0.5 );
-					Canvas.DrawColor.b = 511.0 * FClamp( WheelTextTimer, 0.0, 0.5 );
-
-					Canvas.SetPos( Canvas.ClipX/2 - TextWidth/2, Canvas.ClipY/2 - TextHeight/2 );
-
-					Canvas.DrawText( SelectedName );
-				}
-	
 		}
 	}
 	else if (( iState == 2 ) &&(HUDMode == 1)&&(InventoryGroup>0))
@@ -5091,7 +5089,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 
 defaultproperties
 {
-     RadiusThreshold=2000
+     RadiusThreshold=500
      RadiusThresholdPSX2=500
      Con_X(1)=133
      Con_X(2)=188
@@ -5226,4 +5224,5 @@ defaultproperties
      DotTexture=Texture'Aeons.HUD.Dot'
      bDrawLevelInfo=True
      bDrawBuildInfo=True
+	 NoWheelSelectionText=""
 }

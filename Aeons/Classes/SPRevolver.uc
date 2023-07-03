@@ -5,9 +5,9 @@ class SPRevolver expands SPWeapon;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 		Accuracy = 1.0;
+	super.PreBeginPlay();
 }
 
 //****************************************************************************

@@ -387,6 +387,11 @@ function Tick( float DeltaTime )
 // Sent during actor initialization.
 function PreBeginPlay()
 {
+	if (RGC())
+	{
+		PhysRate = Level.Game.Difficulty + 1;
+		RotationRate.Yaw *= Level.Game.Difficulty + 1;
+	}
 	super.PreBeginPlay();
 
 	if ( Level.Game.Difficulty == 0 )

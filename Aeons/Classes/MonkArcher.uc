@@ -5,11 +5,11 @@ class MonkArcher expands MonkSoldier;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 	{
 		 WeaponAccuracy = 1.0;
 	}
+	super.PreBeginPlay();
 }
 
 //****************************************************************************

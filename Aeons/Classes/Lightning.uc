@@ -7,13 +7,13 @@ var int SpeargunChargeManaCost;
 
 function PreBeginPlay()
 {
-	Super.PreBeginPlay();
 	if (RGC())
 	{
 		MaxTargetRange = 4096;
 		RefireRate = 0.5;
 		SpeargunChargeManaCost = 50;
 	}
+	Super.PreBeginPlay();
 }
 
 // ============================================================================
@@ -100,7 +100,7 @@ function FireAttSpell( float Value )
 		{
 			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
 			{
-				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
+				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged )
 					if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 						ChargeSpear();
 			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {

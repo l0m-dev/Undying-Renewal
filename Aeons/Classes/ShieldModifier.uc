@@ -32,14 +32,6 @@ replication
 
 function PreBeginPlay()
 {
-	Super.PreBeginPlay();
-
-	if (Owner.IsA('AeonsPlayer'))
-		Player = AeonsPlayer(Owner);
-	
-	col = vect(0.5,0.5,1) * 200;	// hud change color
-	str = 0.05;					// HUD change strength
-	
 	if (RGC())
 	{
 		ShieldHealthPerLevel[0] = 15;
@@ -49,6 +41,13 @@ function PreBeginPlay()
 		ShieldHealthPerLevel[4] = 55;
 		ShieldHealthPerLevel[5] = 65;
 	}
+	Super.PreBeginPlay();
+
+	if (Owner.IsA('AeonsPlayer'))
+		Player = AeonsPlayer(Owner);
+	
+	col = vect(0.5,0.5,1) * 200;	// hud change color
+	str = 0.05;					// HUD change strength
 }
 
 //----------------------------------------------------------------------------

@@ -314,15 +314,15 @@ function PlaySoundDeath()
 //****************************************************************************
 function PreBeginPlay()
 {
+	if (RGC())
+	{
+		AirSpeed *= 1.15;
+	}
 	super.PreBeginPlay();
 	MontoBeam = Spawn( class'MontoTractorBeam', self,, Location );
 	if ( MontoBeam != none )
 		MontoBeam.SetBase( self );
 //	SetLimbTangible( 'root', false );
-	if (RGC())
-	{
-		AirSpeed = 350;
-	}
 }
 
 function Destroyed()

@@ -183,8 +183,6 @@ function C_BareFS()
 //****************************************************************************
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	
 	if (RGC())
 	{
 		DamageRadius = 130;
@@ -192,6 +190,7 @@ function PreBeginPlay()
 		GroundSpeed = 600;
 		Health = 600;
 	}
+	super.PreBeginPlay();
 }
 
 function BeginPlay()

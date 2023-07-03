@@ -159,7 +159,7 @@ auto state Flying
 						// Generate Blood?
 						if (bGenBlood)
 						{
-							Wound = Spawn(class 'SpearWound',Other,,HitLocation, Rotator(HitNormal));
+							Wound = Spawn(class 'SpearWound',Other,,HitLocation, Rotator(Normal(OldLocation-Location)));
 							Wound.AttachJoint = HitJointName;
 							Wound.setup();
 						}
@@ -343,6 +343,7 @@ state stuck
 
 	simulated function Tick( float DeltaTime ) 
 	{
+		/*
 		if (( Owner != None ) && (Pawn(Owner).Health <= 0))
 		{
 			// log("Spear_Proj: state Stuck: Tick:  Owner health depleted, detaching");
@@ -350,6 +351,7 @@ state stuck
 			// SetPhysics(PHYS_Falling);
 			gotoState('FadeAway');
 		}
+		*/
 	}
 
 	simulated function Timer()
@@ -360,20 +362,21 @@ state stuck
 		local LightningBoltOfTheGods lbg;
 		local texture HitTexture;
 
+		LightType = LT_None;
 		if ( bCharged && !Owner.IsA('King_Part'))
 		{
 			if (Owner.IsA('Patrick'))
 				SetOwner(none);
 
 			if ( (Owner != none) )
-				Start = Owner.Location;
-			else 
+				Start = Owner.Location + Owner.CollisionHeight * vect(0,0,1.0);
+			else
 				Start = Location;
 			
 			// make sure we're not hitting a dead guy.
-			if (Owner.IsA('Pawn'))
-				if ( Pawn(Owner).Health <= 0 )
-					return;
+			//if (Owner.IsA('Pawn'))
+			//	if ( Pawn(Owner).Health <= 0 )
+			//		return;
 
 			End = Start + vect(0,0,65536);
 			

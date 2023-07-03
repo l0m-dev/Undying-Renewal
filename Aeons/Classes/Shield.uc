@@ -9,7 +9,6 @@ class Shield expands AttSpell;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 	{
 		manaCostPerLevel[0] = 60;
@@ -18,6 +17,7 @@ function PreBeginPlay()
 		manaCostPerLevel[3] = 60;
 		manaCostPerLevel[4] = 60;
 	}
+	super.PreBeginPlay();
 }
 
 state NormalFire

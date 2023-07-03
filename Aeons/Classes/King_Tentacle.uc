@@ -96,11 +96,6 @@ function Tick( float deltaTime )
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	OutOfWater = true;
-	DelayTimer = 0.0;
-	bHidden = true;
-	
 	if (RGC())
 	{
 		DrawScale = 1.25;
@@ -108,6 +103,10 @@ function PreBeginPlay()
 		MeleeRange = 1500;
 		MeleeInfo[0].Damage = 250;
 	}
+	super.PreBeginPlay();
+	OutOfWater = true;
+	DelayTimer = 0.0;
+	bHidden = true;
 }
 
 function PlayNearAttack()

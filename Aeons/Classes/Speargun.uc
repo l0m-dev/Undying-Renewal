@@ -35,7 +35,7 @@ var bool bCharged;
 var() sound InsertSound;
 var() sound ReloadSound;
 var() sound ChargedSound;
-// var ParticleFX ChargedFX;
+var ParticleFX ChargedFX;
 var int SoundID;
 var travel bool bZoomedIn;
 
@@ -49,13 +49,21 @@ function PreBeginPlay()
 
 function Charge()
 {
-	
-	// ChargedFX = Spawn(class 'ChargedSpearFX',self,,Location);
-	// AeonsPlayer(Owner).OverlayActor = ChargedFX;
+	ChargedFX = Spawn(class 'ChargedSpearFX',self,,Location);
+	AeonsPlayer(Owner).OverlayActor = ChargedFX;
 	// log("Speargun: Charge()", 'Misc');
 	bCharged = true;
 	AmbientSound = ChargedSound;
 	ChargeLen = 0;
+}
+
+function RemoveCharge()
+{
+	if (ChargedFX != none)
+		ChargedFX.Destroy();
+	AeonsPlayer(Owner).OverlayActor = none;
+	bCharged = false;
+	AmbientSound = None;
 }
 
 function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
@@ -88,9 +96,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 	AmbientSound = None;
 
 	ChargeLen = 0;
-	// ChargedFX.Destroy();
-	AeonsPlayer(Owner).OverlayActor = none;
-	bCharged = false;
+	RemoveCharge();
 	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSpears = 1.0;
 }
 
@@ -252,10 +258,7 @@ state Idle
 			if ( ChargeLen > ChargeTimer )
 			{
 				log("Speargun: Charge has run out ", 'Misc');
-				//if (ChargedFX != none)
-				//	ChargedFX.Destroy();
-				AeonsPlayer(Owner).OverlayActor = none;
-				bCharged = false;
+				RemoveCharge();
 			}
 		} else {
 			ChargeLen = 0;
@@ -302,10 +305,7 @@ function Tick(float DeltaTime)
 
 	if ( ChargeLen >ChargeTimer )
 	{
-		//if (ChargedFX != none)
-			//ChargedFX.Destroy();
-		AeonsPlayer(Owner).OverlayActor = none;
-		bCharged = false;
+		RemoveCharge();
 	}
 
 	if ( bChangeWeapon )

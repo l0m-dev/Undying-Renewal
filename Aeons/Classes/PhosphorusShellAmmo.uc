@@ -7,12 +7,12 @@ class PhosphorusShellAmmo expands ShotgunAmmo;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 	{
 		AmmoAmount = 6;
 		MaxAmmo = 30;
 	}
+	super.PreBeginPlay();
 }
 
 state Activated

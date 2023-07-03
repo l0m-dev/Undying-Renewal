@@ -120,13 +120,11 @@ var bool	bMeleeAttackFail;	// used to hack howler's freezing during near attacks
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	
 	if (RGC())
 	{
 		Alertness = 1.0;
-		Health = 60;
 	}
+	super.PreBeginPlay();
 }
 
 //****************************************************************************
@@ -222,8 +220,8 @@ function bool DoFarAttack()
 	
 	if (RGC())
 	{
-		// prevent him doing a far attack while standing still
-		if (VSize(Velocity) / GroundSpeed < 0.75)
+		// prevent him doing a far attack while standing still on an enemy that's far away
+		if (( dist > ( MeleeRange * 2.5 ) ) && VSize(Velocity) / GroundSpeed < 0.75)
 			return false;
 		maxJumpDist =  MeleeRange * 8.0;
 	}
@@ -274,7 +272,10 @@ function bool NearStrikeValid( actor Victim, int DamageNum )
 			return JointStrikeValid( Victim, 'head', DamageRadius );
 			break;
 		default:
-			return JointStrikeValid( Victim, 'r_hand1', DamageRadius );
+			if (RGC())
+				return Super.NearStrikeValid(Victim, DamageNum); // fixes missed standing slash attack
+			else
+				return JointStrikeValid( Victim, 'r_hand1', DamageRadius );
 			break;
 	}
 }
@@ -780,5 +781,4 @@ defaultproperties
      SoundRadius=32
      CollisionRadius=24
      CollisionHeight=34
-     RotationRate=(Pitch=0,Yaw=32000,Roll=0)
 }

@@ -8,6 +8,7 @@ var UWindowCheckbox GameplayChangesCheck;
 var UWindowCheckbox GoreCheck;
 var UWindowCheckbox AutoUseHealthVialsCheck;
 var UWindowCheckbox NewHudCheck;
+var UWindowCheckbox AutoShowObjectivesCheck;
 var UWindowCheckbox ShowUsedManaCheck;
 var UWindowHSliderControl DamageScreenShakeScaleSlider;
 var UWindowCheckbox MoreSkippableCutscenesCheck;
@@ -24,6 +25,8 @@ var string AutoUseHealthVialsText;
 var string AutoUseHealthVialsHelp;
 var string NewHudText;
 var string NewHudHelp;
+var string AutoShowObjectivesText;
+var string AutoShowObjectivesHelp;
 var string ShowUsedManaText;
 var string ShowUsedManaHelp;
 var string DamageScreenShakeScaleText;
@@ -52,6 +55,8 @@ function Created()
 	AutoUseHealthVialsHelp = Localize(string(class), "AutoUseHealthVialsHelp", "Renewal");
 	NewHudText = Localize(string(class), "NewHudText", "Renewal");
 	NewHudHelp = Localize(string(class), "NewHudHelp", "Renewal");
+	AutoShowObjectivesText = Localize(string(class), "AutoShowObjectivesText", "Renewal");
+	AutoShowObjectivesHelp = Localize(string(class), "AutoShowObjectivesHelp", "Renewal");
 	ShowUsedManaText = Localize(string(class), "ShowUsedManaText", "Renewal");
 	ShowUsedManaHelp = Localize(string(class), "ShowUsedManaHelp", "Renewal");
 	DamageScreenShakeScaleText = Localize(string(class), "DamageScreenShakeScaleText", "Renewal");
@@ -139,6 +144,13 @@ function Created()
 	NewHudCheck.Align = TA_Left;
 	ControlOffset += 20 * ScaleY;
 	
+	AutoShowObjectivesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
+	AutoShowObjectivesCheck.SetText(AutoShowObjectivesText);
+	AutoShowObjectivesCheck.SetHelpText(AutoShowObjectivesHelp);
+	AutoShowObjectivesCheck.SetFont(F_Normal);
+	AutoShowObjectivesCheck.Align = TA_Left;
+	ControlOffset += 20 * ScaleY;
+	
 	MoreSkippableCutscenesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
 	MoreSkippableCutscenesCheck.SetText(MoreSkippableCutscenesText);
 	MoreSkippableCutscenesCheck.SetHelpText(MoreSkippableCutscenesHelp);
@@ -152,11 +164,14 @@ function Created()
 
 function GetSettings()
 {
+	RenewalConfig = GetPlayerOwner().GetRenewalConfig();
+	
 	//ServerNameEdit.SetValue(class'Engine.GameReplicationInfo'.default.ServerName);
 	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
 	GoreCheck.bChecked = RenewalConfig.bGore;
 	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
 	NewHudCheck.bChecked = RenewalConfig.bNewHud;
+	AutoShowObjectivesCheck.bChecked = RenewalConfig.bAutoShowObjectives;
 	ShowUsedManaCheck.bChecked = RenewalConfig.bShowUsedMana;
 	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
 	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
@@ -191,6 +206,9 @@ function Notify(UWindowDialogControl C, byte E)
 			break;
 		case NewHudCheck:
 			RenewalConfig.bNewHud = NewHudCheck.bChecked;
+			break;
+		case AutoShowObjectivesCheck:
+			RenewalConfig.bAutoShowObjectives = AutoShowObjectivesCheck.bChecked;
 			break;
 		case ShowUsedManaCheck:
 			RenewalConfig.bShowUsedMana = ShowUsedManaCheck.bChecked;
@@ -275,6 +293,9 @@ function BeforePaint(Canvas C, float X, float Y)
 
 	NewHudCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	NewHudCheck.WinLeft = CenterPos;
+
+	AutoShowObjectivesCheck.SetSize(CenterWidth-EditWidth+16, 1);
+	AutoShowObjectivesCheck.WinLeft = CenterPos;
 
 	ShowUsedManaCheck.SetSize(CenterWidth-EditWidth+16, 1);
 	ShowUsedManaCheck.WinLeft = CenterPos;

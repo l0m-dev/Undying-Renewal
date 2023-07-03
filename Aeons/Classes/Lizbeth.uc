@@ -234,18 +234,18 @@ function PlayTaunt()
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	FrenzyTime = 0.0;
-	Health = Health + MinimumHealth - (0.2 * Health);
-	OriginalHealth = Health;
-	HealthDelta = 0.2*(OriginalHealth - MinimumHealth);
-	SetLimbTangible( 'cloth', false );
 	if (RGC())
 	{
 		FrenzyGroundSpeed = 600;
 		DamageRadius = 160;
 		MeleeRange = 200;
 	}
+	super.PreBeginPlay();
+	FrenzyTime = 0.0;
+	Health = Health + MinimumHealth - (0.2 * Health);
+	OriginalHealth = Health;
+	HealthDelta = 0.2*(OriginalHealth - MinimumHealth);
+	SetLimbTangible( 'cloth', false );
 }
 
 //
@@ -619,12 +619,11 @@ state LizbethBossFightFrenzy expands AIScriptedState
 	{
 		super.BeginState();
 		
-		if (RGC())
-			SpawnHowler();
-		
 		if( FrenzyTime <= 0.0 )
 		{
-			if (!RGC())
+			if (RGC())
+				SpawnHowler();
+			else
 				HatedClass=Class'Aeons.DecayedSaint';
 			AmbientSound = Sound'CreatureSFX.Lizbeth.C_Lizbeth_HasteLp1';
 

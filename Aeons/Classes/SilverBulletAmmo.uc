@@ -7,12 +7,12 @@ class SilverBulletAmmo expands BulletAmmo;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 	{
 		AmmoAmount = 12;
 		MaxAmmo = 96;
 	}
+	super.PreBeginPlay();
 }
 
 function PostBeginPlay()

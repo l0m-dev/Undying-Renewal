@@ -574,7 +574,7 @@ var			  const bool  bJustTeleported;   // Used by engine physics - not valid for
 // Physics properties.
 var(Movement) float       Mass;            // Mass of this actor.
 var savable   float       PhysAlpha;       // Interpolating position, 0.0-1.0.
-var savable   float       PhysRate;        // Interpolation rate per second.
+var savable   float       PhysRate;        // Interpolation rate per second. Used in renewal to scale turn animation speed.
 
 //-----------------------------------------------------------------------------
 // Networking.
@@ -1636,7 +1636,7 @@ function int GetHexDigit(string D)
 
 function RenewalConfig GetRenewalConfig()
 {
-	return Level.Game.RenewalConfig;
+	return Level.Game.GetRenewalConfig();
 }
 
 function bool RGC()
@@ -1692,4 +1692,5 @@ defaultproperties
      Mass=100
      NetPriority=1
      NetUpdateFrequency=100
+     PhysRate=1.0
 }

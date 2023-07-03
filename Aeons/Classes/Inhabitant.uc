@@ -147,10 +147,6 @@ function bool PlayLanding()
 //****************************************************************************
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	if ( SPMindshatter(RangedWeapon) != none )
-		SPMindshatter(RangedWeapon).ProjAmplitude = 3;
-	
 	if (RGC())
 	{
 		FollowDistance = 310;
@@ -159,6 +155,9 @@ function PreBeginPlay()
 		DamageRadius = 70;
 		MeleeRange = 70;
 	}
+	super.PreBeginPlay();
+	if ( SPMindshatter(RangedWeapon) != none )
+		SPMindshatter(RangedWeapon).ProjAmplitude = 3;
 }
 
 function bool DoEncounterAnim()

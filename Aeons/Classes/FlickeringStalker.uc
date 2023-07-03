@@ -144,12 +144,12 @@ function PlaySoundMeleeDamage( int Which )
 //****************************************************************************
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
-	OpacityEffector.FlickerRate = 0.05;
 	if (RGC())
 	{
 		HasteScalar = 6;
 	}
+	super.PreBeginPlay();
+	OpacityEffector.FlickerRate = 0.05;
 	SpeedFast();
 }
 

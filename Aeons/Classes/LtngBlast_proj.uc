@@ -19,12 +19,12 @@ var() sound ChainSound;
 
 function PreBeginPlay()
 {
-	super.PreBeginPlay();
 	if (RGC())
 	{
 		Range = 4096;
 		Speed = 6000;
 	}
+	super.PreBeginPlay();
 }
 
 auto state flying

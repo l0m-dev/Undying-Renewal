@@ -8,6 +8,7 @@ var config bool bGore;
 
 var config bool bAutoUseHealthVials;
 var config bool bNewHud;
+var config bool bAutoShowObjectives;
 var config bool bShowUsedMana;
 
 var config string LargeFont;

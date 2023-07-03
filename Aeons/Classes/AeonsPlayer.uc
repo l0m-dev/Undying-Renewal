@@ -7699,6 +7699,10 @@ function AddObjective( int ObjectiveNumber )
 	if ( FreeSlot >= 0 ) 
 	{
 		Objectives[FreeSlot] = ObjectiveNumber;
+		if ( AeonsHUD(myHud) != None && GetRenewalConfig().bAutoShowObjectives ) 
+		{
+			AeonsHUD(myHud).DisplayObjectives();
+		}
 	}
 }
 

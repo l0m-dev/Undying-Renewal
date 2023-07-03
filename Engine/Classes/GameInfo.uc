@@ -207,8 +207,6 @@ function PostBeginPlay()
 
 	// later make this a console command so we can turn it off or on ?
 	//InitShame();
-
-	RenewalConfig = Spawn(class'RenewalConfig');
 	
 	Super.PostBeginPlay();
 }
@@ -1014,10 +1012,15 @@ event PostLogin( playerpawn NewPlayer )
 				}						
 			}
 	}
+}
+
+function RenewalConfig GetRenewalConfig()
+{
 	// RenewalConfig is transient to keep backwards compatibility so spawn it if it's None
 	// don't spawn anything on Login, StartCutscene does that and it duplicates inventory when loading a save (not fixing this for speedrunning purposes)
 	if (RenewalConfig == None)
 		RenewalConfig = Spawn(class'RenewalConfig');
+	return RenewalConfig;
 }
 
 //

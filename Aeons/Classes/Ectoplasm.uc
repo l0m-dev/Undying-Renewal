@@ -44,15 +44,6 @@ replication
 
 function PreBeginPlay ()
 {
-	Super.PreBeginPlay();
-	
-	// Projectile setup
-	ProjectileClass = class'Ectoplasm_proj';
-	ProjectileSpeed = class'Ectoplasm_proj'.default.speed;
-
-	PawnOwner = Pawn(Owner);
-	PlayerPawnOwner = PlayerPawn(Owner);
-
 	if (RGC())
 	{
 		seekWeight[1] = 0.7;
@@ -61,6 +52,14 @@ function PreBeginPlay ()
 		seekWeight[4] = 1.0;
 		seekWeight[5] = 1.0;
 	}
+	Super.PreBeginPlay();
+	
+	// Projectile setup
+	ProjectileClass = class'Ectoplasm_proj';
+	ProjectileSpeed = class'Ectoplasm_proj'.default.speed;
+
+	PawnOwner = Pawn(Owner);
+	PlayerPawnOwner = PlayerPawn(Owner);
 }
 
 //----------------------------------------------------------------------------
