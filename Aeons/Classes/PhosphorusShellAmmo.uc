@@ -36,6 +36,10 @@ state Activated
 					wep.gotoState('NewClip');	// Load the New Clip
 					bActive = true;
 				}
+				else if ( wep.ClipCount == 1 )
+				{
+					wep.Reload();
+				}
 			} else {
 				Pawn(Owner).ClientMessage("Invalid ammo type for your currently selected weapon");
 				/*

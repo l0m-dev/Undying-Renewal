@@ -675,7 +675,7 @@ defaultproperties
 {
      RootWindow="Aeons.AeonsRootWindow"
      ConsoleClass=Class'UWindow.UWindowConsoleWindow'
-     ModClass=Class'UWindow.UWindowModWindow'
+     ModClass=Class'UWindow.UWindowConsoleWindow'
      MouseScale=0.6
      UWindowKey=IK_Escape
      ShellAnalogThreshold=0.5

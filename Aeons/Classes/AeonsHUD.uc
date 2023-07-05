@@ -288,10 +288,13 @@ var float UsedMana;
 var Actor RicochetArrows[3];
 var Rotator SavedView1;
 
-var vector IncreasedMouseBuffer[30];
 var string NoWheelSelectionText;
+var vector WheelDelta;
+const ExtendRadiusThresholdAmount = 24; // allows selection cursor to move beyond required threshold
 
 var float DisplayObjectivesTime;
+
+var(Wheel) int Item_InvGroup[8];
 
 // Message Struct
 Struct MessageStruct
@@ -476,9 +479,10 @@ simulated function DrawSubtitles(Canvas canvas)
 			Y = Canvas.OrgY + ((Canvas.ClipY - Canvas.OrgY) * 0.82);
 		
 		if (Y > Canvas.SizeY - SubtitleHeight)
-			Y = Canvas.SizeY - SubtitleHeight - 10;
+			Y = Canvas.SizeY - SubtitleHeight - 10*ScaleY;
 		Canvas.SetPos (Canvas.OrgX, Y);
 		Canvas.bCenter = true;
+		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 		Canvas.DrawText (Subtitle.Text[Subtitle.Number], true);
 		Canvas.bCenter = false;
 		Canvas.SetPos (Canvas.OrgX, Canvas.OrgY);
@@ -1342,11 +1346,7 @@ simulated function PostRender( canvas Canvas )
 					WeaponX = Canvas.ClipX - 144*ScaleY;
 			}
 			
-			if ( !AeonsPlayer(Owner).Weapon.IsA('Scythe') && !AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-			{
-				DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-80*Scale);
-			}
-
+			DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-80*Scale);
 			DrawConventionalWeapon(Canvas, WeaponX, Canvas.ClipY - 72*Scale );
 		}
 	
@@ -1386,7 +1386,7 @@ simulated function PostRender( canvas Canvas )
 			}
 		}
 		
-		if (AeonsPlayer(Owner).bDrawInvList)
+		if (AeonsPlayer(Owner).bDrawInvList && (!AeonsPlayer(Owner).bSelectObject || AeonsPlayer(Owner).SelectMode != SM_Item))
 			DrawHeldItems(Canvas);
 	
 		if (AeonsPlayer(Owner).bDrawDebugHUD && bShowTex)
@@ -1687,13 +1687,13 @@ simulated function DrawLevelInfo(Canvas Canvas)
 	Canvas.DrawColor.G = 200;
 	Canvas.DrawColor.B = 200;
 
-	Canvas.SetPos( 1 , (Canvas.ClipY - 36));
+	Canvas.SetPos( 1 , (Canvas.ClipY - 36*ScaleY));
 	if ( Level.bPSX2Level )
 		Canvas.DrawText("[PSX2] Title: "$Level.Title$"    "$Level.TimeSeconds, false);
 	else
 		Canvas.DrawText("Title: "$Level.Title$"    "$Level.TimeSeconds, false);
 	
-	Canvas.SetPos( 1 , (Canvas.ClipY - 24));
+	Canvas.SetPos( 1 , (Canvas.ClipY - 24*ScaleY));
 
 	Canvas.DrawText(""$LevelName$" Skill: "$Level.Game.Difficulty, false);
 
@@ -1710,7 +1710,7 @@ simulated function DrawBuildInfo(Canvas Canvas)
 	Canvas.DrawColor.G = 100;
 	Canvas.DrawColor.B = 100;
 	
-	Canvas.SetPos( 1 , (Canvas.ClipY - 12));
+	Canvas.SetPos( 1 , (Canvas.ClipY - 12*ScaleY));
 	Canvas.DrawText(""$VersionMessage, false);
 	
 	Canvas.DrawColor.R = 255;
@@ -2453,6 +2453,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 	local inventory Inv, tempInv;
 	local int cnt, i, nextGroup, PrevGroup, nextIdx, PrevIdx, SelectedGroup;
 	local string InvName;
+	local int InvCount;
 	
 	cnt = 0;
 	
@@ -2578,19 +2579,24 @@ simulated function DrawHeldItems(Canvas Canvas)
 			}
 			
 			if ( Inv == none )
+			{
 				InvName = ("");		// empty slot
 				// InvName = ("---  :  ------- : ---");		// empty slot
-			else {
-				if ( Inv.IsA('Ammo') )
+			}
+			else
+			{
+				if (Inv.IsA('Ammo'))
+					InvCount = Ammo(Inv).AmmoAmount;
+				else if (Pickup(Inv).numCopies > 0)
+					InvCount = Pickup(Inv).numCopies + 1;
+				else
+					InvCount = 0;
+
+				InvName = ""$Inv.ItemName;
+				if (InvCount > 0)
 				{
-					if (Ammo(Inv).AmmoAmount > 0)
-						InvName = (""$Inv.ItemName$" : "$(Ammo(Inv).AmmoAmount) );
-					else
-						InvName = (""); //$Inv.ItemName$" :  --- " );
-				} else if (Pickup(Inv).numCopies > 0) {
-					InvName = (""$Inv.ItemName$" : "$(Pickup(Inv).numCopies + 1) );
-				} else {
-					InvName = (""$Inv.ItemName);
+					InvName = InvName$": ";
+					InvName = InvName$InvCount;
 				}
 			}
 			Canvas.DrawText( (""$InvName), false);
@@ -3195,74 +3201,13 @@ simulated function DrawInventoryItem(Canvas Canvas, int X, int Y)
 }
 
 
-
-simulated function DrawConventionalWheel(Canvas Canvas)
-{
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound, i;
-	local int CenterX, CenterY;
-	local int X, Y;
-
-	CenterX = Canvas.sizeX * 0.5;
-	CenterY = Canvas.sizeY * 0.5;
-		
-	//Canvas.Style = ERenderStyle.STY_Normal;
-	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-
-	Canvas.DrawColor.r = 255;
-	Canvas.DrawColor.g = 255;
-	Canvas.DrawColor.b = 255;	
-
-	// 1 ///////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[0];
-	Y = CenterY + Scale * Con_Y[0];
-	DrawWheelIcon(Canvas, Con_InvGroup[0], 0, X, Y, 64, 64 );
-
-	// 2 //////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[1];
-	Y = CenterY + Scale * Con_Y[1];
-	DrawWheelIcon(Canvas, Con_InvGroup[1], 1, X, Y, 64, 64 );
-
-	// 3 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[2];
-	Y = CenterY + Scale * Con_Y[2];
-	DrawWheelIcon(Canvas, Con_InvGroup[2], 2, X, Y, 64, 64 );
-
-	// 4 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[3];
-	Y = CenterY + Scale * Con_Y[3];
-	DrawWheelIcon(Canvas, Con_InvGroup[3], 3, X, Y, 64, 64 );
-
-	// 5 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[4];
-	Y = CenterY + Scale * Con_Y[4];
-	DrawWheelIcon(Canvas, Con_InvGroup[4], 4, X, Y, 64, 64 );
-
-	// 6 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[5];
-	Y = CenterY + Scale * Con_Y[5];
-	DrawWheelIcon(Canvas, Con_InvGroup[5], 5, X, Y, 64, 64 );
-
-	// 7 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[6];
-	Y = CenterY + Scale * Con_Y[6];
-	DrawWheelIcon(Canvas, Con_InvGroup[6], 6, X, Y, 64, 64 );
-
-	// 8 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Con_X[7];
-	Y = CenterY + Scale * Con_Y[7];
-	DrawWheelIcon(Canvas, Con_InvGroup[7], 7, X, Y, 64, 64 ); 
-
-	Canvas.Style = ERenderStyle.STY_Normal;
-
-}
-
 //----------------------------------------------------------------------------
 
-simulated function DrawOffensiveWheel(Canvas Canvas)
+simulated function DrawWheel(Canvas Canvas, int InvGroup[8])
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound, i;
 	local int X, Y;
 	local int CenterX, CenterY;
+	local int i;
 
 	CenterX = Canvas.sizeX * 0.5;
 	CenterY = Canvas.sizeY * 0.5;
@@ -3274,111 +3219,14 @@ simulated function DrawOffensiveWheel(Canvas Canvas)
 	Canvas.DrawColor.g = 255;
 	Canvas.DrawColor.b = 255;	
 
-	// 1 ///////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[0];
-	Y = CenterY + Scale * Off_Y[0];
-	DrawWheelIcon(Canvas, Off_InvGroup[0], 0, X, Y, 64, 64 );
-
-	// 2 //////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[1];
-	Y = CenterY + Scale * Off_Y[1];
-	DrawWheelIcon(Canvas, Off_InvGroup[1], 1, X, Y, 64, 64 );
-
-	// 3 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[2];
-	Y = CenterY + Scale * Off_Y[2];
-	DrawWheelIcon(Canvas, Off_InvGroup[2], 2, X, Y, 64, 64 );
-
-	// 4 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[3];
-	Y = CenterY + Scale * Off_Y[3];
-	DrawWheelIcon(Canvas, Off_InvGroup[3], 3, X, Y, 64, 64 );
-
-	// 5 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[4];
-	Y = CenterY + Scale * Off_Y[4];
-	DrawWheelIcon(Canvas, Off_InvGroup[4], 4, X, Y, 64, 64 );
-
-	// 6 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[5];
-	Y = CenterY + Scale * Off_Y[5];
-	DrawWheelIcon(Canvas, Off_InvGroup[5], 5, X, Y, 64, 64 );
-
-	// 7 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[6];
-	Y = CenterY + Scale * Off_Y[6];
-	DrawWheelIcon(Canvas, Off_InvGroup[6], 6, X, Y, 64, 64 );
-
-	// 8 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Off_X[7];
-	Y = CenterY + Scale * Off_Y[7];
-	DrawWheelIcon(Canvas, Off_InvGroup[7], 7, X, Y, 64, 64 ); 
+	for ( i = 0; i < 8; i++ )
+	{
+		X = CenterX + Scale * Con_X[i];
+		Y = CenterY + Scale * Con_Y[i];
+		DrawWheelIcon(Canvas, InvGroup[i], i, X, Y, 64, 64 );
+	}
 
 	Canvas.Style = ERenderStyle.STY_Normal;
-
-}
-
-//----------------------------------------------------------------------------
-
-simulated function DrawDefensiveWheel(Canvas Canvas)
-{
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound, i;
-	local int X, Y;
-	local int CenterX, CenterY;
-
-	CenterX = Canvas.sizeX * 0.5;
-	CenterY = Canvas.sizeY * 0.5;
-
-	//Canvas.Style = ERenderStyle.STY_Normal;
-	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-
-	Canvas.DrawColor.r = 255;
-	Canvas.DrawColor.g = 255;
-	Canvas.DrawColor.b = 255;	
-
-	
-	// 1 ///////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[0];
-	Y = CenterY + Scale * Def_Y[0];
-	DrawWheelIcon(Canvas, Def_InvGroup[0], 0, X, Y, 64, 64 );
-
-	// 2 //////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[1];
-	Y = CenterY + Scale * Def_Y[1];
-	DrawWheelIcon(Canvas, Def_InvGroup[1], 1, X, Y, 64, 64 );
-
-	// 3 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[2];
-	Y = CenterY + Scale * Def_Y[2];
-	DrawWheelIcon(Canvas, Def_InvGroup[2], 2, X, Y, 64, 64 );
-
-	// 4 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[3];
-	Y = CenterY + Scale * Def_Y[3];
-	DrawWheelIcon(Canvas, Def_InvGroup[3], 3, X, Y, 64, 64 );
-
-	// 5 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[4];
-	Y = CenterY + Scale * Def_Y[4];
-	DrawWheelIcon(Canvas, Def_InvGroup[4], 4, X, Y, 64, 64 );
-
-	// 6 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[5];
-	Y = CenterY + Scale * Def_Y[5];
-	DrawWheelIcon(Canvas, Def_InvGroup[5], 5, X, Y, 64, 64 );
-
-	// 7 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[6];
-	Y = CenterY + Scale * Def_Y[6];
-	DrawWheelIcon(Canvas, Def_InvGroup[6], 6, X, Y, 64, 64 );
-
-	// 8 ////////////////////////////////////////////////////////////////////
-	X = CenterX + Scale * Def_X[7];
-	Y = CenterY + Scale * Def_Y[7];
-	DrawWheelIcon(Canvas, Def_InvGroup[7], 7, X, Y, 64, 64 ); 
-
-	Canvas.Style = ERenderStyle.STY_Normal;
-
 }
 
 
@@ -3720,13 +3568,6 @@ simulated function bool DisplayMessages( canvas Canvas )
 	if (Owner == none)
 		return false;
 
-/*
-	Console = PlayerPawn(Owner).Player.Console;
-
-	if (!Console.Viewport.Actor.bShowMenu)
-		DrawTypingPrompt(Canvas, Console);
-*/
-
 	Console = PlayerPawn(Owner).Player.Console;
 
 	Canvas.Font = Canvas.SmallFont;//Font'WhiteFont';
@@ -3741,6 +3582,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 		{
 			Canvas.Font = Canvas.MedFont;
 			Canvas.bCenter = true;
+			// STY_AlphaBlend or STY_Normal = outline, STY_Translucent = no outline
 			//fix if ( Level.bHighDetailMode )
 				Canvas.Style = ERenderStyle.STY_Translucent;
 			//else
@@ -3749,7 +3591,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 			Canvas.DrawColor.r = PickupColor;
 			Canvas.DrawColor.g = PickupColor;
 			Canvas.DrawColor.b = PickupColor;
-			Canvas.SetPos(4, Console.FrameY - (Console.FrameY * 0.2));
+			Canvas.SetPos(4*ScaleX, Console.FrameY - (Console.FrameY * 0.2));
 			Canvas.DrawText( Console.GetMsgText(Console.TopLine), true );
 			Canvas.bCenter = false;
 			Canvas.Style = 1;
@@ -3764,15 +3606,15 @@ simulated function bool DisplayMessages( canvas Canvas )
 			Canvas.DrawColor.g = 128;
 			Canvas.DrawColor.b = 255;
 			if ( MsgType == 'CriticalEvent' ) 
-				Canvas.SetPos(0, Console.FrameY/2 - 32);
+				Canvas.SetPos(0, Console.FrameY/2 - 32*ScaleY);
 			else if ( MsgType == 'LowCriticalEvent' ) 
-				Canvas.SetPos(0, Console.FrameY/2 + 32);
+				Canvas.SetPos(0, Console.FrameY/2 + 32*ScaleY);
 			else if ( MsgType == 'RedCriticalEvent' ) {
 				PickupColor = 42.0 * FMin(6, Console.GetMsgTick(Console.TopLine));
 				Canvas.DrawColor.r = PickupColor;
 				Canvas.DrawColor.g = 0;
 				Canvas.DrawColor.b = 0;	
-				Canvas.SetPos(4, Console.FrameY - 44);
+				Canvas.SetPos(4, Console.FrameY - 44*ScaleY);
 			}
 
 			Canvas.DrawText( Console.GetMsgText(Console.TopLine), true );
@@ -3817,7 +3659,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 			if (MessageString[3 - I] != "")
 			{
 				YPos = 2 + (10 * J) + (10 * ExtraSpace); 
-				if ( !DrawMessageHeader(Canvas, ShortMessages[3 - I], YPos) )
+				if ( !DrawMessageHeader(Canvas, ShortMessages[3 - I], YPos*ScaleY) )
 				{
 					if (ShortMessages[3 - I].Type == 'DeathMessage')
 						Canvas.DrawColor = RedColor;
@@ -3827,7 +3669,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 						Canvas.DrawColor.g = 200;
 						Canvas.DrawColor.b = 200;	
 					}
-					Canvas.SetPos(4, YPos);
+					Canvas.SetPos(4*ScaleX, YPos*ScaleY);
 				}
 				if ( !SpecialType(ShortMessages[3 - I].Type) ) {
 					Canvas.DrawText(MessageString[3-I], false );
@@ -3861,7 +3703,7 @@ simulated function float DrawNextMessagePart( Canvas Canvas, coerce string MStri
 {
 	local float XL, YL;
 
-	Canvas.SetPos(4 + XOffset, YPos);
+	Canvas.SetPos(4*ScaleX + XOffset, YPos);
 	Canvas.StrLen( MString, XL, YL );
 	XOffset += XL;
 	Canvas.DrawText( MString, false );
@@ -3876,9 +3718,9 @@ simulated function bool DrawMessageHeader(Canvas Canvas, MessageStruct ShortMess
 		return false;
 
 	Canvas.DrawColor = WhiteColor;
-	XOffset += ArmorOffset;
+	XOffset += ArmorOffset*ScaleX;
 	XOffset = DrawNextMessagePart(Canvas, ShortMessage.PRI.PlayerName$": ", XOffset, YPos);	
-	Canvas.SetPos(4 + XOffset, YPos);
+	Canvas.SetPos(4*ScaleX + XOffset*ScaleX, YPos);
 	return true;
 }
 
@@ -4447,6 +4289,7 @@ simulated function InitSelectMode()
 	*/
 	
 	BufferSlot = 0;
+	WheelDelta = vect(0,0,0);
  
 	aX = 0;
 	aY = 0;
@@ -4759,6 +4602,29 @@ simulated function DrawShalasOverlay(Canvas Canvas)
 
 }
 
+simulated function WheelMouseInput(float DeltaTime)
+{
+	local float ExtendedRadius;
+	local float Delta;
+
+	if (aX != 0)
+		WheelDelta.X += aX * DeltaTime;
+	if (aY != 0)
+		WheelDelta.Y += aY * DeltaTime;
+
+	if (aX != 0 || aY != 0)
+	{
+		Delta = Sqrt(WheelDelta.X*WheelDelta.X + WheelDelta.Y*WheelDelta.Y);
+		ExtendedRadius = RadiusThreshold + ExtendRadiusThresholdAmount;
+
+		if (Delta > ExtendedRadius)
+			WheelDelta.X = WheelDelta.X / Delta * ExtendedRadius;
+		
+		if (Delta > ExtendedRadius)
+			WheelDelta.Y = WheelDelta.Y / Delta * ExtendedRadius;
+	}
+}
+
 simulated function DrawSelectHUD(Canvas Canvas)
 {
     local AeonsPlayer PPawn;
@@ -4776,11 +4642,10 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	if ( !PPawn.bSelectObject )
 		return;
 
-	Delta = Sqrt(aX * aX + aY * aY);
-
 	// If on PSX2, must handle things a little differently
 	if (GetPlatform() == PLATFORM_PSX2)
 	{
+		Delta = Sqrt(aX * aX + aY * aY);
 		if ( Delta > RadiusThresholdPSX2 * PPawn.MouseSensitivity )
 		{
 			if ( Abs(aX) < 0.01 )
@@ -4810,34 +4675,11 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	}
 	else
 	{
-		//	some sort of threshold is necessary so minute movement doesn't corrupt data
-		if ( Delta > RadiusThreshold * PPawn.MouseSensitivity )
-		{
-			IncreasedMouseBuffer[BufferSlot].X = aX; //UnitX;
-			IncreasedMouseBuffer[BufferSlot].Y = aY; //UnitY;
-			IncreasedMouseBuffer[BufferSlot].Z = 0;
-			BufferSlot++;
-		}
-		else
-		{
-			// stopped moving mouse, reset
-				BufferSlot = 0;
-		}
-		if ( BufferSlot >= ArrayCount(IncreasedMouseBuffer) )
-		{
-			AveragedMouseMove.X = 0;
-			AveragedMouseMove.Y = 0;
-			AveragedMouseMove.Z = 0;
-			
-			for ( i=0; i<ArrayCount(IncreasedMouseBuffer) ; i++ )
-			{
-				AveragedMouseMove += IncreasedMouseBuffer[i];
-			}
+		Delta = Sqrt(WheelDelta.X*WheelDelta.X + WheelDelta.Y*WheelDelta.Y);
 
-			BufferSlot = 0;
-
-			Delta = Sqrt(AveragedMouseMove.X*AveragedMouseMove.X + AveragedMouseMove.Y*AveragedMouseMove.Y);
-			AveragedMouseMove /= Delta;	
+		if ( Delta >= RadiusThreshold )
+		{
+			AveragedMouseMove = WheelDelta / Delta;	
 			
 			if ( Abs(AveragedMouseMove.X) < 0.01 ) 
 				AveragedMouseMove.X = 0.01;
@@ -4856,7 +4698,6 @@ simulated function DrawSelectHUD(Canvas Canvas)
 			else
 				SelectedSector = (Theta + 23) / 45;
 
-
 			if ( SelectedSector != LastSector ) 
 			{
 				LastSector = SelectedSector;
@@ -4864,36 +4705,114 @@ simulated function DrawSelectHUD(Canvas Canvas)
 				PlayerPawn(Owner).PlaySound( sound'Aeons.HUD_Mvmt01',SLOT_Misc,0.25 );
 			}
 		}
+		else if (Delta < RadiusThreshold / 2)
+		{
+			SelectedSector = -1;
+			LastSector = SelectedSector;
+		}
+		
+		Canvas.SetPos( Canvas.ClipX/2 - 64*Scale/2.0 + WheelDelta.X*Scale, Canvas.ClipY/2 - 64*Scale/2.0 - WheelDelta.Y*Scale );
+	
+		Canvas.bNoSmooth = false;
+
+		Canvas.DrawColor.r = 0;
+		Canvas.DrawColor.g = 255;
+		Canvas.DrawColor.b = 255;
+		Canvas.Style = 3;
+
+		Canvas.DrawTileClipped(FireTexture'FX.Swirl', 64*Scale, 64*Scale, 0, 0, 64, 64);
 	}
-				
-    if ( PPawn.SelectMode == SM_Weapon )
-    {
-		DrawConventionalWheel(Canvas);
 
-		Canvas.DrawColor.r = 255;
-		Canvas.DrawColor.g = 64; 
-		Canvas.DrawColor.b = 64; 
-    }
+	if ( PPawn.SelectMode == SM_Weapon )
+		DrawWheel(Canvas, Con_InvGroup);
     else if ( PPawn.SelectMode == SM_AttSpell )
-    {
-		DrawOffensiveWheel(Canvas);
-
-		Canvas.DrawColor.r = 64;
-		Canvas.DrawColor.g = 255; 
-		Canvas.DrawColor.b = 64; 
-    }
+		DrawWheel(Canvas, Off_InvGroup);
     else if ( PPawn.SelectMode == SM_DefSpell )
-    {
-
-		DrawDefensiveWheel(Canvas);
-
-		Canvas.DrawColor.r = 64;
-		Canvas.DrawColor.g = 64;
-		Canvas.DrawColor.b = 255; 
- 	}
-
+		DrawWheel(Canvas, Def_InvGroup);
+	else if ( PPawn.SelectMode == SM_Item )
+	{
+		DrawAllItems(Canvas);
+		DrawWheel(Canvas, Item_InvGroup);
+	}
 	Canvas.Style = ERenderStyle.STY_Normal;
 
+}
+
+function DrawAllItems(Canvas Canvas)
+{
+	local Inventory Inv;
+	local string InvName;
+	local int InvCount;
+	local int i, j;
+	local bool bQuickSelectItem;
+	local float TextWidth, TextHeight;
+	local int Spacing;
+	local float IconSize;
+	local float XOffset, YOffset, CurrentY;
+
+	XOffset = 4;
+	YOffset = 25;
+
+	Canvas.Font = Canvas.SmallFont;
+	Canvas.TextSize( "TEST", TextWidth, TextHeight );
+	Spacing = TextHeight + 8;
+	IconSize = TextHeight + 2;
+
+	for ( Inv=Owner.Inventory; Inv!=None; Inv=Inv.Inventory )
+	{
+		if (Inv.ItemType != ITEM_Inventory || !Inv.bDisplayableInv)
+			continue;
+
+		// don't show items from items wheel
+		bQuickSelectItem = false;
+		for (j = 0; j < ArrayCount(Item_InvGroup); j++)
+		{
+			if (Item_InvGroup[j] == Inv.InventoryGroup)
+			{
+				bQuickSelectItem = true;
+				break;
+			}
+		}
+
+		if (bQuickSelectItem)
+			continue;
+		
+		i++;
+		
+		CurrentY = YOffset*ScaleY + (i * Spacing) + Spacing / 2.0; // centered spacing
+		Canvas.Style = ERenderStyle.STY_AlphaBlend;
+		Canvas.DrawColor = WhiteColor;
+		Canvas.DrawColor.a = 255;
+		Canvas.bNoSmooth = false;
+		Canvas.SetPos( XOffset*ScaleX, CurrentY - IconSize / 2.0 );
+		Canvas.DrawIcon(Inv.Icon, IconSize / 64.0);
+		
+		// draw text
+		Canvas.SetPos( XOffset*ScaleX + Spacing, CurrentY - TextHeight / 2.0 );
+		
+		if ( Inv == none )
+		{
+			InvName = "";
+		}
+		else
+		{
+			if (Inv.IsA('Ammo'))
+				InvCount = Ammo(Inv).AmmoAmount;
+			else if (Pickup(Inv).numCopies > 0)
+				InvCount = Pickup(Inv).numCopies + 1;
+			else
+				InvCount = 0;
+
+			InvName = ""$Inv.ItemName;
+			if (InvCount > 0)
+			{
+				InvName = InvName$": ";
+				InvName = InvName$InvCount;
+			}
+		}
+		
+		Canvas.DrawText( (""$InvName), false);
+	}
 }
 
 function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int Y, int W, int H )
@@ -4905,8 +4824,8 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	local texture BackLayer;
 	local Inventory WheelSelection;
 	local float TextWidth, TextHeight;
-
-	//Y -= 32*Scale;
+	local string InvName;
+	local int InvCount;
 	
 	iState = 0;
 
@@ -4926,6 +4845,13 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 		else if ( InventoryGroup < 20 ) 
 		{
 			if ((AeonsPlayer(Owner).FavAttSpell1 == InventoryGroup ) || (AeonsPlayer(Owner).FavAttSpell2 == InventoryGroup))
+			{
+				iState = 2;
+			}
+		}
+		else if ( InventoryGroup >= 100 ) 
+		{
+			if ((AeonsPlayer(Owner).FavItem1 == InventoryGroup ) || (AeonsPlayer(Owner).FavItem2 == InventoryGroup))
 			{
 				iState = 2;
 			}
@@ -5059,20 +4985,39 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	Canvas.SetPos( X-64*Scale/2.0, Y-64*Scale/2.0 );
 	if (WheelSelection != none) //&&(!Weapon(WheelSelection).bSpecialIcon))
 	{
-		if (	(WheelSelection.ItemName != "Scythe") && 
-				(WheelSelection.ItemName != "Gel'ziabar Stone") &&
-				(InventoryGroup < 10) && 
-				(!WheelSelection.bHaveTokens) )
+		if ( InventoryGroup < 10 && !WheelSelection.bHaveTokens )
 			Canvas.DrawColor.a = 64;
 
-		//if (InventoryGroup == 16)
-		//else
+		if (InventoryGroup >= 100)
+			Canvas.DrawIcon(WheelSelection.Icon, Scale);
+		else
 			Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
 	}
 	else 
 	{
 		Canvas.DrawColor.a = 64;
 		Canvas.DrawIcon(Icons[0], Scale);
+	}
+
+	if (WheelSelection != none && InventoryGroup >= 100)
+	{
+		if (WheelSelection.IsA('Ammo'))
+			InvCount = Ammo(WheelSelection).AmmoAmount;
+		else if (Pickup(WheelSelection).numCopies >= 0)
+			InvCount = Pickup(WheelSelection).numCopies + 1;
+		
+		//InvName = ""$WheelSelection.ItemName;
+		if (InvCount > 1)
+		{
+			//InvName = InvName$": ";
+			InvName = InvName$InvCount;
+		}
+
+		Canvas.Font = Canvas.MedFont;
+		Canvas.DrawColor = WhiteColor;
+		Canvas.TextSize( InvName, TextWidth, TextHeight );
+		Canvas.SetPos( X - TextWidth/2, Y - TextHeight/2 + 38 * Scale);
+		Canvas.DrawText( InvName );
 	}
 	
 	Canvas.bNoSmooth = true;
@@ -5089,7 +5034,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 
 defaultproperties
 {
-     RadiusThreshold=500
+     RadiusThreshold=164
      RadiusThresholdPSX2=500
      Con_X(1)=133
      Con_X(2)=188
@@ -5151,6 +5096,14 @@ defaultproperties
      Off_InvGroup(5)=16
      Off_InvGroup(6)=17
      Off_InvGroup(7)=18
+	 Item_InvGroup(0)=110//ammo
+     Item_InvGroup(1)=111//silver
+     Item_InvGroup(2)=101//health
+     Item_InvGroup(3)=109//ether
+     Item_InvGroup(4)=112//shells
+     Item_InvGroup(5)=113//phosphorus
+     Item_InvGroup(6)=116//dynamite
+     Item_InvGroup(7)=103//amplifier
      bShowCrosshairEnemyColor=True
      MAX_CROSSHAIRS=24
      CrossHairs(0)=Texture'Aeons.Icons.CrossHair0'

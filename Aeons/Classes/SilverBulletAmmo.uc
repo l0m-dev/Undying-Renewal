@@ -41,6 +41,10 @@ state Activated
 					wep.AmmoType = Ammo(Pawn(Owner).FindInventoryType(wep.AltAmmoName));
 					wep.gotoState('NewClip');	// Load the New Clip
 				}
+				else
+				{
+					wep.Reload();
+				}
 			} else {
 				Pawn(Owner).ClientMessage("Invalid ammo type for your currently selected weapon");
 				/*

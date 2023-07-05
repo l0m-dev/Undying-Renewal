@@ -1,4 +1,5 @@
-class DefensiveSpells extends Mutator;
+class DefensiveSpells extends Mutator
+	transient;
 
 function ModifyLogin(out class<playerpawn> SpawnClass, out string Portal, out string Options)
 {

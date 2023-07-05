@@ -4017,9 +4017,17 @@ ignores SeePlayer, HearNoise, Bump, TakeDamage;
 	function BeginState()
 	{
 		EyeHeight = BaseEyeHeight;
+		AirSpeed = 9999.0;
 		SetPhysics(PHYS_Flying);
 		if  ( !IsAnimating() ) PlaySwimming();
 		// log("cheat flying");
+	}
+
+	function EndState()
+	{
+		SetCollision(true, true, true);
+		bCollideWorld = true;
+		AirSpeed = default.AirSpeed;
 	}
 }
 
@@ -4745,7 +4753,12 @@ state SpecialKill
 	exec function SelectWeapon( optional float F );
 	exec function SelectAttSpell( optional float F );
 	exec function SelectDefSpell( optional float F );
-	exec function Fire( optional float F ){}
+
+	exec function Fire( optional float F )
+	{
+		if( bCanExitSpecialState )
+			EndSpecialKill();
+	}
 
 	function EndSpecialKill()
 	{
@@ -5082,9 +5095,9 @@ state SpecialKill
 	Begin:
 		Velocity = vect(0,0,0);
 		LoopAnim('Near_Death');
-		Sleep( 5.0 );
+		Sleep( 2.0 );
 		bCanExitSpecialState = true;
-		Sleep( 25.0 );
+		Sleep( 28.0 );
 		goto 'SpecialKillComplete';
 
 } // Special Kill State

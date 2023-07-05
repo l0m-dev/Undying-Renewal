@@ -319,6 +319,9 @@ function bool ProcessCastingLevel()
 		else 
 			SkullFireCount = 1;
 
+		if (RGC())
+			skullSpawnRate = 1.0 / (localCastingLevel / 4.0 + 1);
+
 		return true;
 	} else {
 		return false;

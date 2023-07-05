@@ -1367,6 +1367,7 @@ function bool AddInventory( inventory NewItem )
 	// Skip if already in the inventory.
 	local inventory Inv;
 	local inventory InvFound;
+	local inventory InvFoundExactParent, InvFoundExact;
 	
 	// The item should not have been destroyed if we get here.
 	if (NewItem ==None )
@@ -1379,9 +1380,8 @@ function bool AddInventory( inventory NewItem )
 	// Add to front of inventory chain.
 	NewItem.SetOwner(Self);
 
-
-
 	InvFound = None;
+	InvFoundExactParent = None;
 
 	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )
 	{		
@@ -1389,6 +1389,29 @@ function bool AddInventory( inventory NewItem )
 		{
 			InvFound = Inv;								
 		}
+		if (Inv.Inventory != None && Inv.Inventory.InventoryGroup == NewItem.InventoryGroup)
+		{
+			InvFoundExactParent = Inv;
+			InvFoundExact = Inv.Inventory;
+			break;
+		}
+	}
+
+	// fixes multiple inventory slots
+	if (InvFoundExact != None && InvFoundExact.InventoryGroup > 0)
+	{
+		// add current ammo and copies to new pickup
+		if (NewItem.IsA('Ammo'))
+			Ammo(NewItem).AddAmmo(Ammo(InvFoundExact).AmmoAmount);
+		else if (Pickup(NewItem).bCanHaveMultipleCopies)
+			Pickup(NewItem).numCopies += Pickup(InvFoundExact).numCopies + 1;
+		
+		// replace references and remove current copy
+		InvFoundExactParent.Inventory = NewItem;
+		NewItem.Inventory = InvFoundExact.Inventory;
+		InvFoundExact.Destroy();
+
+		return true;
 	}
 		
 	if ( InvFound != None )

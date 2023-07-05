@@ -227,7 +227,7 @@ function bool StrafeFromDamage(vector momentum, float Damage,name DamageType, bo
 function PlayHit(float Damage, vector HitLocation, name damageType, vector Momentum)
 {
 	local float rnd;
-	local Bubble1 bub;
+	//local Bubble1 bub;
 	local bool bOptionalTakeHit;
 	local vector BloodOffset;
 
@@ -235,16 +235,18 @@ function PlayHit(float Damage, vector HitLocation, name damageType, vector Momen
 	{
 		if (damageType == 'Drowned')
 		{
+			/*
 			bub = spawn(class 'Bubble1',,, Location 
 				+ 0.7 * CollisionRadius * vector(ViewRotation) + 0.3 * EyeHeight * vect(0,0,1));
 			if (bub != None)
 				bub.DrawScale = FRand()*0.06+0.04; 
+			*/
 		}
 		else if ( damageType != 'Corroded' )
 		{
 			BloodOffset = 0.2 * CollisionRadius * Normal(HitLocation - Location);
 			BloodOffset.Z = BloodOffset.Z * 0.5;
-			spawn(class 'BloodSpray',,,hitLocation + BloodOffset, rotator(BloodOffset));
+			//spawn(class 'BloodSpray',,,hitLocation + BloodOffset, rotator(BloodOffset));
 		}
 	}	
 	
@@ -275,11 +277,12 @@ function PlayHitAnim(vector HitLocation, float Damage)
 
 function PlayDeathHit(float Damage, vector HitLocation, name damageType, vector Momentum)
 {
-	local Bubble1 bub;
-	local BloodBurst b;
+	//local Bubble1 bub;
+	//local BloodBurst b;
 
 	if ( Region.Zone.bDestructive && (Region.Zone.ExitActor != None) )
 		Spawn(Region.Zone.ExitActor);
+	/*
 	if (HeadRegion.Zone.bWaterZone)
 	{
 		bub = spawn(class 'Bubble1',,, Location 
@@ -295,12 +298,13 @@ function PlayDeathHit(float Damage, vector HitLocation, name damageType, vector 
 		if (bub != None)
 			bub.DrawScale = FRand()*0.08+0.03; 
 	}
+	*/
 	if ( (damageType != 'Burned') && (damageType != 'Corroded') 
 		 && (damageType != 'Drowned') && (damageType != 'Fell') )
 	{
-		b = spawn(class 'BloodBurst',self,'', hitLocation);
-		if ( bGreenBlood && (b != None) ) 
-			b.GreenBlood();		
+		//b = spawn(class 'BloodBurst',self,'', hitLocation);
+		//if ( bGreenBlood && (b != None) ) 
+		//	b.GreenBlood();		
 	}
 }
 

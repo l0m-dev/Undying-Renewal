@@ -140,7 +140,7 @@ function Dynamite_proj DynamiteFire(class<projectile> ProjClass, float ProjSpeed
 
 	GetAxes(Dir,X,Y,Z);
 
-	Start = Owner.Location + (Vector(Dir) * (Owner.CollisionRadius + 4)) + Owner.Velocity / 10;
+	Start = Owner.Location + (Vector(Dir) * (Owner.CollisionRadius + 4));
 	// log("-=-=-=- Dynamite Fire Location is in zone "$Level.GetZone(Start), 'Misc');
 	
 	Proj = Spawn(class'Dynamite_proj', Pawn(Owner),, Start, Dir);

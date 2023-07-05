@@ -39,6 +39,11 @@ function PreBeginPlay()
 	ManaCost = 10;
 
 	Velocity = Vector(Rotation) * speedPerLevel[castingLevel];
+
+	if (RGC())
+	{
+		LifeSpan = 2.0;
+	}
 	super.PreBeginPlay();
 }
 

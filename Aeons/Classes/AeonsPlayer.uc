@@ -28,7 +28,7 @@ class AeonsPlayer expands PlayerPawn
 //#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
 
 // Misc
-#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
+//#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
 
 // Take Hits
 //#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
@@ -341,7 +341,8 @@ var enum ESelectMode
     SM_None,
     SM_Weapon,
     SM_AttSpell,
-    SM_DefSpell
+    SM_DefSpell,
+	SM_Item
 } SelectMode;
 
 var	travel	  float SelectTimer; // max double click interval for select object
@@ -414,6 +415,11 @@ var localized string	ObjectivesText[100];
 var travel bool bShowScryeHint;
 var travel bool bDrawRico;
 
+var input byte bSelectItem;
+var travel int    FavItem1;  //favorite item #1
+var travel int    FavItem2;
+var travel bool   FavItemToggle; //decides next favorite to be overwritten
+
 replication
 {
 	// Variables the server should send to the client.
@@ -421,6 +427,7 @@ replication
 		ManaWellsFound, ManaWhorlsFound, crossHairScale,
         FavAttSpell1, FavAttSpell2, FavAttSpellToggle,
         FavDefSpell1, FavDefSpell2, FavDefSpellToggle, ScryeMod, 
+		FavItem1, FavItem2, FavItemToggle,
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
@@ -1164,6 +1171,20 @@ exec function SelectDefSpell( optional float F )
 		SelectTimer = SelectTime;
 }
 
+exec function SelectItem( optional float F )
+{
+	if( !bAllowSelectionHUD || bTryingSelect || bSelectObject || !bAllowSpellSelectionHUD || bShowMenu  || (Level.Pauser!="") )
+		return;
+
+   	bTryingSelect = true;
+    SelectMode = SM_Item;
+
+	if ( GetPlatform() == PLATFORM_PSX2 )
+		SelectTimer = SelectTimePSX2;
+	else
+		SelectTimer = SelectTime;
+}
+
 exec function ScrollWeapon( optional float F )
 {
 	if ( bTryingScroll || bScrollObject || bShowMenu || (Level.Pauser!="") )
@@ -1243,6 +1264,12 @@ exec function SwitchWeapon( byte F )
 	    SwitchDefSpell(F);
         return;
     }
+	else
+	if ( (bSelectItem == 1 || (F >= 100)) )
+	{
+		SelectedItem = Inventory.FindItemInGroup(F);
+		return;
+	}
     else
     {
 		// conventional weapon
@@ -2184,6 +2211,13 @@ function bool CheckSelect( float DeltaTime )
 //				Log("CheckSelect: NextDefSpell(), Timer had "$SelectTimer$" left");
 				return false; //don't force calling fn to return
 			}
+			else if ( SelectMode == SM_Item && bSelectItem == 0 )
+			{
+				bTryingSelect = false;
+				NextItem();
+//				Log("CheckSelect: NextItem(), Timer had "$SelectTimer$" left");
+				return false; //don't force calling fn to return
+			}
 		}
 		else
 		{
@@ -2288,6 +2322,36 @@ function bool CheckSelect( float DeltaTime )
 				if ( DefSpell.InventoryGroup == FavDefSpell2 && FavDefSpell1 != 0 )
 				{
 					SwitchWeapon(FavDefSpell1);
+				}
+			}
+			else
+			if ( SelectMode == SM_Item && bSelectItem == 0 )
+			{
+				bTryingSelect = false;
+				if ( SelectedItem == None ||
+					(SelectedItem.InventoryGroup != FavItem1 &&
+					SelectedItem.InventoryGroup != FavItem2) )
+				{
+					if ( FavItem1 != 0 )
+					{
+						SelectedItem = Inventory.FindItemInGroup(FavItem1);
+					}
+					else
+					if ( FavItem2 != 0 )
+					{
+						SelectedItem = Inventory.FindItemInGroup(FavItem2);
+					}
+					return false; //don't force calling fn to return
+				}
+                
+				if ( SelectedItem.InventoryGroup == FavItem1 && FavItem2 != 0 )
+				{
+					SelectedItem = Inventory.FindItemInGroup(FavItem2);
+				}
+				else
+				if ( SelectedItem.InventoryGroup == FavItem2 && FavItem1 != 0 )
+				{
+					SelectedItem = Inventory.FindItemInGroup(FavItem1);
 				}
 			}
 		}
@@ -2981,7 +3045,7 @@ ignores SeePlayer, HearNoise, Bump;
 // Player is being shown a cutscene.
 simulated state PlayerCutScene
 {
-	ignores WeaponAction, ActivateItem, DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, FireAttSpell, FireDefSpell, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook; // SaveGameToMemoryCard, SaveGame, ;
+	ignores WeaponAction, ActivateItem, DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, FireAttSpell, FireDefSpell, SelectWeapon, SelectAttSpell, SelectDefSpell, SelectItem, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook; // SaveGameToMemoryCard, SaveGame, ;
 	
 	function UnLock()
 	{
@@ -3007,6 +3071,7 @@ simulated state PlayerCutScene
 		bSelectWeapon = 0;
 		bSelectAttSpell = 0;
 		bSelectDefSpell = 0;
+		bSelectItem = 0;
 	
 		if ( Player != None && Player.Console != None )
 			WindowConsole(Player.Console).bShellPauses = true;
@@ -3101,6 +3166,11 @@ simulated state PlayerCutScene
 		PlayAnim('Idle');
 	End:
 		//ClientMessage("End Cutscene State");
+}
+
+state SpecialKill
+{
+	ignores SelectItem;
 }
 
 //================================================================================
@@ -3231,15 +3301,17 @@ ignores SeePlayer, HearNoise, Bump;
     {
     }
 
+	/*
 	exec function Jump( optional float F )
 	{
 		//Log("JUmp while in wheel");
 	}
-	
+	*/
+
 	exec function Fire(optional float F)
 	{
 		bFire = 0;
-		SetObject();
+		SetObject(true);
 	}
 
     exec function FireAttSpell( optional float F )
@@ -3271,9 +3343,10 @@ ignores SeePlayer, HearNoise, Bump;
         SwitchWeapon(F);
     }
 
-    function SetObject()
+    function SetObject(optional bool bClicked)
     {
         local byte  slot;
+		local Inventory Inv;
 
 		//Log("SetObject - AeonsHud(myHud) = " $ AeonsHud(myHud) );
         //read mouse coords and determine slot
@@ -3284,28 +3357,35 @@ ignores SeePlayer, HearNoise, Bump;
 				slot = AeonsHUD(myHud).SelectedSector;
 			else 
 				return;
-        
 
             //conventional weapons are inventory groups 1 to 10
 	        //Attack spells are inventory groups 11 to 20
 	        //Defense spells are inventory groups 21 to 30
+	        //Items are inventory groups >= 100
 	        if ( SelectMode == SM_AttSpell )
 	            //slot += 10;
 				slot = AeonsHud(MyHud).Off_InvGroup[slot];
 	        else if ( SelectMode == SM_DefSpell )
 	            //slot += 20;
 				slot = AeonsHud(MyHud).Def_InvGroup[slot];
-			else
+			else if ( SelectMode == SM_Weapon )
 				slot = AeonsHud(MyHud).Con_InvGroup[slot];
-	
-	        if ( slot > 0 )
+			else if ( SelectMode == SM_Item )
+				slot = AeonsHud(MyHud).Item_InvGroup[slot];
+
+			if ( slot >= 100 && bClicked )
+			{
+				// use item directly instead of switching to it
+				Inv = Inventory.FindItemInGroup(slot);
+				if ( Inv != none )
+					Inv.Activate();
+			}
+	        else
 			{
 				SelectInputNumber(slot);
 
 				PlaySound(sound'Aeons.HUD_Select01',SLOT_Misc,0.5);
 			}
-			else
-				PlaySound(sound'Aeons.HUD_Select01',SLOT_Misc,0.1);
         
         }
     }
@@ -3313,6 +3393,7 @@ ignores SeePlayer, HearNoise, Bump;
     exec function SetFavorite()
     {
         local int Favorite;
+		local int InvGroup;
 	
         //read mouse coords and determine valid selection object else return
         // Favorite = ???
@@ -3322,48 +3403,78 @@ ignores SeePlayer, HearNoise, Bump;
 	
 			if ( SelectMode == SM_Weapon )
 	        {
-
-				if ( AeonsHUD(myHud).Con_InvGroup[Favorite] <= 0 )
+				if (Favorite != -1)
 				{
-					PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
-					return;
+					InvGroup = AeonsHUD(myHud).Con_InvGroup[Favorite];
+					if ( InvGroup <= 0 )
+					{
+						PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
+						return;
+					}
 				}
-
+				
 	            if ( FavWeaponToggle )
-	                FavWeapon2 = AeonsHUD(myHud).Con_InvGroup[Favorite];
+	                FavWeapon2 = InvGroup;
 	            else
-	                FavWeapon1 = AeonsHUD(myHud).Con_InvGroup[Favorite];
+	                FavWeapon1 = InvGroup;
 	            FavWeaponToggle = !FavWeaponToggle;
 	        }
 	        else
 	        if ( SelectMode == SM_AttSpell )
 	        {
-	        	if ( AeonsHUD(myHud).Off_InvGroup[Favorite] <= 0 )
+	        	if (Favorite != -1)
 				{
-					PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
-					return;
+					InvGroup = AeonsHUD(myHud).Off_InvGroup[Favorite];
+					if ( InvGroup <= 0 )
+					{
+						PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
+						return;
+					}
 				}
 
 	            if ( FavAttSpellToggle )
-	                FavAttSpell2 = AeonsHUD(myHud).Off_InvGroup[Favorite];
+	                FavAttSpell2 = InvGroup;
 	            else
-	                FavAttSpell1 = AeonsHUD(myHud).Off_InvGroup[Favorite];
+	                FavAttSpell1 = InvGroup;
 	            FavAttSpellToggle = !FavAttSpellToggle;
 	        }
 	        else
 	        if ( SelectMode == SM_DefSpell )
 	        {
-				if ( AeonsHUD(myHud).Def_InvGroup[Favorite] <= 0 )
+				if (Favorite != -1)
 				{
-					PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
-					return;
+					InvGroup = AeonsHUD(myHud).Def_InvGroup[Favorite];
+					if ( InvGroup <= 0 )
+					{
+						PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
+						return;
+					}
 				}
 
 	            if ( FavDefSpellToggle )
-	                FavDefSpell2 = AeonsHUD(myHud).Def_InvGroup[Favorite];
+	                FavDefSpell2 = InvGroup;
 	            else
-	                FavDefSpell1 = AeonsHUD(myHud).Def_InvGroup[Favorite];
+	                FavDefSpell1 = InvGroup;
 	            FavDefSpellToggle = !FavDefSpellToggle;
+	        }
+			else
+	        if ( SelectMode == SM_Item )
+	        {
+				if (Favorite != -1)
+				{
+					InvGroup = AeonsHUD(myHud).Item_InvGroup[Favorite];
+					if ( InvGroup <= 0 )
+					{
+						PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.1);
+						return;
+					}
+				}
+
+	            if ( FavItemToggle )
+	                FavItem2 = InvGroup;
+	            else
+					FavItem1 = InvGroup;
+	            FavItemToggle = !FavItemToggle;
 	        }
 
 			PlaySound( sound'Aeons.HUD_Favorite01',SLOT_Misc,0.25);
@@ -3377,7 +3488,8 @@ ignores SeePlayer, HearNoise, Bump;
 
 		if ( SelectMode == SM_Weapon && bSelectWeapon != 1 ||
 			 SelectMode == SM_AttSpell && bSelectAttSpell != 1 ||
-			 SelectMode == SM_DefSpell && bSelectDefSpell != 1 || 
+			 SelectMode == SM_DefSpell && bSelectDefSpell != 1 ||
+			 SelectMode == SM_Item && bSelectItem != 1 || 
 			 SelectMode == SM_None )
 		{
 			//player has finished with selection screen
@@ -3413,14 +3525,15 @@ ignores SeePlayer, HearNoise, Bump;
 			{
 				if ( bMouseSmoothing ) 
 				{
-					AeonsHUD(myHUD).aX = SmoothMouseX;
-					AeonsHUD(myHUD).aY = SmoothMouseY;
+					AeonsHUD(myHUD).aX = SmoothMouseX * MouseSensitivity;
+					AeonsHUD(myHUD).aY = SmoothMouseY * MouseSensitivity;
 				}
 				else
 				{
-					AeonsHUD(myHUD).aX = aMouseX;
-					AeonsHUD(myHUD).aY = aMouseY;
+					AeonsHUD(myHUD).aX = aMouseX * MouseSensitivity;
+					AeonsHUD(myHUD).aY = aMouseY * MouseSensitivity;
 				}
+				AeonsHUD(myHUD).WheelMouseInput(DeltaTime);
 			}
 
 			aLookUp = 0;
@@ -4086,6 +4199,8 @@ ignores SeePlayer, HearNoise, Bump;
 			SelectedInvPSX2 = AttSpell;
 		else if ( SelectMode == SM_DefSpell )
 			SelectedInvPSX2 = DefSpell;
+		else if ( SelectMode == SM_Item )
+			SelectedInvPSX2 = SelectedItem;
 		else
 			SelectedInvPSX2 = None;
 
@@ -7818,6 +7933,23 @@ exec function QuickSave()
 
 		ClientMessage(QuickSaveString);
 		ConsoleCommand("SaveGame 0");
+	}
+}
+
+state CheatFlying
+{
+	function ProcessMove(float DeltaTime, vector NewAccel, rotator DeltaRot)	
+	{
+		local float OldAirSpeed;
+
+		Acceleration = Normal(NewAccel);
+		Velocity = Normal(NewAccel) * GroundSpeed * HasteModifier(HasteMod).speedMultiplier;
+		
+		OldAirSpeed = AirSpeed;
+		
+		AutonomousPhysics(DeltaTime);
+		AirSpeed = OldAirSpeed;
+		//MoveSmooth(Acceleration * DeltaTime);
 	}
 }
 

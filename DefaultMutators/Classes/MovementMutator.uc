@@ -1,4 +1,5 @@
-class MovementMutator extends Mutator;
+class MovementMutator extends Mutator
+	transient;
 
 function ModifyLogin(out class<playerpawn> SpawnClass, out string Portal, out string Options)
 {

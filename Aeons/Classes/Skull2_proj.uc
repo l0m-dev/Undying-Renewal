@@ -56,6 +56,8 @@ var(Sound)	sound	SpawningSounds[1];				// Spawning Sounds
 var(Sound)	sound	CommentSounds[3];				// Comment sounds
 var(Sound)	sound	ScreamingSounds[2];				// Screaming sounds
 var(Sound)	sound	OnFireSound;
+
+var vector frenzyBob;
 // ================================================
 // This function is called after the skull is spawned from SkullStorm.uc
 // the Spell knows how many skulls it has created, and calls this function
@@ -455,11 +457,16 @@ function Tick(float DeltaTime)
 			fBob += DeltaTime * (3.0 + (Frenzy * 24.0));
 			Loc.z += ( cos(fBob) * (1.0 + ( 1.0 - Frenzy )) );
 		} else {
-			// removed the skull shake
-			//if ( bCanSeeEnemy )
-			//	Loc += VRand() * 0.25;
-			//else
-			//	Loc += VRand() * 0.75;
+			frenzyBob += Frenzy * DeltaTime * vect(1,1,1) * 30; // speed
+
+			if ( bCanSeeEnemy )
+				fBob = 0.25;
+			else
+				fBob = 0.75;
+
+			Loc.x += cos(frenzyBob.x) * Frenzy * FRand() * fBob;
+			Loc.y += cos(frenzyBob.y) * Frenzy * FRand() * fBob;
+			Loc.z += cos(frenzyBob.z) * Frenzy * FRand() * fBob;
 		}
 		
 		// place it

@@ -314,7 +314,10 @@ simulated function Destroyed()
 simulated function ProcessTouch(Actor Other, Vector HitLocation)
 {
 	local vector NewDir;
-	
+
+	if ( Other == Owner )
+		return;
+
 	if ( Other.IsA('Pawn') && (Other != Owner) )
 		Pawn(Other).PlayDamageMethodImpact('Medium', HitLocation, Normal(Location-HitLocation));
 

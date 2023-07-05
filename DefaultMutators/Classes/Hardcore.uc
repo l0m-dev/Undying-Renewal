@@ -3,7 +3,8 @@
 // makes all zones low gravity
 //=============================================================================
 
-class Hardcore expands Mutator;
+class Hardcore expands Mutator
+	transient;
 
 function bool CheckReplacement(Actor Other, out byte bSuperRelevant)
 {

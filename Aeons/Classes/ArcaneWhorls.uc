@@ -79,12 +79,12 @@ state GiveWhorl
 		Player.AttSpell.PlayAnim('ArcaneWhorl',1,,,0);
 		Player.AttSpell.FinishAnim();
 		Player.AttSpell.PutDown();
-		sleep(2.5);
 		mMod = ManaModifier(Player.ManaMod);
 		mMod.manaPerSec += 1;
 		mMod.updateManaTimer();
 		Player.ManaWhorlsFound = Clamp(Player.ManaWhorlsFound+1, 0, 5);
 		Player.AttSpell.SetTexture(1, AeonsSpell(Player.AttSpell).SpellHandTextures[Player.ManaWhorlsFound-1]);
+		sleep(2.5);
 		HandFX.bShuttingDown = true;
 		Player.OverlayActor = none;
 		Destroy();

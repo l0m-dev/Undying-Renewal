@@ -3727,7 +3727,7 @@ function float RelativeStrength( pawn Other )
 	if ( Other.IsA('ScriptedPawn') )
 		adjustedOther = 0.5 * ( Other.Health + ScriptedPawn(Other).InitHealth );	// average other's current and default health (result is potential health?)
 	else
-		adjustedOther = 0.5 * ( Other.Health + Other.default.Health );
+		adjustedOther = 0.5 * ( FMin(Other.Health, 100) + Other.default.Health ); // cap to 100 to prevent issues if player's health overcharged
 	compare = 0.01 * float(adjustedOther - adjustedStrength);		// calculate strength factor as 1% of it's health less my health
 	if ( Intelligence == BRAINS_Human )
 	{

@@ -3977,6 +3977,57 @@ public:
 };
 
 
+class ENGINE_API UPrimitive : public UObject
+{
+public:
+    FBox BoundingBox;
+    FSphere BoundingSphere;
+    DECLARE_CLASS(UPrimitive,UObject,0,Engine)
+    NO_DEFAULT_CONSTRUCTOR(UPrimitive)
+};
+
+#define UCONST_MF_HAS_LOD_DISTANCE 0x10000000
+#define UCONST_MF_UNK 0x00000001
+
+class ENGINE_API UMesh : public UPrimitive
+{
+public:
+    INT Tris_vtableptr;
+    INT Tris_SavedAr;
+    INT Tris_SavedPos;
+    TArray<BYTE> Tris;
+    TArray<class UTexture*> Textures;
+    TArray<FLOAT> TextureLOD;
+    INT MRMMeshData;
+    INT NumVerts;
+    INT NumNormals;
+    INT Unk1;
+    INT Unk2;
+    INT flags;
+    INT AnimData;
+    DECLARE_CLASS(UMesh,UPrimitive,0,Engine)
+    NO_DEFAULT_CONSTRUCTOR(UMesh)
+};
+
+
+class ENGINE_API USkelMesh : public UMesh
+{
+public:
+    INT SkelProto;
+    TArray<BYTE> Joints;
+    TArray<BYTE> JointLocs;
+    INT JointVerts_vtableptr;
+    INT JointVerts_SavedAr;
+    INT JointVerts_SavedPos;
+    TArray<BYTE> JointVerts;
+    TArray<BYTE> PhysObj;
+    class USkelMesh* ParentMesh;
+    FPlace Origin;
+    DECLARE_CLASS(USkelMesh,UMesh,0,Engine)
+    NO_DEFAULT_CONSTRUCTOR(USkelMesh)
+};
+
+
 class ENGINE_API USoundContainer : public UObject
 {
 public:

@@ -4,17 +4,7 @@
 class Lightning expands AttSpell;
 
 var int SpeargunChargeManaCost;
-
-function PreBeginPlay()
-{
-	if (RGC())
-	{
-		MaxTargetRange = 4096;
-		RefireRate = 0.5;
-		SpeargunChargeManaCost = 50;
-	}
-	Super.PreBeginPlay();
-}
+var float TimeToReachDamage;
 
 // ============================================================================
 // Sounds
@@ -24,111 +14,6 @@ function PreBeginPlay()
 //#exec AUDIO IMPORT FILE="E_Spl_LightningSustain03.wav" NAME="E_Spl_LightningSustain03" GROUP="Spells"
 // ============================================================================
 
-simulated function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
-{
-	local Vector X,Y,Z, HitLocation, Start;
-	local rotator Dir;
-	local Ectoplasm_proj ecto;
-	local LtngBlast_proj SP;
-
-	AeonsPlayer(Owner).MakePlayerNoise(1.0);
-	// Pawn(Owner).eyeTrace(HitLocation,, 4096,true);
-	if (PlayerPawn(Owner).bUsingAutoAim)
-		GetAxes(AutoAimDir,X,Y,Z);
-	else
-		GetAxes(Pawn(owner).ViewRotation,X,Y,Z);
-	Start = Owner.Location + CalcDrawOffset() + FireOffset.X * X + FireOffset.Y * Y + FireOffset.Z * Z;
-	Dir = Rotator(Normal(PlayerPawn(Owner).EyeTraceLoc - Start));
-
-	SP = Spawn(Class 'LtngBlast_proj', PlayerPawn(Owner),, Start, Dir);
-	// SP.Range = InitialStrikeRange;
-	SP.CastingLevel = LocalCastingLevel;
-	SP.StartLoc = Start;
-	Switch( LocalCastingLevel)
-	{
-		case 0:
-			SP.Charge = 0;
-			break;
-
-		case 1:
-			SP.Charge = 1;
-			break;
-
-		case 2:
-			SP.Charge = 1;
-			break;
-
-		case 3:
-			SP.Charge = 1;
-			break;
-
-		case 4:
-			SP.Charge = 2;
-			break;
-
-		case 5:
-			SP.Charge = 2;
-			break;
-	
-	}
-	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fLightning = 1.0;
-	// SP.Velocity = SP.Speed * vector(Dir);
-}
-
-function ChargeSpear()
-{
-	Speargun(PlayerPawn(Owner).Weapon).Charge();
-}
-
-function FireAttSpell( float Value )
-{
-	local bool bPCL;
-	
-	bPCL = ProcessCastingLevel();
-	
-	PawnOwner = Pawn(Owner);
-
-    if ( PawnOwner.HeadRegion.Zone.bWaterZone && !bWaterFire)
-	{
-		PlayFireEmpty(); //perhaps a fizzle sound
-    } else if ( !bSpellUp && bPCL) {
-		BringUp();
-	} else {
-		SayMagicWords();
-
-		if ( bPCL && !AeonsPlayer(Owner).bDispelActive )
-		{
-			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
-			{
-				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged )
-					if ( PawnOwner.useMana(SpeargunChargeManaCost) )
-						ChargeSpear();
-			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {
-				PlayFiring();
-				// gotoState('NormalFire');
-				if ( Owner.bHidden )
-					CheckVisibility();
-			} else {
-				FailedSpellCast();
-				GotoState('Idle');
-			}
-		}
-	}
-}
-
-state NormalFire
-{
-	ignores FireAttSpell;
-	
-	Begin:
-		ProjectileFire(ProjectileClass, 8000, false, true);
-		FinishAnim();
-		PlayAnim('Down');
-		sleep(RefireRate);
-		Finish();
-}
-
-/*
 struct Pulse
 {
 	var float 	Index;			// Current index of the pulse
@@ -205,8 +90,84 @@ function PreBeginPlay()
 	PawnOwner = Pawn(Owner);
 	PlayerPawnOwner = PlayerPawn(Owner);
 	chaos = 0.6;
+	if (RGC())
+	{
+		MaxTargetRange = 4096;
+		RefireRate = 0.5;
+		SpeargunChargeManaCost = 50;
+
+		manaCostPerLevel[0] = 40;
+		manaCostPerLevel[1] = 35;
+		manaCostPerLevel[2] = 30;
+		manaCostPerLevel[3] = 25;
+		manaCostPerLevel[4] = 20;
+		manaCostPerLevel[5] = 20;
+		damagePerLevel[0] = 30;
+		damagePerLevel[1] = 40;
+		damagePerLevel[2] = 50;
+		damagePerLevel[3] = 60;
+		damagePerLevel[4] = 80;
+		damagePerLevel[5] = 100;
+	}
 	Super.PreBeginPlay();
 }
+
+function ChargeSpear()
+{
+	Speargun(PlayerPawn(Owner).Weapon).Charge();
+}
+
+simulated function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
+{
+	local Vector X,Y,Z, HitLocation, Start;
+	local rotator Dir;
+	local Ectoplasm_proj ecto;
+	local LtngBlast_proj SP;
+
+	AeonsPlayer(Owner).MakePlayerNoise(1.0);
+	// Pawn(Owner).eyeTrace(HitLocation,, 4096,true);
+	if (PlayerPawn(Owner).bUsingAutoAim)
+		GetAxes(AutoAimDir,X,Y,Z);
+	else
+		GetAxes(Pawn(owner).ViewRotation,X,Y,Z);
+	Start = Owner.Location + CalcDrawOffset() + FireOffset.X * X + FireOffset.Y * Y + FireOffset.Z * Z;
+	Dir = Rotator(Normal(PlayerPawn(Owner).EyeTraceLoc - Start));
+
+	SP = Spawn(Class 'LtngBlast_proj', PlayerPawn(Owner),, Start, Dir);
+	// SP.Range = InitialStrikeRange;
+	SP.CastingLevel = LocalCastingLevel;
+	SP.StartLoc = Start;
+	Switch( LocalCastingLevel)
+	{
+		case 0:
+			SP.Charge = 0;
+			break;
+
+		case 1:
+			SP.Charge = 1;
+			break;
+
+		case 2:
+			SP.Charge = 1;
+			break;
+
+		case 3:
+			SP.Charge = 1;
+			break;
+
+		case 4:
+			SP.Charge = 2;
+			break;
+
+		case 5:
+			SP.Charge = 2;
+			break;
+	
+	}
+	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fLightning = 1.0;
+	// SP.Velocity = SP.Speed * vector(Dir);
+}
+
 
 // look for lit pawns within my strike radius
 // and find the closest one to me that is lit
@@ -233,10 +194,11 @@ function GetLitPawn()
 
 function StartStrike()
 {
-	local vector end;
+	local vector end, HitNormal;
 	local place fingerPlace;
+	local int HitJoint;
 
-	DmgTime = 1.0 / DamagePerLevel[localCastingLevel];
+	DmgTime = TimeToReachDamage / DamagePerLevel[localCastingLevel];
 	if (pfx != none)
 	{
 		pFX.Destroy();
@@ -244,22 +206,17 @@ function StartStrike()
 	}
 	fingerPlace = JointPlace('Mid_base');
 	// PawnOwner.EyeTrace(End,,,true);
-	PawnOwner.EyeTrace(End,,Range[LocalCastingLevel],false);
+	PawnOwner.EyeTrace(End,HitNormal,HitJoint,Range[LocalCastingLevel],false);
 	Strike(FingerPlace.pos + Vector(PlayerPawn(Owner).ViewRotation) * PlayerPawn(Owner).CollisionRadius, End);
 }
 
 function FireSpell()
 {
 	// are we holding a speargun?
-	if (PlayerPawn(Owner).Weapon.IsA('Speargun'))
+	if ( PlayerPawn(Owner).Weapon.IsA('Speargun') && !Speargun(PlayerPawn(Owner).Weapon).bCharged )
 	{
-		// is the speargun charged?
-		if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-			if ( PawnOwner.useMana(SpeargunChargeManaCost) )
-				Speargun(PlayerPawn(Owner).Weapon).Charge();
-		else
-			// normal lightning behavior
-			StartStrike();
+		if ( PawnOwner.useMana(SpeargunChargeManaCost) )
+			Speargun(PlayerPawn(Owner).Weapon).Charge();
 	} else
 		// normal lightning behavior
 		StartStrike();
@@ -529,10 +486,27 @@ state NormalFire
 		if ( pFX != none )
 			pFX.Destroy();
 		PlayAnim('Lightning_start');
-		PlaySound(FireSound);
 		FinishAnim();
-		FireSpell();
-		GotoState('Holding');
+
+		if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) )
+		{
+			PlaySound(FireSound);
+			if ( PlayerPawn(Owner).bFireAttSpell == 0 || !RGC() )
+			{
+				ProjectileFire(ProjectileClass, 8000, false, true);
+				FinishAnim();
+				playAnim('Lightning_end');
+				FinishAnim();
+				PlayAnim('Down');
+				sleep(RefireRate);
+				Finish();
+			}
+			else
+			{
+				FireSpell();
+				GotoState('Holding');
+			}
+		}
 }
 
 function DamageInfo GetDamageInfo(optional name DamageType)
@@ -608,8 +582,8 @@ state Holding
 			if (LitPawn == none)
 			{
 				// nothing lit by firefly - proceed as normal
-				A = PawnOwner.EyeTrace(end,HitNormal,Range[LocalCastingLevel], true);
-				PawnOwner.EyeTrace(end,HitNormal,Range[LocalCastingLevel], false);
+				A = PawnOwner.EyeTrace(end,HitNormal,HitJoint,Range[LocalCastingLevel], true);
+				PawnOwner.EyeTrace(end,HitNormal,HitJoint,Range[LocalCastingLevel], false);
 
 				if ( IsWaterZone(end) )
 				{
@@ -818,7 +792,7 @@ state Holding
 	}
 
 	Begin:
-		setTimer(0.04,true);
+		setTimer(0.05,true);
 		sndID = PlaySound(HoldSounds[Rand(3)]);
 		loopAnim('Lightning_cycle');
 		timeDampening = 3.0;
@@ -861,6 +835,7 @@ state Release
 		PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_FadeOut, 0.1f);
 		playAnim('Lightning_end');
 		FinishAnim();
+		PlayAnim('Down');
 		sleep(RefireRate);
 		Finish();
 }
@@ -884,12 +859,11 @@ function FireAttSpell( float Value )
 
 		if ( bPCL && !AeonsPlayer(Owner).bDispelActive )
 		{
-			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') )
+			if ( PlayerPawn(Owner).Weapon.IsA('Speargun') && !Speargun(PlayerPawn(Owner).Weapon).bCharged )
 			{
-				if ( !Speargun(PlayerPawn(Owner).Weapon).bCharged ){}
-					if ( PawnOwner.useMana(SpeargunChargeManaCost) )
-						ChargeSpear();
-			} else if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) ) {
+				if ( PawnOwner.useMana(SpeargunChargeManaCost) )
+					ChargeSpear();
+			} else if ( PawnOwner.Mana >= manaCostPerLevel[localCastingLevel] ) {
 				gotoState('NormalFire');
 				if ( Owner.bHidden )
 					CheckVisibility();
@@ -899,7 +873,6 @@ function FireAttSpell( float Value )
 		}
 	}
 }
-*/
 
 defaultproperties
 {
@@ -916,6 +889,12 @@ defaultproperties
      damagePerLevel(3)=30
      damagePerLevel(4)=40
      damagePerLevel(5)=50
+     Range(0)=4096
+     Range(1)=4096
+     Range(2)=4096
+     Range(3)=4096
+     Range(4)=4096
+     Range(5)=4096
      MaxTargetRange=512
      FireOffset=(Y=16,Z=-10)
      ProjectileClass=Class'Aeons.LtngBlast_proj'
@@ -931,5 +910,9 @@ defaultproperties
      Rotation=(Yaw=16384)
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     HoldSounds(0)=Sound'Aeons.Spells.E_Spl_LightningSustain01'
+     HoldSounds(1)=Sound'Aeons.Spells.E_Spl_LightningSustain01'
+     HoldSounds(2)=Sound'Aeons.Spells.E_Spl_LightningSustain01'
      SpeargunChargeManaCost=100
+     TimeToReachDamage=0.5
 }

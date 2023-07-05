@@ -3,7 +3,8 @@
 // makes all zones low gravity
 //=============================================================================
 
-class LowGravity expands Mutator;
+class LowGravity expands Mutator
+	transient;
 
 function bool CheckReplacement(Actor Other, out byte bSuperRelevant)
 {

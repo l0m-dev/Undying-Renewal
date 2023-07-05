@@ -158,14 +158,13 @@ function Created()
 	MoreSkippableCutscenesCheck.Align = TA_Left;
 	ControlOffset += 20 * ScaleY;
 	
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig();
 	GetSettings();
 }
 
 function GetSettings()
 {
 	RenewalConfig = GetPlayerOwner().GetRenewalConfig();
-	
+
 	//ServerNameEdit.SetValue(class'Engine.GameReplicationInfo'.default.ServerName);
 	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
 	GoreCheck.bChecked = RenewalConfig.bGore;
@@ -180,7 +179,6 @@ function GetSettings()
 function ShowWindow()
 {
 	Super.ShowWindow();
-	//RenewalConfig = GetPlayerOwner().GetRenewalConfig();
 	GetSettings();
 }
 

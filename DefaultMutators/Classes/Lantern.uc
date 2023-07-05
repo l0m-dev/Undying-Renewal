@@ -1,4 +1,5 @@
-class Lantern extends Mutator;
+class Lantern extends Mutator
+	transient;
 
 function Timer()
 {

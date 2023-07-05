@@ -27,6 +27,8 @@ var 	PlayerPawn	PlayerPawnOwner;
 var		ParticleFX	DripParticles;
 var		Light		EffectLight;
 
+var bool bFromFullyIdle;
+
 //////////////////////////////////////////////////////////////////////////////
 //	Replication
 //////////////////////////////////////////////////////////////////////////////
@@ -60,6 +62,8 @@ function PreBeginPlay ()
 
 	PawnOwner = Pawn(Owner);
 	PlayerPawnOwner = PlayerPawn(Owner);
+
+	bFromFullyIdle = true;
 }
 
 //----------------------------------------------------------------------------
@@ -130,13 +134,31 @@ simulated function PlayFiring()
 		Owner.MakeNOise(3.0, 1280);
 	}
 // * /
-	LoopAnim('EctoCycle',2);
+	//LoopAnim('EctoCycle',2);
 	bStillFiring = true;
 }
 
 simulated function StartFiring()
 {
 	PlayAnim('EctoStart',1,,,0);
+}
+
+state Idle
+{
+	function BeginState()
+	{
+		Super.BeginState();
+		bFromFullyIdle = false;
+	}
+}
+
+state Idle2
+{
+	function BeginState()
+	{
+		Super.BeginState();
+		bFromFullyIdle = true;
+	}
 }
 
 state NormalFire
@@ -224,11 +246,13 @@ state NormalFire
 	
 	Begin:
 		//log("Ecto: NormalFire:Begin", 'Misc');
-		if ( !bStillFiring )
+		if ( bFromFullyIdle )
 		{
-			StartFiring();
-			FinishAnim();
+			//StartFiring();
+			//FinishAnim();
+			PlayAnim('EctoStart',1,,,0);
 		}
+		
 		bStillFiring = false;
 		// Fire the first shot - this avoids the delay in firing
 		if ( ProcessCastingLevel() && Pawn(Owner).useMana(manaCostPerLevel[localCastingLevel]) && (!AeonsPlayer(Owner).DispelMod.isInState('Dispel')) )
@@ -240,7 +264,9 @@ state NormalFire
 			// no mana, or dispelled... see ya later.
 			GotoState('');
 		}
-	
+		if (bFromFullyIdle)
+			FinishAnim();
+		LoopAnim('EctoCycle',2);
 }
 
 function Finish()

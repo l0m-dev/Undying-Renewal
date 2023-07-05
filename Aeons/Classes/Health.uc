@@ -97,7 +97,7 @@ auto state Pickup
 		if ( Other.IsA('AeonsPlayer') )
 		{
 			AP = AeonsPlayer(Other);
-			HealthPacks = Pickup(PlayerPawn(Other).Inventory.FindItemInGroup(101)).numCopies + 1;
+			HealthPacks = Pickup(PlayerPawn(Other).Inventory.FindItemInGroup(default.InventoryGroup)).numCopies + 1;
 
 			if (((Level.Game.Difficulty == 0) && ( HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65 )) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
 			{

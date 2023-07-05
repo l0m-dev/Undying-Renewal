@@ -33,8 +33,8 @@ var string ReplayMessage;
 struct SubtitleInfo
 {
 	var float Timer;
-	var string[255] Name;
-	var string[255] Text[10];
+	var string Name;
+	var string Text[10];
 	var int Number;
 	var int X, Y;
 };

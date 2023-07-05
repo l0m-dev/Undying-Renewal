@@ -424,6 +424,7 @@ state Dying
 	exec function SelectWeapon( optional float F );
 	exec function SelectAttSpell( optional float F );
 	exec function SelectDefSpell( optional float F );
+	exec function SelectItem( optional float F );
 
 	exec function Fire( optional float F )
 	{
@@ -698,7 +699,7 @@ exec function TestLightning()
 
 state DialogScene expands PlayerWalking
 {
-	ignores WeaponAction, DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook, ActivateItem;
+	ignores WeaponAction, DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, SelectWeapon, SelectAttSpell, SelectDefSpell, SelectItem, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook, ActivateItem;
 	
 	function FireAttSpell(float F)
 	{
@@ -791,7 +792,7 @@ Begin:
 state GuidingPhoenix expands PlayerWalking
 {
 	// ignores Fire, FireAttSpell, FireDefSpell, ActivateItem, UseLantern, Jump,  NextItem, PrevItem, PrevWeapon, NextWeapon;
-	ignores DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, FireDefSpell, SelectWeapon, SelectAttSpell, SelectDefSpell, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook;
+	ignores DoJump, SeePlayer, HearNoise, Bump, FeignDeath, ProcessMove, FireDefSpell, SelectWeapon, SelectAttSpell, SelectDefSpell, SelectItem, SwitchWeapon, SwitchAttSpell, SwitchDefSpell, Scrye, NextItem, PrevItem, PrevWeapon, NextWeapon, QuickSave, ShowBook;
 	
 	function BeginState()
 	{

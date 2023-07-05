@@ -12,7 +12,7 @@ class AttSpell extends AeonsSpell
 
 // Weightings for spell projectiles seeking Pawns.
 var int localCastingLevel;
-var(SpellAI) 	float 	seekWeight[5];
+var(SpellAI) 	float 	seekWeight[6];
 var(SpellAI) 	float 	SightRadius;
 var Pawn PawnOwner;
 
