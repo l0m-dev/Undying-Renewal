@@ -48,8 +48,8 @@ function Created()
 	}
 	else
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 
 	TextColor.R = 255;
@@ -430,8 +430,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else
 	{

@@ -52,8 +52,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 	
 	SmokingWindows[0] = -1;
 	SmokingWindows[1] = -1;
@@ -291,8 +291,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 		
 	if ( FindGameWindow != None )

@@ -131,8 +131,8 @@ function MouseLeave()
 
 function ManagerResized(float ScaleX, float ScaleY)
 {
-	ScaleX = Manager.InnerWidth / 800;
-	ScaleY = Manager.InnerHeight / 600;
+	ScaleX = Manager.InnerWidth / Root.OriginalWidth;
+	ScaleY = Manager.InnerHeight / Root.OriginalHeight;
 
 	if (ScaleX > ScaleY) {
 		ScaleX = ScaleY;

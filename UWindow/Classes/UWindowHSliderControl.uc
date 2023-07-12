@@ -84,7 +84,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	switch(Align)
 	{
 	case TA_Left:
-		SliderDrawX = WinWidth - SliderWidth;
+		SliderDrawX = WinWidth - SliderWidth*Root.ScaleY;
 		TextX = 0;
 		break;
 	case TA_Right:
@@ -92,7 +92,7 @@ function BeforePaint(Canvas C, float X, float Y)
 		TextX = WinWidth - W;
 		break;
 	case TA_Center:
-		SliderDrawX = (WinWidth - SliderWidth) / 2;
+		SliderDrawX = (WinWidth - SliderWidth*Root.ScaleY) / 2;
 		TextX = (WinWidth - W) / 2;
 		break;
 	}
@@ -100,7 +100,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	SliderDrawY = (WinHeight - 2) / 2;
 	TextY = (WinHeight - H) / 2;
 
-	TrackStart = SliderDrawX + (SliderWidth - TrackWidth) * ((Value - MinValue)/(MaxValue - MinValue));
+	TrackStart = SliderDrawX + (SliderWidth*Root.ScaleY - TrackWidth) * ((Value - MinValue)/(MaxValue - MinValue));
 }
 
 
@@ -110,7 +110,6 @@ function Paint(Canvas C, float X, float Y)
 	local Region R;
 
 	T = GetLookAndFeelTexture();
-
 
 	if(Text != "")
 	{
@@ -122,9 +121,9 @@ function Paint(Canvas C, float X, float Y)
 	}
 	
 	R = LookAndFeel.HLine;
-	DrawStretchedTextureSegment( C, SliderDrawX, SliderDrawY, SliderWidth, R.H, R.X, R.Y, R.W, R.H, T);
+	DrawStretchedTextureSegment( C, SliderDrawX, SliderDrawY, SliderWidth*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T);
 
-	DrawUpBevel(C, TrackStart, SliderDrawY-4, TrackWidth, 10, T);
+	DrawUpBevel(C, TrackStart, SliderDrawY-4*Root.ScaleY, TrackWidth, 10*Root.ScaleY, T);
 }
 
 function LMouseUp(float X, float Y)
@@ -151,7 +150,7 @@ function LMouseDown(float X, float Y)
 			SetValue(Value - 1);
 	}
 	
-	if(X > TrackStart + TrackWidth && X < SliderDrawX + SliderWidth)
+	if(X > TrackStart + TrackWidth && X < SliderDrawX + SliderWidth*Root.ScaleY)
 	{
 		if(Step != 0.0)
 			SetValue(Value + Step);
@@ -166,7 +165,7 @@ function MouseMove(float X, float Y)
 	Super.MouseMove(X, Y);
 	if(bSliding && bMouseDown)
 	{
-		SetValue((((X - SliderDrawX) / (SliderWidth - TrackWidth)) * (MaxValue - MinValue)) + MinValue, bNoSlidingNotify);
+		SetValue((((X - SliderDrawX) / (SliderWidth*Root.ScaleY - TrackWidth)) * (MaxValue - MinValue)) + MinValue, bNoSlidingNotify);
 	}
 	else
 		bSliding = False;

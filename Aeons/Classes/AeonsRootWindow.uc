@@ -8,8 +8,8 @@ class AeonsRootWindow extends UWindowRootWindow;
 //#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
 
-var float ScaleX;
-var float ScaleY;
+// needed to compile, otherwise throws missing audio_x
+var float ScaleX, ScaleY;
 
 var UWindowWindow MainMenu;
 var UWindowWindow Book;
@@ -32,12 +32,11 @@ function Created()
 	local int i;
 	local string KeyName;
 	local bool bFoundBookKey;
+	local int MouseOffsetX;
+	local float InnerWidth, MouseXPosScale;
 	
+	LookAndFeelClass = default.LookAndFeelClass; // breaks user config but old users have wrong one set
 	Super.Created();
-
-	//Scale = (WinHeight - WinTop) / 600.0;
-	ScaleX = WinWidth / 800.0;
-	ScaleY = WinHeight / 600.0;
 
 	MainWindowClass = Class<UWindowWindow>(DynamicLoadObject("UndyingShellPC.MainMenuWindow", class'Class'));
 	if ( MainWindowClass != None ) 
@@ -47,6 +46,21 @@ function Created()
 		MainMenu.HideWindow();
 	
 	Resized();
+	
+	// set mouse position
+	
+	if (Root.WinHeight / Root.WinWidth < 0.75 )
+	{
+		InnerWidth = Root.WinHeight / 0.75;
+		MouseOffsetX = (Root.WinWidth - InnerWidth) / 2;
+		MouseXPosScale = InnerWidth / Root.OriginalWidth;
+	}
+	else
+	{
+		MouseXPosScale = Root.ScaleX;
+	}
+
+	Root.SetMousePos(290*MouseXPosScale + MouseOffsetX, 250 * Root.ScaleY);
 	
 	// since F3 is no longer hard coded for the book we need to bind it	
 	for (i=0; i<255; i++)
@@ -82,20 +96,12 @@ function NotifyBeforeLevelChange()
 function Resized()
 {
 	Super.Resized();
-
-//	if ( WinWidth > 1024 )
-//		Scale = 768.0 / 600.0;
-//	else
-		ScaleX = WinWidth / 800.0;
-		ScaleY = WinHeight / 600.0;
-
 	
 	if ( MainMenu != None )
 		MainMenu.Resized();
 
 	if ( Book != None ) 
 		Book.Resized();
-	
 }
 
 function Tick( float DeltaTime )
@@ -154,8 +160,27 @@ function DrawMouse(Canvas C)
 	local vector Loc;
 	local float lightscale;
 	local float Distance;
-	
-	Super.DrawMouse(C);
+
+	if(Console.Viewport.bWindowsMouseAvailable)
+	{
+		// Set the windows cursor...
+		Console.Viewport.SelectedCursor = MouseWindow.Cursor.WindowsCursor;
+	}
+	else
+	{
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
+		C.DrawColor.A = 255;
+		C.bNoSmooth = True;
+
+		C.SetPos(MouseX * GUIScale - MouseWindow.Cursor.HotX, MouseY * GUIScale - MouseWindow.Cursor.HotY);
+		
+		if ( MouseWindow.Cursor.tex == Texture'UWindow.Icons.ShellCursor' )
+			C.Style = 5;
+
+		C.DrawIcon(MouseWindow.Cursor.tex, Root.ScaleY);
+	}
 
 	if ( CursorFX == None )
 	{
@@ -194,7 +219,7 @@ function DrawMouse(Canvas C)
 
 	if ( Light != None )
 	{
-		lightscale = FClamp(CursorFX.ParticlesPerSec.Base / 20.0, 1.0, 2.5);
+		lightscale = FClamp(CursorFX.ParticlesPerSec.Base / 20.0, 1.0, 2.5) * Root.ScaleY;
 		C.SetPos(MouseX * GUIScale - MouseWindow.Cursor.HotX - LightScale*32.0 , MouseY * GUIScale - MouseWindow.Cursor.HotY - LightScale*32.0);
 		if (MouseWindow.Cursor == NormalCursor)
 			C.DrawIcon(Light, lightscale); 
@@ -221,5 +246,5 @@ function DrawMouse(Canvas C)
 
 defaultproperties
 {
-     LookAndFeelClass="UMenu.UMenuMetalLookAndFeel"
+     LookAndFeelClass="UndyingShellPC.UndyingLookAndFeel"
 }

@@ -149,7 +149,7 @@ simulated function MouseEnter()
 		ToolTip(ToolTipString);
 
 	if (!bDisabled && (OverSound != None))
-		GetPlayerOwner().PlaySound(OverSound, SLOT_Interface, [Flags]482 );
+		GetPlayerOwner().PlaySound(OverSound, SLOT_Interface, [Pitch]FRand()*0.1 + 0.95, [Flags]482 );
 }
 
 simulated function Click(float X, float Y) 
@@ -159,7 +159,7 @@ simulated function Click(float X, float Y)
 		SendMessage(DE_Click);
 		
 		if (!bDisabled && (DownSound != None))
-			GetPlayerOwner().PlaySound(DownSound, SLOT_Interact, [Flags]482 );
+			GetPlayerOwner().PlaySound(DownSound, SLOT_Interact, [Pitch]FRand()*0.1 + 0.95, [Flags]482 );
 	}
 	else
 		bIgnoreNextClick = False;

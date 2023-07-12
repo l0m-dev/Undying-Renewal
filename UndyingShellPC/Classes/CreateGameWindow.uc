@@ -103,8 +103,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	for ( i = 0; i < 3; i++ )
 		SmokingWindows[i] = -1;
@@ -751,8 +751,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 
 	//fix might be better to have AeonsRootWindow or UWindowRootWindow know the active window

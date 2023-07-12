@@ -27,7 +27,7 @@ var 	PlayerPawn	PlayerPawnOwner;
 var		ParticleFX	DripParticles;
 var		Light		EffectLight;
 
-var bool bFromFullyIdle;
+var bool bPlayStartAnimation;
 
 //////////////////////////////////////////////////////////////////////////////
 //	Replication
@@ -62,8 +62,6 @@ function PreBeginPlay ()
 
 	PawnOwner = Pawn(Owner);
 	PlayerPawnOwner = PlayerPawn(Owner);
-
-	bFromFullyIdle = true;
 }
 
 //----------------------------------------------------------------------------
@@ -141,24 +139,6 @@ simulated function PlayFiring()
 simulated function StartFiring()
 {
 	PlayAnim('EctoStart',1,,,0);
-}
-
-state Idle
-{
-	function BeginState()
-	{
-		Super.BeginState();
-		bFromFullyIdle = false;
-	}
-}
-
-state Idle2
-{
-	function BeginState()
-	{
-		Super.BeginState();
-		bFromFullyIdle = true;
-	}
 }
 
 state NormalFire
@@ -246,7 +226,8 @@ state NormalFire
 	
 	Begin:
 		//log("Ecto: NormalFire:Begin", 'Misc');
-		if ( bFromFullyIdle )
+		bPlayStartAnimation = AnimSequence != 'EctoEnd';
+		if ( bPlayStartAnimation )
 		{
 			//StartFiring();
 			//FinishAnim();
@@ -264,7 +245,7 @@ state NormalFire
 			// no mana, or dispelled... see ya later.
 			GotoState('');
 		}
-		if (bFromFullyIdle)
+		if ( bPlayStartAnimation )
 			FinishAnim();
 		LoopAnim('EctoCycle',2);
 }

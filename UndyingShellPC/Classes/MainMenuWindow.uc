@@ -121,8 +121,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	for( i=0; i<8; i++ )
 	{
@@ -254,7 +254,8 @@ function Created()
 	// Check for a temporary save file, used when the player changes Video Drivers in the middle of the game.
 	SaveString = GetPlayerOwner().GetSaveGameList();
 	if ((InStr (SaveString, "99,")) >= 0)
-	{	
+	{
+		// added default 32 bits by renewal
 		GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
 		FromRelaunch = True;
 	}
@@ -587,7 +588,7 @@ function RenewalButtonPressed()
 	//GetPlayerOwner().ConsoleCommand("start http://undying.ea.com");
 	
 	if ( Renewal == None )
-		Renewal = RenewalWindow(Root.CreateWindow(class'RenewalWindow', 100, 100, 200, 200));
+		Renewal = Root.CreateWindow(class'RenewalWindow', Root.WinWidth - 400, 100, 300, 200);
 	else
 		Renewal.ShowWindow();
 	
@@ -643,6 +644,8 @@ function Paint(Canvas C, float X, float Y)
 	if (FromRelaunch)
 	{
 		VideoPressed();
+		//GetPlayerOwner().ConsoleCommand("LoadGame 99");
+		//GetPlayerOwner().ConsoleCommand("DeleteGame 99");
 		FromRelaunch=False;
 		return;
 	}
@@ -745,8 +748,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else
 	{

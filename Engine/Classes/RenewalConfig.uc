@@ -7,7 +7,7 @@ var config bool bGameplayChanges;
 var config bool bGore;
 
 var config bool bAutoUseHealthVials;
-var config bool bNewHud;
+var config bool bAltHud;
 var config bool bAutoShowObjectives;
 var config bool bShowUsedMana;
 
@@ -37,7 +37,7 @@ defaultproperties
      bGameplayChanges=True
      bGore=True
      bAutoUseHealthVials=True
-     bNewHud=False
+     bAltHud=False
 	 bShowUsedMana=False
 	 JournalFont="Aeons.Dauphin16_Skinny"
 	 LargeFont="Aeons.MorpheusFont"

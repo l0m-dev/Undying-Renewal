@@ -49,8 +49,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 //--	
 
 	PSX2CreditsButton = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
@@ -240,8 +240,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 
 	if ( PSX2Credits != None )

@@ -13,8 +13,14 @@ function BeforePaint(Canvas C, float X, float Y)
 
 function Paint(Canvas C, float X, float Y)
 {
+	local float oldW;
 	LookAndFeel.Checkbox_Draw(Self, C);
+
+	oldW = WinWidth;
+	if (bStretched)
+		WinWidth = WinHeight;
 	Super.Paint(C, X, Y);
+	WinWidth = oldW;
 }
 
 

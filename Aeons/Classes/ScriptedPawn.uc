@@ -389,7 +389,7 @@ function PreBeginPlay()
 {
 	if (RGC())
 	{
-		PhysRate = Level.Game.Difficulty + 1;
+		PhysRate = 1.0 / (Level.Game.Difficulty + 1);
 		RotationRate.Yaw *= Level.Game.Difficulty + 1;
 	}
 	super.PreBeginPlay();

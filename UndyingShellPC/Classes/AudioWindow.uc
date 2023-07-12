@@ -129,8 +129,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	SmokingWindows[0] = -1;
 	SmokingWindows[1] = -1;
@@ -398,8 +398,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else 
 	{
@@ -439,8 +439,8 @@ function SoundVolumeChanged(float Delta)
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else 
 	{
@@ -481,8 +481,8 @@ function BackgroundVolumeChanged(float Delta)
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else 
 	{
@@ -523,8 +523,8 @@ function VoiceVolumeChanged(float Delta)
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else 
 	{

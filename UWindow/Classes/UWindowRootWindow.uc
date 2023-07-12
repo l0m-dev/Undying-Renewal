@@ -38,11 +38,19 @@ var bool				bRequestQuit;
 var float				QuitTime;
 var bool				bAllowConsole;
 
+const OriginalWidth = 800;
+const OriginalHeight = 600;
+
+var float ScaleX, ScaleY;
+
 function BeginPlay() 
 {
 	Root = Self;
 	MouseWindow = Self;
 	KeyFocusWindow = Self;
+
+	ScaleX = WinWidth / OriginalWidth;
+	ScaleY = WinHeight / OriginalHeight;
 }
 
 function UWindowLookAndFeel GetLookAndFeel(String LFClassName)
@@ -343,6 +351,9 @@ function Resized()
 	ResolutionChanged(WinWidth, WinHeight);
 	
 	Fonts[F_Normal] = None;
+
+	ScaleX = WinWidth / OriginalWidth;
+	ScaleY = WinHeight / OriginalHeight;
 }
 
 function SetScale(float NewScale)

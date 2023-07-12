@@ -49,6 +49,9 @@ function Paint(Canvas C, float X, float Y)
 	
 	C.bNoSmooth = true;
 
+	//if (Root.ActiveWindow != Self)
+	//	return;
+
 	DrawStretchedTextureSegment( C, WinLeft, WinTop, WinWidth, WinHeight, 0, 0, 256, 256, texture'Engine.BlackTexture' );
 
 	DrawStretchedTextureSegment( C, InnerLeft, InnerTop, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
@@ -91,10 +94,10 @@ function PaintSmoke(Canvas C, ShellButton B, out int SmokingWindow, out float Sm
 		C.DrawColor.b = Brightness;
 
 		C.Style = 3;
-		C.SetPos(B.WinLeft+8*AeonsRootWindow(Root).ScaleX, B.WinTop - 50*AeonsRootWindow(Root).ScaleY);
+		C.SetPos(B.WinLeft+8*Root.ScaleX, B.WinTop - 50*Root.ScaleY);
 		//Smoke = Texture(DynamicLoadObject("FX.Smoke", Class'Texture'));
 		if ( SmokeTexture != None )
-			C.DrawTile( SmokeTexture, B.WinWidth-24*AeonsRootWindow(Root).ScaleX, 70*AeonsRootWindow(Root).ScaleY, 0, 0, 64, 32 );
+			C.DrawTile( SmokeTexture, B.WinWidth-24*Root.ScaleX, 70*Root.ScaleY, 0, 0, 64, 32 );
 		else
 			Log("SmokeTexture = None!  We have a problem...");
 	}

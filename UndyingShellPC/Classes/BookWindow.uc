@@ -94,8 +94,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 	if (RootScaleX > RootScaleY) {
 		RootScaleX = RootScaleY;
 	} else {
@@ -635,10 +635,10 @@ function Paint(Canvas C, float X, float Y)
 	local int JournalDelta;
   	local float RootScaleX, RootScaleY;
 
-	if ( ( Root != None ) && (AeonsRootWindow(Root)!=None) )
+	if ( Root != None )
 	{
-		RootScaleX = AeonsRootWindow(Root).ScaleX;
-		RootScaleY = AeonsRootWindow(Root).ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else
 	{
@@ -794,8 +794,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 	else
 	{

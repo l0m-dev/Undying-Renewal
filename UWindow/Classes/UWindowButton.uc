@@ -109,14 +109,14 @@ simulated function MouseEnter()
 	Super.MouseEnter();
 	if(ToolTipString != "") ToolTip(ToolTipString);
 	if (!bDisabled && (OverSound != None))
-		GetPlayerOwner().PlaySound(OverSound, SLOT_Interface);
+		GetPlayerOwner().PlaySound(OverSound, SLOT_Interface, [Flags]482);
 }
 
 simulated function Click(float X, float Y) 
 {
 	Notify(DE_Click);
 	if (!bDisabled && (DownSound != None))
-		GetPlayerOwner().PlaySound(DownSound, SLOT_Interact);
+		GetPlayerOwner().PlaySound(DownSound, SLOT_Interact, [Flags]482);
 }
 
 function DoubleClick(float X, float Y) 

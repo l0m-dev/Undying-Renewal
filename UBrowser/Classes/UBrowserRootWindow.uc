@@ -29,5 +29,5 @@ function Resized()
 
 defaultproperties
 {
-     LookAndFeelClass="UWindow.UMenuMetalLookAndFeel"
+     LookAndFeelClass="UndyingShellPC.UndyingLookAndFeel"
 }

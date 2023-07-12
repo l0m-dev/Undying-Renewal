@@ -34,17 +34,39 @@ var string DamageScreenShakeScaleHelp;
 var string MoreSkippableCutscenesText;
 var string MoreSkippableCutscenesHelp;
 
-var float ScaleX;
-var float ScaleY;
-
 var RenewalConfig RenewalConfig;
+
+struct ControlInfo
+{
+	var UWindowDialogControl Control;
+	var float WinTop;
+};
+
+var ControlInfo Controls[32];
+var int NumControls;
+
+function UWindowDialogControl AddControl(class<UWindowDialogControl> ClassRef, string Text, string HelpText)
+{
+	local ControlInfo option;
+
+	option.Control = CreateControl(ClassRef, 1, 1, 1, 1);
+	option.WinTop = ControlOffset;
+
+	option.Control.SetText(Text);
+	option.Control.SetHelpText(HelpText);
+	option.Control.SetFont(F_Normal);
+	option.Control.Align = TA_Left;
+	ControlOffset += 20;
+
+	Controls[NumControls++] = option;
+
+	return option.Control;
+}
 
 function Created()
 {
-	local int ControlWidth, ControlLeft, ControlRight;
-	local int CenterWidth, CenterPos;
 	local Color ExperimentalColor;
-	
+
 	ServerNameText = Localize(string(class), "ServerNameText", "Renewal");
 	ServerNameHelp = Localize(string(class), "ServerNameHelp", "Renewal");
 	GameplayChangesText = Localize(string(class), "GameplayChangesText", "Renewal");
@@ -65,21 +87,11 @@ function Created()
 	MoreSkippableCutscenesHelp = Localize(string(class), "MoreSkippableCutscenesHelp", "Renewal");
 
 	Cursor = Root.DefaultNormalCursor;
-	
-	ScaleX = Root.WinWidth / 800.0;
-	ScaleY = Root.WinHeight / 600.0;
 
-	ControlOffset = 10 * ScaleY;
+	ControlOffset = 10;
 	bInitialized = False;
 
 	Super.Created();
-
-	ControlWidth = WinWidth/2.5;
-	ControlLeft = (WinWidth/2 - ControlWidth)/2;
-	ControlRight = WinWidth/2 + ControlLeft;
-
-	CenterWidth = (WinWidth/4)*3;
-	CenterPos = (WinWidth - CenterWidth)/2;
 
 	/*
 	ServerNameEdit = UWindowEditControl(CreateControl(class'UWindowEditControl', CenterPos, ControlOffset, CenterWidth, 1));
@@ -89,75 +101,35 @@ function Created()
 	ServerNameEdit.SetNumericOnly(False);
 	ServerNameEdit.SetMaxLength(205);
 	ServerNameEdit.SetDelayedNotify(True);
-	ControlOffset += 20 * ScaleY;
+	ControlOffset += 20 * Root.ScaleY;
 	*/
 
-	GameplayChangesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	GameplayChangesCheck.SetText(GameplayChangesText);
-	GameplayChangesCheck.SetHelpText(GameplayChangesHelp);
-	GameplayChangesCheck.SetFont(F_Normal);
-	GameplayChangesCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
-	
-	GoreCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	GoreCheck.SetText(GoreText);
-	GoreCheck.SetHelpText(GoreHelp);
-	GoreCheck.SetFont(F_Normal);
-	GoreCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
+	GameplayChangesCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', GameplayChangesText, GameplayChangesHelp));
 
-	AutoUseHealthVialsCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	AutoUseHealthVialsCheck.SetText(AutoUseHealthVialsText);
-	AutoUseHealthVialsCheck.SetHelpText(AutoUseHealthVialsHelp);
-	AutoUseHealthVialsCheck.SetFont(F_Normal);
-	AutoUseHealthVialsCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
-	
-	DamageScreenShakeScaleSlider = UWindowHSliderControl(CreateControl(class'UWindowHSliderControl', CenterPos, ControlOffset, CenterWidth, 1));
-	DamageScreenShakeScaleSlider.SetText(DamageScreenShakeScaleText);
-	DamageScreenShakeScaleSlider.SetHelpText(DamageScreenShakeScaleHelp);
-	DamageScreenShakeScaleSlider.SetFont(F_Normal);
+	GoreCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', GoreText, GoreHelp));
+
+	AutoUseHealthVialsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', AutoUseHealthVialsText, AutoUseHealthVialsHelp));
+
+	DamageScreenShakeScaleSlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', DamageScreenShakeScaleText, DamageScreenShakeScaleHelp));
 	DamageScreenShakeScaleSlider.SetRange(0.0, 1.0, 0.1);
-	ControlOffset += 20 * ScaleY;
+	DamageScreenShakeScaleSlider.SliderWidth = 90;
 	
-	ShowUsedManaCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	ShowUsedManaCheck.SetText(ShowUsedManaText);
-	ShowUsedManaCheck.SetHelpText(ShowUsedManaHelp);
-	ShowUsedManaCheck.SetFont(F_Normal);
-	ShowUsedManaCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
+	AutoUseHealthVialsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', ShowUsedManaText, ShowUsedManaHelp));
 	
 	// Experimental settings
-	
 	ExperimentalColor.R = 15;
 	ExperimentalColor.G = 90;
 	ExperimentalColor.B = 5;
-	ExperimentalLabel = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth, 1));
-	ExperimentalLabel.SetText("Experimental settings");
+	ExperimentalLabel = UWindowLabelControl(AddControl(class'UWindowLabelControl', "Experimental settings", ""));
 	ExperimentalLabel.SetTextColor(ExperimentalColor);
-	ControlOffset += 20 * ScaleY;
 	
-	NewHudCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	NewHudCheck.SetText(NewHudText);
-	NewHudCheck.SetHelpText(NewHudHelp);
-	NewHudCheck.SetFont(F_Normal);
-	NewHudCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
+	NewHudCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', NewHudText, NewHudHelp));
+
+	AutoShowObjectivesCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', AutoShowObjectivesText, AutoShowObjectivesHelp));
+
+	MoreSkippableCutscenesCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', MoreSkippableCutscenesText, MoreSkippableCutscenesHelp));
 	
-	AutoShowObjectivesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	AutoShowObjectivesCheck.SetText(AutoShowObjectivesText);
-	AutoShowObjectivesCheck.SetHelpText(AutoShowObjectivesHelp);
-	AutoShowObjectivesCheck.SetFont(F_Normal);
-	AutoShowObjectivesCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
-	
-	MoreSkippableCutscenesCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', CenterPos, ControlOffset, CenterWidth, 1));
-	MoreSkippableCutscenesCheck.SetText(MoreSkippableCutscenesText);
-	MoreSkippableCutscenesCheck.SetHelpText(MoreSkippableCutscenesHelp);
-	MoreSkippableCutscenesCheck.SetFont(F_Normal);
-	MoreSkippableCutscenesCheck.Align = TA_Left;
-	ControlOffset += 20 * ScaleY;
-	
+	//ControlOffset += 20;
 	GetSettings();
 }
 
@@ -169,7 +141,7 @@ function GetSettings()
 	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
 	GoreCheck.bChecked = RenewalConfig.bGore;
 	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
-	NewHudCheck.bChecked = RenewalConfig.bNewHud;
+	NewHudCheck.bChecked = RenewalConfig.bAltHud;
 	AutoShowObjectivesCheck.bChecked = RenewalConfig.bAutoShowObjectives;
 	ShowUsedManaCheck.bChecked = RenewalConfig.bShowUsedMana;
 	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
@@ -203,7 +175,7 @@ function Notify(UWindowDialogControl C, byte E)
 			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
 			break;
 		case NewHudCheck:
-			RenewalConfig.bNewHud = NewHudCheck.bChecked;
+			RenewalConfig.bAltHud = NewHudCheck.bChecked;
 			break;
 		case AutoShowObjectivesCheck:
 			RenewalConfig.bAutoShowObjectives = AutoShowObjectivesCheck.bChecked;
@@ -244,65 +216,39 @@ function AfterCreate()
 {
 	Super.AfterCreate();
 
-	DesiredWidth = 270;
-	DesiredHeight = ControlOffset + 5;
+	DesiredWidth = 220;
+	DesiredHeight = ControlOffset * Root.ScaleY;
 
 	bInitialized = True;
 }
 
-function Resized()
+function ResolutionChanged(float W, float H)
 {
-	Super.Resized();
-
-	ScaleX = Root.WinWidth / 800.0;
-	ScaleY = Root.WinHeight / 600.0;
+	DesiredHeight = ControlOffset * Root.ScaleY;
 }
 
 function BeforePaint(Canvas C, float X, float Y)
 {
-	local int ControlWidth, ControlLeft, ControlRight;
-	local int CenterWidth, CenterPos;
-	local int EditWidth;
+	local int CenterPos, ControlPadding;
+	local int i;
+	local UWindowDialogControl Control;
 
 	Super.BeforePaint(C, X, Y);
 
-	ControlWidth = WinWidth/2;
-	ControlLeft = (WinWidth/2 - ControlWidth)/2;
-	ControlRight = WinWidth/2 + ControlLeft;
-
-	CenterWidth = WinWidth * 0.95;
+	//ControlOffset = 10 * Root.ScaleY;
 	
-	CenterPos = (WinWidth - CenterWidth)/2;
+	ControlPadding = 16;
+	CenterPos = WinWidth/2 + ControlPadding;
 	
-	EditWidth = ControlRight;
-
-	//ServerNameEdit.SetSize(CenterWidth, 1);
-	//ServerNameEdit.WinLeft = CenterPos;
-	//ServerNameEdit.EditBoxWidth = EditWidth;
-
-	GameplayChangesCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	GameplayChangesCheck.WinLeft = CenterPos;
-
-	GoreCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	GoreCheck.WinLeft = CenterPos;
-
-	AutoUseHealthVialsCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	AutoUseHealthVialsCheck.WinLeft = CenterPos;
-
-	NewHudCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	NewHudCheck.WinLeft = CenterPos;
-
-	AutoShowObjectivesCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	AutoShowObjectivesCheck.WinLeft = CenterPos;
-
-	ShowUsedManaCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	ShowUsedManaCheck.WinLeft = CenterPos;
-
-	DamageScreenShakeScaleSlider.SetSize(CenterWidth, 1);
-	DamageScreenShakeScaleSlider.WinLeft = CenterPos;
-
-	MoreSkippableCutscenesCheck.SetSize(CenterWidth-EditWidth+16, 1);
-	MoreSkippableCutscenesCheck.WinLeft = CenterPos;
+	for (i = 0; i < NumControls; i++)
+	{
+		Control = Controls[i].Control;
+		Control.WinLeft = ControlPadding;
+		Control.WinTop = Controls[i].WinTop * Root.ScaleY;
+		Control.SetSize(WinWidth-(ControlPadding*2+LookAndFeel.Size_ScrollbarWidth), 1);
+		//Control.WinTop = ControlOffset;
+		//ControlOffset += 20 * Root.ScaleY;
+	}
 }
 
 defaultproperties

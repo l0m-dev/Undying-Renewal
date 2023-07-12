@@ -10,7 +10,8 @@ function Created()
 
 function Click(float X, float Y)
 {
-	UWindowFramedWindow(GetParent(class'UWindowFramedWindow')).Close();
+	//UWindowFramedWindow(GetParent(class'UWindowFramedWindow')).Close();
+	ParentWindow.Close();
 }
 
 defaultproperties

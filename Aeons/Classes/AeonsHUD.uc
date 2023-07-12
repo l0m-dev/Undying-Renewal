@@ -631,6 +631,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	local texture CurrentCrossHair;
 	local Actor A;
 	local vector HitLocation;
+	local float CrosshairScale;
 
  	A = PlayerPawn(Owner).EyeTraceActor; //EyeTrace(HitLocation,,4096, true);
 	
@@ -638,7 +639,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	
 	PlayerPawn(Owner).bHaveTarget = false;
 	
-	Scale = Scale * (Canvas.ClipY / 768);
+	CrosshairScale = ScaleY;
 	CurrentCrossHair = CrossHairs[ CrossHair ];	
 	// if we are tracing a Scripted Pawn, change the crosshair to green.
 	if ( A != none )
@@ -683,7 +684,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	if (Crosshair>MAX_CROSSHAIRS-1) 
 		Crosshair=0;
 		
-	Canvas.SetPos(StartX - 8*Scale, StartY - 8*Scale );
+	Canvas.SetPos(StartX - 8*CrosshairScale, StartY - 8*CrosshairScale );
 	Canvas.Style = 3;
 		
 	
@@ -696,7 +697,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	Canvas.bNoSmooth = false;
 	
 	if ( CurrentCrossHair != None ) 
-		Canvas.DrawIcon( CurrentCrossHair, Scale );
+		Canvas.DrawIcon( CurrentCrossHair, CrosshairScale );
 		
 	Canvas.DrawColor.r = 255;
 	Canvas.DrawColor.g = 255;
@@ -1099,7 +1100,7 @@ simulated function PostRender( canvas Canvas )
 	local string TempString;
 	local int Token;
 	local float WeaponX;
-	local bool bNewHud;
+	local bool bAltHud;
 
 	url = Level.GetLocalURL();
 
@@ -1111,13 +1112,17 @@ simulated function PostRender( canvas Canvas )
 		LevelName = url;
 	
 	bDrawHUD = true;
-	bNewHud = Owner.GetRenewalConfig().bNewHud;
+	bAltHud = Owner.GetRenewalConfig().bAltHud;
 	
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
-	Scale = Canvas.ClipY / 600.0;
-	ScaleX = Canvas.ClipX / 800.0;
-	ScaleY = Canvas.ClipY / 600.0;
+	//Scale = Canvas.ClipY / 600.0;
+	//ScaleX = Canvas.ClipX / 800.0;
+	//ScaleY = Canvas.ClipY / 600.0;
 
+	ScaleX = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleX;
+	ScaleY = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleY;
+	Scale = ScaleY;
+	
 	HUDSetup(canvas);
 
 	if ( IsLetterBoxed() )
@@ -1288,15 +1293,15 @@ simulated function PostRender( canvas Canvas )
 			DrawTouchList(Canvas);
 		}
 	
-		if (bNewHud)
+		if (bAltHud)
 		{
 			DrawHealth(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY - 69*Scale);
 			DrawMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 69*Scale);
 		}
 		else
 		{
-			DrawHealth(Canvas, 317*ScaleX - 55*ScaleY, 532*ScaleY);
-			DrawMana(Canvas, 426*ScaleX + 64*ScaleY, 532*ScaleY);
+			DrawHealth(Canvas, 317*ScaleX - 55*ScaleY, Canvas.ClipY - 68*ScaleY);
+			DrawMana(Canvas, 426*ScaleX + 64*ScaleY, Canvas.ClipY - 68*ScaleY);
 		}
 	
 		if (Level.bDebugMessaging)
@@ -1311,7 +1316,7 @@ simulated function PostRender( canvas Canvas )
 		
 		if (Owner.GetRenewalConfig().bShowUsedMana)
 		{
-			if (bNewHud)
+			if (bAltHud)
 			{
 				DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*Scale);
 			}
@@ -1332,13 +1337,13 @@ simulated function PostRender( canvas Canvas )
 				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*Scale);
 			}
 	
-			if (bNewHud)
+			if (bAltHud)
 				DrawInventoryItem(Canvas, 1*ScaleX, 1*Scale);
 			else
 				DrawInventoryItem(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY-72*Scale);
 			
 			WeaponX = 5*ScaleX;
-			if (bNewHud)
+			if (bAltHud)
 			{
 				if (AeonsPlayer(Owner).DefSpell != none)
 					WeaponX = Canvas.ClipX - 208*ScaleY;
@@ -1369,7 +1374,7 @@ simulated function PostRender( canvas Canvas )
 
 			for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
 			{
-				if (bNewHud)
+				if (bAltHud)
 					Canvas.SetPos( 64, 64+25*i );
 				else
 					Canvas.SetPos( 50, 25+25*i );
@@ -1929,7 +1934,7 @@ simulated function DrawManaInfo(Canvas Canvas)
 		Canvas.DrawColor.B = 100;
 		
 		ManaInfoX = 550 * ScaleX;
-		if (Owner.GetRenewalConfig().bNewHud)
+		if (Owner.GetRenewalConfig().bAltHud)
 			ManaInfoX = 245 * ScaleX;
 
 		Canvas.SetPos(ManaInfoX, 550*ScaleY);
@@ -2403,7 +2408,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 	if ( Owner != None )
 		AP = AeonsPlayer(Owner);
 	
-	if (AP.Book == None || Owner.GetRenewalConfig().bNewHud) // don't draw this hud element with new hud
+	if (AP.Book == None || Owner.GetRenewalConfig().bAltHud) // don't draw this hud element with new hud
 		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
@@ -2424,7 +2429,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 			Canvas.DrawColor.B = 255;
 			Canvas.DrawColor.A = 255;
 			//Canvas.SetPos( 10, 10 );
-			if (Owner.GetRenewalConfig().bNewHud)
+			if (Owner.GetRenewalConfig().bAltHud)
 			{
 				Canvas.SetPos( 1 * ScaleY, Canvas.ClipY - 136*ScaleY );
 			}
@@ -3267,26 +3272,26 @@ simulated function DrawCenterpiece( canvas Canvas )
 
 	Canvas.bNoSmooth = false;
 	
-	if (Owner.GetRenewalConfig().bNewHud)
-		Canvas.SetPos( 5*ScaleX, 532*ScaleY);
+	if (Owner.GetRenewalConfig().bAltHud)
+		Canvas.SetPos( 5*ScaleX, Canvas.ClipY - 68*ScaleY);
 	else
-		Canvas.SetPos( 317*ScaleX, 532*ScaleY);
+		Canvas.SetPos( 317*ScaleX, Canvas.ClipY - 68*ScaleY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 
 	ManaX = 426 * ScaleX;
-	if (Owner.GetRenewalConfig().bNewHud)
+	if (Owner.GetRenewalConfig().bAltHud)
 		ManaX = 120 * ScaleX;
 	
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
-		Canvas.SetPos( ManaX, 534*ScaleY);
+		Canvas.SetPos( ManaX, Canvas.ClipY - 66*ScaleY);
 		Canvas.Style = ERenderStyle.STY_Translucent;
 		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 	}
 
-	Canvas.SetPos( ManaX, 534*ScaleY);
+	Canvas.SetPos( ManaX, Canvas.ClipY - 66*ScaleY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 }
@@ -3546,6 +3551,7 @@ simulated function DrawTypingPrompt( canvas Canvas, console Console )
 		Canvas.DrawColor.b = 255;	
 		TypingPrompt = "> "$Console.TypedStr$"_";
 		Canvas.Font = Canvas.MedFont;
+		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 		Canvas.StrLen( TypingPrompt, XL, YL );
 		Canvas.SetPos( 50*Scale, 450*Scale);// Console.FrameY - Console.ConsoleLines - YL - 1 );
 		Canvas.DrawText( TypingPrompt, false );
@@ -5131,7 +5137,7 @@ defaultproperties
      CrossHairs(22)=Texture'Aeons.Icons.CrossHair22'
      CrossHairs(23)=Texture'Aeons.Icons.CrossHair23'
      Icons(0)=Texture'Aeons.Icons.null_Icon'
-     Icons(1)=Texture'Aeons.Icons.Revolver_Icon_Silver'
+     Icons(1)=Texture'Aeons.Icons.Revolver_Icon'
      Icons(2)=Texture'Aeons.Icons.Ghelz_Icon'
      Icons(3)=Texture'Aeons.Icons.Scythe_Icon'
      Icons(4)=Texture'Aeons.Icons.Cannon_Icon'

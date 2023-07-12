@@ -1692,5 +1692,4 @@ defaultproperties
      Mass=100
      NetPriority=1
      NetUpdateFrequency=100
-     PhysRate=1.0
 }

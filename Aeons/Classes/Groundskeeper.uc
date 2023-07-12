@@ -35,7 +35,6 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	if ( MyProp[0] != none )
 	{
 		MyProp[0].SetBase( none );
-		MyProp[0].bCollideWorld = true;		// TODO: move to Thrown() in HeldProp?
 
 		DRot = MyProp[0].Rotation;
 		DRot.Pitch = 0;

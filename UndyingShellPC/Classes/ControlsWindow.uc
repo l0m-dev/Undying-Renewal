@@ -119,8 +119,8 @@ function Created()
 		return;
 	}
 
-	RootScaleX = AeonsRoot.ScaleX;
-	RootScaleY = AeonsRoot.ScaleY;
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	SmokingWindows[0] = -1;
 	SmokingWindows[1] = -1;
@@ -1113,8 +1113,8 @@ function Resized()
 
 	if (AeonsRoot != None)
 	{
-		RootScaleX = AeonsRoot.ScaleX;
-		RootScaleY = AeonsRoot.ScaleY;
+		RootScaleX = Root.ScaleX;
+		RootScaleY = Root.ScaleY;
 	}
 
 	if ( AdvControls != None )
@@ -1375,7 +1375,7 @@ defaultproperties
      LabelList(50)="Display Objectives"
      LabelList(51)="Defensive Spell Fire"
      LabelList(52)="Defensive Spell Select"
-     LabelList(53)="Items Quick Select"
+     LabelList(53)="Item Quick Select"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

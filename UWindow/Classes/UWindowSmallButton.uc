@@ -30,6 +30,8 @@ function BeforePaint(Canvas C, float X, float Y)
 	C.Font = Root.Fonts[Font];
 	
 	TextSize(C, RemoveAmpersand(Text), W, H);
+	// added
+	WinHeight = H * 1.1;
 
 	TextX = (WinWidth-W)/2;
 	TextY = (WinHeight-H)/2;
