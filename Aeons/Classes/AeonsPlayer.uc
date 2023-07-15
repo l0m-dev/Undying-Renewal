@@ -2425,6 +2425,9 @@ event PlayerInput( float DeltaTime )
 
 	Super.PlayerInput( DeltaTime );
 
+	if (Player.Console != None)
+		WindowConsole(Player.Console).MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * WindowConsole(Player.Console).Root.ScaleY;
+
 	if ( bJump > 0 ) 
 		JumpHeldTime += DeltaTime;
 	else

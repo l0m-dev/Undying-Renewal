@@ -291,7 +291,7 @@ var Rotator SavedView1;
 var string NoWheelSelectionText;
 var vector WheelDelta;
 const ExtendRadiusThresholdAmount = 24; // allows selection cursor to move beyond required threshold
-const WheelCursorSensitivity = 0.5;
+const WheelCursorSensitivity = 0.75;
 
 var float DisplayObjectivesTime;
 
