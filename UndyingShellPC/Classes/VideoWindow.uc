@@ -150,7 +150,7 @@ function Created()
 	BrightnessSlider.DisabledTexture = None;
 
 // Resolution buttons
-	for( i=0; i<5; i++ )
+	for( i=0; i<ArrayCount(Resolutions); i++ )
 	{
 		Resolutions[i] = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
@@ -404,20 +404,55 @@ function Created()
 	Root.Console.bBlackout = True;
 
 	GetCurrentSettings();
+	GetStartingRow();
 	RefreshButtons();
+	
 	Resized();
 
 	bInitialized=True;
 }
 
+function GetStartingRow()
+{
+	local int i;
+	for ( i=0; i<ArrayCount(ResolutionList); i++ )
+	{
+		if ( ResLabel.Text ~= ResolutionList[i] )
+		{
+			break;
+		}
+	}
+	CurrentRow = clamp(i - (ArrayCount(Resolutions) / 2), 0, ArrayCount(ResolutionList) - ArrayCount(Resolutions));
+
+	if ( CurrentRow > 0 ) 
+	{
+		Up.bDisabled = false;
+	}
+	if ( CurrentRow >= ArrayCount(ResolutionList) - ArrayCount(Resolutions) )
+	{
+		Down.bDisabled = true;
+	}
+}
+
 function Message(UWindowWindow B, byte E)
 {
+	local int i;
+	
 	switch (E)
 	{
 		case DE_DoubleClick:
 		case DE_Click:
 			if ( ShellButton(B).bDisabled ) 
 				return;
+			for ( i=0; i<ArrayCount(Resolutions); i++ )
+			{
+				if ( B == Resolutions[i] )
+				{
+					ResolutionClicked(B);
+					return;
+				}
+				
+			}
 			switch (B)
 			{
 				case Advanced:
@@ -434,14 +469,6 @@ function Message(UWindowWindow B, byte E)
 					bSaveChanges = false;
 					PlayNewScreenSound();
 					Close();
-					break;
-
-				case Resolutions[0]:
-				case Resolutions[1]:
-				case Resolutions[2]:
-				case Resolutions[3]:
-				case Resolutions[4]:
-					ResolutionClicked(B);	
 					break;
 
 				case Up:

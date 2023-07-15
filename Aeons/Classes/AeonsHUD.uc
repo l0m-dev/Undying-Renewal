@@ -291,6 +291,7 @@ var Rotator SavedView1;
 var string NoWheelSelectionText;
 var vector WheelDelta;
 const ExtendRadiusThresholdAmount = 24; // allows selection cursor to move beyond required threshold
+const WheelCursorSensitivity = 0.5;
 
 var float DisplayObjectivesTime;
 
@@ -4614,9 +4615,9 @@ simulated function WheelMouseInput(float DeltaTime)
 	local float Delta;
 
 	if (aX != 0)
-		WheelDelta.X += aX * DeltaTime;
+		WheelDelta.X += aX * WheelCursorSensitivity * DeltaTime;
 	if (aY != 0)
-		WheelDelta.Y += aY * DeltaTime;
+		WheelDelta.Y += aY * WheelCursorSensitivity * DeltaTime;
 
 	if (aX != 0 || aY != 0)
 	{
