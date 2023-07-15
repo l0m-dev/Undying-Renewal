@@ -1710,12 +1710,14 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
 		
-	if (RGORE() && damageType == 'pellet')
+	if (RGORE() && damageType == 'pellet' && bHackable && !bIsBoss)
 	{
 		if (FRand() > 0.5)
 			Patrick(Killer).DetachJoint();
 		else
 			Patrick(Killer).DestroyJoint();
+
+		Spawn(class 'SmokyBloodFX',Killer,,HitLocation); // or SmokyBloodSmallFX
 	}
 
 	// Remove all non-persistent effectors.
