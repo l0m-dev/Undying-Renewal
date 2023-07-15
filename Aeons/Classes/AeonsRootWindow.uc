@@ -35,7 +35,12 @@ function Created()
 	local int MouseOffsetX;
 	local float InnerWidth, MouseXPosScale;
 	
-	LookAndFeelClass = default.LookAndFeelClass; // breaks user config but old users have wrong one set
+	if (LookAndFeelClass ~= "UMenu.UMenuMetalLookAndFeel")
+	{
+		LookAndFeelClass = "UndyingShellPC.UndyingLookAndFeel";
+		SaveConfig();
+	}
+
 	Super.Created();
 
 	MainWindowClass = Class<UWindowWindow>(DynamicLoadObject("UndyingShellPC.MainMenuWindow", class'Class'));
@@ -239,7 +244,7 @@ function DrawMouse(Canvas C)
 		// only DrawClippedActor calls ComputeRenderSize which calls SetSceneNode where we correct the fov
 		// ex. with ScreenFlashes=False main menu cursor would be in the wrong position
 		if (MouseWindow.Cursor == NormalCursor)
-			C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX, C.SizeY, 0, 0, true);
+			C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX/ GUIScale, C.SizeY/ GUIScale, 0, 0, true);
 	}
 
 }

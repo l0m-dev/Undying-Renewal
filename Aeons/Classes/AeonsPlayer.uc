@@ -3523,15 +3523,16 @@ ignores SeePlayer, HearNoise, Bump;
 			//mouse input goes to HUD
 			if ( AeonsHUD(myHUD) != None )
 			{
+				// MouseSensitivity is already applied to all of these
 				if ( bMouseSmoothing ) 
 				{
-					AeonsHUD(myHUD).aX = SmoothMouseX * MouseSensitivity;
-					AeonsHUD(myHUD).aY = SmoothMouseY * MouseSensitivity;
+					AeonsHUD(myHUD).aX = SmoothMouseX;
+					AeonsHUD(myHUD).aY = SmoothMouseY;
 				}
 				else
 				{
-					AeonsHUD(myHUD).aX = aMouseX * MouseSensitivity;
-					AeonsHUD(myHUD).aY = aMouseY * MouseSensitivity;
+					AeonsHUD(myHUD).aX = aMouseX;
+					AeonsHUD(myHUD).aY = aMouseY;
 				}
 				AeonsHUD(myHUD).WheelMouseInput(DeltaTime);
 			}
