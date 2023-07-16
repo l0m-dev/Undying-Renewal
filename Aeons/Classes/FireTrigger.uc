@@ -13,7 +13,10 @@ var Actor LastTouchList[8];
 function DamageInfo GetDamageInfo(optional name DamageType)
 {
 	local DamageInfo DInfo;
-	DInfo.Damage = 1.0;
+	if (RGC())
+		DInfo.Damage = 5.0;
+	else
+		DInfo.Damage = 1.0;
 	DInfo.DamageType = 'Fire';
 	DInfo.DamageMultiplier = 1.0;
 	return DInfo;	

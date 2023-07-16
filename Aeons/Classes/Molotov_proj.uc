@@ -312,7 +312,7 @@ auto state Flying
 		// can't hit self
 		if (Other != Owner)
 		{
-			if ( Other.IsA('ScriptedPawn') )
+			if ( Other.IsA('Pawn') )
 				Pawn(Other).OnFire(true);
 			
 			if (Other.AcceptDamage(GetDamageInfo('Fire')))

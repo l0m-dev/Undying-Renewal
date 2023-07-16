@@ -63,7 +63,10 @@ function DamageInfo GetDamageInfo(optional name DamageType)
 	local DamageInfo DInfo;
 	DInfo.DamageMultiplier = 1.0;
 	DInfo.DamageType = 'Fire';
-	DInfo.Damage = 1;
+	if (RGC())
+		DInfo.Damage = 5;
+	else
+		DInfo.Damage = 1;
 	return DInfo;
 }
 

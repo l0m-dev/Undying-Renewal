@@ -48,8 +48,12 @@ simulated function ProcessTouch(Actor Other, Vector HitLocation)
 	if ( Other.IsA('Pawn') )
 		PlaySound(PawnImpactSound);
 
-	if (Other != Owner)
+	if (bCanHitInstigator || Other != Owner)
+	{
 		Other.ProjectileHit(Instigator, HitLocation, (MomentumTransfer * Normal(Velocity)), self, getDamageInfo());
+		if (Other.IsA('Pawn'))
+			Pawn(Other).OnFire(true);
+	}
 }
 
 simulated function Timer()
@@ -110,6 +114,7 @@ simulated function Destroyed()
 			if (LifeSpan > 0)
 			{
 				spawn(class 'PhoenixExplosion', Owner,,Location);
+				spawn (class 'MolotovExplosion',Owner,,Location);
 			} else {
 				if ( ExpireSound != none )
 					PlaySound(ExpireSound,,2,,4096);
@@ -499,6 +504,7 @@ auto state Flying
 		MakeNoise(1.0, 2560);
 
 		setTimer( 0.75 + 0.5*FRand(), false );
+		bCanHitInstigator = true;
 	}
 
 	function BeginState()

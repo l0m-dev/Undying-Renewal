@@ -4632,13 +4632,32 @@ simulated function WheelMouseInput(float DeltaTime)
 	}
 }
 
+simulated function int GetSectionFromPos(vector CursorPos)
+{
+	local float Theta;
+
+	if ( Abs(CursorPos.X) < 0.01 ) 
+		CursorPos.X = 0.01;
+		
+	if ( CursorPos.X < 0 ) 
+	{
+		Theta = 270 - ATan( CursorPos.Y/CursorPos.X )*57.3;
+	}
+	else
+	{
+		Theta = 90 - ATan( CursorPos.Y/CursorPos.X )*57.3;
+	}
+
+	if ( Theta > 337 )
+		return 0;
+	else
+		return ((Theta + 23) / 45);
+}
+
 simulated function DrawSelectHUD(Canvas Canvas)
 {
     local AeonsPlayer PPawn;
-    local float UnitX, UnitY;
     local float Delta;
-    local float Theta;
-    local float ThetaSum;
     local int i;
 
 	PPawn = AeonsPlayer(Owner);
@@ -4655,22 +4674,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 		Delta = Sqrt(aX * aX + aY * aY);
 		if ( Delta > RadiusThresholdPSX2 * PPawn.MouseSensitivity )
 		{
-			if ( Abs(aX) < 0.01 )
-				aX = 0.01;
-
-			if ( aX < 0 )
-			{
-				Theta = 270 - ATan( aY/aX )*57.3;
-			}
-			else
-			{
-				Theta =  90 - ATan( aY/aX )*57.3;
-			}
-			
-			if ( Theta > 337 )
-				SelectedSector = 0;
-			else
-				SelectedSector = (Theta + 23) / 45;
+			SelectedSector = GetSectionFromPos(vect(1,0,0)*aX + vect(0,1,0)*aY);
 
 			if ( SelectedSector != LastSector ) 
 			{
@@ -4682,28 +4686,11 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	}
 	else
 	{
-		Delta = Sqrt(WheelDelta.X*WheelDelta.X + WheelDelta.Y*WheelDelta.Y);
+		Delta = VSize(WheelDelta);
 
 		if ( Delta >= RadiusThreshold )
 		{
-			AveragedMouseMove = WheelDelta / Delta;	
-			
-			if ( Abs(AveragedMouseMove.X) < 0.01 ) 
-				AveragedMouseMove.X = 0.01;
-				
-			if ( AveragedMouseMove.X < 0 ) 
-			{
-				Theta = 270 - ATan( AveragedMouseMove.Y/AveragedMouseMove.X )*57.3;
-			}
-			else
-			{
-				Theta = 90 - ATan( AveragedMouseMove.Y/AveragedMouseMove.X )*57.3;
-			}
-
-			if ( Theta > 337 )
-				SelectedSector = 0;
-			else
-				SelectedSector = (Theta + 23) / 45;
+			SelectedSector = GetSectionFromPos(WheelDelta);
 
 			if ( SelectedSector != LastSector ) 
 			{
@@ -4712,7 +4699,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 				PlayerPawn(Owner).PlaySound( sound'Aeons.HUD_Mvmt01',SLOT_Misc,0.25 );
 			}
 		}
-		else if (Delta < RadiusThreshold / 2)
+		else if (SelectedSector != -1 && (Delta < RadiusThreshold / 2 || GetSectionFromPos(WheelDelta) != SelectedSector))
 		{
 			SelectedSector = -1;
 			LastSector = SelectedSector;
