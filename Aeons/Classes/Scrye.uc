@@ -44,7 +44,7 @@ function FireAttSpell( float Value )
 					if ( PawnOwner.useMana(cost) && !AeonsPlayer(Owner).bDispelActive )
 					{
 						bFiring = true;
-						GhelzUse(manaCostPerLevel[castingLevel]);
+						//GhelzUse(manaCostPerLevel[castingLevel]);
 						PlayFiring();
 						
 						if ( Owner.bHidden )

@@ -427,6 +427,21 @@ function bool ValidHit( actor StartActor, actor TargetActor,
 	return false;
 }
 
+function bool CheckScytheHeadshot(name JointName)
+{
+	switch ( JointName )
+	{
+		case 'Hair':
+		case 'Hair1':
+		case 'Hair2':
+		case 'Hair3':
+		case 'Neck':
+		case 'Head':
+			return true;
+	}
+	return false;
+}
+
 function MeleeAttack(float Range)
 {
 	local bool bHeadShot, bSpawnWounds;
@@ -471,254 +486,242 @@ function MeleeAttack(float Range)
 			DInfo = getDamageInfo('Scythe');
 			if ( A.AcceptDamage(DInfo) )
 				A.TakeDamage(Pawn(Owner), hitloc, 300.0 * x, DInfo);
+			continue;
 		}
-	}
-
-	foreach TraceActors( class'Pawn', Other, HitLocation, HitNormal, HitJoint, end, start, true, true, vect(48,48,24) )
-	{
-		if ( (FastTrace (Other.Location, Start) || 
-				FastTrace (Other.Location + vect(0,0,0.85)*Other.CollisionHeight, Start) || 
-				FastTrace (Other.Location - vect(0,0,0.85)*Other.CollisionHeight, Start) )
-			&& (Other.Location - Owner.Location) Dot X > 0 && Other.IsA('Pawn') )
+		else
 		{
-			if ( Other.Health > 0 )
+			Other = Pawn(A);
+		}
+
+		if ( Other.Health <= 0 )
+			continue;
+		
+		if ( (Other.Location - Owner.Location) Dot X <= 0)
+			continue;
+		
+		if (!FastTrace(Other.Location, Start) &&
+			!FastTrace(Other.Location + vect(0,0,0.85)*Other.CollisionHeight, Start) &&
+			!FastTrace(Other.Location - vect(0,0,0.85)*Other.CollisionHeight, Start))
+		{
+			continue;
+		}
+		
+		// Reset the total damage accumulator with each traced pawn
+		TotalDamage = 0;
+		
+		JointName = Other.JointName(PlayerPawn(Owner).EyeTraceJoint);
+
+		if (Level.bDebugMessaging)
+			PlayerPawn(Owner).ClientMessage(""$JointName);
+		
+		// log( "" $ name $ " registered valid hit on " $ Other.name $ ", joint " $ JointName $ ".", 'Misc');
+			
+		bSpawnWounds = false;
+		bHeadShot = CheckScytheHeadshot(JointName);
+		if (bHeadShot)
+			JointName = 'Head';
+
+		// allows us to exit BloodThirst state in boss fights
+		if (ScriptedPawn(Other).bIsBoss)
+		{
+			if (bThirsty)
 			{
-				// Reset the total damage accumulator with each traced pawn
-				TotalDamage = 0;
-				
-				JointName = Other.JointName(PlayerPawn(Owner).EyeTraceJoint);
-
-				if (Level.bDebugMessaging)
-					PlayerPawn(Owner).ClientMessage(""$JointName);
-				
-				// log( "" $ name $ " registered valid hit on " $ Other.name $ ", joint " $ JointName $ ".", 'Misc');
-					
-				bSpawnWounds = false;
-
-				switch ( JointName )
-				{
-					case 'Hair':
-					case 'Hair1':
-					case 'Hair2':
-					case 'Hair3':
-					case 'Neck':
-					case 'Head':
-						bHeadShot = true;
-						JointName = 'Head';
-						break;
-						
-					default:
-						bHeadShot = false;
-						break;
-				}
-
-				if (ScriptedPawn(Other).bIsBoss)
-				{
-					if (bThirsty)
-					{
-						GotoState('NormalFire');
-					}
-				}
-
-				if ( false /*bHeadShot*/ )
-				{
-					MyView = Vector(PlayerPawn(Owner).ViewRotation);
-					MyView.z = 0;
-
-					YourView = Vector(Other.Rotation);
-					YourView.z = 0;
-
-					if ( (MyView dot YourView) > 0 )
-						PlayerPawn(Owner).Health = clamp((PlayerPawn(Owner).Health + (Other.Health * 0.5)), 0, 200);
-
-					Other.PlayDamageMethodImpact('RipSlice', Other.Location, SlashDir);
-					// Other.Decapitate((SlashDir + vect(0,0,0.5)) * 256);
-					if( Other.Decapitate((y + vect(0,0,0.8)) * 256) )
-					{ 
-						Other.Died( Pawn(Owner), 'Decapitated', HitLocation, DInfo );
-					}
-				} 
-				else
-				{
-					hitloc = Other.Location + (Other.Location - Owner.Location) * Other.CollisionRadius;
-
-					// log(""$(Vector(PlayerPawn(Owner).ViewRotation) dot Vector(Other.ViewRotation)));
-
-					if (PawnImpactSound != none) 
-					{
-						PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
-						MakeNoise(1.0, 1280);
-					}
-
-					Other.PlayDamageMethodImpact('RipSlice', hitloc, -Vector(Pawn(Owner).ViewRotation)); 
-
-					MyView = Vector(PlayerPawn(Owner).ViewRotation);
-					MyView.z = 0;
-	
-					YourView = Vector(Other.Rotation);
-					YourView.z = 0;
-
-					if ( (MyView dot YourView) < 0 )
-					{
-						// hit in front
-						healthTaken = 0;	
-
-						// This is the limb hacking stuff
-						if ( Other.IsA('ScriptedPawn') )
-						{
-							SP = ScriptedPawn(Other);
-							
-							DInfo = getDamageInfo('Scythe');
-							DInfo.JointName = JointName;
-							DInfo.Damage *= 0.5;
-							DInfo.bMagical = true;
-							if ( SP.AcceptDamage(DInfo) )
-							{
-								SP.AdjustDamage(DInfo);
-								DInfo = SP.AdjustDamageByLocation(DInfo);
-								TotalDamage += DInfo.Damage;
-							}
-							
-							DInfo = getDamageInfo('Scythe');
-							DInfo.JointName = JointName;
-							DInfo.Damage *= 0.5;
-							DInfo.bMagical = false;
-							if ( SP.AcceptDamage(DInfo) )
-							{
-								SP.AdjustDamage(DInfo);
-								DInfo = SP.AdjustDamageByLocation(DInfo);
-								TotalDamage += DInfo.Damage;
-							}
-
-							bSpawnWounds = TotalDamage > 5.0;							
-
-							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss )
-							{
-								// we now know that the creature is going to die
-								healthTaken = 0.5 * Other.Health;
-								HackLimb(SP, DInfo.JointName, SlashDir);
-							}
-						}
-						else
-							bSpawnWounds = true;
-
-						DInfo = getDamageInfo('Scythe');
-						DInfo.JointName = JointName;
-						
-						DInfo.Damage *= 0.5;
-						
-						DInfo.bMagical = true;
-						if ( Other.AcceptDamage(DInfo) )
-							Other.TakeDamage(Pawn(Owner), hitloc, 300.0 * x, DInfo);
-						
-						DInfo.bMagical = false;
-						if ( Other.AcceptDamage(DInfo) )
-							Other.TakeDamage(Pawn(Owner), hitloc, 300.0 * x, DInfo);
-					} 
-					else 
-					{
-						// hit from behind
-						healthTaken = 0;
-
-						// This is the limb hacking stuff
-						if ( Other.IsA('ScriptedPawn') )
-						{
-							SP = ScriptedPawn(Other);
-							
-							DInfo = getDamageInfo('ScytheDouble');
-							DInfo.JointName = JointName;
-							DInfo.Damage *= 0.5;
-							DInfo.bMagical = true;
-							if ( SP.AcceptDamage(DInfo) )
-							{
-								SP.AdjustDamage(DInfo);
-								DInfo = SP.AdjustDamageByLocation(DInfo);
-								TotalDamage += DInfo.Damage;
-							}
-							
-							DInfo = getDamageInfo('ScytheDouble');
-							DInfo.JointName = JointName;
-							DInfo.Damage *= 0.5;
-							DInfo.bMagical = false;
-							if ( SP.AcceptDamage(DInfo) )
-							{
-								SP.AdjustDamage(DInfo);
-								DInfo = SP.AdjustDamageByLocation(DInfo);
-								TotalDamage += DInfo.Damage;
-							}
-							
-							bSpawnWounds = TotalDamage > 5.0;
-
-							if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss)
-							{
-								// we now know that the creature is going to die
-								healthTaken = Other.Health * 0.5;
-								HackLimb(SP, DInfo.JointName, SlashDir);
-							}
-						}
-						else
-							bSpawnWounds = true;
-
-						DInfo = getDamageInfo('ScytheDouble');
-						DInfo.JointName = JointName;
-
-						DInfo.Damage *= 0.5;
-
-						DInfo.bMagical = true;
-						if ( Other.AcceptDamage(DInfo) )
-							Other.TakeDamage(Pawn(Owner), hitloc, 300.0 * x, DInfo);
-
-						DInfo.bMagical = false;
-						if ( Other.AcceptDamage(DInfo) )
-							Other.TakeDamage(Pawn(Owner), hitloc, 300.0 * x, DInfo);
-					}
-
-					// if we hit a scripted pawn and the scripted pawn can be hit by a scythe
-					// Only in berserk mode!
-					if (bBerserk)
-					{
-						if ( (HealthTaken > 0) && Other.IsA('ScriptedPawn'))
-							if (ScriptedPawn(Other).bGiveScytheHealth)
-							{
-								log ("Health Taken = "$HealthTaken, 'Misc');
-								HealthRefreshAmt = healthTaken;
-								GotoState('AbsorbHealth');
-							} else {
-								log ("bGiveScytheHealth = "$ScriptedPawn(Other).bGiveScytheHealth, 'Misc');
-							}
-					}
-				}
-
-				if (bSpawnWounds && ScriptedPawn(Other).bHackable && !ScriptedPawn(Other).bIsBoss)
-				{
-					if (BloodDrip == none)
-					{
-						BloodDrip = Spawn(class 'ScytheWoundFX',,,JointPlace('Blade5').pos);
-						BloodDrip.SetBase(self,'Blade5','root');
-					}
-
-					if (JointName != 'none')
-					{
-						Spawn(class 'InstantScytheWound',Other,,HitLocation);
-						Wound = Spawn(class 'ScytheWound',Other,,Other.JointPlace(JointName).pos, Rotator(HitNormal));
-						Wound.AttachJoint = JointName;
-						Wound.setup();
-					}
-				}
-				else if (Other.IsA('DecayedSaint'))
-				{
-					Spawn(class 'DustPuffFX',Other,,HitLocation);
-					//Wound = Spawn(class 'DustPuffFX',Other,,Other.JointPlace(JointName).pos, Rotator(HitNormal));
-					//Wound.AttachJoint = JointName;
-					//Wound.setup();
-				}
+				GotoState('NormalFire');
 			}
 		}
 
-		// momentum = (Other.Location - Owner.Location) * 300/Other.Mass;
-		// Other.Velocity += momentum;
+		/*
+		if ( bHeadShot )
+		{
+			MyView = Vector(PlayerPawn(Owner).ViewRotation);
+			MyView.z = 0;
+
+			YourView = Vector(Other.Rotation);
+			YourView.z = 0;
+
+			if ( (MyView dot YourView) > 0 )
+				PlayerPawn(Owner).Health = clamp((PlayerPawn(Owner).Health + (Other.Health * 0.5)), 0, 200);
+
+			Other.PlayDamageMethodImpact('RipSlice', Other.Location, SlashDir);
+			// Other.Decapitate((SlashDir + vect(0,0,0.5)) * 256);
+			if( Other.Decapitate((y + vect(0,0,0.8)) * 256) )
+			{ 
+				Other.Died( Pawn(Owner), 'Decapitated', HitLocation, DInfo );
+			}
+		}
+		else
+		*/
+
+		// log(""$(Vector(PlayerPawn(Owner).ViewRotation) dot Vector(Other.ViewRotation)));
+
+		hitloc = Other.Location + (Other.Location - Owner.Location) * Other.CollisionRadius;
+
+		if (PawnImpactSound != none) 
+		{
+			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
+			MakeNoise(1.0, 1280);
+		}
+
+		Other.PlayDamageMethodImpact('RipSlice', hitloc, -Vector(Pawn(Owner).ViewRotation)); 
+
+		MyView = Vector(PlayerPawn(Owner).ViewRotation);
+		MyView.z = 0;
+
+		YourView = Vector(Other.Rotation);
+		YourView.z = 0;
+
+		if ( (MyView dot YourView) < 0 )
+		{
+			// hit in front
+			healthTaken = 0;	
+
+			// This is the limb hacking stuff
+			if ( Other.IsA('ScriptedPawn') )
+			{
+				SP = ScriptedPawn(Other);
+				
+				DInfo = getDamageInfo('Scythe');
+				DInfo.JointName = JointName;
+				DInfo.Damage *= 0.5;
+				DInfo.bMagical = true;
+				if ( SP.AcceptDamage(DInfo) )
+				{
+					SP.AdjustDamage(DInfo);
+					DInfo = SP.AdjustDamageByLocation(DInfo);
+					TotalDamage += DInfo.Damage;
+				}
+				
+				DInfo = getDamageInfo('Scythe');
+				DInfo.JointName = JointName;
+				DInfo.Damage *= 0.5;
+				DInfo.bMagical = false;
+				if ( SP.AcceptDamage(DInfo) )
+				{
+					SP.AdjustDamage(DInfo);
+					DInfo = SP.AdjustDamageByLocation(DInfo);
+					TotalDamage += DInfo.Damage;
+				}
+
+				bSpawnWounds = TotalDamage > 5.0;							
+
+				if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss )
+				{
+					// we now know that the creature is going to die
+					healthTaken = 0.5 * Other.Health;
+					HackLimb(SP, DInfo.JointName, SlashDir);
+				}
+			}
+			else
+				bSpawnWounds = true;
+
+			DInfo = getDamageInfo('Scythe');
+			DInfo.JointName = JointName;
+		} 
+		else 
+		{
+			// hit from behind
+			healthTaken = 0;
+
+			// This is the limb hacking stuff
+			if ( Other.IsA('ScriptedPawn') )
+			{
+				SP = ScriptedPawn(Other);
+				
+				DInfo = getDamageInfo('ScytheDouble');
+				DInfo.JointName = JointName;
+				DInfo.Damage *= 0.5;
+				DInfo.bMagical = true;
+				if ( SP.AcceptDamage(DInfo) )
+				{
+					SP.AdjustDamage(DInfo);
+					DInfo = SP.AdjustDamageByLocation(DInfo);
+					TotalDamage += DInfo.Damage;
+				}
+				
+				DInfo = getDamageInfo('ScytheDouble');
+				DInfo.JointName = JointName;
+				DInfo.Damage *= 0.5;
+				DInfo.bMagical = false;
+				if ( SP.AcceptDamage(DInfo) )
+				{
+					SP.AdjustDamage(DInfo);
+					DInfo = SP.AdjustDamageByLocation(DInfo);
+					TotalDamage += DInfo.Damage;
+				}
+				
+				bSpawnWounds = TotalDamage > 5.0;
+
+				if ( TotalDamage >= SP.Health && SP.bHackable && !SP.bIsBoss)
+				{
+					// we now know that the creature is going to die
+					healthTaken = Other.Health * 0.5;
+					HackLimb(SP, DInfo.JointName, SlashDir);
+				}
+			}
+			else
+				bSpawnWounds = true;
+
+			DInfo = getDamageInfo('ScytheDouble');
+			DInfo.JointName = JointName;
+		}
+
+		momentum = 300.0 * x;
+		
+		DInfo.Damage *= 0.5;
+
+		DInfo.bMagical = true;
+		if ( Other.AcceptDamage(DInfo) )
+			Other.TakeDamage(Pawn(Owner), hitloc, momentum, DInfo);
+
+		DInfo.bMagical = false;
+		if ( Other.AcceptDamage(DInfo) )
+			Other.TakeDamage(Pawn(Owner), hitloc, momentum, DInfo);
+
+		// if we hit a scripted pawn and the scripted pawn can be hit by a scythe
+		// Only in berserk mode!
+		if (bBerserk)
+		{
+			if ( (HealthTaken > 0) && Other.IsA('ScriptedPawn'))
+				if (ScriptedPawn(Other).bGiveScytheHealth)
+				{
+					log ("Health Taken = "$HealthTaken, 'Misc');
+					HealthRefreshAmt = healthTaken;
+					GotoState('AbsorbHealth');
+				} else {
+					log ("bGiveScytheHealth = "$ScriptedPawn(Other).bGiveScytheHealth, 'Misc');
+				}
+		}
+
+		if (bSpawnWounds )
+		{
+			if (Other.IsA('DecayedSaint'))
+			{
+				Spawn(class 'DustPuffFX',Other,,HitLocation);
+				//Wound = Spawn(class 'DustPuffFX',Other,,Other.JointPlace(JointName).pos, Rotator(HitNormal));
+				//Wound.AttachJoint = JointName;
+				//Wound.setup();
+			}
+			else
+			{
+				if (BloodDrip == none)
+				{
+					BloodDrip = Spawn(class 'ScytheWoundFX',,,JointPlace('Blade5').pos);
+					BloodDrip.SetBase(self,'Blade5','root');
+				}
+
+				if (JointName != 'none')
+				{
+					Spawn(class 'InstantScytheWound',Other,,HitLocation);
+					Wound = Spawn(class 'ScytheWound',Other,,Other.JointPlace(JointName).pos, Rotator(HitNormal));
+					Wound.AttachJoint = JointName;
+					Wound.setup();
+				}
+			}
+		}
 	}
-	
+
+	// momentum = (Other.Location - Owner.Location) * 300/Other.Mass;
+	// Other.Velocity += momentum;
 }
 
 function bool HackLimb(ScriptedPawn SP, name JointName, vector Dir)
@@ -1045,6 +1048,8 @@ state BloodThirst
 	function EndState()
 	{
 		bThirsty = false;
+
+		PlayerPawn(Owner).Mana = FMin(PlayerPawn(Owner).Mana, 50);
 
 		StopSound(SndID);
 

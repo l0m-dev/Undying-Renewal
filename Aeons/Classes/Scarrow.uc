@@ -63,7 +63,9 @@ var float					SpitDelay;			// TEMP counter for when spit is affecting player
 var() float					FadedOpacity;		// Opacity value when faded out.
 var() vector				SK_SyncOffset;		//
 var() int					DispelLevel;		//
+var float					LanternResistanceTime;
 
+const LanternResistanceDelay = 15.0;
 
 //****************************************************************************
 // Animation trigger functions.
@@ -136,9 +138,16 @@ function LanternBump( actor Other )
 {
 	if ( ( vector(Rotation) dot ( Other.Owner.Location - Location ) ) > 0.0 )
 	{
-		SetEnemy( pawn(Other.Owner) );
-		PushState( GetStateName(), 'RESUME' );
-		GotoState( 'AIAvoidLantern' );
+		if (LanternResistanceTime >= Level.TimeSeconds)
+		{
+			OpacityEffector.SetFade((LanternResistanceTime - Level.TimeSeconds) / LanternResistanceDelay, 0.0);
+		}
+		else
+		{
+			SetEnemy( pawn(Other.Owner) );
+			PushState( GetStateName(), 'RESUME' );
+			GotoState( 'AIAvoidLantern' );
+		}
 	}
 	else
 		super.LanternBump( Other );
@@ -809,12 +818,15 @@ state AIAvoidLantern
 		global.BeginState();
 		PushLookAt( none );
 		bLanternRetreat = false;
+		bAcceptMagicDamage = false;
+		LanternResistanceTime = Level.TimeSeconds + LanternResistanceDelay;
 	}
 
 	function EndState()
 	{
 		global.EndState();
 		PopLookAt();
+		bAcceptMagicDamage = true;
 	}
 
 	function Tick( float DeltaTime )
@@ -830,7 +842,7 @@ state AIAvoidLantern
 	function LanternBump( actor Other )
 	{
 		if ( !bLanternRetreat )
-			FreezeDelay = 2.0;
+			FreezeDelay = 1.0;
 	}
 
 	function Timer()
@@ -869,8 +881,8 @@ BEGIN:
 	OpacityEffector.SetFade( FadedOpacity, 1.0 );
 	StopMovement();
 	PlayAnim( 'damage_stun_start',, MOVE_None );
-	FreezeDelay = 2.0;
-	SetTimer( FVariant( 3.5, 0.5 ), false );
+	FreezeDelay = 1.0;
+	SetTimer( FVariant( 1.5, 0.5 ), false );
 
 TURRET:
 	TurnToward( Enemy, 20 * DEGREES );

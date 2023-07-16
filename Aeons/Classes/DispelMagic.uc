@@ -51,7 +51,7 @@ function FireAttSpell( float Value )
 			SayMagicWords();
 			if ( !AeonsPlayer(Owner).bDispelActive )
 			{
-				GhelzUse(manaCostPerLevel[castingLevel]);
+				//GhelzUse(manaCostPerLevel[castingLevel]);
 				PlayFiring();
 				
 				if ( Owner.bHidden )
@@ -82,6 +82,8 @@ state NormalFire
 		local int OtherLevel;
 
 		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fDispel = 1.0;
+
+		GhelzUse(manaCostPerLevel[castingLevel]);
 		
 		// Generate the effect
 		spawn (class 'DispelCastFX',,,Pawn(Owner).Location + vect(0,0,1) * Pawn(Owner).EyeHeight + vect(0,0,-12) );

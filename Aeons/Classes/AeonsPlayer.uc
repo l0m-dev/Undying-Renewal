@@ -2425,7 +2425,7 @@ event PlayerInput( float DeltaTime )
 
 	Super.PlayerInput( DeltaTime );
 
-	if (Player.Console != None)
+	if (WindowConsole(Player.Console) != None)
 		WindowConsole(Player.Console).MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * WindowConsole(Player.Console).Root.ScaleY;
 
 	if ( bJump > 0 ) 
@@ -3136,6 +3136,7 @@ simulated state PlayerCutScene
 	{
 		local CameraProjectile Cam;
 		local ScriptedPawn SP;
+		//local Dispatcher DP;
 
 		if ( MasterCamPoint != none && (MasterCamPoint.bEscapable || MasterCamPoint.URL != "") )
 		{
@@ -3149,6 +3150,36 @@ simulated state PlayerCutScene
 			{
 				Cam.SkipIt();
 			}
+
+			/*
+			ForEach AllActors(class 'Dispatcher', DP)
+			{
+				if (DP.Instigator == None)
+					continue;
+
+				for( DP.i=0; DP.i<ArrayCount(DP.OutEvents); DP.i++ )
+				{
+					if( DP.OutEvents[DP.i] != '' )
+					{
+						foreach AllActors( class 'Actor', Target, DP.OutEvents[DP.i] )
+						{
+							if ( Target.IsA('Trigger') )
+							{
+								// handle Pass Thru message
+								if ( Trigger(Target).bPassThru )
+								{
+									Trigger(Target).PassThru(DP.Other);
+								}
+							}
+							Target.Trigger( DP, DP.Instigator );
+						}
+					}
+				}
+
+				DP.GotoState('');
+				DP.bDisabled = true;
+			}
+			*/
 
 			foreach AllActors( class'ScriptedPawn', SP )
 			{

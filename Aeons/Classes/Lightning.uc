@@ -774,7 +774,6 @@ state Holding
 	{
 		if ( !Pawn(Owner).UseMana(1) )
 		{
-			GhelzUse(1);
 			PlayerPawn(Owner).bFireAttSpell = 0;
 			GotoState('Release');
 		}
@@ -809,6 +808,8 @@ state Release
 		
 		for (i=0; i<4; i++)
 			lts[i].Destroy();
+
+		//GhelzUse(1);
 	}
 
 	Begin:
@@ -864,6 +865,7 @@ function FireAttSpell( float Value )
 				if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 					ChargeSpear();
 			} else if ( PawnOwner.Mana >= manaCostPerLevel[localCastingLevel] ) {
+				GhelzUse(manaCostPerLevel[castingLevel]);
 				gotoState('NormalFire');
 				if ( Owner.bHidden )
 					CheckVisibility();
