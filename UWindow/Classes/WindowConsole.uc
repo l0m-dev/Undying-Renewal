@@ -13,11 +13,9 @@ var float				MouseX;
 var float				MouseY;
 
 var class<UWindowWindow> ConsoleClass;
-var class<UWindowWindow> ModClass;
 var config float		MouseScale;
 var config bool			ShowDesktop;
 var config bool			bShowConsole;
-var config bool			bShowMod;
 var bool				bBlackout;
 var bool				bUWindowType;
 
@@ -31,7 +29,6 @@ var globalconfig byte	ConsoleKey;
 var config EInputKey	UWindowKey;
 
 var UWindowWindow ConsoleWindow;
-var UWindowWindow ModWindow;
 
 var float XaxisPSX2;	// for getting analog input
 var float YaxisPSX2;	// in state UWindow
@@ -49,7 +46,6 @@ function ResetUWindow()
 	bCreatedRoot = False;
 	ConsoleWindow = None;
 	bShowConsole = False;
-	bShowMod = False;
 	CloseUWindow();
 }
 
@@ -114,25 +110,11 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 						ConsoleCommand("ResetInput");
 						LaunchUWindow();
 
-						if(!bShowConsole && !bShowMod)
+						if(!bShowConsole)
 							ShowConsole();
 					}
 					return true;
 					break;
-/*
-				case EInputKey.IK_F4:
-					if (!bLocked)
-					{
-						bQuickKeyEnable = True;
-						ConsoleCommand("ResetInput");
-						LaunchUWindow();
-
-						if(!bShowConsole && !bShowMod)
-							ShowMod();
-					}
-					return true;
-					break;
-*/
 			}
 		break;
 	}
@@ -156,21 +138,6 @@ function HideConsole()
 	
 	if (ConsoleWindow != None)
 		ConsoleWindow.HideWindow();
-}
-
-function ShowMod()
-{
-	bShowMod = true;
-	if(bCreatedRoot && ModWindow != None)
-		ModWindow.ShowWindow();
-}
-
-function HideMod()
-{
-	bShowMod = false;
-	
-	if (ModWindow != None)
-		ModWindow.HideWindow();
 }
 
 event Tick( float Delta )
@@ -301,10 +268,6 @@ state UWindow
 			case EInputKey.IK_F9:	// Screenshot
 				return Global.KeyEvent(Key, Action, Delta);
 				break;
-			case EInputKey.IK_F3:   // book
-				if(Root != None)
-					Root.WindowEvent(WM_KeyDown, None, MouseX, MouseY, k);
-				break;
 			case ConsoleKey:
 				if (bShowConsole)
 				{
@@ -316,33 +279,14 @@ state UWindow
 				{
 					if (!bLocked)
 					{
-						if(Root.bAllowConsole && !bShowMod)
+						if(Root.bAllowConsole)
 							ShowConsole();
 						else
 							Root.WindowEvent(WM_KeyDown, None, MouseX, MouseY, k);
 					}
 				}
 				break;
-/*
-			case EInputKey.IK_F4:
-				if (bShowMod)
-				{
-					HideMod();
-					if(bQuickKeyEnable)
-						CloseUWindow();
-				}
-				else
-				{
-					if (!bLocked)
-					{
-						if(!bShowConsole)
-							ShowMod();
-						else
-							Root.WindowEvent(WM_KeyDown, None, MouseX, MouseY, k);
-					}
-				}
-				break;
-*/
+
 			case EInputKey.IK_Escape:
 				if (EscapeDelay > 0.0)
 					return true;
@@ -354,9 +298,6 @@ state UWindow
 
 				if (bShowConsole)
 					HideConsole();
-
-				if (bShowMod)
-					HideMod();
 
 				if(bQuickKeyEnable)
 					CloseUWindow();
@@ -528,10 +469,6 @@ function CreateRootWindow(Canvas Canvas)
 	ConsoleWindow = Root.CreateWindow(ConsoleClass, 100, 100, 200, 200);
 	if(!bShowConsole)
 		HideConsole();
-		
-	//ModWindow = Root.CreateWindow(ModClass, 100, 100, 200, 200);
-	//if(!bShowMod)
-	//	HideMod();
 
 	//UWindowConsoleClientWindow(ConsoleWindow.ClientArea).TextArea.AddText(" ");
 	//for (I=0; I<4; I++)
@@ -675,7 +612,6 @@ defaultproperties
 {
      RootWindow="Aeons.AeonsRootWindow"
      ConsoleClass=Class'UWindow.UWindowConsoleWindow'
-     ModClass=Class'UWindow.UWindowConsoleWindow'
      MouseScale=0.6
      UWindowKey=IK_Escape
      ShellAnalogThreshold=0.5

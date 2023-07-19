@@ -68,6 +68,7 @@ function Created()
 	Root.SetMousePos(290*MouseXPosScale + MouseOffsetX, 250 * Root.ScaleY);
 	
 	// since F3 is no longer hard coded for the book we need to bind it	
+	// doesn't seem necessary as it's already bound by default
 	for (i=0; i<255; i++)
 	{
 		KeyName = GetPlayerOwner().ConsoleCommand( "KEYNAME "$i );

@@ -16,6 +16,11 @@ function Notify(UWindowDialogControl C, byte E)
 	// Handle this notification in a subclass.
 }
 
+function bool AllowScroll()
+{
+	return true;
+}
+
 function UWindowDialogControl CreateControl(class<UWindowDialogControl> ControlClass, float X, float Y, float W, float H, optional UWindowWindow OwnerWindow)
 {
 	local UWindowDialogControl C;

@@ -586,6 +586,9 @@ function Fire()
 	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSkulls += 1.0;
 	
 	bFlying = true;					// I am flying - Tick() checks this to see if positions, etc need to be updated.
+
+	// turn on collision
+	bCollideWorld = true;
 	
 	// turn off the timer
 	SetTimer(0 ,false);
@@ -652,4 +655,5 @@ defaultproperties
      CollisionRadius=3
      CollisionHeight=4
      bRotateToDesired=True
+	 bCollideWorld=False
 }

@@ -2411,6 +2411,9 @@ function bool CheckScroll( float DeltaTime )
 
 event PlayerInput( float DeltaTime )
 {
+	local WindowConsole wconsole;
+	wconsole = WindowConsole(Player.Console);
+
 	if ( !bShowMenu && bTryingSelect && (myHud != None) )
     {
         CheckSelect( DeltaTime );
@@ -2425,8 +2428,8 @@ event PlayerInput( float DeltaTime )
 
 	Super.PlayerInput( DeltaTime );
 
-	if (WindowConsole(Player.Console) != None)
-		WindowConsole(Player.Console).MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * WindowConsole(Player.Console).Root.ScaleY;
+	if (wconsole != None && wconsole.Root != None)
+		wconsole.MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * wconsole.Root.ScaleY;
 
 	if ( bJump > 0 ) 
 		JumpHeldTime += DeltaTime;

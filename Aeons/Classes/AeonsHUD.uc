@@ -1090,30 +1090,21 @@ simulated function DrawRicochet(canvas Canvas)
 
 simulated function PostRender( canvas Canvas )
 {
-	local float XOffset, YOffset;
 	local int FPS;
 	local PlayerPawn PlayerOwner;
 	local int YDelta;
 	local bool bDrawHUD;
 	local int i;
-	local string LevelName;
-	local string url;
 	local string TempString;
 	local int Token;
 	local float WeaponX;
 	local bool bAltHud;
-
-	url = Level.GetLocalURL();
-
-	i=instr(url, "?");
-	
-	if ( i >0 ) 
-		LevelName = Left(url, i);
-	else
-		LevelName = url;
 	
 	bDrawHUD = true;
 	bAltHud = Owner.GetRenewalConfig().bAltHud;
+	
+	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root == None)
+		return;
 	
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
 	//Scale = Canvas.ClipY / 600.0;
@@ -1490,7 +1481,7 @@ simulated function PostRender( canvas Canvas )
 		//fix only if debug build or other criteria
 	
 		//	if ( AeonsPlayer(Owner).bDrawDebugHUD )
-			DrawIconsofShame(Canvas);
+		//	DrawIconsofShame(Canvas);
 	}
 	
 	/*
@@ -2617,14 +2608,17 @@ simulated function DrawAmmo(Canvas Canvas, int X, int Y)
 {
 	local string tmpStr;
 	local int Ammocount, ClipCount;
+	local Ammo ammo;
 
-	if (Pawn(Owner).Weapon.ammoType != none)
+	ammo = Pawn(Owner).Weapon.ammoType;
+
+	if (ammo != none && ammo.MaxAmmo > 0)
 	{
 		clipCount = AeonsWeapon(Pawn(Owner).Weapon).ClipCount;
-		AmmoCount = Pawn(Owner).Weapon.AmmoType.AmmoAmount - clipCount;
+		AmmoCount = ammo.AmmoAmount - clipCount;
 		AmmoCount = Clamp(AmmoCount, 0, 99999);
 		
-		if (Pawn(Owner).Weapon.AmmoType.AmmoAmount == 0)
+		if (ammo.AmmoAmount == 0)
 			ClipCount = 0;
 
 		tmpStr = (ClipCount$"/"$AmmoCount);
@@ -3506,7 +3500,7 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	Canvas.DrawColor.r = 30;
 	Canvas.DrawColor.g = 0;
 	Canvas.DrawColor.b = 0;
-	Canvas.DrawTileClipped(Texture'Aeons.Meshes.White', 16*ScaleY*0.5 + 2, 5*ScaleY*0.5 + 2, 0, 0, 8, 8);
+	Canvas.DrawTileClipped(Texture'UWindow.WhiteTexture', 16*ScaleY*0.5 + 2, 5*ScaleY*0.5 + 2, 0, 0, 8, 8);
 	
 	// - sign
 	Canvas.CurX = X;	
@@ -3514,7 +3508,7 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	Canvas.DrawColor.r = 200;
 	Canvas.DrawColor.g = 5;
 	Canvas.DrawColor.b = 5;
-	Canvas.DrawTileClipped(Texture'Aeons.Meshes.White', 16*ScaleY*0.5, 5*ScaleY*0.5, 0, 0, 8, 8);
+	Canvas.DrawTileClipped(Texture'UWindow.WhiteTexture', 16*ScaleY*0.5, 5*ScaleY*0.5, 0, 0, 8, 8);
 	
 	Canvas.CurX += 2 * ScaleX;
 	Canvas.CurY = Y;
@@ -4658,7 +4652,6 @@ simulated function DrawSelectHUD(Canvas Canvas)
 {
     local AeonsPlayer PPawn;
     local float Delta;
-    local int i;
 
 	PPawn = AeonsPlayer(Owner);
 
@@ -4983,9 +4976,19 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 			Canvas.DrawColor.a = 64;
 
 		if (InventoryGroup >= 100)
+		{
+			if (WheelSelection.bActiveToggle && !WheelSelection.bActive)
+			{
+				Canvas.DrawColor.r = 128;
+				Canvas.DrawColor.g = 128;
+				Canvas.DrawColor.b = 128;
+			}
 			Canvas.DrawIcon(WheelSelection.Icon, Scale);
+		}
 		else
+		{
 			Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
+		}
 	}
 	else 
 	{

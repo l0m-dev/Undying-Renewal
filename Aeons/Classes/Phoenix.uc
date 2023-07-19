@@ -224,18 +224,24 @@ state Guiding
 
 		if ( !bCanFire )
 			return;
-		if ( GuidedShell != None )
+		if ( GuidedShell != None)
 		{
-			GuidedShell.GotoState('Release');
-			PCam = Spawn(class 'PhoenixCameraProjectile',GuidedShell,,GuidedShell.Location, GuidedShell.Rotation);
-			PlayerPawn(Owner).ViewTarget = PCam;
-			// GuidedShell.Explode(GuidedShell.Location,Vect(0,0,1));
+			if (GuidedShell.GetStateName() != 'Release')
+			{
+				GuidedShell.GotoState('Release');
+				PCam = Spawn(class 'PhoenixCameraProjectile',GuidedShell,,GuidedShell.Location, GuidedShell.Rotation);
+				PlayerPawn(Owner).ViewTarget = PCam;
+				// GuidedShell.Explode(GuidedShell.Location,Vect(0,0,1));
+			}
 		}
-		bCanClientFire = true;
+		else
+		{
+			bCanClientFire = true;
 
-		if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) ) 
-			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
-		GotoState('Finishing');
+			if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) ) 
+				Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
+			GotoState('Finishing');
+		}
 	}
 	
 	function FireAttSpell(float f)
@@ -271,11 +277,12 @@ state Guiding
 		bGuiding = false;
 		if ( GuidingPawn != None )
 		{
-			//PlayerPawn(Owner).UnFreeze();
+			//PlayerPawn(Owner).UnFreeze(); // done in GuidingPhoenix EndState
 			GuidingPawn.ClientAdjustGlow(0.2,vect(-200,0,0));
 			GuidingPawn.ClientSetRotation(StartRotation);
 			GuidingPawn.DesiredFOV = GuidingPawn.default.DesiredFOV;
 			GuidingPawn.GotoState('PlayerWalking');
+			GuidingPawn.ViewTarget = None;
 			GuidingPawn = None;
 			// Test PlayActuator here!!
 			PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_FadeOut, 0.1f);
@@ -350,7 +357,7 @@ defaultproperties
 {
      AmmoName=Class'Aeons.PhoenixAmmo'
      PickupAmmoCount=3
-     FireOffset=(X=32)
+     FireOffset=(X=16) // X was 32 but it was spawning in walls if too close
      FireSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_PhoenixLaunch01'
      ItemType=WEAPON_Conventional
      AutoSwitchPriority=7

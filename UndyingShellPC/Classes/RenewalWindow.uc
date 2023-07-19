@@ -4,7 +4,7 @@ class RenewalWindow extends UWindowDialogClientWindow
 var UMenuPageControl Pages;
 var UWindowSmallCloseButton CloseButton;
 
-var localized string GamePlayTab, HUDTab;
+var localized string GamePlayTab, HUDTab, ControlsTab;
 var UWindowPageControlPage Network;
 
 var string StatusBarText;
@@ -32,6 +32,8 @@ function Created()
 
 	AddScrollPage(GamePlayTab, class'RenewalSettingsGamePage');
 	AddScrollPage(HUDTab, class'RenewalSettingsHUDPage');
+	AddScrollPage(ControlsTab, class'RenewalSettingsControlsBasePage');
+	//AddScrollPage("Renewal Controls", class'RenewalSettingsControlsPage');
 
 	CloseButton = UWindowSmallCloseButton(CreateControl(class'UWindowSmallCloseButton', 0, 0, 1, 1));
 	
@@ -100,4 +102,5 @@ defaultproperties
 {
      GamePlayTab="Game"
      HUDTab="HUD"
+     ControlsTab="Controls"
 }

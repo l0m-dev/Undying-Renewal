@@ -35,6 +35,12 @@ replication
 		ServerMove;
 }
 
+function PreBeginPlay()
+{
+	bCollideWorld = true;
+	super.PreBeginPlay();
+}
+
 simulated function ZoneChange( Zoneinfo NewZone )
 {
 	if ( NewZone.bWaterZone)
@@ -114,13 +120,11 @@ simulated function Destroyed()
 			if (LifeSpan > 0)
 			{
 				spawn(class 'PhoenixExplosion', Owner,,Location);
-				spawn (class 'MolotovExplosion',Owner,,Location);
+				spawn (class 'MolotovExplosion',Owner,,Location); // added for now
 			} else {
 				if ( ExpireSound != none )
 					PlaySound(ExpireSound,,2,,4096);
 			}
-			if ( (PlayerPawn(Guider) != None) )
-				PlayerPawn(Guider).ViewTarget = None;
 			break;
 		
 		case 'Release':
@@ -556,7 +560,7 @@ var Phoenix PhoenixSpell;
 var PhoenixParticleFX ParticleTrail;
 var MolotovFire_proj fProj;
 
-/*
+/ * nested comment, added spaces for correct highlighting
 function Warped(vector oldLocation)
 {
 	fProj.setLocation(Location);
@@ -564,7 +568,7 @@ function Warped(vector oldLocation)
 	PhoenixSpell.pCam.setLocation(Location);
 	PhoenixSpell.pCam.setBase(self);
 }
-*/
+* /
 
 function preBeginPlay()
 {
@@ -587,7 +591,7 @@ function SendWarning()
 	}
 }
 
-/* Kyle, this was our old   "auto state flying".. the Redeemer had it's own.  we need to merge the 2
+/ * Kyle, this was our old   "auto state flying".. the Redeemer had it's own.  we need to merge the 2
 auto state Flying
 {
 	simulated function ProcessTouch (Actor Other, Vector HitLocation)
@@ -626,7 +630,7 @@ auto state Flying
 		Velocity = speed * LastDir;
 		Timer();
 }
-*/
+* /
 
 
 // release state - go forth and destroy!
@@ -751,4 +755,5 @@ defaultproperties
      LightSaturation=64
      LightRadius=40
      LightRadiusInner=18
+	 bCollideWorld=False
 }

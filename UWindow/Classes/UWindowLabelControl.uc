@@ -16,7 +16,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	
 	TextSize(C, Text, W, H);
 	WinHeight = H+1;
-	//WinWidth = W+1;
+	WinWidth = W+1;
 	TextY = (WinHeight - H) / 2;
 	switch (Align)
 	{

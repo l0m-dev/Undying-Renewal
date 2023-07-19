@@ -40,6 +40,38 @@ function Created()
 	BRBitmap.bStretch = True;
 }
 
+
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	if (ClientArea.AllowScroll())
+	{
+		switch(Msg)
+		{
+		case WM_KeyDown:
+			switch(Key)
+			{
+			case Root.Console.EInputKey.IK_Up:
+			case Root.Console.EInputKey.IK_MWheelUp:
+				VertSB.Scroll(-20);
+				break;
+			case Root.Console.EInputKey.IK_Down:
+			case Root.Console.EInputKey.IK_MWheelDown:
+				VertSB.Scroll(20);
+				break;
+			case Root.Console.EInputKey.IK_PageUp:
+				VertSB.Scroll(-(VertSB.MaxVisible-1));
+				break;
+			case Root.Console.EInputKey.IK_PageDown:
+				VertSB.Scroll(VertSB.MaxVisible-1);
+				break;
+			}
+			break;
+		}
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
+}
+
 function BeforePaint(Canvas C, float X, float Y)
 {
 	local float ClientWidth, ClientHeight;

@@ -682,7 +682,7 @@ function Fire( float Value )
 	local Vector FireDir, WpnToPawn;
 	local Float DotProd, BigRatio, VecLen, Thresh, Ratio;
 	
-	if (AmmoType == None || AmmoType.UseAmmo(1))
+	if (AmmoType.UseAmmo(1))
 	{
 		if (PlayerPawn(Owner).bUsingAutoAim)
 			AutoAimDir = Pawn(Owner).ViewRotation;

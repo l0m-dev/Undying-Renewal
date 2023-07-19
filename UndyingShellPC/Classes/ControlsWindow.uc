@@ -94,6 +94,8 @@ var bool bSaveChanges;
 var string MenuValues1[70], OrigMenuValues1[70];
 var string MenuValues2[70], OrigMenuValues2[70];
 
+var byte ChangedMenuValues1[70], ChangedMenuValues2[70];
+
 var localized string AliasNames[70];
 var int AliasCount;
 
@@ -104,12 +106,22 @@ var localized string LabelList[70];
 function Created()
 {
 
-	local int i;
+	local int i, j;
 	local color TextColor;
 	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Created();
+
+	// remove category names and commas
+	for (i=0; i<AliasCount; i++)
+	{
+		j = InStr(LabelList[I], ",");
+		if(j != -1)
+		{
+			LabelList[I] = Mid(LabelList[I], j+1);
+		}
+	}
 	
 	AeonsRoot = AeonsRootWindow(Root);
 
@@ -472,6 +484,9 @@ function GetCurrentSettings(bool bResetOrig)
 	{
 		MenuValues1[I] = "";
 		MenuValues2[I] = "";
+
+		ChangedMenuValues1[I] = 0;
+		ChangedMenuValues2[I] = 0;
 	}
 
 	for (I=0; I<255; I++)
@@ -488,7 +503,9 @@ function GetCurrentSettings(bool bResetOrig)
 				{
 					if( !(Left(Alias, pos) ~= "taunt") &&
 						!(Left(Alias, pos) ~= "getweapon") &&
-						!(Left(Alias, pos) ~= "viewplayernum"))
+						!(Left(Alias, pos) ~= "viewplayernum") &&
+						!(Left(Alias, pos) ~= "savegame") &&
+						!(Left(Alias, pos) ~= "loadgame"))
 						Alias = Left(Alias, pos);
 				}
 				for (J=0; J<AliasCount; J++)
@@ -550,6 +567,20 @@ function RemoveExistingKey(int KeyNo, string KeyName)
 	}
 }
 
+function string GetKeyName(int Key)
+{
+	return mid(string(GetEnum(enum'EInputKey', Key)),3);
+}
+
+function BindKey(string Bind, optional bool bBindFavorite)
+{
+	Bind = "SET Input"@Bind;
+	if (bBindFavorite)
+		Bind = Bind @ "| SetFavorite";
+	
+	GetPlayerOwner().ConsoleCommand(Bind);
+}
+
 function RefreshButtons()
 {
 	local int i;
@@ -578,15 +609,12 @@ function SetKey(int KeyNo, string KeyName)
 					{
 						MenuValues2[SelectedRow] = "";
 					}
-					GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues1[SelectedRow]);
+					ChangedMenuValues1[SelectedRow] = 1;
+					BindKey(MenuValues1[SelectedRow]);
 					MenuValues1[SelectedRow] = KeyName;
 					SelectedButton.Text = MenuValues1[SelectedRow];
 					
-					if ( KeyName ~= "RightMouse" )
-						GetPlayerOwner().ConsoleCommand("SET Input"@KeyName@AliasNames[SelectedRow] $ " | SetFavorite" );		
-					else
-						GetPlayerOwner().ConsoleCommand("SET Input"@KeyName@AliasNames[SelectedRow]);					
-					
+					BindKey(KeyName@AliasNames[SelectedRow], KeyName ~= "RightMouse");
 					break;
 					
 				case 1:
@@ -594,15 +622,12 @@ function SetKey(int KeyNo, string KeyName)
 					{
 						MenuValues1[SelectedRow] = "";
 					}
-					GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues2[SelectedRow]);
+					ChangedMenuValues2[SelectedRow] = 1;
+					BindKey(MenuValues2[SelectedRow]);
 					MenuValues2[SelectedRow] = KeyName;
 					SelectedButton.Text = MenuValues2[SelectedRow];
 
-					if ( KeyName ~= "RightMouse" )
-						GetPlayerOwner().ConsoleCommand("SET Input"@KeyName@AliasNames[SelectedRow] $ " | SetFavorite" );		
-					else
-						GetPlayerOwner().ConsoleCommand("SET Input"@KeyName@AliasNames[SelectedRow]);
-					
+					BindKey(KeyName@AliasNames[SelectedRow], KeyName ~= "RightMouse");
 					break;					
 			}
 		}
@@ -627,33 +652,21 @@ function UndoChanges()
 	// Wipe out existing key bindings
 	for ( i=0; i<AliasCount; i++ )
 	{
-		if ( MenuValues1[i] != "" )
-			if ( MenuValues1[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues1[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues1[i] $ " ");
+		if ( ChangedMenuValues1[i] == 1 && MenuValues1[i] != "" )
+			BindKey(MenuValues1[i], MenuValues1[i] ~= "RightMouse");
 
-		if ( MenuValues2[i] != "" )
-			if ( MenuValues1[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues2[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues2[i] $ " ");
+		if ( ChangedMenuValues2[i] == 1 && MenuValues2[i] != "" )
+			BindKey(MenuValues2[i], MenuValues1[i] ~= "RightMouse"); // should both be MenuValues2? 
 	}
 
 	// Restore original key bindings
 	for ( i=0; i<AliasCount; i++ )
 	{
 		if ( OrigMenuValues1[i] != "" )
-			if ( OrigMenuValues1[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@OrigMenuValues1[i]@AliasNames[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@OrigMenuValues1[i]@AliasNames[i]);
+			BindKey(OrigMenuValues1[i]@AliasNames[i], MenuValues1[i] ~= "RightMouse");
 
 		if ( OrigMenuValues2[i] != "" )
-			if ( OrigMenuValues2[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@OrigMenuValues2[i]@AliasNames[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@OrigMenuValues2[i]@AliasNames[i]);
+			BindKey(OrigMenuValues2[i]@AliasNames[i], OrigMenuValues2[i] ~= "RightMouse");
 	}
 
 	// ? GetPlayerOwner().SaveConfig();
@@ -664,11 +677,8 @@ function SaveChanges()
 	GetPlayerOwner().SaveConfig();
 }
 
-// Ideally Key would be a EInputKey but I can't see that class here.
 function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
 {
-
-
 	switch(Msg)
 	{
 		case WM_LMouseDown:
@@ -676,7 +686,7 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 
 			if (bSelecting)
 			{
-				ProcessMenuKey( 1, mid(string(GetEnum(enum'EInputKey', 1)),3) );
+				ProcessMenuKey( 1, GetKeyName(Root.Console.EInputKey.IK_LeftMouse) );
 				bSelecting = False;
 				return;
 			}
@@ -690,7 +700,7 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 		case WM_RMouseDown:
 			if (bSelecting)
 			{
-				ProcessMenuKey( 2, mid(string(GetEnum(enum'EInputKey', 2)),3) );
+				ProcessMenuKey( 2, GetKeyName(Root.Console.EInputKey.IK_RightMouse) );
 				bSelecting = False;
 			}
 			RMouseDown(X, Y);
@@ -704,7 +714,7 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 
 			if (bSelecting)
 			{
-				ProcessMenuKey( 4, mid(string(GetEnum(enum'EInputKey', 4)),3) );
+				ProcessMenuKey( 4, GetKeyName(Root.Console.EInputKey.IK_MiddleMouse) );
 				bSelecting = False;
 			}
 		
@@ -717,6 +727,10 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 			break;	
 
 		case WM_KeyDown:
+			if (Key == Root.Console.EInputKey.IK_MWheelUp && !Up.bDisabled && !bSelecting)
+				ScrolledUp();
+			if (Key == Root.Console.EInputKey.IK_MWheelDown && !Down.bDisabled && !bSelecting)
+				ScrolledDown();
 			KeyDown(Key, X, Y);
 			break;	
 
@@ -901,16 +915,10 @@ function ResetDefaults()
 	for ( i=0; i<AliasCount; i++ )
 	{
 		if ( MenuValues1[i] != "" )
-			if ( MenuValues1[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues1[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues1[i] $ " ");
+			BindKey(MenuValues1[i], MenuValues1[i] ~= "RightMouse");
 
 		if ( MenuValues2[i] != "" )
-			if ( MenuValues1[i] ~= "RightMouse" )
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues2[i] $ " | SetFavorite" );
-			else
-				GetPlayerOwner().ConsoleCommand("SET Input"@MenuValues2[i] $ " ");
+			BindKey(MenuValues2[i], MenuValues1[i] ~= "RightMouse");
 	}
 
 	GetPlayerOwner().ResetKeyboard();
@@ -946,7 +954,7 @@ function CrossHairChanged(int d)
 
 function RestoreButton()
 {
-	if ( SelectedRow == 0 ) 
+	if ( SelectedCol == 0 ) 
 	{
 		SelectedButton.Text = MenuValues1[SelectedRow];
 	}
@@ -989,7 +997,7 @@ function KeyDown( int Key, float X, float Y )
 
 	if (bSelecting)
 	{
-		ProcessMenuKey( Key, mid(string(GetEnum(enum'EInputKey',Key)),3) );
+		ProcessMenuKey( Key, GetKeyName(Key) );
 		bSelecting = False;
 		bWasSelecting = True;
 	}
@@ -998,16 +1006,6 @@ function KeyDown( int Key, float X, float Y )
 
 function ProcessMenuKey( int KeyNo, string KeyName )
 {
-	if ( KeyName == "Escape" )
-	{
-		if ( bSelecting )
-		{ 
-			bSelecting = false;
-			SelectedCol = -1;
-			SelectedRow = -1;
-		}
-	}
-	
 	if ( (KeyName == "") || (KeyName == "Escape") || (KeyName == "Pause") )
 //		|| ((KeyNo >= 0x70 ) && (KeyNo <= 0x79)) // function keys
 //		|| ((KeyNo >= 0x30 ) && (KeyNo <= 0x39))) // number keys
@@ -1282,52 +1280,56 @@ defaultproperties
      AliasNames(12)="LookDown"
      AliasNames(13)="Duck"
      AliasNames(14)="Jump"
-     AliasNames(15)="Look"
-     AliasNames(16)="Sneak"
-     AliasNames(17)="Strafe"
-     AliasNames(18)="InventoryPrevious"
-     AliasNames(19)="InventoryNext"
-     AliasNames(20)="InventoryActivate"
-     AliasNames(21)="PrevWeapon"
-     AliasNames(22)="NextWeapon"
-     AliasNames(23)="PrevAttSpell"
-     AliasNames(24)="NextAttSpell"
-     AliasNames(25)="CenterView"
+     AliasNames(15)="Sneak"
+     AliasNames(16)="Strafe"
+	 AliasNames(17)="Look"
+	 AliasNames(18)="CenterView"
+     AliasNames(19)="InventoryPrevious"
+     AliasNames(20)="InventoryNext"
+     AliasNames(21)="InventoryActivate"
+     AliasNames(22)="PrevWeapon"
+     AliasNames(23)="NextWeapon"
+     AliasNames(24)="PrevAttSpell"
+     AliasNames(25)="NextAttSpell"
      AliasNames(26)="QuickSave"
      AliasNames(27)="QuickLoad"
-     AliasNames(28)="Revolver"
-     AliasNames(29)="Gelziabar"
-     AliasNames(30)="Scythe"
-     AliasNames(31)="WarCannon"
-     AliasNames(32)="Shotgun"
-     AliasNames(33)="Speargun"
-     AliasNames(34)="Phoenix"
-     AliasNames(35)="Molotov"
-     AliasNames(36)="Ectoplasm"
-     AliasNames(37)="DispelMagic"
-     AliasNames(38)="Lightning"
-     AliasNames(39)="Haste"
-     AliasNames(40)="SkullStorm"
-     AliasNames(41)="Scrye"
-     AliasNames(42)="Shield"
-     AliasNames(43)="Invoke"
-     AliasNames(44)="PickDynamite"
-     AliasNames(45)="PickSilverBullet"
-     AliasNames(46)="PickPhosphorusShell"
-     AliasNames(47)="PickAmplifier"
-     AliasNames(48)="PickEtherTrap"
-     AliasNames(49)="ShowBook"
-     AliasNames(50)="DisplayObjectives"
-     AliasNames(51)="FireDefSpell"
-     AliasNames(52)="SelectDefSpell"
-     AliasNames(53)="Button bSelectItem | SelectItem"
-     AliasCount=54
-     LabelList(0)="Weapon Fire"
+     AliasNames(28)="SaveGame 1"
+     AliasNames(29)="LoadGame 1"
+	 AliasNames(30)="SaveGame 2"
+     AliasNames(31)="LoadGame 2"
+     AliasNames(32)="Revolver"
+     AliasNames(33)="Gelziabar"
+     AliasNames(34)="Scythe"
+     AliasNames(35)="WarCannon"
+     AliasNames(36)="Shotgun"
+     AliasNames(37)="Speargun"
+     AliasNames(38)="Phoenix"
+     AliasNames(39)="Molotov"
+     AliasNames(40)="Ectoplasm"
+     AliasNames(41)="DispelMagic"
+     AliasNames(42)="Lightning"
+     AliasNames(43)="Haste"
+     AliasNames(44)="SkullStorm"
+     AliasNames(45)="Scrye"
+     AliasNames(46)="Shield"
+     AliasNames(47)="Invoke"
+     AliasNames(48)="PickDynamite"
+     AliasNames(49)="PickSilverBullet"
+     AliasNames(50)="PickPhosphorusShell"
+     AliasNames(51)="PickAmplifier"
+     AliasNames(52)="PickEtherTrap"
+     AliasNames(53)="ShowBook"
+     AliasNames(54)="DisplayObjectives"
+     AliasNames(55)="FireDefSpell"
+     AliasNames(56)="SelectDefSpell"
+     AliasNames(57)="Button bSelectItem | SelectItem"
+     AliasCount=58
+     LabelList(0)="Weapon/Spells Actions,Weapon Fire"
      LabelList(1)="Weapon Select"
      LabelList(2)="Spell Fire"
      LabelList(3)="Spell Select"
      LabelList(4)="Weapon Action"
-     LabelList(5)="Forward"
+     LabelList(5)="Movement,Forward"
      LabelList(6)="Backward"
      LabelList(7)="Step Left"
      LabelList(8)="Step Right"
@@ -1337,45 +1339,49 @@ defaultproperties
      LabelList(12)="Look Down"
      LabelList(13)="Duck"
      LabelList(14)="Jump"
-     LabelList(15)="Mouse Look"
-     LabelList(16)="Sneak (toggle)"
-     LabelList(17)="Strafe Modifier"
-     LabelList(18)="Previous Inventory"
-     LabelList(19)="Next Inventory"
-     LabelList(20)="Use Inventory"
-     LabelList(21)="Previous Weapon"
-     LabelList(22)="Next Weapon"
-     LabelList(23)="Previous Spell"
-     LabelList(24)="Next Spell"
-     LabelList(25)="Center View"
-     LabelList(26)="Quick Save"
+	 LabelList(15)="Sneak (toggle)"
+     LabelList(16)="Strafe Modifier"
+     LabelList(17)="Mouse Look"
+	 LabelList(18)="Center View"
+     LabelList(19)="Inventory,Previous Inventory"
+     LabelList(20)="Next Inventory"
+     LabelList(21)="Use Inventory"
+     LabelList(22)="Previous Weapon"
+     LabelList(23)="Next Weapon"
+     LabelList(24)="Previous Spell"
+     LabelList(25)="Next Spell"
+     LabelList(26)="Save/Load,Quick Save"
      LabelList(27)="Quick Load"
-     LabelList(28)="Revolver"
-     LabelList(29)="Gel'ziabar Stone"
-     LabelList(30)="Scythe"
-     LabelList(31)="War Cannon"
-     LabelList(32)="Shotgun"
-     LabelList(33)="Speargun"
-     LabelList(34)="Phoenix"
-     LabelList(35)="Molotov"
-     LabelList(36)="Ectoplasm"
-     LabelList(37)="Dispel Magic"
-     LabelList(38)="Lightning"
-     LabelList(39)="Haste"
-     LabelList(40)="Skull Storm"
-     LabelList(41)="Scrye"
-     LabelList(42)="Shield"
-     LabelList(43)="Invoke"
-     LabelList(44)="Dynamite"
-     LabelList(45)="Silver Bullets"
-     LabelList(46)="Phosphorus Shells"
-     LabelList(47)="Amplifier"
-     LabelList(48)="Ether Trap"
-     LabelList(49)="Show Journal"
-     LabelList(50)="Display Objectives"
-     LabelList(51)="Defensive Spell Fire"
-     LabelList(52)="Defensive Spell Select"
-     LabelList(53)="Item Quick Select"
+     LabelList(28)="Save Slot 1"
+     LabelList(29)="Load Slot 1"
+	 LabelList(30)="Save Slot 2"
+     LabelList(31)="Load Slot 2"
+     LabelList(32)="Fast Select,Revolver"
+     LabelList(33)="Gel'ziabar Stone"
+     LabelList(34)="Scythe"
+     LabelList(35)="War Cannon"
+     LabelList(36)="Shotgun"
+     LabelList(37)="Speargun"
+     LabelList(38)="Phoenix"
+     LabelList(39)="Molotov"
+     LabelList(40)="Ectoplasm"
+     LabelList(41)="Dispel Magic"
+     LabelList(42)="Lightning"
+     LabelList(43)="Haste"
+     LabelList(44)="Skull Storm"
+     LabelList(45)="Scrye"
+     LabelList(46)="Shield"
+     LabelList(47)="Invoke"
+     LabelList(48)="Dynamite"
+     LabelList(49)="Silver Bullets"
+     LabelList(50)="Phosphorus Shells"
+     LabelList(51)="Amplifier"
+     LabelList(52)="Ether Trap"
+     LabelList(53)="Renewal,Show Journal"
+     LabelList(54)="Display Objectives"
+     LabelList(55)="Defensive Spell Fire"
+     LabelList(56)="Defensive Spell Select"
+     LabelList(57)="Item Quick Select"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

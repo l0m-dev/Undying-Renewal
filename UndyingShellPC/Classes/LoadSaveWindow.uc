@@ -329,7 +329,7 @@ function Message(UWindowWindow B, byte E)
 				case SaveGameButtons[9]:
 					SelectSlot(9);
 					break;
-					
+
 				case Up:
 					ScrolledUp();
 					break;
@@ -349,8 +349,22 @@ function Message(UWindowWindow B, byte E)
 		case DE_MouseEnter:
 			OverEffect(ShellButton(B));
 			break;
-
 	}
+}
+
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg)
+	{
+	case WM_KeyDown:
+		if (Key == Root.Console.EInputKey.IK_MWheelUp && !Up.bDisabled)
+			ScrolledUp();
+		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Down.bDisabled)
+			ScrolledDown();
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
 }
 
 //----------------------------------------------------------------------------

@@ -81,8 +81,7 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	//AmmoType.AmmoAmount = 9999;
-	//AmmoName=Class'Aeons.ScytheAmmo'
+	AmmoType.AmmoAmount = 9999;
 }
 
 function Berserk()
@@ -1120,6 +1119,7 @@ defaultproperties
      bAltWaterFire=True
      ExplosionDecal=Class'Aeons.ScytheDecal'
      ThirdPersonJointName=ScytheAtt
+	 AmmoName=Class'Aeons.ScytheAmmo'
      PickupAmmoCount=999
      bMeleeWeapon=True
      AIRating=0.4

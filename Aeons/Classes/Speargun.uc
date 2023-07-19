@@ -470,7 +470,7 @@ defaultproperties
      ReloadCount=1
      PickupAmmoCount=24
      bWarnTarget=True
-     FireOffset=(X=32,Z=-20)
+     FireOffset=(X=16,Y=5,Z=-10) // original was (X=32,Z=-20)
      ProjectileClass=Class'Aeons.Spear_proj'
      shakemag=1200
      shaketime=0.3

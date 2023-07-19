@@ -16,6 +16,8 @@ function PreBeginPlay()
 {
 	DamageThreshold = 2;
 	Super.preBeginPlay();
+	if (RGC())
+		MaxAmmo = 10;
 }
 
 function DamageInfo getDamageInfo(optional name DamageType)

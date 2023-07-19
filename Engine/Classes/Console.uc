@@ -640,7 +640,7 @@ simulated function DrawSingleView( Canvas C )
 		I = 0;
 		while ((I < 4) && (J >= 0))
 		{
-			if ((MsgText[J] != "") && (MsgTick[J] > 0.0) && (MsgTick[J] > MsgTickTime) )
+			if ((MsgText[J] != "") && (MsgTick[J] > 0.0) && (MsgTick[J] < MsgTickTime) )
 			{
 				if (MsgType[J] == 'Say') 
 					ShortMessages[I] = MsgPlayer[J]$":"@MsgText[J];
@@ -740,6 +740,8 @@ state Typing
 					History[HistoryCur++ % MaxHistory] = TypedStr;
 					if( HistoryCur > HistoryBot )
 						HistoryBot++;
+					else
+						HistoryCur = HistoryBot;
 					if( HistoryCur - HistoryTop >= MaxHistory )
 						HistoryTop = HistoryCur - MaxHistory + 1;
 

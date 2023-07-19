@@ -20,7 +20,7 @@ var string MaxHealthMessage;
 
 function PreBeginPlay()
 {
-	MaxHealthMessage = Localize(string(class), "MaxHealthMessage", "Renewal");
+	MaxHealthMessage = Localize("Aeons.Health", "MaxHealthMessage", "Renewal");
 }
 
 function BecomeHealthVial()

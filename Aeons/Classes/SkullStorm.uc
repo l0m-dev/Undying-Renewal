@@ -99,6 +99,9 @@ function bool CheckGenSkull()
 {
 	local Pawn PawnOwner;
 	local vector Start;
+
+	// we always want them to spawn now
+	return true;
 		
 	PawnOwner = Pawn(Owner);
 

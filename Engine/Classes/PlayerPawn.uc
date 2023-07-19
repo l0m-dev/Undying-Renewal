@@ -3248,7 +3248,7 @@ event PreBeginPlay()
 	{
 		// Log("Initializing Icons of Shame...");
 	
-		IconsofShame = spawn(class'StatManager', self);
+		//IconsofShame = spawn(class'StatManager', self);
 	}	
 
 	Super.PreBeginPlay();

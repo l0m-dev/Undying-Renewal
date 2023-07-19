@@ -25,6 +25,15 @@ replication
 		AmmoAmount;
 }
 
+state Activated
+{
+	function BeginState()
+	{
+		Super.BeginState();
+		bActive = default.bActive;
+	}
+}
+
 event float BotDesireability(Pawn Bot)
 {
 	local Ammo AlreadyHas;
@@ -132,4 +141,5 @@ defaultproperties
      Texture=Texture'Engine.S_Ammo'
      ShadowImportance=0
      bCollideActors=False
+	 bActive=True
 }

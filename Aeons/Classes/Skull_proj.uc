@@ -3,6 +3,8 @@
 //=============================================================================
 class Skull_proj expands SpellProjectile;
 
+// Unused?
+
 //#exec MESH IMPORT MESH=Skull_Proj SKELFILE=skull_Proj.ngf
 
 struct Sequence

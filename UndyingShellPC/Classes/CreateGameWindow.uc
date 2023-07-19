@@ -515,6 +515,21 @@ function Message(UWindowWindow B, byte E)
 	}
 }
 
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg)
+	{
+	case WM_KeyDown:
+		if (Key == Root.Console.EInputKey.IK_MWheelUp && !Up.bDisabled)
+			ScrolledUp();
+		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Down.bDisabled)
+			ScrolledDown();
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
+}
+
 function MapNametoScreenShot(string MapName)
 {
 	if ( InStr(MapName, "Catacombs") >= 0 )

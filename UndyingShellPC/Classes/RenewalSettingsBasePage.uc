@@ -15,24 +15,24 @@ var int NumControls;
 
 var bool bHasScrollBar;
 
-var string ServerNameText;
-var string ServerNameHelp;
-var string GameplayChangesText;
-var string GameplayChangesHelp;
-var string GoreText;
-var string GoreHelp;
-var string AutoUseHealthVialsText;
-var string AutoUseHealthVialsHelp;
-var string AltHudText;
-var string AltHudHelp;
-var string AutoShowObjectivesText;
-var string AutoShowObjectivesHelp;
-var string ShowUsedManaText;
-var string ShowUsedManaHelp;
-var string DamageScreenShakeScaleText;
-var string DamageScreenShakeScaleHelp;
-var string MoreSkippableCutscenesText;
-var string MoreSkippableCutscenesHelp;
+var localized string ServerNameText;
+var localized string ServerNameHelp;
+var localized string GameplayChangesText;
+var localized string GameplayChangesHelp;
+var localized string GoreText;
+var localized string GoreHelp;
+var localized string AutoUseHealthVialsText;
+var localized string AutoUseHealthVialsHelp;
+var localized string AltHudText;
+var localized string AltHudHelp;
+var localized string AutoShowObjectivesText;
+var localized string AutoShowObjectivesHelp;
+var localized string ShowUsedManaText;
+var localized string ShowUsedManaHelp;
+var localized string DamageScreenShakeScaleText;
+var localized string DamageScreenShakeScaleHelp;
+var localized string MoreSkippableCutscenesText;
+var localized string MoreSkippableCutscenesHelp;
 
 var string ExperimentalText;
 
@@ -67,6 +67,7 @@ function Created()
 	GetSettings();
 
 	//SectionName = string(class);
+	/*
 	SectionName = "UndyingShellPC.RenewalSettingsBasePage";
 
 	ServerNameText = Localize(SectionName, "ServerNameText", "Renewal");
@@ -87,6 +88,7 @@ function Created()
 	DamageScreenShakeScaleHelp = Localize(SectionName, "DamageScreenShakeScaleHelp", "Renewal");
 	MoreSkippableCutscenesText = Localize(SectionName, "MoreSkippableCutscenesText", "Renewal");
 	MoreSkippableCutscenesHelp = Localize(SectionName, "MoreSkippableCutscenesHelp", "Renewal");
+	*/
 }
 
 static function bool LocalizationExists(String SectionName, String KeyName, String PackageName, optional out String resultStr) {
@@ -114,8 +116,7 @@ function Notify(UWindowDialogControl C, byte E)
 	switch(E)
 	{
 	case DE_MouseMove:
-		if (Root.WinHeight <= 1080)
-			ParentWindow.ToolTip(C.HelpText);
+		ParentWindow.ToolTip(C.HelpText);
 		break;
 	case DE_MouseLeave:
 		ParentWindow.ToolTip("");

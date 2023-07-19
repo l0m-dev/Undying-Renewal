@@ -35,8 +35,7 @@ var float GlowFlashX, GlowFlashY;
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	//AmmoType.AmmoAmount = 9999;
-	//AmmoName=Class'Aeons.GhelziabahrAmmo'
+	AmmoType.AmmoAmount = 9999;
 }
 
 function FellOutOfWorld()
@@ -391,6 +390,7 @@ defaultproperties
      GlowFlashY=0.677
      MomentumTransfer=300
      ExpireMessage="Expire Message"
+	 AmmoName=Class'Aeons.GhelziabahrAmmo'
      PickupAmmoCount=20
      AIRating=0.4
      FireSound=Sound'Aeons.Weapons.E_Wpn_GhelFire01'

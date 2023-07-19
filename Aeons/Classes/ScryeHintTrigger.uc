@@ -23,7 +23,7 @@ var string ScryeHintMessage;
 function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	ScryeHintMessage = Localize(string(class), "ScryeHintMessage", "Renewal");
+	ScryeHintMessage = Localize("Aeons.ScryeHintTrigger", "ScryeHintMessage", "Renewal");
 }
 
 function PassThru(Actor Other)

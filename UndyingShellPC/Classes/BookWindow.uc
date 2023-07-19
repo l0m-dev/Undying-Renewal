@@ -415,6 +415,21 @@ function Message(UWindowWindow B, byte E)
 	}
 }
 
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg)
+	{
+	case WM_KeyDown:
+		if (Key == Root.Console.EInputKey.IK_MWheelUp && !Buttons[0].bDisabled)
+			ScrollUp();
+		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Buttons[1].bDisabled)
+			ScrollDown();
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
+}
+
 //----------------------------------------------------------------------------
 
 function BackPressed()
