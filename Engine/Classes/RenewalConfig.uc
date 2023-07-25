@@ -10,6 +10,7 @@ var config bool bAutoUseHealthVials;
 var config bool bAltHud;
 var config bool bAutoShowObjectives;
 var config bool bShowUsedMana;
+var config float HudScale;
 
 var config string LargeFont;
 var config string MediumFont;
@@ -23,6 +24,12 @@ var config string JournalColor;
 var config float DamageScreenShakeScale;
 
 var config bool bMoreSkippableCutscenes;
+
+// for live tweaking/debugging
+var bool bDebug;
+var bool bDebug2;
+var float fDebug;
+var float fDebug2;
 
 function PostBeginPlay()
 {
@@ -39,6 +46,7 @@ defaultproperties
      bAutoUseHealthVials=True
      bAltHud=False
 	 bShowUsedMana=False
+	 HudScale=1.0
 	 JournalFont="Aeons.Dauphin16_Skinny"
 	 LargeFont="Aeons.MorpheusFont"
 	 MediumFont="Aeons.Dauphin_Grey"
@@ -49,6 +57,8 @@ defaultproperties
 	 JournalColor="#ffffff"
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
+	 fDebug=1.0
+	 fDebug2=1.0
      bAlwaysRelevant=True
      bSavable=False
 }

@@ -69,18 +69,9 @@ function Created()
 {
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -659,19 +650,10 @@ function BeforePaint(Canvas C, float X, float Y)
 function Paint(Canvas C, float X, float Y)
 {
 	local int W, H;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local int localSlot;
 	
 	Super.Paint(C, X, Y);
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -911,25 +893,13 @@ function ShowWindow()
 
 function Resized()
 {
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local int i;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	for( i=0; i<ArrayCount(SaveGameButtons); i++ )
 		SaveGameButtons[i].ManagerResized(RootScaleX, RootScaleY);

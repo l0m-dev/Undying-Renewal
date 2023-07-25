@@ -111,6 +111,8 @@ function Paint(Canvas C, float X, float Y)
 
 	T = GetLookAndFeelTexture();
 
+	TrackWidth = 4 * Root.ScaleY;
+
 	if(Text != "")
 	{
 		C.DrawColor = TextColor;

@@ -218,6 +218,21 @@ static function Object BuildObjectWithProperties(string Text)
 	return O;
 }
 
+static function string TrimFloat(coerce string Text, int DecimalPlaces)
+{
+	local int i;
+
+	i = InStr(Text, ".");
+	if(i == -1)
+	{
+		return Text;
+	}
+	else
+	{
+		return Mid(Text, 0, i+1+DecimalPlaces);
+	}
+}
+
 defaultproperties
 {
 }

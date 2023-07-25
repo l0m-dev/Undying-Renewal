@@ -8,7 +8,7 @@ class AeonsRootWindow extends UWindowRootWindow;
 //#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
 
-// needed to compile, otherwise throws missing audio_x
+// needed to compile, otherwise throws missing audio_x, do not use!
 var float ScaleX, ScaleY;
 
 var UWindowWindow MainMenu;
@@ -75,7 +75,7 @@ function Created()
 
 		if ( KeyName != "" )
 		{
-			if ( GetPlayerOwner().ConsoleCommand( "KEYBINDING "$KeyName ) == "ShowBook" )
+			if ( InStr(GetPlayerOwner().ConsoleCommand( "KEYBINDING "$KeyName ), "ShowBook") >= 0 )
 			{
 				bFoundBookKey = true;
 				break;
@@ -191,6 +191,7 @@ function DrawMouse(Canvas C)
 	if ( CursorFX == None )
 	{
 		CursorFX = GetPlayerOwner().Spawn(class'Aeons.ShellFX');
+		CursorFX.bShellOnly = true;
 	}
 	else
 	{
@@ -236,8 +237,6 @@ function DrawMouse(Canvas C)
 
 	if ( CursorFX != None )
 	{
-		CursorFX.bShellOnly = true;
-
 		Loc.X = Root.MouseX;
 		Loc.Y = Root.MouseY;
 		Loc.Z = 10.0; 

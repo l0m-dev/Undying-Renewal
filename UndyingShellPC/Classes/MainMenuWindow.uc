@@ -107,19 +107,10 @@ function Created()
 {
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local string SaveString;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -738,24 +729,12 @@ function ShowWindow()
 function Resized()
 {
 	local int W, H, XMod, YMod, i;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
-
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else
-	{
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	// MainMenuWindow is parent of Single and other windows.
 	//fix might be better to have AeonsRootWindow or UWindowRootWindow know the active window

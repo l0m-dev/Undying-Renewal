@@ -33,8 +33,13 @@ function color DeriveColor()
 		blk.r = 0;
 		blk.g = 0;
 		blk.b = 0;
+
+		if (Owner.IsA('ScriptedPawn'))
+			RelativeHealth = Pawn(Owner).Health / ScriptedPawn(Owner).InitHealth;
+		else
+			RelativeHealth = Pawn(Owner).Health / Pawn(Owner).default.Health;
 		
-		RelativeHealth = Pawn(Owner).Health / Pawn(Owner).default.Health;
+		// RelativeHealth should be clamped to 0 but it kinda looks cool so leave it for now
 		
 		if (RelativeHealth > 0.65)
 			c = (Healthy * ((RelativeHealth - 0.65) / 0.35)) + ( Wounded * abs(((RelativeHealth - 0.65) / 0.35)-1) );

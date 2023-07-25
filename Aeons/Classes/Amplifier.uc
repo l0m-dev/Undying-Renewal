@@ -107,11 +107,6 @@ state Activated
 
 					PlayerPawnOwner.AttSpell.CastingLevel ++;
 					numcopies--;
-					if ( numCopies < 0 )
-					{
-						SelectNext();
-						Pawn(Owner).DeleteInventory(self);
-					}
 					bSucess	= true;
 					GotoState('Holding');
 				}

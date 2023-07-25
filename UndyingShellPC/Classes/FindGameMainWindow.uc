@@ -17,21 +17,12 @@ class FindGameMainWindow expands ShellWindow;
 function Created()
 {
 	local int i;
-	local AeonsRootWindow AeonsRoot;
 	
 	Super.Created();
 	bAlwaysOnTop = True;
 	
 	SetAcceptsFocus();
 	FocusWindow();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 }
 
 //----------------------------------------------------------------------------

@@ -344,6 +344,12 @@ function KeyDown(int Key, float X, float Y)
 				CurrentHistory = HistoryList;
 			}
 			Notify(DE_EnterPressed);
+
+			if(bChangePending)
+			{
+				bChangePending = False;
+				Notify(DE_Change);
+			}
 		}
 		break;
 	case P.EInputKey.IK_MWheelUp:
@@ -565,6 +571,12 @@ function KeyFocusExit()
 {
 	bAllSelected = False;
 	Super.KeyFocusExit();
+
+	if(bChangePending)
+	{
+		bChangePending = False;
+		Notify(DE_Change);
+	}
 }
 	
 

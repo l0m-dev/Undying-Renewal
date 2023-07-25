@@ -30,23 +30,12 @@ function Created()
 
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
 
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
-	else
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	TextColor.R = 255;
 	TextColor.G = 255;
@@ -237,23 +226,12 @@ function SaveChanges()
 function Resized()
 {
 	local int i;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else
-	{
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	for ( i = 0; i < 8; i++ )
 		if ( Checkboxes[i] != None )

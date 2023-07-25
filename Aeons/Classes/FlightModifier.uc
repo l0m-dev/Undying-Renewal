@@ -45,48 +45,7 @@ state Active
 			}
 			
 			// this part needs to go in FlightModifier
-			if ( Owner.GetStateName() == 'PlayerFlying')
-			{
-				if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
-				{
-						Owner.SetPhysics(PHYS_Falling);
-						Owner.GotoState('PlayerWalking');
-						GotoState('Idle');
-				}				
-				else
-				{
-
-					if ( Pawn(Owner).Acceleration.Z > 0 )
-					{						
-						FuelNeeded = 1.5 + 1.5*Pawn(Owner).Acceleration.Z/Pawn(Owner).AirSpeed;	
-					}	
-					else
-					{
-						FuelNeeded = 1.5;
-					}			
-					
-					if ( FuelNeeded > Fuel )
-					{
-						// sorry but you are all out of mana
-						Owner.SetPhysics(PHYS_Falling);
-						Owner.GotoState('PlayerWalking');
-						Fuel = 0;
-						GotoState('Idle');
-					}
-					else
-					{
-						Fuel -= FuelNeeded;					
-						
-						/*
-						if ( Fuel >= 30 )
-							AmbientSound = FlyingSound;
-						else
-							AmbientSound = SputterSound;
-						*/
-					}
-				}								
-			}
-			else
+			if ( Owner.GetStateName() != 'PlayerFlying')
 			{
 				if ( ( AeonsPlayer(Owner).JumpHeldTime >= 0.2 ) &&
 					 ( !AeonsPlayer(Owner).InCrouch() ) &&
@@ -98,14 +57,53 @@ state Active
 				{
 					bActive = true;
 					AeonsPlayer(Owner).GotoState('PlayerFlying');//KeebFly();
-				} else {
+				} else
+				{
 					if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
 					{
 						GotoState('Idle');
+						return;
 					}
 				}
 			}
-		
+
+			if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
+			{
+				Owner.SetPhysics(PHYS_Falling);
+				Owner.GotoState('PlayerWalking');
+				Fuel = FMax(0, Fuel-1.5); // prevents spamming to fly further
+				GotoState('Idle');
+				return;
+			}				
+			
+			if ( Pawn(Owner).Acceleration.Z > 0 )
+			{						
+				FuelNeeded = 1.5 + 1.5*Pawn(Owner).Acceleration.Z/Pawn(Owner).AirSpeed;
+			}	
+			else
+			{
+				FuelNeeded = 1.5;
+			}
+			
+			if ( FuelNeeded > Fuel )
+			{
+				// sorry but you are all out of mana
+				Owner.SetPhysics(PHYS_Falling);
+				Owner.GotoState('PlayerWalking');
+				Fuel = 0;
+				GotoState('Idle');
+			}
+			else
+			{
+				Fuel -= FuelNeeded;					
+				
+				/*
+				if ( Fuel >= 30 )
+					AmbientSound = FlyingSound;
+				else
+					AmbientSound = SputterSound;
+				*/
+			}						
 		}
 	}
 	
@@ -115,6 +113,7 @@ state Active
 	
 	function BeginState()
 	{
+		Timer(); // removes 0.1s delay
 		SetTimer(0.1, True);
 		AmbientSound = FlyingSound;
 		SetBase(Owner, 'root', 'root');
@@ -159,7 +158,11 @@ auto state Idle
 		{
 			if ( Fuel < 60 ) 
 			{
-				Fuel += 25.0 * DeltaTime;
+				// another form of balancing flight with no delay
+				if (Owner.Physics == PHYS_Falling)
+					Fuel += 15.0 * DeltaTime;
+				else
+					Fuel += 25.0 * DeltaTime;
 
 				Fuel = FClamp( Fuel, 0.0, 60.0 );
 			}

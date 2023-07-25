@@ -80,7 +80,6 @@ function Created()
 
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local string SaveString;
 
@@ -93,14 +92,6 @@ function Created()
 	}
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -784,18 +775,12 @@ function AdvVideoPressed()
 function Resized()
 {
 	local int i;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	//fix might be better to have AeonsRootWindow or UWindowRootWindow know the active window
 	// I think there is already a variable for that, i'll look later
@@ -889,6 +874,7 @@ function ShowWindow()
 	Super.ShowWindow();
 
 	GetCurrentSettings();
+	GetStartingRow();
 	RefreshButtons();
 }
 

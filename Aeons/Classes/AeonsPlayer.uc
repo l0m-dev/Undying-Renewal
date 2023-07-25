@@ -2431,11 +2431,18 @@ event PlayerInput( float DeltaTime )
 	if (wconsole != None && wconsole.Root != None)
 		wconsole.MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * wconsole.Root.ScaleY;
 
-	if ( bJump > 0 ) 
+	if ( bJump > 0 )
+	{
+		// remove delay in flying if holding jump again
+		if (JumpHeldTime == 0 && Physics == PHYS_Falling)
+			JumpHeldTime = 0.2;
 		JumpHeldTime += DeltaTime;
+	}
 	else
+	{
 		JumpHeldTime = 0;
-		
+	}
+
 	if ( bFire > 0 ) 
 		FireHeldTime += DeltaTime;
 	else

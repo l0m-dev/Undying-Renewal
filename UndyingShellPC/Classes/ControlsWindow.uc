@@ -108,7 +108,6 @@ function Created()
 
 	local int i, j;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Created();
@@ -121,14 +120,6 @@ function Created()
 		{
 			LabelList[I] = Mid(LabelList[I], j+1);
 		}
-	}
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
 	}
 
 	RootScaleX = Root.ScaleX;
@@ -504,6 +495,7 @@ function GetCurrentSettings(bool bResetOrig)
 					if( !(Left(Alias, pos) ~= "taunt") &&
 						!(Left(Alias, pos) ~= "getweapon") &&
 						!(Left(Alias, pos) ~= "viewplayernum") &&
+						!(Left(Alias, pos) ~= "button") &&
 						!(Left(Alias, pos) ~= "savegame") &&
 						!(Left(Alias, pos) ~= "loadgame"))
 						Alias = Left(Alias, pos);
@@ -569,6 +561,7 @@ function RemoveExistingKey(int KeyNo, string KeyName)
 
 function string GetKeyName(int Key)
 {
+	// same as: return GetPlayerOwner().ConsoleCommand("KEYNAME "$Key);
 	return mid(string(GetEnum(enum'EInputKey', Key)),3);
 }
 
@@ -1101,19 +1094,13 @@ function SensitivityChanged()
 
 function Resized()
 {
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local int i;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	if ( AdvControls != None )
 		AdvControls.Resized();

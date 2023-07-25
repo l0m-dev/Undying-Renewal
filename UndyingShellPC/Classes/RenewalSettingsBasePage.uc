@@ -29,6 +29,8 @@ var localized string AutoShowObjectivesText;
 var localized string AutoShowObjectivesHelp;
 var localized string ShowUsedManaText;
 var localized string ShowUsedManaHelp;
+var localized string HudSizeText;
+var localized string HudSizeHelp;
 var localized string DamageScreenShakeScaleText;
 var localized string DamageScreenShakeScaleHelp;
 var localized string MoreSkippableCutscenesText;
@@ -36,7 +38,7 @@ var localized string MoreSkippableCutscenesHelp;
 
 var string ExperimentalText;
 
-function UWindowDialogControl AddControl(class<UWindowDialogControl> ClassRef, string Text, string HelpText)
+function UWindowDialogControl AddControl(class<UWindowDialogControl> ClassRef, optional string Text, optional string HelpText)
 {
 	local ControlInfo option;
 

@@ -233,7 +233,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	C.Font = Root.Fonts[F_Normal];
 	C.SetPos(0, 0);
 
-	MaxWidth = Owner.EditBoxWidth;
+	MaxWidth = Owner.EditBoxWidth * Root.ScaleY;
 	ExtraWidth = ((HBorder + TextBorder) * 2);
 
 	Count = Items.Count();
@@ -257,7 +257,7 @@ function BeforePaint(Canvas C, float X, float Y)
 
 	WinWidth = MaxWidth;
 
-	ListX = Owner.EditAreaDrawX + Owner.EditBoxWidth - WinWidth;
+	ListX = Owner.EditAreaDrawX + Owner.EditBoxWidth*Root.ScaleY - WinWidth;
 	ListY = Owner.Button.WinTop + Owner.Button.WinHeight;
 
 	if(Count > MaxVisible)

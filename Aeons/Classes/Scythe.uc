@@ -685,6 +685,10 @@ function MeleeAttack(float Range)
 				{
 					log ("Health Taken = "$HealthTaken, 'Misc');
 					HealthRefreshAmt = healthTaken;
+					if (bThirsty)
+					{
+						PlayerPawn(Owner).Mana = FMin(PlayerPawn(Owner).Mana, 50);
+					}
 					GotoState('AbsorbHealth');
 				} else {
 					log ("bGiveScytheHealth = "$ScriptedPawn(Other).bGiveScytheHealth, 'Misc');
@@ -1048,7 +1052,7 @@ state BloodThirst
 	{
 		bThirsty = false;
 
-		PlayerPawn(Owner).Mana = FMin(PlayerPawn(Owner).Mana, 50);
+		//PlayerPawn(Owner).Mana = FMin(PlayerPawn(Owner).Mana, 50);
 
 		StopSound(SndID);
 

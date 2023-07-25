@@ -40,19 +40,10 @@ function Created()
 {
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local vector Delta;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 	
 	SmokingWindows[0] = -1;
 
@@ -134,25 +125,13 @@ function Created()
 
 function Resized()
 {
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local int i;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 	
 	if ( FaceButton != None )
 		FaceButton.ManagerResized(RootScaleX, RootScaleY);

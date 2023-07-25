@@ -24,18 +24,9 @@ function Created()
 
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -124,18 +115,12 @@ function Paint(Canvas C, float X, float Y)
 function Resized()
 {
 	local int W, H, XMod, YMod, i;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 	
 	if ( PCCreditsButton != None )
 		PCCreditsButton.ManagerResized(RootScaleX, RootScaleY);

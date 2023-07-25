@@ -114,20 +114,11 @@ function Created()
 
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local vector Delta;
 	local float ThetaStart, ThetaEnd, ThetaStep;
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -388,25 +379,13 @@ function Created()
 
 function Resized()
 {
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 	local int i;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	SoundVolumeUp.ManagerResized(RootScaleX, RootScaleY);
 	SoundVolumeDown.ManagerResized(RootScaleX, RootScaleY);
@@ -432,23 +411,10 @@ function Resized()
 function SoundVolumeChanged(float Delta)
 {
 	local float ThetaRange;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
-
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	Soundvolume += Delta;
 	SoundVolume = Clamp( SoundVolume, 0, 255);
@@ -474,23 +440,10 @@ function SoundVolumeChanged(float Delta)
 function BackgroundVolumeChanged(float Delta)
 {
 	local float ThetaRange;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
-
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	Backgroundvolume += Delta;
 	BackgroundVolume = Clamp( BackgroundVolume, 0, 255);
@@ -516,23 +469,10 @@ function BackgroundVolumeChanged(float Delta)
 function VoiceVolumeChanged(float Delta)
 {
 	local float ThetaRange;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else 
-	{
-		// nasty
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
-
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	Voicevolume += Delta;
 	VoiceVolume = Clamp( VoiceVolume, 0, 255);

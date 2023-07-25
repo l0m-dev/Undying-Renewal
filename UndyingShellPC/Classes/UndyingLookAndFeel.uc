@@ -185,6 +185,7 @@ function FW_SetupFrameButtons(UWindowFramedWindow W, Canvas C)
 
 	W.CloseBox.SetSize(CloseBoxUp.W, CloseBoxUp.H);
 	W.CloseBox.bUseRegion = True;
+	W.CloseBox.RegionScale = ScaleY;
 
 	W.CloseBox.UpTexture = T;
 	W.CloseBox.DownTexture = T;
@@ -244,6 +245,9 @@ function DrawClientArea(UWindowClientWindow W, Canvas C)
 	ScaleY = W.Root.ScaleY;//W.Root.WinHeight / 600.0;
 	
 	Size_TabAreaHeight = default.Size_TabAreaHeight * ScaleY;
+	Size_ScrollbarWidth = default.Size_ScrollbarWidth * ScaleY;
+	Size_ScrollbarButtonHeight = default.Size_ScrollbarButtonHeight * ScaleY;
+	ComboBtnUp.W = default.ComboBtnUp.W * ScaleY;
 	/*
 	TabSelectedL.H = default.TabSelectedL.H * ScaleY;
 	TabSelectedM.H = default.TabSelectedM.H * ScaleY;
@@ -278,12 +282,12 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 	C.Font = W.Root.Fonts[W.Font];
 	W.TextSize(C, W.Text, TW, TH);
 	
-	W.WinHeight = 12 + MiscBevelT[2].H + MiscBevelB[2].H;
-	
+	W.WinHeight = 12*ScaleY + MiscBevelT[2].H + MiscBevelB[2].H;
+
 	switch(W.Align)
 	{
 	case TA_Left:
-		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth;
+		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth*ScaleY;
 		W.TextX = 0;
 		break;
 	case TA_Right:
@@ -291,7 +295,7 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 		W.TextX = W.WinWidth - TW;
 		break;
 	case TA_Center:
-		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth) / 2;
+		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth*ScaleY) / 2;
 		W.TextX = (W.WinWidth - TW) / 2;
 		break;
 	}
@@ -305,7 +309,7 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 
 	if(W.bButtons)
 	{
-		W.EditBox.WinWidth = W.EditBoxWidth - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W - SBLeftUp.W - SBRightUp.W;
+		W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W - SBLeftUp.W - SBRightUp.W;
 		W.EditBox.WinHeight = W.WinHeight - MiscBevelT[2].H - MiscBevelB[2].H;
 		W.Button.WinLeft = W.WinWidth - ComboBtnUp.W - MiscBevelR[2].W - SBLeftUp.W - SBRightUp.W;
 		W.Button.WinTop = W.EditBox.WinTop;
@@ -322,7 +326,7 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 	}
 	else
 	{
-		W.EditBox.WinWidth = W.EditBoxWidth - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W;
+		W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W;
 		W.EditBox.WinHeight = W.WinHeight - MiscBevelT[2].H - MiscBevelB[2].H;
 		W.Button.WinLeft = W.WinWidth - ComboBtnUp.W - MiscBevelR[2].W;
 		W.Button.WinTop = W.EditBox.WinTop;
@@ -332,7 +336,8 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 
 function Combo_Draw(UWindowComboControl W, Canvas C)
 {
-	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth, W.WinHeight, Misc, 2);
+	// done
+	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth*ScaleY, W.WinHeight, Misc, 2);
 
 	if(W.Text != "")
 	{
@@ -366,11 +371,16 @@ function ComboList_DrawItem(UWindowComboList Combo, Canvas C, float X, float Y, 
 	C.DrawColor.G = 255;
 	C.DrawColor.B = 255;
 
+	Combo.ItemHeight = 15 * ScaleY;
+	Combo.VBorder = 3 * ScaleY;
+	Combo.HBorder = 3 * ScaleY;
+	Combo.TextBorder = 9 * ScaleY;
+
 	if(bSelected)
 	{
-		Combo.DrawClippedTexture(C, X, Y, Texture'UMenu.MetalMenuHL');
-		Combo.DrawStretchedTexture(C, X + 4, Y, W - 8, 16, Texture'UMenu.MetalMenuHM');
-		Combo.DrawClippedTexture(C, X + W - 4, Y, Texture'UMenu.MetalMenuHR');
+		Combo.DrawStretchedTexture(C, X, Y, 4*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHL');
+		Combo.DrawStretchedTexture(C, X + 4*ScaleY, Y, W - 8*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHM');
+		Combo.DrawStretchedTexture(C, X + W - 4*ScaleY, Y, 4*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHR');
 		C.DrawColor.R = 0;
 		C.DrawColor.G = 0;
 		C.DrawColor.B = 0;
@@ -435,6 +445,7 @@ function Combo_GetButtonBitmaps(UWindowComboButton W)
 	T = W.GetLookAndFeelTexture();
 	
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -454,6 +465,7 @@ function Combo_SetupLeftButton(UWindowComboLeftButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -473,6 +485,7 @@ function Combo_SetupRightButton(UWindowComboRightButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -497,12 +510,12 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 	C.Font = W.Root.Fonts[W.Font];
 	W.TextSize(C, W.Text, TW, TH);
 	
-	W.WinHeight = 12 + MiscBevelT[B].H + MiscBevelB[B].H;
+	W.WinHeight = (12 + MiscBevelT[B].H + MiscBevelB[B].H) * ScaleY;
 	
 	switch(W.Align)
 	{
 	case TA_Left:
-		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth;
+		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth*ScaleY;
 		W.TextX = 0;
 		break;
 	case TA_Right:
@@ -510,7 +523,7 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 		W.TextX = W.WinWidth - TW;
 		break;
 	case TA_Center:
-		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth) / 2;
+		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth*ScaleY) / 2;
 		W.TextX = (W.WinWidth - TW) / 2;
 		break;
 	}
@@ -520,13 +533,13 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 
 	W.EditBox.WinLeft = W.EditAreaDrawX + MiscBevelL[B].W;
 	W.EditBox.WinTop = MiscBevelT[B].H;
-	W.EditBox.WinWidth = W.EditBoxWidth - MiscBevelL[B].W - MiscBevelR[B].W;
+	W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[B].W - MiscBevelR[B].W;
 	W.EditBox.WinHeight = W.WinHeight - MiscBevelT[B].H - MiscBevelB[B].H;
 }
 
 function Editbox_Draw(UWindowEditControl W, Canvas C)
 {
-	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth, W.WinHeight, Misc, EditBoxBevel);
+	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth*ScaleY, W.WinHeight, Misc, EditBoxBevel);
 
 	if(W.Text != "")
 	{
@@ -630,6 +643,7 @@ function SB_SetupUpButton(UWindowSBUpButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -649,6 +663,7 @@ function SB_SetupDownButton(UWindowSBDownButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -670,6 +685,7 @@ function SB_SetupLeftButton(UWindowSBLeftButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -689,6 +705,7 @@ function SB_SetupRightButton(UWindowSBRightButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -746,6 +763,7 @@ function Tab_SetupLeftButton(UWindowTabControlLeftButton W)
 	W.WinLeft = W.ParentWindow.WinWidth - 2*W.WinWidth;
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -770,6 +788,7 @@ function Tab_SetupRightButton(UWindowTabControlRightButton W)
 	W.WinLeft = W.ParentWindow.WinWidth - W.WinWidth;
 
 	W.bUseRegion = True;
+	W.RegionScale = ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;

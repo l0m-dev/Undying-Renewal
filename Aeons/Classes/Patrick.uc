@@ -22,6 +22,42 @@ var bool bAckClickThrough;
 
 //----------------------------------------------------------------------------
 
+
+function UWindowWindow CreateWindow(string ClassName, float Width, float Height)
+{
+	local UWindowWindow Window;
+	local UWindowRootWindow Root;
+	local WindowConsole wconsole;
+
+	wconsole = WindowConsole(Player.Console);
+
+	if (wconsole == None)
+		return None;
+
+	Root = wconsole.Root;
+
+	Width *= Root.ScaleY;
+	Height *= Root.ScaleY;
+
+	wconsole.bQuickKeyEnable = True;
+	wconsole.ConsoleCommand("ResetInput");
+	// we need to do this instead of LaunchUWindow so it works from console
+	// otherwise console state will be Typing and it won't work
+	AeonsConsole(wconsole).bRequestWindow = true; 
+	Window = Root.CreateWindow(class<UWindowWindow>(DynamicLoadObject(ClassName, class'Class')), Root.WinWidth/2 - Width/2, Root.WinHeight/2 - Height/2, Width, Height);
+	
+	return Window;
+}
+
+exec function dbg()
+{
+	local UWindowWindow Window;
+
+	Window = CreateWindow("UndyingShellPC.RenewalWindow", 300, 200);
+	Window.bLeaveOnScreen = True;
+	Window.SetPropertyText("bDebug", "true");
+}
+
 function StartLevel()
 {
 	if ( (Player != None) && (Player.Console != None) )

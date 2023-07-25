@@ -79,20 +79,11 @@ function Created()
 {
 	local int i;
 	local color TextColor;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Log("BookWindow: Created");
 
 	Super.Created();
-	
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if ( AeonsRoot == None ) 
-	{
-		Log("AeonsRoot is Null!");
-		return;
-	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -303,8 +294,8 @@ function Tick(float Delta)
 	{
 		fExitDelay -= Delta;
 
-		if ( fExitDelay <= 0.0 )
-			HideWindow();
+		//if ( fExitDelay <= 0.0 )
+		//	HideWindow();
 
 	}
 
@@ -417,6 +408,11 @@ function Message(UWindowWindow B, byte E)
 
 function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
 {
+	local string KeyName, Alias;
+
+	KeyName = GetPlayerOwner().ConsoleCommand("KEYNAME "$Key);
+	Alias = GetPlayerOwner().ConsoleCommand("KEYBINDING "$KeyName);
+
 	switch(Msg)
 	{
 	case WM_KeyDown:
@@ -424,6 +420,8 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 			ScrollUp();
 		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Buttons[1].bDisabled)
 			ScrollDown();
+		if (KeyName!="" && Alias != "" && instr(Alias, "ShowBook") >= 0)
+			Close();
 		break;
 	}
 
@@ -650,16 +648,8 @@ function Paint(Canvas C, float X, float Y)
 	local int JournalDelta;
   	local float RootScaleX, RootScaleY;
 
-	if ( Root != None )
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else
-	{
-		RootScaleX = 1.0;
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	if (RootScaleX > RootScaleY) {
 		RootScaleX = RootScaleY;
@@ -733,8 +723,7 @@ function Close(optional bool bByParent)
 			GetPlayerOwner().PlaySound( sound'Aeons.I_BookClose01' ,SLOT_Misc, [Flags]482  );
 		else
 			GetPlayerOwner().PlaySound( sound'Aeons.I_BookClose02',SLOT_Misc, [Flags]482   );
-
-		fExitDelay = 0.25;
+		HideWindow();
 	}
 }
 
@@ -745,6 +734,8 @@ function ShowWindow()
 
 	//log("BookWindow: ShowWindow");
 	Super.ShowWindow();
+
+	fExitDelay = 0.25;
 
 	Root.Console.bLocked = True;
 
@@ -800,23 +791,12 @@ function HideWindow()
 function Resized()
 {
 	local int W, H, XMod, YMod, i;
-	local AeonsRootWindow AeonsRoot;
 	local float RootScaleX, RootScaleY;
 
 	Super.Resized();
 
-	AeonsRoot = AeonsRootWindow(Root);
-
-	if (AeonsRoot != None)
-	{
-		RootScaleX = Root.ScaleX;
-		RootScaleY = Root.ScaleY;
-	}
-	else
-	{
-		RootScaleX = 1.0;	
-		RootScaleY = 1.0;
-	}
+	RootScaleX = Root.ScaleX;
+	RootScaleY = Root.ScaleY;
 
 	if (RootScaleX > RootScaleY) {
 		RootScaleX = RootScaleY;

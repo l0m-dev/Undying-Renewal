@@ -100,6 +100,8 @@ defaultproperties
      Text(0)="Message goes here"
      TextColor=(R=255,G=255,B=255)
      DisplayTime=10
+     px=0.35
+     py=0.70
      FadeToBlack=True
      Texture=Texture'Aeons.System.osm'
      DrawScale=0.5

@@ -297,6 +297,23 @@ var float DisplayObjectivesTime;
 
 var(Wheel) int Item_InvGroup[8];
 
+var int LastDrawnItemsCount;
+var float HalfClipX;
+var float HalfClipY;
+var float HudScale;
+var float ClampedHudScale;
+
+const OSMClientMessage = true;
+
+// 80 comes from 64 + 16
+const WSI_Bottom = 80; // Weapon, Spells, Items bottom offset, old value is 72, undying original is 80,
+					   // but some things like spell icon, book icon and mana icon were 72
+const WSI_Right = 80;
+const WSI_Top = 16;
+const WSI_Left = 16;
+const WSI_Padding = 16;
+//var float WSI_Padding;
+
 // Message Struct
 Struct MessageStruct
 {
@@ -387,7 +404,7 @@ simulated function AddSubtitle( string NewSubtitle, optional string SoundName )
 	
 	// Parse out the portion of the string minus the duration.
 	i = InStr (NewSubtitle, "&d=");
-	Subtitle.Text[Subtitle.Number] = Left (NewSubtitle, i);
+	Subtitle.Text[Subtitle.Number] = Trim(Left(NewSubtitle, i));
 
 	// Get the length of the string that pertains to the duration.
 	timelen = Len (NewSubtitle) - (i + 3);
@@ -461,7 +478,7 @@ simulated function DrawSubtitles(Canvas canvas)
 		Canvas.Font = Canvas.MedFont;
 		
 		Canvas.TextSize(Subtitle.Text[Subtitle.Number], W, H);
-		//StartHeight = (Canvas.ClipY/2-LetterboxHeight/2);
+		//StartHeight = (HalfClipY-LetterboxHeight/2);
 		StartHeight = LetterboxHeight;
 		LineCount = ceil(W / Canvas.ClipX);
 		SubtitleHeight = (H * LineCount);
@@ -481,6 +498,16 @@ simulated function DrawSubtitles(Canvas canvas)
 		
 		if (Y > Canvas.SizeY - SubtitleHeight)
 			Y = Canvas.SizeY - SubtitleHeight - 10*ScaleY;
+
+		if (!IsLetterBoxed())
+		{
+			Canvas.Style = 4;
+			Canvas.DrawColor = Canvas.Default.DrawColor;
+			Canvas.SetPos(HalfClipX - W/2 - 4*ScaleY, Y);
+			Canvas.DrawTileClipped( texture'HUD_Inv_Shad_Test', W + 8*ScaleY, SubtitleHeight, 0, 0, 60, 64);
+			Canvas.DrawColor = WhiteColor;
+		}
+
 		Canvas.SetPos (Canvas.OrgX, Y);
 		Canvas.bCenter = true;
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
@@ -735,6 +762,37 @@ simulated function DisplayProgressMessage( canvas Canvas )
 
 simulated function PreRender( canvas Canvas )
 {
+	HudScale = Owner.GetRenewalConfig().HudScale;
+	ClampedHudScale = FMax(HudScale, 1.0);
+	
+	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root == None)
+		return;
+	
+	// used throughout AeonsHUD to scale currentres with respect to 800x600
+	//
+	ScaleX = Canvas.ClipX / WindowConsole(PlayerPawn(Owner).Player.Console).Root.OriginalWidth * HudScale;
+	ScaleY = Canvas.ClipY / WindowConsole(PlayerPawn(Owner).Player.Console).Root.OriginalHeight * HudScale;
+	Scale = ScaleY;
+
+	HalfClipX = Canvas.ClipX / 2;
+	HalfClipY = Canvas.ClipY / 2;
+
+	/*
+	if we use root's scale, we need to call RenderUWindow when resolution changes (alt tab) outside of menus
+	to calculate ScaleX again, so it's easier to just use our ClipX
+
+	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root.WinHeight != Canvas.ClipY)
+	{
+		WindowConsole(PlayerPawn(Owner).Player.Console).Root.Console.RenderUWindow(Canvas);
+		return;
+	}
+
+	ScaleX = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleX;
+	ScaleY = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleY;
+	Scale = ScaleY;
+	*/
+	
+
 	if (PlayerPawn(Owner).Weapon != None)
 		PlayerPawn(Owner).Weapon.PreRender(Canvas);
 	
@@ -1094,26 +1152,11 @@ simulated function PostRender( canvas Canvas )
 	local PlayerPawn PlayerOwner;
 	local int YDelta;
 	local bool bDrawHUD;
-	local int i;
-	local string TempString;
-	local int Token;
 	local float WeaponX;
 	local bool bAltHud;
 	
 	bDrawHUD = true;
 	bAltHud = Owner.GetRenewalConfig().bAltHud;
-	
-	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root == None)
-		return;
-	
-	// used throughout AeonsHUD to scale currentres with respect to 800x600
-	//Scale = Canvas.ClipY / 600.0;
-	//ScaleX = Canvas.ClipX / 800.0;
-	//ScaleY = Canvas.ClipY / 600.0;
-
-	ScaleX = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleX;
-	ScaleY = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleY;
-	Scale = ScaleY;
 	
 	HUDSetup(canvas);
 
@@ -1131,7 +1174,7 @@ simulated function PostRender( canvas Canvas )
 		
 		if (LetterboxHeight > 0 && bEnableLetterBox)
 		{
-			//YDelta = Canvas.ClipY/2-LetterboxHeight/2;
+			//YDelta = HalfClipY-LetterboxHeight/2;
 			YDelta = LetterboxHeight;
 
 			Canvas.SetPos(0,0);
@@ -1228,7 +1271,7 @@ simulated function PostRender( canvas Canvas )
 			if ( PlayerOwner.bShowScores )
 			{
 	//			if ( (AeonsPlayer(Owner).bDrawCrosshair) && ( PlayerOwner.Weapon != None ) && ( !PlayerOwner.Weapon.bOwnsCrossHair ) )
-	//				 DrawCrossHair(Canvas, (0.5 * Canvas.ClipX) + AeonsPlayer(Owner).crossHairOffsetX, (0.5 * Canvas.ClipY) + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
+	//				 DrawCrossHair(Canvas, HalfClipX + AeonsPlayer(Owner).crossHairOffsetX, HalfClipY + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
 				if ( (PlayerOwner.Scoring == None) && (PlayerOwner.ScoringType != None) )
 					PlayerOwner.Scoring = Spawn(PlayerOwner.ScoringType, PlayerOwner);
 				if ( PlayerOwner.Scoring != None )
@@ -1242,7 +1285,7 @@ simulated function PostRender( canvas Canvas )
 			{
 				PlayerOwner.Weapon.PostRender(Canvas);
 				if ( !PlayerOwner.Weapon.bOwnsCrossHair && !AeonsPlayer(PlayerOwner).bSelectObject )
-					DrawCrossHair(Canvas, (0.5 * Canvas.ClipX) + AeonsPlayer(Owner).crossHairOffsetX, (0.5 * Canvas.ClipY) + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
+					DrawCrossHair(Canvas, HalfClipX + AeonsPlayer(Owner).crossHairOffsetX, HalfClipY + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
 			}
 	
 			if ( !PlayerOwner.bBehindView && (PlayerOwner.AttSpell != None) && (Level.LevelAction == LEVACT_None) )
@@ -1267,9 +1310,9 @@ simulated function PostRender( canvas Canvas )
 		
 		//This is a crosshair test
 		// if ( AeonsPlayer(Owner).bDrawCrossHair )
-			// DrawCrossHair(Canvas, (0.5 * Canvas.ClipX - 8) + AeonsPlayer(Owner).crossHairOffsetX, (0.5 * Canvas.ClipY - 8) + AeonsPlayer(Owner).crossHairOffsetY,AeonsPlayer(Owner).crossHairScale);
+			// DrawCrossHair(Canvas, (HalfClipX - 8) + AeonsPlayer(Owner).crossHairOffsetX, (HalfClipY - 8) + AeonsPlayer(Owner).crossHairOffsetY,AeonsPlayer(Owner).crossHairScale);
 		// this next line always draws a stationary cross hair - for debugging mindshatter
-		// DrawCrossHair(Canvas, (0.5 * Canvas.ClipX - 8), (0.5 * Canvas.ClipY - 8),1);
+		// DrawCrossHair(Canvas, (HalfClipX - 8), (HalfClipY - 8),1);
 	
 		//if (AeonsPlayer(Owner).bDrawStealth || AeonsPlayer(Owner).bDrawDebugHUD )
 		//	DrawStealth(Canvas);
@@ -1287,13 +1330,13 @@ simulated function PostRender( canvas Canvas )
 	
 		if (bAltHud)
 		{
-			DrawHealth(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY - 69*Scale);
-			DrawMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 69*Scale);
+			DrawHealth(Canvas, (64+WSI_Padding+WSI_Left)*ScaleY, Canvas.ClipY - 64*Scale);
+			DrawMana(Canvas, (128+60+WSI_Left+WSI_Padding*3)*ScaleY, Canvas.ClipY - 64*Scale);
 		}
 		else
 		{
-			DrawHealth(Canvas, 317*ScaleX - 55*ScaleY, Canvas.ClipY - 68*ScaleY);
-			DrawMana(Canvas, 426*ScaleX + 64*ScaleY, Canvas.ClipY - 68*ScaleY);
+			DrawHealth(Canvas, HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY, true); // was 68 in renewal
+			DrawMana(Canvas, HalfClipX + (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
 		}
 	
 		if (Level.bDebugMessaging)
@@ -1310,11 +1353,11 @@ simulated function PostRender( canvas Canvas )
 		{
 			if (bAltHud)
 			{
-				DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*Scale);
+				DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
 			}
 			else
 			{
-				DrawUsedMana(Canvas, 426*ScaleX + 64*ScaleY, 505*ScaleY);
+				DrawUsedMana(Canvas, HalfClipX + 26*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
 			}
 		}
 		
@@ -1326,62 +1369,47 @@ simulated function PostRender( canvas Canvas )
 			if ( AeonsPlayer(Owner).bDrawDebugHUD )
 			{
 				DrawGhelzUse(Canvas, Canvas.sizeX - 50, 30);
-				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*Scale);
+				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*ScaleY);
 			}
-	
-			if (bAltHud)
-				DrawInventoryItem(Canvas, 1*ScaleX, 1*Scale);
-			else
-				DrawInventoryItem(Canvas, 64*ScaleY + 5*ScaleX, Canvas.ClipY-72*Scale);
-			
-			WeaponX = 5*ScaleX;
+
 			if (bAltHud)
 			{
 				if (AeonsPlayer(Owner).DefSpell != none)
-					WeaponX = Canvas.ClipX - 208*ScaleY;
+					DrawInventoryItem(Canvas, Canvas.ClipX - (WSI_Left + 256 + WSI_Padding*3)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
 				else
-					WeaponX = Canvas.ClipX - 144*ScaleY;
+					DrawInventoryItem(Canvas, Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
+			}
+			else
+			{
+				DrawInventoryItem(Canvas, 64*ScaleY + (WSI_Left + WSI_Padding)*ScaleY, Canvas.ClipY-WSI_Bottom*ScaleY);
 			}
 			
-			DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-80*Scale);
-			DrawConventionalWeapon(Canvas, WeaponX, Canvas.ClipY - 72*Scale );
+			WeaponX = WSI_Left*ScaleY;
+			if (bAltHud)
+			{
+				if (AeonsPlayer(Owner).DefSpell != none)
+					WeaponX = Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY;
+				else
+					WeaponX = Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY;
+			}
+			
+			DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-WSI_Bottom*ScaleY - 8*ScaleY/HudScale); // TextSize would be the proper way
+			DrawConventionalWeapon(Canvas, WeaponX, Canvas.ClipY - WSI_Bottom*ScaleY);
 		}
-	
-		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - 78*ScaleY, Canvas.ClipY - 84*Scale);
-		DrawOffensiveSpell(Canvas, Canvas.ClipX - 80*ScaleY, Canvas.ClipY - 72*Scale );	
-	
-		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 84*Scale );	
-		DrawDefensiveSpell(Canvas, Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 72*Scale );
+
+		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Right-2)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);
+		DrawOffensiveSpell(Canvas, Canvas.ClipX - WSI_Right*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);	
+
+		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);	
+		DrawDefensiveSpell(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
 		
 		DrawActiveSpells(Canvas);
 
 		// if their are any unread entries in the book, draw the hud icon
 		DrawBookInfo(Canvas);
 		
-		// display objectives
-		if (Level.TimeSeconds < DisplayObjectivesTime)
-		{
-			Canvas.DrawColor = WhiteColor;
-			Canvas.Font = Canvas.SmallFont;
-
-			for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
-			{
-				if (bAltHud)
-					Canvas.SetPos( 64, 64+25*i );
-				else
-					Canvas.SetPos( 50, 25+25*i );
-				
-				TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
-				Token = InStr(TempString, ",");
-				
-				if (Token >= 0)
-				{
-					TempString = Right(TempString, Len(TempString)-Token-1);	
-				}
-				
-				Canvas.DrawText( "" $ TempString, false );
-			}
-		}
+		// draw objectives
+		DrawObjectives(Canvas);
 		
 		if (AeonsPlayer(Owner).bDrawInvList && (!AeonsPlayer(Owner).bSelectObject || AeonsPlayer(Owner).SelectMode != SM_Item))
 			DrawHeldItems(Canvas);
@@ -1643,10 +1671,6 @@ simulated function DrawInvCount(Canvas Canvas, int X, int Y)
 
 simulated function DrawReplayMessage(Canvas Canvas)
 {
-	local string LevelName;
-	local int i;
-	local string url;
-
 	Canvas.Font = Canvas.SmallFont;
 
 	Canvas.DrawColor.R = 200;
@@ -1925,21 +1949,15 @@ simulated function DrawManaInfo(Canvas Canvas)
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 100;
 		
-		ManaInfoX = 550 * ScaleX;
+		ManaInfoX = HalfClipX + 26*ScaleX + 128*ScaleY;
 		if (Owner.GetRenewalConfig().bAltHud)
-			ManaInfoX = 245 * ScaleX;
+			ManaInfoX = 120*ScaleX + 128*ScaleY;
 
-		Canvas.SetPos(ManaInfoX, 550*ScaleY);
+		Canvas.SetPos(ManaInfoX, Canvas.ClipY - 50*ScaleY);
 		Canvas.DrawText(("+"$ManaModifier(AeonsPlayer(Owner).ManaMod).ManaPerSec), false);
 
-		Canvas.SetPos(ManaInfoX, 570*ScaleY);
+		Canvas.SetPos(ManaInfoX, Canvas.ClipY - 30*ScaleY);
 		Canvas.DrawText(("-"$(ManaModifier(AeonsPlayer(Owner).ManaMod).ManaMaint + ManaModifier(AeonsPlayer(Owner).ManaMod).ScytheMaint)), false);
-		
-		if ( UsedManaFlashTime > Level.TimeSeconds )
-		{
-			Canvas.SetPos(ManaInfoX, 530*ScaleY);
-			Canvas.DrawText(("-"$UsedMana), false);
-		}
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -1970,14 +1988,14 @@ function DrawStealth(Canvas Canvas)
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 156;
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 52 + 48 );
+		Canvas.SetPos( 8, HalfClipY + 52 + 48 );
 		Canvas.DrawText( ("Player Stealth Info"), false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 64 + 48);
+		Canvas.SetPos( 8, HalfClipY + 64 + 48);
 		Canvas.DrawText( ("Audible:  "$a$" Ca:"$ca), false);
 
 		c = PlayerPawn(Owner).Weapon.IncidentLight;
@@ -1985,17 +2003,17 @@ function DrawStealth(Canvas Canvas)
 		Canvas.DrawColor.G = c.g;
 		Canvas.DrawColor.B = c.b;
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 64 + 12 + 48 );
+		Canvas.SetPos( 8, HalfClipY + 64 + 12 + 48 );
 		Canvas.DrawText( ("Visible:  "$v), false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 64 + 24 + 48 );
+		Canvas.SetPos( 8, HalfClipY + 64 + 24 + 48 );
 		Canvas.DrawText( ("Movement: "$m), false);
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 64 + 36 + 48);
+		Canvas.SetPos( 8, HalfClipY + 64 + 36 + 48);
 		Canvas.DrawText( ("Total:    "$t), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2086,7 +2104,7 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawColor.G = 0;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 48);
+		Canvas.SetPos( 8, HalfClipY + 128 + 48);
 		Canvas.DrawText( ("Coordinate Info"), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2113,13 +2131,13 @@ function DrawCoords(Canvas Canvas)
 		else
 			zStr = (" 0."$z);
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 12 + 48);
+		Canvas.SetPos( 8, HalfClipY + 128 + 12 + 48);
 		Canvas.DrawText( ("Location: "$int(pos.x)$"  "$int(pos.y)$"  "$int(pos.z)), false);
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 24 + 48);
+		Canvas.SetPos( 8, HalfClipY + 128 + 24 + 48);
 		Canvas.DrawText( ("Dir:      "$Dir.x$"  "$Dir.y$"  "$Dir.z), false);
 
-		Canvas.SetPos( 8, (Canvas.ClipY * 0.5) + 128 + 36 + 48);
+		Canvas.SetPos( 8, HalfClipY + 128 + 36 + 48);
 		Canvas.DrawText(("Speed:    "$int(VSize(Pawn(Owner).Velocity))), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2171,7 +2189,7 @@ simulated function DrawActiveSpells(Canvas canvas)
 			if ( Level.bDebugMessaging )
 			{
 				Canvas.SetPos( OffsetX, 8*Scale );
-				Canvas.DrawText(""$int(HasteModifier(Player.HasteMod).TimeLeft), false);
+				Canvas.DrawText(class'UWindowBase'.static.TrimFloat(HasteModifier(Player.HasteMod).TimeLeft, 2), false);
 			}
 			OffsetX -= (32 + 8)*Scale;
 		}
@@ -2428,9 +2446,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 			else
 			{
 				if (AeonsPlayer(Owner).DefSpell != none)
-					Canvas.SetPos( Canvas.ClipX - 208*ScaleY, Canvas.ClipY - 72*ScaleY );
+					Canvas.SetPos( Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY );
 				else
-					Canvas.SetPos( Canvas.ClipX - 144*ScaleY, Canvas.ClipY - 72*ScaleY );
+					Canvas.SetPos( Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY );
 			}
 			
 			if ( AP.Book.NewestUnread.HUDIcon != None ) 
@@ -2443,7 +2461,37 @@ simulated function DrawBookInfo(Canvas Canvas)
 }
 
 
-// Draws the held list of inventory itemswww
+// draw objectives
+simulated function DrawObjectives(Canvas Canvas)
+{
+	local string TempString;
+	local int Token;
+	local int i;
+
+	if (Level.TimeSeconds < DisplayObjectivesTime)
+	{
+		Canvas.DrawColor = WhiteColor;
+		Canvas.Font = Canvas.SmallFont;
+		Canvas.Style = ERenderStyle.STY_Normal;
+
+		for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
+		{
+			Canvas.SetPos( 50, 25+25*i );
+			
+			TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
+			Token = InStr(TempString, ",");
+			
+			if (Token >= 0)
+			{
+				TempString = Right(TempString, Len(TempString)-Token-1);
+			}
+			
+			Canvas.DrawText( "" $ TempString, false );
+		}
+	}
+}
+
+
 // Draws the held list of inventory items
 simulated function DrawHeldItems(Canvas Canvas)
 {
@@ -2451,6 +2499,22 @@ simulated function DrawHeldItems(Canvas Canvas)
 	local int cnt, i, nextGroup, PrevGroup, nextIdx, PrevIdx, SelectedGroup;
 	local string InvName;
 	local int InvCount;
+
+	local float TextWidth, TextHeight, TextLeftMargin;
+	local int Spacing;
+	local float IconSize;
+	local float XOffset, YOffset, CurrentY;
+
+	XOffset = 4;
+	//YOffset = 25;
+	YOffset = 114;
+
+	Canvas.Font = Canvas.SmallFont;
+	Canvas.TextSize( "TEST", TextWidth, TextHeight );
+	//Spacing = TextHeight + 8;
+	Spacing = 14 * ScaleY;
+	IconSize = TextHeight + 2;
+	TextLeftMargin = 5 * ScaleY;
 	
 	cnt = 0;
 	
@@ -2547,10 +2611,27 @@ simulated function DrawHeldItems(Canvas Canvas)
 		{
 			// one last time, position text differently on PSX2
 			Inv = LuckysevenItems[i];
-			if ( GetPlatform() == PLATFORM_PSX2 )
-				Canvas.SetPos( 8*Scale, (80 + (i * 36))*Scale );
+
+			if (Owner.GetRenewalConfig().bAltHud)
+			{
+				CurrentY = YOffset*ScaleY + (i * Spacing) + Spacing / 2.0; // centered spacing
+				Canvas.Style = ERenderStyle.STY_AlphaBlend;
+				Canvas.DrawColor = WhiteColor;
+				Canvas.DrawColor.a = 255;
+				Canvas.bNoSmooth = false;
+				Canvas.SetPos( XOffset*ScaleX, CurrentY - IconSize / 2.0 );
+				Canvas.DrawIcon(Inv.Icon, IconSize / 64.0);
+
+				// draw text
+				Canvas.SetPos( XOffset*ScaleX + IconSize + TextLeftMargin, CurrentY - TextHeight / 2.0 );
+			}
 			else
-				Canvas.SetPos( 8*Scale, (114 + (i * 14))*Scale );
+			{
+				if ( GetPlatform() == PLATFORM_PSX2 )
+					Canvas.SetPos( 8*Scale, (80 + (i * 36))*Scale );
+				else
+					Canvas.SetPos( 8*Scale, (114 + (i * 14))*Scale );
+			}
 					
 			if ( i == 3 )
 			{
@@ -2633,18 +2714,40 @@ simulated function DrawAmmo(Canvas Canvas, int X, int Y)
 	}
 }
 
-
-simulated function DrawHealth(Canvas Canvas, int X, int Y)
+simulated function DrawNumber(Canvas Canvas, int X, int Y, int Number, optional bool bRightAligned, optional float DigitScale)
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound;
+	local float TotalWidth;
+	local int Digits[10];
+	local int i, NumDigits, Digit;
 
+	// force zero to draw by checking NumDigits
+	while (Number != 0 || NumDigits == 0)
+	{
+		Digit = Number % 10;
+		Digits[NumDigits++] = Digit;
+		TotalWidth += DigitInfo.Width[Digit]*ScaleY;
+		Number /= 10;
+	}
+
+	// right align number
+	if (bRightAligned)
+		Canvas.CurX -= TotalWidth;
+
+	for (i = NumDigits - 1; i >= 0; i--)
+	{
+		DrawDigit(Canvas, Digits[i], DigitScale);
+	}
+}
+
+simulated function DrawHealth(Canvas Canvas, int X, int Y, optional bool bRightAligned)
+{
+	local int iTempHealth;
 
 	if ( Pawn(Owner).Health < 0 )
 		Pawn(Owner).Health = 0;
 
 	if (HudMode > 0)
 	{
-
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 
 		iTempHealth = Pawn(Owner).Health;
@@ -2655,7 +2758,7 @@ simulated function DrawHealth(Canvas Canvas, int X, int Y)
 		{
 			Canvas.DrawColor.r = 192;
 			Canvas.DrawColor.g = 192;
-			Canvas.DrawColor.b = 192;	
+			Canvas.DrawColor.b = 192;
 		} 
 		else if ( iTempHealth > 50 ) 
 		{
@@ -2676,40 +2779,23 @@ simulated function DrawHealth(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.b = 32;	
 		}
 
-		Canvas.CurX = X;	
+		Canvas.CurX = X;
 		Canvas.CurY = Y;
 
 		Canvas.bNoSmooth = false;
 
-if ( iTempHealth > 99 )
-		// 100's digit
-		DrawDigit( Canvas, iTempHealth / 100, 0, rdHealth[0]);
-		//Canvas.CurX += 1;
-
-		// 10's digit
-		iTempHealth = iTempHealth % 100;
-if (( iTempHealth > 9 )||( Pawn(Owner).Health > 99 ))
-		DrawDigit( Canvas, iTempHealth / 10, 1, rdHealth[1]);
-		//Canvas.CurX += 1;
-		
-		// 1's digit
-		iTempHealth = iTempHealth % 10;
-		DrawDigit( Canvas, iTempHealth, 2, rdHealth[2]);
+		DrawNumber(Canvas, X, Y, iTempHealth, bRightAligned);
 
 		Canvas.DrawColor.r = 255;
 		Canvas.DrawColor.g = 255;
 		Canvas.DrawColor.b = 255;	
 		
 		Canvas.Style = ERenderStyle.STY_Normal;
-
 	}
-
-
 }
 
 simulated function DrawConventionalWeapon(Canvas Canvas, int X, int Y)
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound;
 	local int Slot;
 	local Weapon whatToDraw;
 	
@@ -2832,21 +2918,21 @@ simulated function DrawStealthIcons(Canvas Canvas)
 			Canvas.DrawColor.G = 100;
 			Canvas.DrawColor.B = 255;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 28 * ScaleX, Canvas.ClipY - 18*Scale);
+			Canvas.SetPos(HalfClipX - 28 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*vi), 0, 16, 16);
 
 			Canvas.DrawColor.R = 100;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 - 8 * ScaleX, Canvas.ClipY - 18*Scale);
+			Canvas.SetPos(HalfClipX - 8 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*ai), 0, 16, 16);
 
 			Canvas.DrawColor.R = 255;
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 100;
 
-			Canvas.SetPos(Canvas.ClipX * 0.5 + 12 * ScaleX, Canvas.ClipY - 18*Scale);
+			Canvas.SetPos(HalfClipX + 12 * ScaleX, Canvas.ClipY - 18*Scale);
 			Canvas.DrawTileClipped( Texture'Aeons.StealthIcon', 16*Scale, 16*Scale, 0 + (16*mi), 0, 16, 16);
 		}
 	}
@@ -2955,7 +3041,6 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 
 simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound;
 	local int Slot;
 	local Spell whatToDraw;
 	
@@ -3026,7 +3111,6 @@ simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 
 simulated function DrawDefensiveSpell(Canvas Canvas, int X, int Y)
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound;
 	local int Slot;
 	local Spell whatToDraw;
 	
@@ -3151,7 +3235,6 @@ simulated function DrawSelectHighlightPSX2(Canvas Canvas, int X, int Y)
 
 simulated function DrawInventoryItem(Canvas Canvas, int X, int Y)
 {
-	local int MainHUDX, MainHUDY, iTempHealth, iWidth, iFound;
 	local inventory Inv;
 
 	if (Owner == none)
@@ -3221,8 +3304,8 @@ simulated function DrawWheel(Canvas Canvas, int InvGroup[8])
 
 	for ( i = 0; i < 8; i++ )
 	{
-		X = CenterX + Scale * Con_X[i];
-		Y = CenterY + Scale * Con_Y[i];
+		X = CenterX + Scale * Con_X[i] / ClampedHudScale;
+		Y = CenterY + Scale * Con_Y[i] / ClampedHudScale;
 		DrawWheelIcon(Canvas, InvGroup[i], i, X, Y, 64, 64 );
 	}
 
@@ -3266,29 +3349,29 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.DrawColor.a = 255;
 
 	Canvas.bNoSmooth = false;
-	
-	if (Owner.GetRenewalConfig().bAltHud)
-		Canvas.SetPos( 5*ScaleX, Canvas.ClipY - 68*ScaleY);
-	else
-		Canvas.SetPos( 317*ScaleX, Canvas.ClipY - 68*ScaleY);
-	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 
-	ManaX = 426 * ScaleX;
 	if (Owner.GetRenewalConfig().bAltHud)
-		ManaX = 120 * ScaleX;
+		Canvas.SetPos(WSI_Left*ScaleY, Canvas.ClipY - 62*ScaleY);
+	else
+		Canvas.SetPos( HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 62*ScaleY); // was 68
+	Canvas.Style = ERenderStyle.STY_AlphaBlend;
+	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
+
+	ManaX = HalfClipX + 19 * ScaleY;
+	if (Owner.GetRenewalConfig().bAltHud)
+		ManaX = (128 + WSI_Left + WSI_Padding*2)*ScaleY;
 	
 	// glow on mana icon - shows when you don't have enough mana
 	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
 	{
-		Canvas.SetPos( ManaX, Canvas.ClipY - 66*ScaleY);
+		Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY);
 		Canvas.Style = ERenderStyle.STY_Translucent;
 		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 	}
 
-	Canvas.SetPos( ManaX, Canvas.ClipY - 66*ScaleY);
+	Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY); // was 66 in old renewal, 62 in undying
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
+	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
 }
 
 
@@ -3336,7 +3419,7 @@ simulated function DrawFlightMana( canvas Canvas )
 	Height = 30 * FuelRatio;
   
 	Canvas.Style = ERenderStyle.STY_Masked;
-	Canvas.SetPos( 383*ScaleX, Canvas.ClipY - (Height+21)*ScaleY); 
+	Canvas.SetPos( HalfClipX - 19*ScaleY, Canvas.ClipY - (Height+21)*ScaleY); 
 	Canvas.DrawTileClipped( Texture'FlightBar_Icon_Fixed', 40*ScaleY, (Height+6)*ScaleY, 0, 32-Height, 32, Height);
 
 	Canvas.DrawColor.r = 192;
@@ -3346,13 +3429,13 @@ simulated function DrawFlightMana( canvas Canvas )
 
 	Canvas.Style = 5;
 
-	Canvas.SetPos( 381*ScaleX - 51 * ScaleY, Canvas.ClipY - 75.0*ScaleY); 
-	Canvas.DrawTileClipped( Texture'Flight_Icon', 150*ScaleY, 64*ScaleY, 0, 0, 150, 64);
+	Canvas.SetPos( HalfClipX - 72*ScaleY, Canvas.ClipY - 75.0*ScaleY); 
+	Canvas.DrawTileClipped( Texture'Flight_Icon', 144*ScaleY, 64*ScaleY, 0, 0, 144, 64);
 }
 
-simulated function DrawMana(Canvas Canvas, int X, int Y)
+simulated function DrawMana(Canvas Canvas, int X, int Y, optional bool bRightAligned)
 {
-	local int MainHUDX, MainHUDY, iTempMana, iWidth, iFound;
+	local int iTempMana;
 
 	if (AeonsPlayer(Owner) == none)
 		return;
@@ -3362,11 +3445,10 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 
 	if (HudMode > 0)
 	{
-
 		Canvas.Style = ERenderStyle.STY_Masked;
 
 		Canvas.CurX = 0;
-		Canvas.CurY = Canvas.ClipY - 72*ScaleY;
+		Canvas.CurY = Canvas.ClipY - WSI_Bottom*ScaleY;
 /*
 		else
 		{
@@ -3375,45 +3457,39 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 		}
 */
 
-
 /*
 		Canvas.CurX = 81;
 		Canvas.CurY = Canvas.ClipY - 43;
 
-
 		iFound = 1;
-
 		iWidth = 23 + 35 * iFound;
 		Canvas.DrawTileClipped( Texture'SlidingPieces', iWidth, 43, 205 - iWidth, 0, iWidth, 43);
 */
 		iTempMana = AeonsPlayer(Owner).Mana;
 	
-		if (false)
+		if ( iTempMana > 75 )
 		{
-			if ( iTempMana > 50 )
-			{
-				Canvas.DrawColor.r = 10;
-				Canvas.DrawColor.g = 255;
-				Canvas.DrawColor.b = 10;
-			}
-			else if ( iTempMana > 25 )
-			{
-				Canvas.DrawColor.r = 255;
-				Canvas.DrawColor.g = 255;
-				Canvas.DrawColor.b = 10;	
-			}
-			else
-			{
-				Canvas.DrawColor.r = 255;
-				Canvas.DrawColor.g = 30;
-				Canvas.DrawColor.b = 30;	
-			}
+			Canvas.DrawColor.r = 192;
+			Canvas.DrawColor.g = 192;
+			Canvas.DrawColor.b = 192;
+		}
+		else if ( iTempMana > 50 )
+		{
+			Canvas.DrawColor.r = 192;
+			Canvas.DrawColor.g = 128;
+			Canvas.DrawColor.b = 128;
+		}
+		else if ( iTempMana > 25 )
+		{
+			Canvas.DrawColor.r = 192;
+			Canvas.DrawColor.g = 64;
+			Canvas.DrawColor.b = 64;
 		}
 		else
 		{
-			Canvas.DrawColor.r = 255;
-			Canvas.DrawColor.g = 255;
-			Canvas.DrawColor.b = 255;	
+			Canvas.DrawColor.r = 192;
+			Canvas.DrawColor.g = 32;
+			Canvas.DrawColor.b = 32;	
 		}
 
 		Canvas.CurX = X;	
@@ -3422,21 +3498,7 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 		Canvas.bNoSmooth = false;
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 
-		// 100's digit
-		if ( iTempMana > 99 )
-			DrawDigit( Canvas, iTempMana / 100, 0, rdMana[0]);
-		
-
-		// 10's digit
-		iTempMana = iTempMana % 100;
-
-		if (( iTempMana > 9 )||( AeonsPlayer(Owner).Mana > 99 ))
-			DrawDigit( Canvas, iTempMana / 10, 1, rdMana[1]);
-		
-		
-		// 1's digit
-		iTempMana = iTempMana % 10;
-		DrawDigit( Canvas, iTempMana, 2, rdMana[2]);
+		DrawNumber(Canvas, X, Y, iTempMana, bRightAligned);
 
 		/*
 		if (Level.Pauser=="")
@@ -3462,15 +3524,11 @@ simulated function DrawMana(Canvas Canvas, int X, int Y)
 		//	Canvas.DrawTile(Texture'HudLine',FMin(27.0*(float(Pawn(Owner).Health)/float(Pawn(Owner).Default.Health)),27),2.0,0,0,32.0,2.0);	
 		
 		Canvas.Style = ERenderStyle.STY_Normal;
-
 	}
-
-
 }
 
-simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
+simulated function DrawUsedMana(Canvas Canvas, int X, int Y, optional bool bRightAligned)
 {
-	local int MainHUDX, MainHUDY, iTempMana, iWidth, iFound;
 	local float fTempMana;
 
 	if (AeonsPlayer(Owner) == none)
@@ -3492,7 +3550,6 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	Canvas.bNoSmooth = false;
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.bCenter = false;
-	iTempMana = UsedMana;
 	
 	// - sign outline
 	Canvas.CurX = X - 1;	
@@ -3513,20 +3570,7 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y)
 	Canvas.CurX += 2 * ScaleX;
 	Canvas.CurY = Y;
 	
-	// 100's digit
-	
-	if ( iTempMana > 99 )
-		DrawDigitScaled( Canvas, iTempMana / 100, 0.5);
-	
-	// 10's digit
-	iTempMana = iTempMana % 100;
-
-	if ( iTempMana > 9 || UsedMana > 99 )
-		DrawDigitScaled( Canvas, iTempMana / 10, 0.5);
-	
-	// 1's digit
-	iTempMana = iTempMana % 10;
-	DrawDigitScaled( Canvas, iTempMana, 0.5);
+	DrawNumber(Canvas, X, Y, UsedMana, bRightAligned, 0.5);
 	
 	//Canvas.DrawText(("-"$UsedMana), false);
 
@@ -3548,10 +3592,17 @@ simulated function DrawTypingPrompt( canvas Canvas, console Console )
 		Canvas.Font = Canvas.MedFont;
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 		Canvas.StrLen( TypingPrompt, XL, YL );
-		Canvas.SetPos( 50*Scale, 450*Scale);// Console.FrameY - Console.ConsoleLines - YL - 1 );
+		Canvas.SetPos( 50*Scale, Canvas.ClipY - 150*Scale);// Console.FrameY - Console.ConsoleLines - YL - 1 );
 		Canvas.DrawText( TypingPrompt, false );
 	}
 
+}
+
+simulated function Message( PlayerReplicationInfo PRI, coerce string Msg, name Type )
+{
+	Super.Message(PRI, Msg, Type);
+	if (OSMClientMessage && Type == 'Pickup')
+		AeonsPlayer(Owner).ScreenMessage(Msg, 4.0);
 }
 
 simulated function bool DisplayMessages( canvas Canvas )
@@ -3579,7 +3630,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 	if ( (Console.TextLines > 0) && (!Console.Viewport.Actor.bShowMenu || Console.Viewport.Actor.bShowScores) )
 	{
 		MsgType = Console.GetMsgType(Console.TopLine);
-		if ( MsgType == 'Pickup' )
+		if ( !OSMClientMessage && MsgType == 'Pickup' )
 		{
 			Canvas.Font = Canvas.MedFont;
 			Canvas.bCenter = true;
@@ -3592,7 +3643,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 			Canvas.DrawColor.r = PickupColor;
 			Canvas.DrawColor.g = PickupColor;
 			Canvas.DrawColor.b = PickupColor;
-			Canvas.SetPos(4*ScaleX, Console.FrameY - (Console.FrameY * 0.2));
+			Canvas.SetPos(4*ScaleX, Canvas.ClipY * 0.76);
 			Canvas.DrawText( Console.GetMsgText(Console.TopLine), true );
 			Canvas.bCenter = false;
 			Canvas.Style = 1;
@@ -3721,7 +3772,7 @@ simulated function bool DrawMessageHeader(Canvas Canvas, MessageStruct ShortMess
 	Canvas.DrawColor = WhiteColor;
 	XOffset += ArmorOffset*ScaleX;
 	XOffset = DrawNextMessagePart(Canvas, ShortMessage.PRI.PlayerName$": ", XOffset, YPos);	
-	Canvas.SetPos(4*ScaleX + XOffset*ScaleX, YPos);
+	Canvas.SetPos(4*ScaleX + XOffset, YPos);
 	return true;
 }
 
@@ -3857,26 +3908,26 @@ simulated function DrawPawnName(canvas Canvas, float PosX, float PosY)
 	Canvas.DrawColor.G = 100;
 	Canvas.DrawColor.B = 255;
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2) - 16);
+	Canvas.SetPos(4, HalfClipY - 16);
 	Canvas.DrawText("Name: "$IdentifyTarget.name);
 
 	Canvas.DrawColor.R = 50;
 	Canvas.DrawColor.G = 50;
 	Canvas.DrawColor.B = 255;
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2));
+	Canvas.SetPos(4, HalfClipY);
 	Canvas.DrawText("Health: "$IdentifyTarget.Health);
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2) + 16);
+	Canvas.SetPos(4, HalfClipY + 16);
 	Canvas.DrawText("State: "$IdentifyTarget.GetStateName());
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2) + 2*16);
+	Canvas.SetPos(4, HalfClipY + 2*16);
 	Canvas.DrawText("Enemy: "$IdentifyTarget.Enemy);
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2) + 3*16);
+	Canvas.SetPos(4, HalfClipY + 3*16);
 	Canvas.DrawText("Trace Joint: "$TraceIdentifyJoint());
 
-	Canvas.SetPos(4, (Canvas.ClipY / 2) + 4*16);
+	Canvas.SetPos(4, HalfClipY + 4*16);
 	Canvas.DrawText("GroundFriction: "$IdentifyTarget.GroundFriction);
 
 	Canvas.Style = 1;
@@ -3967,7 +4018,7 @@ simulated function DrawIdentifyInfo(canvas Canvas, float PosX, float PosY)
 
 	XOffset = 0.0;
 	Canvas.StrLen(IdentifyName$": "$IdentifyTarget.PlayerReplicationInfo.PlayerName, XL, YL);
-	XOffset = Canvas.ClipX/2 - XL/2;
+	XOffset = HalfClipX - XL/2;
 	Canvas.SetPos(XOffset, Canvas.ClipY - 54);
 	
 	if(IdentifyTarget.IsA('PlayerPawn'))
@@ -4104,15 +4155,12 @@ simulated function DrawMOTD(Canvas Canvas)
 }
 
 
-simulated function DrawDigit(canvas Canvas, int iDigit, int iPlace, out digit dCurrent, optional float DigitScale)
+simulated function DrawDigit(canvas Canvas, int iDigit, optional float DigitScale)
 {
-	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
-	
-	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
-}
+	if (DigitScale == 0)
+		DigitScale = 1.0;
 
-simulated function DrawDigitScaled(canvas Canvas, int iDigit, float DigitScale)
-{
+	//Canvas.DrawTileClipped( Texture'HUD_Numbers', DigitInfo.Width[iDigit]*ScaleY, 64*ScaleY, DigitInfo.Offset[iDigit], 0, DigitInfo.Width[iDigit], 64);
 	Canvas.DrawTileClipped( Texture'HUD_Numbers_HD', DigitInfo.Width[iDigit]*ScaleY*DigitScale, 64*ScaleY*DigitScale, DigitInfo.Offset[iDigit]*4, 0, DigitInfo.Width[iDigit]*4, 64*4);
 }
 
@@ -4191,7 +4239,7 @@ simulated function DrawDebugInfo(canvas Canvas)
 			return;
 
 		fX = 0.0;
-		fY = Canvas.ClipY / 2;
+		fY = HalfClipY;
 
 		Canvas.Style = ERenderStyle.STY_Translucent;
 		Canvas.Font = Canvas.SmallFont;
@@ -4242,8 +4290,8 @@ simulated function DrawDebugInfo(canvas Canvas)
 			
 			DistanceScale = (640 / RangeToTarget) * 90 / player.FOVAngle;
 			
-			fX = (Canvas.ClipX / 2) + ((vecPawnView Dot Y)) * ((Canvas.ClipX / 2) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
-			fY = (Canvas.ClipY / 2) + (-(vecPawnView Dot Z)) * ((Canvas.ClipX / 2) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
+			fX = (HalfClipX) + ((vecPawnView Dot Y)) * ((HalfClipX) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
+			fY = (HalfClipY) + (-(vecPawnView Dot Z)) * ((HalfClipX) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
 
 			Canvas.Style = ERenderStyle.STY_Translucent;
 			Canvas.Font = Canvas.SmallFont;
@@ -4615,7 +4663,7 @@ simulated function WheelMouseInput(float DeltaTime)
 
 	if (aX != 0 || aY != 0)
 	{
-		Delta = Sqrt(WheelDelta.X*WheelDelta.X + WheelDelta.Y*WheelDelta.Y);
+		Delta = VSize(WheelDelta) * ClampedHudScale;
 		ExtendedRadius = RadiusThreshold + ExtendRadiusThresholdAmount;
 
 		if (Delta > ExtendedRadius)
@@ -4679,7 +4727,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 	}
 	else
 	{
-		Delta = VSize(WheelDelta);
+		Delta = VSize(WheelDelta) * ClampedHudScale;
 
 		if ( Delta >= RadiusThreshold )
 		{
@@ -4698,7 +4746,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 			LastSector = SelectedSector;
 		}
 		
-		Canvas.SetPos( Canvas.ClipX/2 - 64*Scale/2.0 + WheelDelta.X*Scale, Canvas.ClipY/2 - 64*Scale/2.0 - WheelDelta.Y*Scale );
+		Canvas.SetPos( HalfClipX - 64*Scale/2.0 + WheelDelta.X*Scale, HalfClipY - 64*Scale/2.0 - WheelDelta.Y*Scale );
 	
 		Canvas.bNoSmooth = false;
 
@@ -4732,7 +4780,7 @@ function DrawAllItems(Canvas Canvas)
 	local int InvCount;
 	local int i, j;
 	local bool bQuickSelectItem;
-	local float TextWidth, TextHeight;
+	local float TextWidth, TextHeight, TextLeftMargin;
 	local int Spacing;
 	local float IconSize;
 	local float XOffset, YOffset, CurrentY;
@@ -4744,6 +4792,16 @@ function DrawAllItems(Canvas Canvas)
 	Canvas.TextSize( "TEST", TextWidth, TextHeight );
 	Spacing = TextHeight + 8;
 	IconSize = TextHeight + 2;
+	TextLeftMargin = 5 * ScaleY;
+
+	// draw shadow behind items
+	if (LastDrawnItemsCount > 0)
+	{
+		Canvas.Style = 4;
+		Canvas.DrawColor = Canvas.Default.DrawColor;
+		Canvas.SetPos(0, YOffset*ScaleY + Spacing / 2.0);
+		Canvas.DrawTileClipped( texture'HUD_Inv_Shad_Test', 178*Scale, (LastDrawnItemsCount + 1) * Spacing, 0, 0, 60, 64);
+	}
 
 	for ( Inv=Owner.Inventory; Inv!=None; Inv=Inv.Inventory )
 	{
@@ -4775,7 +4833,7 @@ function DrawAllItems(Canvas Canvas)
 		Canvas.DrawIcon(Inv.Icon, IconSize / 64.0);
 		
 		// draw text
-		Canvas.SetPos( XOffset*ScaleX + Spacing, CurrentY - TextHeight / 2.0 );
+		Canvas.SetPos( XOffset*ScaleX + IconSize + TextLeftMargin, CurrentY - TextHeight / 2.0 );
 		
 		if ( Inv == none )
 		{
@@ -4800,6 +4858,7 @@ function DrawAllItems(Canvas Canvas)
 		
 		Canvas.DrawText( (""$InvName), false);
 	}
+	LastDrawnItemsCount = i;
 }
 
 function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int Y, int W, int H )
@@ -4900,6 +4959,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 				if ( WheelTextTimer > 0.0 ) 
 				{
 					Canvas.Font = Canvas.MedFont;
+					Canvas.Style = ERenderStyle.STY_Normal;
 
 					Canvas.TextSize( SelectedName, TextWidth, TextHeight );
 
@@ -4913,7 +4973,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 						Canvas.DrawColor.b = 511.0 * WheelTextTimer;
 				}
 
-					Canvas.SetPos( Canvas.ClipX/2 - TextWidth/2, Canvas.ClipY/2 - TextHeight/2 );
+					Canvas.SetPos( HalfClipX - TextWidth/2, HalfClipY - TextHeight/2 );
 
 					Canvas.DrawText( SelectedName );
 				}
@@ -5023,6 +5083,25 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	Canvas.DrawColor.g = 255;
 	Canvas.DrawColor.b = 255;
 	Canvas.DrawColor.a = 255;
+}
+
+static final function string LTrim(coerce string S)
+{
+	while (Left(S, 1) == " ")
+		S = Right(S, Len(S) - 1);
+	return S;
+}
+
+static final function string RTrim(coerce string S)
+{
+	while (Right(S, 1) == " ")
+		S = Left(S, Len(S) - 1);
+	return S;
+}
+
+static final function string Trim(coerce string S)
+{
+	return LTrim(RTrim(S));
 }
 
 //////////////////////////////////////////////////////////////////////////////

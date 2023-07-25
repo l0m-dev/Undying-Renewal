@@ -9,6 +9,8 @@ var UWindowPageControlPage Network;
 
 var string StatusBarText;
 
+var bool bDebug;
+
 function UWindowPageControlPage AddScrollPage(string Caption, class<UWindowDialogClientWindow> ClientClass)
 {
 	local UWindowPageControlPage Tab;
@@ -22,7 +24,7 @@ function UWindowPageControlPage AddScrollPage(string Caption, class<UWindowDialo
 
 function Created() 
 {
-	bLeaveOnScreen = False;
+	bLeaveOnScreen = True; // if it can be shown in game
 	bAlwaysOnTop = True;
 
 	Cursor = Root.DefaultNormalCursor;
@@ -63,6 +65,12 @@ function Resized()
 function Paint(Canvas C, float X, float Y)
 {
 	local Texture T;
+
+	if (bDebug)
+	{
+		bDebug = False;
+		Pages.GotoTab(AddScrollPage("Debug", class'RenewalSettingsDebugPage'));
+	}
 
 	T = GetLookAndFeelTexture();
 	DrawUpBevel( C, 0, LookAndFeel.TabUnselectedM.H, WinWidth, WinHeight-LookAndFeel.TabUnselectedM.H, T);

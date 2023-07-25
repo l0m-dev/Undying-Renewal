@@ -1,4 +1,4 @@
-class RenewalSettingsControlsBasePage extends UMenuPageWindow;
+class RenewalSettingsControlsBasePage extends RenewalSettingsBasePage;
 
 var string RealKeyName[255];
 var int BoundKey1[100];
@@ -36,6 +36,8 @@ var int AliasCount;
 var bool bLoadedExisting;
 var bool bJoystick;
 var float JoyDesiredHeight, NoJoyDesiredHeight;
+
+var UMenuLabelControl Headings[100];
 
 function Created()
 {
@@ -88,9 +90,10 @@ function Created()
 			if(!bTop)
 				ButtonTop += 10;
 			Heading = UMenuLabelControl(CreateControl(class'UMenuLabelControl', LabelLeft-10, ButtonTop+3, WinWidth, 1));
-			Heading.SetText(Left(LabelList[I], j));
-			Heading.SetFont(F_Bold);
+			Heading.SetText("----"@Left(LabelList[I], j)@"----");
+			Heading.SetFont(F_Normal); // 5 is almost good enough
 			LabelList[I] = Mid(LabelList[I], j+1);
+			Headings[I] = Heading;
 			ButtonTop += 19;
 		}
 		bTop = False;
@@ -112,6 +115,7 @@ function Created()
 	NoJoyDesiredHeight = ButtonTop + 10;
 
 	// Joystick
+	/*
 	ButtonTop += 10;
 	JoystickHeading = UMenuLabelControl(CreateControl(class'UMenuLabelControl', LabelLeft-10, ButtonTop+3, WinWidth, 1));
 	JoystickHeading.SetText(JoystickText);
@@ -140,6 +144,7 @@ function Created()
 	JoyYCombo.AddItem(JoyYOptions[1]);
 	JoyYCombo.EditBoxWidth = ButtonWidth;
 	ButtonTop += 20;
+	*/
 
 	LoadExistingKeys();
 
@@ -185,6 +190,7 @@ function LoadExistingKeys()
 					if( !(Left(Alias, pos) ~= "taunt") &&
 						!(Left(Alias, pos) ~= "getweapon") &&
 						!(Left(Alias, pos) ~= "viewplayernum") &&
+						!(Left(Alias, pos) ~= "button") &&
 						!(Left(Alias, pos) ~= "savegame") &&
 						!(Left(Alias, pos) ~= "loadgame"))
 						Alias = Left(Alias, pos);
@@ -226,11 +232,12 @@ function string GetKeyName(int Key)
 
 function BeforePaint(Canvas C, float X, float Y)
 {
-	local int ButtonWidth, ButtonLeft, I;
+	local int ButtonWidth, ButtonLeft, ButtonTop, I;
 	local int LabelWidth, LabelLeft;
 
 	ButtonWidth = WinWidth - 155*Root.ScaleY;
 	ButtonLeft = WinWidth - ButtonWidth - 20*Root.ScaleY;
+	ButtonTop = 25 * Root.ScaleY;
 
 	DefaultsButton.AutoWidth(C);
 	DefaultsButton.WinLeft = ButtonLeft + ButtonWidth - DefaultsButton.WinWidth;
@@ -238,6 +245,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	LabelWidth = WinWidth - 100*Root.ScaleY;
 	LabelLeft = 20*Root.ScaleY;
 
+	/*
 	if(bJoystick)
 	{
 		DesiredHeight = JoyDesiredHeight;
@@ -260,15 +268,32 @@ function BeforePaint(Canvas C, float X, float Y)
 		JoyXCombo.HideWindow();
 		JoyYCombo.HideWindow();
 	}
+	*/
 
 	for (I=0; I<AliasCount; I++)
 	{
+		if (Headings[I] != None)
+		{
+			if (I != 0)
+				ButtonTop += 12 * Root.ScaleY;
+			Headings[I].WinTop = ButtonTop;
+			ButtonTop += 24 * Root.ScaleY;
+		}
+
 		KeyButtons[I].SetSize(ButtonWidth, 1);
 		KeyButtons[I].WinLeft = ButtonLeft;
+		KeyButtons[I].WinTop = ButtonTop;
 
 		KeyNames[I].SetSize(LabelWidth, 1);
 		KeyNames[I].WinLeft = LabelLeft;
+		KeyNames[I].WinTop = ButtonTop;
+
+		ButtonTop += 19 * Root.ScaleY;
 	}
+
+	ButtonTop += 5 * Root.ScaleY;
+
+	DesiredHeight = ButtonTop;
 
 	for (I=0; I<AliasCount; I++ )
 	{
@@ -485,7 +510,7 @@ function Notify(UWindowDialogControl C, byte E)
 function GetDesiredDimensions(out float W, out float H)
 {	
 	Super.GetDesiredDimensions(W, H);
-	H = 200;
+	H = 200*Root.ScaleY;
 }
 
 defaultproperties
