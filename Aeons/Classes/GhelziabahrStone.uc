@@ -35,7 +35,7 @@ var float GlowFlashX, GlowFlashY;
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	AmmoType.AmmoAmount = 9999;
+	//AmmoType.AmmoAmount = 9999;
 }
 
 function FellOutOfWorld()

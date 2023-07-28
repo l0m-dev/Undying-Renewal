@@ -81,7 +81,6 @@ function DrawClippedActorFixedFov( Actor A, float Fov, bool WireFrame, int X, in
 	DrawClippedActor(A, WireFrame, X, Y, XB, YB, ClearZ);
 	if (P != None)
 	{
-		OldFov = P.FOVAngle;
 		P.SetFOVAngle(OldFov);
 	}
 }

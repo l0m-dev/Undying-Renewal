@@ -2429,7 +2429,7 @@ event PlayerInput( float DeltaTime )
 	Super.PlayerInput( DeltaTime );
 
 	if (wconsole != None && wconsole.Root != None)
-		wconsole.MouseScale = class'WindowConsole'.default.MouseScale * MouseSensitivity * wconsole.Root.ScaleY;
+		wconsole.MouseScale = class'WindowConsole'.default.MouseScale * wconsole.Root.ScaleY; // * MouseSensitivity 
 
 	if ( bJump > 0 )
 	{

@@ -2476,7 +2476,7 @@ simulated function DrawObjectives(Canvas Canvas)
 
 		for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
 		{
-			Canvas.SetPos( 50, 25+25*i );
+			Canvas.SetPos( 50*ScaleY, (25+25*i)*ScaleY );
 			
 			TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
 			Token = InStr(TempString, ",");
