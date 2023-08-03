@@ -79,7 +79,7 @@ var() sound HoldSounds[3];
 var() float Range[6];			// Distance you can fire the lightning - per amplitude
 var() float MinPtDist;			// Minimmum distance from one point to the next.
 var() float ArcPct;				// Percentage of the length of the lightning that will arc
-var LightningLight lts[4];		// Dynamic lights for the lightning shaft
+var LightningLight lts[8];		// Dynamic lights for the lightning shaft
 var float DmgTime, DmgRem;		// 
 var Pawn LitPawn;				// Pawn that is lit by the firefly spell
 
@@ -459,7 +459,7 @@ function Strike(vector Start, vector End)
 	}
 	shaft.bUpdate = true;
 
-	for (i=0; i<8; i++)
+	for (i=0; i<ArrayCount(lts); i++)
 	{
 		if ( lts[i] != none )
 			lts[i].Destroy();
@@ -601,7 +601,7 @@ state Holding
 				HitTexture = TraceTexture(end + (Normal(end-start) * 2), start, Flags);
 
 				// update Lights
-				for (i=0; i<8; i++)
+				for (i=0; i<ArrayCount(lts); i++)
 					lts[i].SetLocation(start + (end-start) * 0.25 * i);
 	
 				if ( len < MinPtDist )
@@ -711,7 +711,7 @@ state Holding
 				len = VSize(end-start) / float(numKnots);
 	
 				// update Lights
-				for (i=0; i<4; i++)
+				for (i=0; i<ArrayCount(lts); i++)
 					lts[i].SetLocation(start + (end-start) * 0.25 * i);
 	
 				LastPoint = start;
@@ -806,7 +806,7 @@ state Release
 	{
 		local int i;
 		
-		for (i=0; i<4; i++)
+		for (i=0; i<ArrayCount(lts); i++)
 			lts[i].Destroy();
 
 		//GhelzUse(1);

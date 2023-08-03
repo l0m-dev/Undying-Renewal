@@ -1768,7 +1768,7 @@ function SpawnGibbedCarcass( vector Dir )
 		Dir = Dir/dist;
 		damageScale = FMax(0, 1 - FMax(0,(dist - CollisionRadius)/DamageRadius));
 		
-		if (Health <= 0 && bHackable)
+		if (Health <= 0 && bHackable && !IsA('Rat'))
 		{
 			for (i=0; i<NumJoints(); i++)
 			{

@@ -121,7 +121,10 @@ function HideWindow()
 	for ( i=0; i<6; i++ )
 	{
 		if ( Back[i] != None )
+		{
 			GetPlayerOwner().UnloadTexture( Back[i] );
+			Back[i] = None;
+		}
 	}
 	
 	//fix be smarter about this, use some sort of cache scheme

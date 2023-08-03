@@ -34,7 +34,7 @@ function Strike(vector Start, vector End)
 	local int i;
 	local vector loc;
 		
-	shaft = spawn( class 'SimpleLightningFX',,, (Start + End) * 0.5 );
+	shaft = spawn( class 'SimpleLightningFX',StartActor,, (Start + End) * 0.5 );
 
 	len = VSize(end-start) / 8.0;
 	

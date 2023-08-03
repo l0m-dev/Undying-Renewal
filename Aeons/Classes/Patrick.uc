@@ -20,6 +20,8 @@ var int i;
 var bool bOnFire;
 var bool bAckClickThrough;
 
+var CommandRepeater Repeater;
+
 //----------------------------------------------------------------------------
 
 
@@ -56,6 +58,19 @@ exec function dbg()
 	Window = CreateWindow("UndyingShellPC.RenewalWindow", 300, 200);
 	Window.bLeaveOnScreen = True;
 	Window.SetPropertyText("bDebug", "true");
+}
+
+exec function RepeatCommand(name Command, name HoldDuration, name RepeatDelay)
+{
+	if (Repeater == None)
+		Repeater = Spawn(class'CommandRepeater', self);
+	Repeater.Start(string(Command), float(string(HoldDuration)), float(string(RepeatDelay)));
+}
+
+exec function StopRepeating()
+{
+	if (Repeater != None)
+		Repeater.Stop();
 }
 
 function StartLevel()

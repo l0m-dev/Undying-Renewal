@@ -39,23 +39,6 @@ function Close(optional bool bByParent)
 }
 
 
-function HideWindow()
-{
-	local int i;
-
-	Root.Console.bBlackOut = False;
-	Super.HideWindow();
-
-	for ( i=0; i<6; i++ )
-	{
-		if ( Back[i] != None )
-			GetPlayerOwner().UnloadTexture( Back[i] );
-	}
-
-}
-
-
-
 function Paint(Canvas C, float X, float Y) 
 {
 	local float OldFov;

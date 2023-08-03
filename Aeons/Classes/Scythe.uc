@@ -81,7 +81,7 @@ function PreBeginPlay()
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	AmmoType.AmmoAmount = 9999;
+	//AmmoType.AmmoAmount = 9999;
 }
 
 function Berserk()

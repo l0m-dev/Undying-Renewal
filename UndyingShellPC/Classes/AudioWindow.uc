@@ -715,23 +715,6 @@ function Close(optional bool bByParent)
 	HideWindow();
 }
 
-/*
-function HideWindow()
-{
-	local int i;
-
-	Root.Console.bBlackOut = False;
-	Super.HideWindow();
-
-	for ( i=0; i<6; i++ )
-	{
-		if ( Back[i] != None )
-			GetPlayerOwner().UnloadTexture( Back[i] );
-	}
-
-}
-*/
-
 function ShowWindow()
 {
 	Super.ShowWindow();

@@ -16,7 +16,7 @@ function Created()
 	Debug2Check = UWindowCheckbox(AddControl(class'UWindowCheckbox', "bDebug2", ""));
 
 	DebugSlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', "Debug", ""));
-	DebugSlider.SetRange(0.75, 1.25, 0.05);
+	DebugSlider.SetRange(0, 2, 0.05);
 	DebugSlider.SliderWidth = 90;
 
 	DebugEditBox = UWindowEditControl(AddControl(class'UWindowEditControl')); 
@@ -29,7 +29,7 @@ function Created()
 	DebugEditBox.EditBoxWidth = 50;
 
 	Debug2Slider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', "Debug2", ""));
-	Debug2Slider.SetRange(0.75, 1.25, 0.05);
+	Debug2Slider.SetRange(0, 2, 0.05);
 	Debug2Slider.SliderWidth = 90;
 
 	Debug2EditBox = UWindowEditControl(AddControl(class'UWindowEditControl')); 

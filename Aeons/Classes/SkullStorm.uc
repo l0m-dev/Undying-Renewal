@@ -72,7 +72,7 @@ var 	float 		skullSpawnRate;			// time between each skull spawning
 
 // Internal vars
 var 	int 		numSkulls, skullFireCount, numSummonedSkulls, SndId;
-var 	Skull_proj 	skull, summonedSkulls[3];
+var 	Skull_proj 	skull, summonedSkulls[4];
 
 var 	Skull2_proj Skull2;
 var() sound GenSound;
@@ -280,6 +280,8 @@ state NormalFire
 					GhelzUse(manaCostPerLevel[CastingLevel]);
 					AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 					
+					/*
+					commented out since GenSkull returns None
 					if ( NumSkulls > 0 )
 					{
 						SummonedSkulls[numskulls-1].LookAtActor = SummonedSkulls[numSkulls];
@@ -287,6 +289,7 @@ state NormalFire
 					}
 					else
 						SummonedSkulls[numskulls].LookAtActor = none;
+					*/
 
 					NumSkulls++;
 					NumSummonedSkulls++;

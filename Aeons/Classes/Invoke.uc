@@ -89,7 +89,7 @@ function FireAttSpell( float Value )
 
 	if ( bPCL )
 	{
-		if ( PawnOwner.HeadRegion.Zone.bWaterZone && !bWaterFire)
+		if ( Pawn(Owner).HeadRegion.Zone.bWaterZone && !bWaterFire)
 			PlayFireEmpty(); //perhaps a fizzle sound
 		else if ( !bSpellUp )
 				BringUp();
@@ -97,10 +97,10 @@ function FireAttSpell( float Value )
 		{
 			PlayAnim(HandAnim,,,,0);
 			TargetPawn = CheckInvoke();
-			NumSPJoints = TargetPawn.NumJoints();
 
 			if ( TargetPawn != none )
 			{
+				NumSPJoints = TargetPawn.NumJoints();
 				if ( TargetPawn.IsA('Trsanti') )
 				{
 					FinalManaCost = 75;

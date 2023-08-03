@@ -302,6 +302,7 @@ var float HalfClipX;
 var float HalfClipY;
 var float HudScale;
 var float ClampedHudScale;
+var bool bAltHud;
 
 const OSMClientMessage = true;
 
@@ -310,9 +311,8 @@ const WSI_Bottom = 80; // Weapon, Spells, Items bottom offset, old value is 72, 
 					   // but some things like spell icon, book icon and mana icon were 72
 const WSI_Right = 80;
 const WSI_Top = 16;
-const WSI_Left = 16;
-const WSI_Padding = 16;
-//var float WSI_Padding;
+var int WSI_Left;
+var int WSI_Padding;
 
 // Message Struct
 Struct MessageStruct
@@ -764,6 +764,7 @@ simulated function PreRender( canvas Canvas )
 {
 	HudScale = Owner.GetRenewalConfig().HudScale;
 	ClampedHudScale = FMax(HudScale, 1.0);
+	bAltHud = Owner.GetRenewalConfig().bAltHud;
 	
 	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root == None)
 		return;
@@ -776,6 +777,17 @@ simulated function PreRender( canvas Canvas )
 
 	HalfClipX = Canvas.ClipX / 2;
 	HalfClipY = Canvas.ClipY / 2;
+
+	if (bAltHud)
+	{
+		WSI_Padding = 4;
+		WSI_Left = 8; // needs to be smaller since health icon is smaller than 64
+	}
+	else
+	{
+		WSI_Padding = 16;
+		WSI_Left = 16;
+	}
 
 	/*
 	if we use root's scale, we need to call RenderUWindow when resolution changes (alt tab) outside of menus
@@ -1153,10 +1165,8 @@ simulated function PostRender( canvas Canvas )
 	local int YDelta;
 	local bool bDrawHUD;
 	local float WeaponX;
-	local bool bAltHud;
 	
 	bDrawHUD = true;
-	bAltHud = Owner.GetRenewalConfig().bAltHud;
 	
 	HUDSetup(canvas);
 
@@ -1950,8 +1960,8 @@ simulated function DrawManaInfo(Canvas Canvas)
 		Canvas.DrawColor.B = 100;
 		
 		ManaInfoX = HalfClipX + 26*ScaleX + 128*ScaleY;
-		if (Owner.GetRenewalConfig().bAltHud)
-			ManaInfoX = 120*ScaleX + 128*ScaleY;
+		if (bAltHud)
+			ManaInfoX = (128+60+60+WSI_Left+WSI_Padding*3)*ScaleY;
 
 		Canvas.SetPos(ManaInfoX, Canvas.ClipY - 50*ScaleY);
 		Canvas.DrawText(("+"$ManaModifier(AeonsPlayer(Owner).ManaMod).ManaPerSec), false);
@@ -2418,7 +2428,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 	if ( Owner != None )
 		AP = AeonsPlayer(Owner);
 	
-	if (AP.Book == None || Owner.GetRenewalConfig().bAltHud) // don't draw this hud element with new hud
+	if (AP.Book == None || bAltHud) // don't draw this hud element with new hud
 		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
@@ -2439,7 +2449,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 			Canvas.DrawColor.B = 255;
 			Canvas.DrawColor.A = 255;
 			//Canvas.SetPos( 10, 10 );
-			if (Owner.GetRenewalConfig().bAltHud)
+			if (bAltHud)
 			{
 				Canvas.SetPos( 1 * ScaleY, Canvas.ClipY - 136*ScaleY );
 			}
@@ -2612,7 +2622,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			// one last time, position text differently on PSX2
 			Inv = LuckysevenItems[i];
 
-			if (Owner.GetRenewalConfig().bAltHud)
+			if (bAltHud)
 			{
 				CurrentY = YOffset*ScaleY + (i * Spacing) + Spacing / 2.0; // centered spacing
 				Canvas.Style = ERenderStyle.STY_AlphaBlend;
@@ -3350,7 +3360,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 
 	Canvas.bNoSmooth = false;
 
-	if (Owner.GetRenewalConfig().bAltHud)
+	if (bAltHud)
 		Canvas.SetPos(WSI_Left*ScaleY, Canvas.ClipY - 62*ScaleY);
 	else
 		Canvas.SetPos( HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 62*ScaleY); // was 68
@@ -3358,7 +3368,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
 
 	ManaX = HalfClipX + 19 * ScaleY;
-	if (Owner.GetRenewalConfig().bAltHud)
+	if (bAltHud)
 		ManaX = (128 + WSI_Left + WSI_Padding*2)*ScaleY;
 	
 	// glow on mana icon - shows when you don't have enough mana
@@ -3727,7 +3737,7 @@ simulated function bool DisplayMessages( canvas Canvas )
 					Canvas.DrawText(MessageString[3-I], false );
 					J++;
 				}
-				if ( YL == 18.0 )
+				if ( YL == 18.0*ScaleY )
 					ExtraSpace++;
 			}
 	}

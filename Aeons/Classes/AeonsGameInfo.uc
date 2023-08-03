@@ -24,6 +24,8 @@ var(DeathMessage) localized string BurnedMessage;
 var(DeathMessage) localized string CorrodedMessage;
 var(DeathMessage) localized string HackedMessage;
 
+var bool bBhopEnabled;
+
 function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instigatedBy)
 {
 	if (injured.Region.Zone.bNeutralZone)
@@ -47,6 +49,12 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 	else if ( injured.bIsPlayer )
 		Damage = Damage * (0.4 + 0.2 * instigatedBy.skill);
 	return (Damage * instigatedBy.DamageScaling);
+}
+
+exec function bhop()
+{
+	bBhopEnabled = !bBhopEnabled;
+	default.bBhopEnabled = bBhopEnabled;
 }
 
 exec function message (string Msg) {

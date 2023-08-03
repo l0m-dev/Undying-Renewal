@@ -66,7 +66,6 @@ function Created()
 	bHasScrollBar = ParentWindow.IsA('UWindowScrollingDialogClient');
 
 	Super.Created();
-	GetSettings();
 
 	//SectionName = string(class);
 	/*
@@ -124,7 +123,8 @@ function Notify(UWindowDialogControl C, byte E)
 		ParentWindow.ToolTip("");
 		break;
 	}
-	RenewalConfig.SaveConfig();
+	if (RenewalConfig != None)
+		RenewalConfig.SaveConfig();
 	Super.Notify(C, E);
 }
 

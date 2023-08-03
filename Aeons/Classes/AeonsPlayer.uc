@@ -3027,7 +3027,10 @@ ignores SeePlayer, HearNoise, Bump;
 			ReplicateMove(DeltaTime, NewAccel, OldRotation - Rotation);
 		else
 			ProcessMove(DeltaTime, NewAccel, OldRotation - Rotation);
-		bPressedJump = bSaveJump;
+		if (AeonsGameInfo(Level.Game).bBhopEnabled)
+			bPressedJump = bJump != 0;
+		else
+			bPressedJump = bSaveJump;
 	}
 
 	function BeginState()

@@ -118,11 +118,11 @@ simulated function ZoneChange( ZoneInfo NewZone )
 
 simulated function ParticleHitFX(vector HitLocation, vector HitNormal)
 {
-	local actor a;
+	//local actor a;
 
 	Spawn(class'ChargedSoCHitFX', , , HitLocation, rotator(HitNormal));
 	// Server running this code. Don't replicate to clients
-	a.RemoteRole = ROLE_None;
+	//a.RemoteRole = ROLE_None;
 }
 
 simulated function Explode(vector HitLocation, vector HitNormal)

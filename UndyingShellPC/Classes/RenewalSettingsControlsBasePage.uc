@@ -17,6 +17,7 @@ var UWindowSmallButton DefaultsButton;
 var localized string DefaultsText;
 var localized string DefaultsHelp;
 
+/*
 var UMenuLabelControl JoystickHeading;
 var localized string JoystickText;
 
@@ -31,6 +32,7 @@ var localized string JoyYText;
 var localized string JoyYHelp;
 var localized string JoyYOptions[2];
 var string JoyYBinding[2];
+*/
 
 var int AliasCount;
 var bool bLoadedExisting;
@@ -211,6 +213,7 @@ function LoadExistingKeys()
 	}
 
 	bLoadedExisting = False;
+	/*
 	Alias = GetPlayerOwner().ConsoleCommand( "KEYBINDING JoyX" );
 	if(Alias ~= JoyXBinding[0])
 		JoyXCombo.SetSelectedIndex(0);
@@ -222,6 +225,7 @@ function LoadExistingKeys()
 		JoyYCombo.SetSelectedIndex(0);
 	if(Alias ~= JoyYBinding[1])
 		JoyYCombo.SetSelectedIndex(1);
+	*/
 	bLoadedExisting = True;
 }
 
@@ -435,6 +439,7 @@ function Notify(UWindowDialogControl C, byte E)
 	switch(E)
 	{
 	case DE_Change:
+		/*
 		switch(C)
 		{
 		case JoyXCombo:
@@ -447,6 +452,7 @@ function Notify(UWindowDialogControl C, byte E)
 			break;
 		}
 		break;
+		*/
 	case DE_Click:
 		if (bPolling)
 		{
@@ -519,6 +525,9 @@ defaultproperties
      CustomizeHelp="Click the rectangle and then press the key to bind."
      DefaultsText="Reset"
      DefaultsHelp="Reset all controls to their default settings."
+}
+
+/*
      JoystickText="Joystick"
      JoyXText="X Axis"
      JoyXHelp="Select the behavior for the left-right axis of your joystick."
@@ -532,4 +541,4 @@ defaultproperties
      JoyYOptions(1)="Look Up/Down"
      JoyYBinding(0)="Axis aBaseY speed=2"
      JoyYBinding(1)="Axis aLookup speed=-0.4"
-}
+*/

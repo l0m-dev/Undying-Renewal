@@ -27,7 +27,8 @@ simulated function Touch( actor Other )
 {
 	local actor A;
 	
-	Pawn(Other).TakeDamage(Instigator, Location, vect(0,0,0), getDamageInfo());
+	if (Pawn(Other) != None)
+		Pawn(Other).TakeDamage(Instigator, Location, vect(0,0,0), getDamageInfo());
 }
 
 simulated function Timer()

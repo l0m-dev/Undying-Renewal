@@ -24,9 +24,9 @@ function Created()
 	HudSizeCombo.EditBoxWidth = 90;
 	HudSizeCombo.SetFont(F_Normal);
 	HudSizeCombo.SetEditable(False);
-	HudSizeCombo.AddItem("Small", "0.75");
+	HudSizeCombo.AddItem("Small", "0.9");
 	HudSizeCombo.AddItem("Normal", "1.0");
-	HudSizeCombo.AddItem("Big", "1.25");
+	HudSizeCombo.AddItem("Big", "1.1");
 	
 	GetSettings();
 }
