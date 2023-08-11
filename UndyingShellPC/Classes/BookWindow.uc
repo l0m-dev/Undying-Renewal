@@ -540,32 +540,38 @@ function RefreshButtons()
 
 	TempEntry = Book.GetJournalEntry(Book.CurrentJournalIndex);
 
-	if ( TempEntry == None )
-		return;
-		
-	//Log("CurrentPage=" $ TempEntry.CurrentPage $ " NumPages=" $ TempEntry.NumPages);
+	if ( TempEntry != None )
+	{
+		//Log("CurrentPage=" $ TempEntry.CurrentPage $ " NumPages=" $ TempEntry.NumPages);
 
-	// Check to see if we need to hide or show the PrevPage / NextPage buttons
-	if ( TempEntry.CurrentPage == 0 ) 
-	{
-		//log("RefreshButtons: CurrentPage=0, hiding button 2");
-		Buttons[2].HideWindow();
-	}
-	else 
-	{
-		//log("RefreshButtons: CurrentPage!=0, showing button 2");
-		Buttons[2].ShowWindow();
-	}
+		// Check to see if we need to hide or show the PrevPage / NextPage buttons
+		if ( TempEntry.CurrentPage == 0 ) 
+		{
+			//log("RefreshButtons: CurrentPage=0, hiding button 2");
+			Buttons[2].HideWindow();
+		}
+		else 
+		{
+			//log("RefreshButtons: CurrentPage!=0, showing button 2");
+			Buttons[2].ShowWindow();
+		}
 
-	if ( TempEntry.CurrentPage == (TempEntry.NumPages-1) )
-	{
-		//log("RefreshButtons: CurrentPage==numpages-1, hiding button 3");
-		Buttons[3].HideWindow();
+		if ( TempEntry.CurrentPage == (TempEntry.NumPages-1) )
+		{
+			//log("RefreshButtons: CurrentPage==numpages-1, hiding button 3");
+			Buttons[3].HideWindow();
+		}
+		else
+		{
+			//log("RefreshButtons: CurrentPage!=numpages-1, showing button 3");
+			Buttons[3].ShowWindow();
+		}
 	}
 	else
 	{
-		//log("RefreshButtons: CurrentPage!=numpages-1, showing button 3");
-		Buttons[3].ShowWindow();
+		// hide PrevPage / NextPage buttons
+		Buttons[2].HideWindow();
+		Buttons[3].HideWindow();
 	}
 
 	for ( i = Book.FirstJournalId; i > Book.FirstJournalId - MAX_VISIBLE_BOOKS; i-- )

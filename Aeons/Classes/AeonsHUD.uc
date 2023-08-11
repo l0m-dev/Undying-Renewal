@@ -2474,9 +2474,13 @@ simulated function DrawBookInfo(Canvas Canvas)
 // draw objectives
 simulated function DrawObjectives(Canvas Canvas)
 {
+	local AeonsPlayer AP;
 	local string TempString;
 	local int Token;
 	local int i;
+	local int Objective;
+
+	AP = AeonsPlayer(Owner);
 
 	if (Level.TimeSeconds < DisplayObjectivesTime)
 	{
@@ -2484,19 +2488,31 @@ simulated function DrawObjectives(Canvas Canvas)
 		Canvas.Font = Canvas.SmallFont;
 		Canvas.Style = ERenderStyle.STY_Normal;
 
-		for ( i=0; i<ArrayCount(Aeonsplayer(Owner).Objectives); i++ )
+		for (i=0; i<ArrayCount(AP.Objectives); i++)
 		{
 			Canvas.SetPos( 50*ScaleY, (25+25*i)*ScaleY );
 			
-			TempString = Aeonsplayer(Owner).ObjectivesText[ Aeonsplayer(Owner).Objectives[i] ];
-			Token = InStr(TempString, ",");
-			
-			if (Token >= 0)
+			Objective = AP.Objectives[i];
+
+			// once we hit a 0 or a disabled objective we have reached the end of the valid objectives
+			if ( (AP.Objectives[i] == 0) || (AP.Objectives[i] >= 100) )
 			{
-				TempString = Right(TempString, Len(TempString)-Token-1);
+				return;
 			}
-			
-			Canvas.DrawText( "" $ TempString, false );
+
+			TempString = AP.ObjectivesText[Objective];
+
+			if (TempString != "")
+			{
+				Token = InStr(TempString, ",");
+				
+				if (Token >= 0)
+				{
+					TempString = Right(TempString, Len(TempString)-Token-1);
+				}
+
+				Canvas.DrawText(TempString, false);
+			}
 		}
 	}
 }

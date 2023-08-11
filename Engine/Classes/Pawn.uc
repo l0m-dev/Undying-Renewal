@@ -1389,7 +1389,8 @@ function bool AddInventory( inventory NewItem )
 		{
 			InvFound = Inv;								
 		}
-		if (Inv.Inventory != None && Inv.Inventory.InventoryGroup == NewItem.InventoryGroup)
+		// added class check since BookJournal and TimeIncantation have the same InventoryGroup
+		if (Inv.Inventory != None && Inv.Inventory.InventoryGroup == NewItem.InventoryGroup && Inv.Inventory.class == NewItem.class)
 		{
 			InvFoundExactParent = Inv;
 			InvFoundExact = Inv.Inventory;

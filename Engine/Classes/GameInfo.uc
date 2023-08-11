@@ -969,7 +969,7 @@ event playerpawn Login
 	if ( !NewPlayer.IsA('Spectator') )
 		NumPlayers++;
 
-	if ( PlayerStart(StartSpot).bCutScene )
+	if ( PlayerStart(StartSpot) != None && PlayerStart(StartSpot).bCutScene )
 		StartCutScene(NewPlayer);
 
 	return newPlayer;

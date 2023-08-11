@@ -322,28 +322,26 @@ function RefreshPages()
 	else
 		Entry = Journals[CurrentJournalIndex];
 
-	if ( Entry == None ) 
+	if ( Entry != None ) 
 	{
-		return;
-	}
-
-	if (!Entry.bRead)
-	{
-		NumUnreadJournals--;
-		//Log("BookJournal: RefreshPages: NumUnreadJournals = " $ NumUnreadJournals);
-		Entry.bRead = True;
-		// journals don't travel with player so we need to store an extra array of bools of what entries have been read or not
-		if ( CurrentJournalIndex >= 0 ) 
-			JournalRead[CurrentJournalIndex] = 1;
-
-		// If this journal entry was the newest unread entry, assign a different entry as the latest.
-		NewestUnread = None;
-		for (i = 0; i < NumJournals; i++)
+		if (!Entry.bRead)
 		{
-			if (!Journals[i].bRead)
-				NewestUnread = Journals[i];
-		}
+			NumUnreadJournals--;
+			//Log("BookJournal: RefreshPages: NumUnreadJournals = " $ NumUnreadJournals);
+			Entry.bRead = True;
+			// journals don't travel with player so we need to store an extra array of bools of what entries have been read or not
+			if ( CurrentJournalIndex >= 0 ) 
+				JournalRead[CurrentJournalIndex] = 1;
 
+			// If this journal entry was the newest unread entry, assign a different entry as the latest.
+			NewestUnread = None;
+			for (i = 0; i < NumJournals; i++)
+			{
+				if (!Journals[i].bRead)
+					NewestUnread = Journals[i];
+			}
+
+		}
 	}
 		
 	//new Journals[CurrentJournalIndex].Repaginate( Entry.Text, 5, 5, 256, 256, Texture'Pages.Page0', TextFont);
