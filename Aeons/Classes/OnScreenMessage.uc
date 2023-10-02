@@ -14,6 +14,7 @@ var() float DisplayTime;
 var() float px, py;
 var() bool FadeToBlack;
 var() bool bHideHUD;
+var() bool bCenterIndividualLines;
 
 function Trigger ( Actor Other, Pawn Instigator )
 {
@@ -74,16 +75,26 @@ function RenderOverlays(Canvas Canvas)
 		
 		// DAVE SAYS:  let's center the block of text based on the longest text line
 		Wmax = 0;
-		for (i=0; i<32; i++)
+		
+		if (!bCenterIndividualLines)
 		{
-			if ( Text[i] != "" )
+			for (i=0; i<32; i++)
 			{
-				Canvas.StrLen(Text[i], W, H);
-				if ( W > Wmax )
-					Wmax = W;
+				if ( Text[i] != "" )
+				{
+					Canvas.StrLen(Text[i], W, H);
+					if ( W > Wmax )
+						Wmax = W;
+				}
 			}
+			px = (Canvas.ClipX - Wmax)/2;
 		}
-		px = (Canvas.ClipX - Wmax)/2;
+		else
+		{
+			Canvas.bCenter = true;
+			px = 0;
+		}
+		
 		//Canvas.SetPos(Canvas.ClipX * px, Canvas.ClipY * py );
 		Canvas.SetPos(px, Canvas.ClipY * py );
 

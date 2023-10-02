@@ -3,7 +3,14 @@
 //=============================================================================
 class BloodFootprintModifier expands PlayerModifier;
 
+// made into more generic footstep modifier
+// todo: add states?
+
+var bool bBloodyFootprints;
+var bool bSnowyFootprints;
+
 var() float BloodTimer;
+var() float SnowTimer;
 
 function PreBeginPlay()
 {
@@ -15,16 +22,26 @@ function PreBeginPlay()
 
 function MyFeetAreBloody()
 {
-	Pawn(Owner).bBloodyFootprints = true;
+	bBloodyFootprints = true;
+	bSnowyFootprints = false;
 	SetTimer(BloodTimer, false);
+}
+
+function MyFeetAreSnowy()
+{
+	bBloodyFootprints = false;
+	bSnowyFootprints = true;
+	SetTimer(SnowTimer, false);
 }
 
 function Timer()
 {
-	Pawn(Owner).bBloodyFootprints = false;
+	bBloodyFootprints = false;
+	bSnowyFootprints = false;
 }
 
 defaultproperties
 {
      BloodTimer=4
+     SnowTimer=3
 }

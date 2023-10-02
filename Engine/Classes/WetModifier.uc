@@ -28,6 +28,7 @@ function PreBeginPlay()
 
 function Activate()
 {
+	gotoState('');
 	if (Owner != none)
 	{
 		Pawn(Owner).Lighting[1].TextureMask = -1;
@@ -64,10 +65,10 @@ state ShuttingDown
 		local Actor A;
 		
 		bActive = false;
-		ForEach AllActors(class 'Actor', A)
-			if ( A.Owner == Pawn(Owner) )
-				if ( A.IsA('ParticleFX') )
-					ParticleFX(A).Destroy();
+		//ForEach AllActors(class 'Actor', A)
+		//	if ( A.Owner == Pawn(Owner) )
+		//		if ( A.IsA('ParticleFX') )
+		//			ParticleFX(A).Destroy();
 
 		Pawn(Owner).Lighting[1].TextureMask = 0;
 		Pawn(Owner).Lighting[1].Diffuse = White;
@@ -83,13 +84,12 @@ state ShuttingDown
 
 	function Tick(float DeltaTime)
 	{
-
 		local Actor A;
 		
 		ForEach AllActors(class 'Actor', A)
 			if ( A.Owner == Pawn(Owner) )
 				if ( A.IsA('ParticleFX') )
-					ParticleFX(A).Strength = FClamp(ParticleFX(A).Strength + 0.01, 0, 1);
+					ParticleFX(A).Strength = FClamp(ParticleFX(A).Strength + 0.02, 0, 1);
 
 		if (Pawn(Owner).Lighting[1].Diffuse.R < 255)
 			Pawn(Owner).Lighting[1].Diffuse.R += 1;
@@ -135,10 +135,11 @@ state ShuttingDown
 					JointName = Owner.JointName(i);
 					P = Owner.JointPlace(JointName);
 					// Only attach a drip on joints that are at or below the location of the owner.
-					if ( P.pos.z <= (Owner.Location.z + 32) )
+					if ( P.pos.z <= (Owner.Location.z) )
 					{
 						A = Spawn(Pawn(Owner).WaterParticles, Owner,, P.pos);
 						A.SetBase(Owner,JointName, 'root');
+						A.LifeSpan = 1.0;
 					}
 				}
 			}
@@ -147,12 +148,16 @@ state ShuttingDown
 		disable('Tick');
 	}
 
+	function EndState()
+	{
+		TurnOff();
+	}
+
 	Begin:
 		setTimer(0.25, true);
-		sleep(HoldTimer);
+		//sleep(HoldTimer);
 		enable('Tick');
 		sleep(ScaleDownTimer);
-		TurnOff();
 		gotoState('');
 }
 

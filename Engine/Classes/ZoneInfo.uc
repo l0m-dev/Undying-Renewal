@@ -189,8 +189,8 @@ event ActorEntered( actor Other )
 			Pawn(Other).OnFire(false);
 
 		// make wet
-		//if (Pawn(Other).WetMod != none)
-		//	Pawn(Other).WetMod.Activate();
+		if (Pawn(Other).WetMod != none)
+			Pawn(Other).WetMod.Activate();
 	}
 	
 	if( Pawn(Other)!=None && Pawn(Other).bIsPlayer )
@@ -216,9 +216,9 @@ event ActorLeaving( actor Other )
 	local actor A;
 
 	// leaving a waterZone
-	//if (Other.IsA('Pawn') && bWaterZone)
-	//	if (Pawn(Other).WetMod != none)
-	//		Pawn(Other).WetMod.Deactivate();
+	if (Other.IsA('Pawn') && bWaterZone)
+		if (Pawn(Other).WetMod != none)
+			Pawn(Other).WetMod.Deactivate();
 
 
 	if( Pawn(Other)!=None && Pawn(Other).bIsPlayer )

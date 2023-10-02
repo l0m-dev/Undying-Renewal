@@ -431,7 +431,7 @@ replication
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, bDrawInvList, bShowScryeHint;
+		bDoubleShotgun, bDrawInvList;
 
 	reliable if ( Role==ROLE_Authority )
 		SendClientFire, RealWeapon;
@@ -474,6 +474,8 @@ event PreBeginPlay()
 	//EMod = spawn(class 'EnvironmentModifier',self,,Location);
 	//EMod.setBase(self);
 	bAllowSpellSelectionHUD = true;
+
+	bShowScryeHint = GetRenewalConfig().bShowScryeHint;
 }
 
 event PreClientTravel()
@@ -2807,9 +2809,16 @@ ignores SeePlayer, HearNoise, Bump;
 
 	function Landed(vector HitNormal)
 	{
+		local rotator NewRot;
+
+		// flying and swimming can mess up player's rotation, reset it here
+		NewRot.Yaw = Rotation.Yaw;
+		SetRotation( NewRot );
+		
 //		log( "event Landed()" );
 //		ClientMessage( "event Landed()" );
 		Global.Landed(HitNormal);
+
 		if ( VSize(Acceleration) < 100 )
 			PlayWaiting();
 	}
@@ -8001,6 +8010,79 @@ state CheatFlying
 	}
 }
 
+function DisableScryeHint()
+{
+	GetRenewalConfig().bShowScryeHint = false;
+	GetRenewalConfig().SaveConfig();
+	bShowScryeHint = false;
+}
+
+exec function ShowInventoryMessage(string Line1, string Line2, float Time)
+{
+	local InvMessage Msg;
+
+	Msg = Spawn(class 'InvMessage');
+
+	Msg.Text[0] = Line1;
+	Msg.Text[1] = Line2; // line 2 is needed so LifeSpan works
+
+    Msg.TextColor.R = 255;
+    Msg.TextColor.G = 255;
+    Msg.TextColor.B = 255;
+
+    Msg.DisplayTime = Time;
+    Msg.bCenterIndividualLines = true;
+
+	Msg.Player = self;
+	Msg.GotoState('Holding');
+
+	Msg.LifeSpan = Msg.DisplayTime;
+}
+
+function bool ShowSelectItemHint(string Line1)
+{
+	local int i;
+	local string KeyName;
+	local bool bFoundKey;
+
+	// find SelectItem key
+	for (i=0; i<255; i++)
+	{
+		KeyName = ConsoleCommand( "KEYNAME "$i );
+
+		if ( KeyName != "" )
+		{
+			if ( InStr(ConsoleCommand( "KEYBINDING "$KeyName ), "SelectItem") >= 0 )
+			{
+				bFoundKey = true;
+				break;
+			}
+		}
+	}
+
+	if (!bFoundKey)
+	{
+		if ( ConsoleCommand( "KEYBINDING G" ) == "" )
+		{
+			// bind it to G if it's free
+			ConsoleCommand("SET Input G Button bSelectItem | SelectItem");
+			KeyName = "G";
+			bFoundKey = true;
+		}
+	}
+
+	if (bFoundKey)
+	{
+		KeyName = class'ScrollingMessageTexture'.static.Replace(Localize("Misc", "SelectItemHint", "Renewal"), "%key", KeyName);
+		ShowInventoryMessage(Line1, KeyName, 6.0);
+	}
+
+	GetRenewalConfig().bShowQuickSelectHint = false;
+	GetRenewalConfig().SaveConfig();
+
+	return bFoundKey;
+}
+
 //----------------------------------------------------------------------------
 //	Default Properties
 //----------------------------------------------------------------------------
@@ -8060,5 +8142,4 @@ defaultproperties
      Sprite=Texture'Engine.S_Pawn'
      CollisionRadius=32
      CollisionHeight=64
-	 bShowScryeHint=True
 }

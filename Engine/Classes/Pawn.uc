@@ -539,7 +539,13 @@ function PlayEffectAtJoint(name JointName, name JointType)
 				BloodMod.MyFeetAreBloody();
 
 		if ( HitTexture.ImpactID == TID_Snow )
+		{
+			// for pawns without BloodMod
 			bSnowFootprints = true;
+
+			if (BloodMod != none)
+				BloodMod.MyFeetAreSnowy();
+		}
 
 		Trace(HitLocation, HitNormal, HitJoint, end, JointLoc);
 		if ( bWetFeet || FootRegion.Zone.bWaterZone )
@@ -629,7 +635,7 @@ function PlayEffectAtJoint(name JointName, name JointType)
 		
 		Dust(HitLocation, HitNormal, HitTexture, 0.65);
 
-		if ( bSnowFootprints )
+		if ( bSnowFootprints || (BloodMod != none && BloodMod.bSnowyFootprints) )
 		{
 			switch ( JointType )
 			{
@@ -669,7 +675,7 @@ function PlayEffectAtJoint(name JointName, name JointType)
 					break;
 			}
 		}
-		else if ( bBloodyFootprints )
+		else if ( BloodMod != None && BloodMod.bBloodyFootprints )
 		{
 			switch ( JointType )
 			{

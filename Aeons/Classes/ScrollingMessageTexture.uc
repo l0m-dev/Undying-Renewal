@@ -93,7 +93,7 @@ simulated event RenderTexture(ScriptedTexture Tex)
 	Tex.DrawColoredText( Position, YPos, Text, Font, FontColor );
 }
 
-simulated function string Replace(string Text, string Match, string Replacement)
+static simulated function string Replace(string Text, string Match, string Replacement)
 {
 	local int i;
 	

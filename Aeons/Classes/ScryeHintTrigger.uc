@@ -51,8 +51,8 @@ function UnTouch(Actor Other)
 		if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 			GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = false;
 			
-		if ( AeonsPlayer(Other).ScryeMod.bActive )
-			AeonsPlayer(Other).bShowScryeHint = false;
+		if ( AeonsPlayer(Other).ScryeMod.bActive && AeonsPlayer(Other).bShowScryeHint )
+			AeonsPlayer(Other).DisableScryeHint();
 	}
 }
 
@@ -71,10 +71,12 @@ function Touch( actor Other )
 		if ( Other.IsA('AeonsPlayer') )
 		{
 			if ( AeonsPlayer(Other).bShowScryeHint )
-				AeonsPlayer(Other).ScreenMessage(ScryeHintMessage, 5.0);
-			
-			if ( AeonsPlayer(Other).ScryeMod.bActive )
-				AeonsPlayer(Other).bShowScryeHint = false;
+			{
+				if ( AeonsPlayer(Other).ScryeMod.bActive )
+					AeonsPlayer(Other).DisableScryeHint();
+				else
+					AeonsPlayer(Other).ScreenMessage(ScryeHintMessage, 5.0);
+			}
 		
 			NumTimesTriggered ++;
 
@@ -82,6 +84,7 @@ function Touch( actor Other )
 				bEventSeen = true;
 				if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 					GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = false;
+				return;
 			}
 
 			if ( bCanPlayScryeSound )

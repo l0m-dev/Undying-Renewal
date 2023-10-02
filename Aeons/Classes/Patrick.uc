@@ -194,8 +194,6 @@ exec function CastGlow()
 			spawn(class 'GlowScriptedFX',A,,A.Location);
 }
 
-
-/*
 exec function MakeWet(bool bWet)
 {	
 	if ( bWet )
@@ -207,7 +205,6 @@ exec function MakeWet(bool bWet)
 			WetMod.Deactivate();
 	}
 }
-*/
 
 exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 {

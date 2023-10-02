@@ -25,6 +25,10 @@ var config float DamageScreenShakeScale;
 
 var config bool bMoreSkippableCutscenes;
 
+// things that are not configurable
+var config bool bShowScryeHint;
+var config bool bShowQuickSelectHint;
+
 // for live tweaking/debugging
 var bool bDebug;
 var bool bDebug2;
@@ -57,6 +61,8 @@ defaultproperties
 	 JournalColor="#ffffff"
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
+	 bShowScryeHint=True
+	 bShowQuickSelectHint=True
 	 fDebug=1.0
 	 fDebug2=1.0
      bAlwaysRelevant=True

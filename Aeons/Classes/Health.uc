@@ -136,10 +136,18 @@ auto state Pickup
 			if (bActivatable && Pawn(Other).SelectedItem==None) 
 				Pawn(Other).SelectedItem=Copy;
 			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
-			if ( PickupMessageClass == None )
-				Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
+
+			if (GetRenewalConfig().bShowQuickSelectHint && AP != None && Ap.ShowSelectItemHint(PickupMessage))
+			{
+				// hint was shown successfully
+			}
 			else
-				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
+			{
+				if ( PickupMessageClass == None )
+					Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
+				else
+					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
+			}
 
 			Copy = SpawnCopy(Pawn(Other));
 			Pickup(Copy).PickupFunction(Pawn(Other));
