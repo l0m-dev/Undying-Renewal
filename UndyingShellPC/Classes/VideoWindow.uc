@@ -81,15 +81,6 @@ function Created()
 	local int i;
 	local color TextColor;
 	local float RootScaleX, RootScaleY;
-	local string SaveString;
-
-	// Check for a temporary save file, used when the player changes Video Drivers in the middle of the game.
-	SaveString = GetPlayerOwner().GetSaveGameList();
-	if ((InStr (SaveString, "99,")) >= 0)
-	{
-		GetPlayerOwner().ConsoleCommand("LoadGame 99");
-		GetPlayerOwner().ConsoleCommand("DeleteGame 99");
-	}
 
 	Super.Created();
 
@@ -581,6 +572,7 @@ function ChangeDriverPressed()
 	GetPlayerOwner().EnableSaveGame();
 	
 	GetPlayerOwner().ConsoleCommand("SaveGame 99");
+	GetPlayerOwner().ConsoleCommand("deletesavelevels");
 	GetPlayerOwner().ConsoleCommand("RELAUNCH -changevideo?-nointro");
 	
 	Close();

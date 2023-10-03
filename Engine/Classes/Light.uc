@@ -6,6 +6,15 @@ class Light extends Invisible
 
 //#exec Texture Import File=Textures\S_Light.pcx  Name=S_Light Mips=On Flags=2
 
+/*
+// potential no strobe setting
+simulated function PostBeginPlay()
+{
+	if (LightType == LT_Strobe)
+          LightType = LT_Flicker;
+}
+*/
+
 defaultproperties
 {
      bStatic=True

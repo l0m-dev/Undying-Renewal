@@ -468,6 +468,7 @@ function SetMousePos(float X, float Y)
 
 function QuitGame()
 {
+	Console.Viewport.Actor.ClientTravel("entry", TRAVEL_Absolute, false); // needed so Current.sav is deleted
 	bRequestQuit = True;
 	QuitTime = 0;
 	NotifyQuitUnreal();
@@ -478,8 +479,9 @@ function DoQuitGame()
 	SaveConfig();
 	Console.SaveConfig();
 	Console.ViewPort.Actor.SaveConfig();
-	Close();
+	Console.Viewport.Actor.ConsoleCommand("deletesavelevels"); // delete temp saves so we know we crashed if the saves are there on startup
 	Console.Viewport.Actor.ConsoleCommand("exit");
+	Close();
 }
 
 function Tick(float Delta)

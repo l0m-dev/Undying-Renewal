@@ -634,9 +634,10 @@ function Paint(Canvas C, float X, float Y)
 	
 	if (FromRelaunch)
 	{
-		VideoPressed();
-		//GetPlayerOwner().ConsoleCommand("LoadGame 99");
-		//GetPlayerOwner().ConsoleCommand("DeleteGame 99");
+		// disable for now since we use it for autosaves as well
+		//VideoPressed();
+		GetPlayerOwner().ConsoleCommand("LoadGame 99");
+		GetPlayerOwner().ConsoleCommand("DeleteGame 99");
 		FromRelaunch=False;
 		return;
 	}
