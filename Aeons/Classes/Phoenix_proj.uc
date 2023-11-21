@@ -45,7 +45,8 @@ simulated function ZoneChange( Zoneinfo NewZone )
 {
 	if ( NewZone.bWaterZone)
 	{
-		Destroy();
+		// it can be called before we have an owner and it would soft lock the player
+		//Destroy();
 	}
 }
 
@@ -227,6 +228,12 @@ simulated function Tick(float DeltaTime)
 	}
 	else if ( (Level.NetMode != NM_Standalone) && (RemoteRole == ROLE_AutonomousProxy) ) 
 			return;
+
+	if ( Region.Zone.bWaterZone )
+	{
+		Destroy();
+		return;
+	}
 
 	// if server updated client position, client needs to replay moves after the update
 	if ( bUpdatePosition )

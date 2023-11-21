@@ -92,6 +92,7 @@ var int AmbientSoundID;
 
 var bool Initialized;
 var bool FromReLaunch;
+var bool LoadingAutosave;
 
 var int XCenter, YCenter;
 /*
@@ -249,6 +250,8 @@ function Created()
 		// added default 32 bits by renewal
 		GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
 		FromRelaunch = True;
+
+		LoadingAutosave = ((InStr (SaveString, "99,Autosave")) >= 0);
 	}
 }
 
@@ -634,11 +637,12 @@ function Paint(Canvas C, float X, float Y)
 	
 	if (FromRelaunch)
 	{
-		// disable for now since we use it for autosaves as well
-		//VideoPressed();
+		if (!LoadingAutosave)
+			VideoPressed();
 		GetPlayerOwner().ConsoleCommand("LoadGame 99");
 		GetPlayerOwner().ConsoleCommand("DeleteGame 99");
 		FromRelaunch=False;
+		LoadingAutosave=False;
 		return;
 	}
 	

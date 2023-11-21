@@ -272,6 +272,12 @@ function ScriptedPawn SpawnCreature( class<ScriptedPawn> classID, GenCreatureInf
 		lPawn.Generated();
 		SetGenCount( GetGenCount() + 1 );
 		MaxGenerated -= 1;
+		
+		// if we are spawning infinite creatures reduce their fade out delay
+		if (MaxGenerated < 0)
+		{
+			lPawn.FadeOutDelay = FMin(9.5, lPawn.FadeOutDelay); // 9.5 is the orignal value
+		}
 	}
 	return lPawn;
 }

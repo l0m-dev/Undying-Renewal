@@ -468,7 +468,7 @@ function SetMousePos(float X, float Y)
 
 function QuitGame()
 {
-	Console.Viewport.Actor.ClientTravel("entry", TRAVEL_Absolute, false); // needed so Current.sav is deleted
+	Console.Viewport.Actor.ClientTravel("start?nosave", TRAVEL_Absolute, false); // needed so Current.sav is deleted
 	bRequestQuit = True;
 	QuitTime = 0;
 	NotifyQuitUnreal();

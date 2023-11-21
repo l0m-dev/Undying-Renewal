@@ -525,6 +525,7 @@ function MeleeAttack(float Range)
 		{
 			if (bThirsty)
 			{
+				PlayerPawn(Owner).Mana = FMin(PlayerPawn(Owner).Mana, 50);
 				GotoState('NormalFire');
 			}
 		}
