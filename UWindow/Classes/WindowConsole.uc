@@ -212,8 +212,7 @@ state UWindow
 				
 				if (!ViewPort.Actor.Level.bLoadBootShellPSX2)
 				{
-					if(Root != None)
-						Root.CloseActiveWindow();
+					Root.CloseActiveWindow();
 
 					if(bQuickKeyEnable)
 						CloseUWindow();

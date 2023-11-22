@@ -603,7 +603,7 @@ function StopShellAmbient()
 function Close(optional bool bByParent)
 {
 	//if BackToGame isn't visible we want the shell to stay up
-	if ( !BackToGame.bWindowVisible ) 
+	if ( !BackToGame.bWindowVisible && !LoadingAutosave ) 
 		return;
 
 	StopShellAmbient();
@@ -642,6 +642,12 @@ function Paint(Canvas C, float X, float Y)
 		GetPlayerOwner().ConsoleCommand("LoadGame 99");
 		GetPlayerOwner().ConsoleCommand("DeleteGame 99");
 		FromRelaunch=False;
+		return;
+	}
+
+	if (LoadingAutosave && !GetPlayerOwner().Level.bLoadBootShellPSX2)
+	{
+		Close();
 		LoadingAutosave=False;
 		return;
 	}
