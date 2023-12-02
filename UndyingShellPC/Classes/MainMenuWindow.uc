@@ -645,6 +645,12 @@ function Paint(Canvas C, float X, float Y)
 		return;
 	}
 
+	// if some time has passed make sure we are done with autosaving
+	if (LoadingAutosave && GetEntryLevel().TimeSeconds > 0.5)
+	{
+		LoadingAutosave=False;
+	}
+
 	if (LoadingAutosave && !GetPlayerOwner().Level.bLoadBootShellPSX2)
 	{
 		Close();

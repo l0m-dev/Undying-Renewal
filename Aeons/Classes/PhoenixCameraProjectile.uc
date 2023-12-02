@@ -40,7 +40,8 @@ auto state Hover
 		{
 			break;
 		}
-		Player.ViewTarget = none;
+		if (Player.ViewTarget == self)
+			Player.ViewTarget = none;
 		Destroy();
 	}
 }

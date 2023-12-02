@@ -3614,7 +3614,8 @@ simulated function DrawTypingPrompt( canvas Canvas, console Console )
 		Canvas.DrawColor.r = 255;
 		Canvas.DrawColor.g = 255;
 		Canvas.DrawColor.b = 255;	
-		TypingPrompt = "> "$Console.TypedStr$"_";
+		//TypingPrompt = "> "$Console.TypedStr$"_";
+		TypingPrompt = "> "$Left(Console.TypedStr,AeonsConsole(Console).CursorPos) $ "_" $ Right(Console.TypedStr,Len(Console.TypedStr)-AeonsConsole(Console).CursorPos);
 		Canvas.Font = Canvas.MedFont;
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 		Canvas.StrLen( TypingPrompt, XL, YL );
