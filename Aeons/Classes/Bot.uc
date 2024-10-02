@@ -229,7 +229,10 @@ function CastShield()
 {
 	Shield = Spawn( class'SPShield', self,, Location, Rotation );
 	if ( Shield != none )
-		Shield.Offset = ShieldOffset;
+	{
+		Shield.PrePivot = ShieldOffset;
+		Shield.SetBase(Self);
+	}
 }
 
 function bool NeedShieldCast()

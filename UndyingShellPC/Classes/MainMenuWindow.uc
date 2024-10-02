@@ -25,6 +25,10 @@ class MainMenuWindow expands ShellWindow;
 #exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
 #exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
 
+#exec Texture Import File=Main_Reconnect_up.bmp		Mips=Off
+#exec Texture Import File=Main_Reconnect_ov.bmp		Mips=Off
+#exec Texture Import File=Main_Reconnect_dn.bmp		Mips=Off
+
 #exec Texture Import File=renewal_up.bmp		Mips=Off
 #exec Texture Import File=renewal_ov.bmp		Mips=Off
 #exec Texture Import File=renewal_dn.bmp		Mips=Off
@@ -66,6 +70,7 @@ class MainMenuWindow expands ShellWindow;
 var ShellButton Buttons[8];
 var ShellButton BackToGame;
 var ShellButton Disconnect;
+var ShellButton Reconnect;
 var ShellButton RenewalButton;
 
 var UWindowWindow Single;
@@ -85,8 +90,8 @@ var UWindowWindow Confirm;
 //var UWindowMessageBox ConfirmJoin;
 //var() sound NewScreenSound;
 //var sound ExitSound;
-var int		SmokingWindows[11];
-var float	SmokingTimers[11];
+var int		SmokingWindows[12];
+var float	SmokingTimers[12];
 
 var int AmbientSoundID;
 
@@ -130,8 +135,6 @@ function Created()
 		Buttons[i].bBurnable = true;
 		Buttons[i].OverSound=sound'Shell_HUD.Shell_Blacken01';	
 	}
-
-	SmokingWindows[i] = -1;
 
 	Buttons[0].UpTexture =   texture'Main_New_up';
 	Buttons[0].DownTexture = texture'Main_New_dn';
@@ -210,6 +213,23 @@ function Created()
 
 	Disconnect.bBurnable = true;
 	Disconnect.OverSound=sound'Aeons.Shell_Blacken01';
+
+// reconnect button
+	Reconnect = ShellButton(CreateWindow(class'ShellButton', 610*RootScaleX, 350*RootScaleY, 160*RootScaleX, 64*RootScaleY));
+
+	Reconnect.TexCoords = NewRegion(0,0,160,64);
+
+	Reconnect.Template = NewRegion( 610, 350, 160, 64);
+
+	Reconnect.Manager = Self;
+	Reconnect.Style=5;
+
+	Reconnect.UpTexture   = texture'Main_Reconnect_Up';
+	Reconnect.DownTexture = texture'Main_Reconnect_Dn';
+	Reconnect.OverTexture = texture'Main_Reconnect_Ov';
+
+	Reconnect.bBurnable = true;
+	Reconnect.OverSound=sound'Aeons.Shell_Blacken01';
 	
 // renewal button
 	RenewalButton = ShellButton(CreateWindow(class'ShellButton', 600*RootScaleX, 30*RootScaleY, 160*RootScaleX, 64*RootScaleY));
@@ -227,6 +247,8 @@ function Created()
 
 	RenewalButton.bBurnable = true;
 	RenewalButton.OverSound=sound'Aeons.Shell_Blacken01';
+
+	RenewalButton.bDrawShadow = true;
 
 //	ExitSound = Sound(DynamicLoadObject("Aeons.Shell_Select01", class'Sound'));
 
@@ -309,6 +331,9 @@ function Message(UWindowWindow B, byte E)
 				case Disconnect:
 					DisconnectPressed();
 					break;
+				case Reconnect:
+					ReconnectPressed();
+					break;
 				case RenewalButton:
 					RenewalButtonPressed();
 					break;
@@ -381,9 +406,14 @@ function OverEffect(ShellButton B)
 			SmokingTimers[9] = 90;
 			break;	
 
-		case RenewalButton:
+		case Reconnect:
 			SmokingWindows[10] = 1;
 			SmokingTimers[10] = 90;
+			break;	
+
+		case RenewalButton:
+			SmokingWindows[11] = 1;
+			SmokingTimers[11] = 90;
 			break;
 	}
 }
@@ -409,6 +439,12 @@ function PlayExitSound()
 
 function LoadSavePressed()
 {
+	if (GetPlayerOwner().Level.NetMode != NM_Standalone && !GetPlayerOwner().PlayerReplicationInfo.bAdmin)
+	{
+		GetPlayerOwner().PlaySound( Sound(DynamicLoadObject("Shell_HUD.HUD.HUD_Negative01",class'Sound')), [Flags]482 );
+		return;
+	}
+
 	PlayNewScreenSound();
 
 	if (LoadSave == None ) 
@@ -571,14 +607,21 @@ function BackPressed()
 function DisconnectPressed()
 {
 	SmokingTimers[9] = 0;
-	GetPlayerOwner().ClientTravel("start?nosave", TRAVEL_Absolute, false);
+	GetPlayerOwner().ConsoleCommand("DISCONNECT");
 	PlayNewScreenSound(); //PlayExitSound();
 	//Close(); 
 }
 
-function RenewalButtonPressed()
+function ReconnectPressed()
 {
 	SmokingTimers[10] = 0;
+	GetPlayerOwner().ConsoleCommand("RECONNECT");
+	PlayNewScreenSound();
+}
+
+function RenewalButtonPressed()
+{
+	SmokingTimers[11] = 0;
 	//GetPlayerOwner().ConsoleCommand("start http://undying.ea.com");
 	
 	if ( Renewal == None )
@@ -634,6 +677,12 @@ function Paint(Canvas C, float X, float Y)
 	local UWindowWindow Book;
 
 	//log("mainmenuwindow: paint");
+
+	// main menu always receives Paint messages, even if another window is open
+	// a workaround is to check PrevSiblingWindow, to see if another window is open
+	// leave the current behavior for now
+	//if (PrevSiblingWindow != None)
+	//	return;
 	
 	if (FromRelaunch)
 	{
@@ -646,7 +695,7 @@ function Paint(Canvas C, float X, float Y)
 	}
 
 	// if some time has passed make sure we are done with autosaving
-	if (LoadingAutosave && GetEntryLevel().TimeSeconds > 0.5)
+	if (LoadingAutosave && GetEntryLevel().TimeSeconds > 0.5) // use bStartup instead?
 	{
 		LoadingAutosave=False;
 	}
@@ -660,16 +709,26 @@ function Paint(Canvas C, float X, float Y)
 	
 	Super.Paint(C, X, Y);
 
-	if ( GetPlayerOwner().Level.bLoadBootShellPSX2 )
-	{
+	if ( GetPlayerOwner().Level.bLoadBootShellPSX2 && GetLevel().NetMode == NM_Standalone )
 		BackToGame.HideWindow();
-		Disconnect.HideWindow();
+	else
+		BackToGame.ShowWindow();
+
+	if ( GetLevel().NetMode == NM_Client )
+	{
+		Disconnect.ShowWindow();
+		Reconnect.WinTop = 350*Root.ScaleY;
 	}
 	else
 	{
-		BackToGame.ShowWindow();
-		Disconnect.ShowWindow();
+		Disconnect.HideWindow();
+		Reconnect.WinTop = 420*Root.ScaleY;
 	}
+
+	if ( GetLevel().NetMode == NM_Client || GetLevel() == GetEntryLevel() )
+		Reconnect.ShowWindow();
+	else
+		Reconnect.HideWindow();
 
 	Root.Console.bLocked =  True;
 
@@ -688,7 +747,8 @@ function Paint(Canvas C, float X, float Y)
 
 	Super.PaintSmoke(C, BackToGame, SmokingWindows[8], SmokingTimers[8]);
 	Super.PaintSmoke(C, Disconnect, SmokingWindows[9], SmokingTimers[9]);
-	Super.PaintSmoke(C, RenewalButton, SmokingWindows[10], SmokingTimers[10]);
+	Super.PaintSmoke(C, Reconnect, SmokingWindows[10], SmokingTimers[10]);
+	Super.PaintSmoke(C, RenewalButton, SmokingWindows[11], SmokingTimers[11]);
 	for ( i=0; i<8; i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
 
@@ -788,6 +848,9 @@ function Resized()
 
 	if ( Disconnect != None )
 		Disconnect.ManagerResized(RootScaleX, RootScaleY);	
+
+	if ( Reconnect != None )
+		Reconnect.ManagerResized(RootScaleX, RootScaleY);	
 
 	if ( RenewalButton != None )
 		RenewalButton.ManagerResized(RootScaleX, RootScaleY);

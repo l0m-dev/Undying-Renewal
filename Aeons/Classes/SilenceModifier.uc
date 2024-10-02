@@ -8,11 +8,11 @@ var float VolMult;
 var AeonsPlayer Player;
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	VolMult = 0.25;
 	invVolMult = 1 / VolMult;
-	if ( Owner.IsA('AeonsPlayer') )
+	if ( Owner != None && Owner.IsA('AeonsPlayer') )
 		Player = AeonsPlayer(Owner);
 
 	super.PreBeginPlay();
@@ -91,5 +91,5 @@ state Deactivated
 
 defaultproperties
 {
-     RemoteRole=ROLE_None
+     
 }

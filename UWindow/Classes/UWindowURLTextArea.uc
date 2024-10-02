@@ -5,7 +5,7 @@ var bool bReleased;
 function BeforePaint(Canvas C, float X, float Y)
 {
 	Super.BeforePaint(C, X, Y);
-	Cursor = Root.NormalCursor;
+	Cursor = Root.DefaultNormalCursor;
 }
 
 function Paint(Canvas C, float X, float Y)

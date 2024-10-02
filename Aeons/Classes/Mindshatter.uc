@@ -84,7 +84,7 @@ state NormalFire
 	function FireAttSpell(float F){}
 
 	Begin:
-		Enable('FireAttSpell');
+		//Enable('FireAttSpell');
 		ProjectileFire(ProjectileClass, ProjectileSpeed, false, true);
 		FinishAnim();
 		Sleep(RefireRate);

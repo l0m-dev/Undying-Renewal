@@ -3,7 +3,7 @@
 //=============================================================================
 class EctoDecal expands AeonsDecal;
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	if (DrawScale > 0.01)
 		SetDrawScale(DrawScale - (DeltaTime/7.0));

@@ -48,12 +48,13 @@ function StartParticles()
 	cnt  = 0;
 
 	GetEye(EyeLoc);
-	pFX.Destroy();
+	if (pFX != None)
+		pFX.Destroy();
 
 	pFX = spawn(class 'PWSignParticleFX',self,, EyeLoc);
 	pFX.setBase(self, 'Mid_Tip', 'root');
 	
-	for (i=0; i<256; i++)
+	for (i=0; i<ArrayCount(PLocs); i++)
 	{
 		PLocs[i] = vect(0,0,0);
 	}
@@ -94,7 +95,10 @@ state GenParticles
 		GetAxes(Pawn(Owner).ViewRotation, x, y, z);
 		
 		WorldLoc = JointPlace('Mid_Tip').pos;
-	 	PLocs[cnt] = (WorldLoc - EyeLoc) << Pawn(Owner).ViewRotation;
+	 	//PLocs[cnt] = (WorldLoc - EyeLoc) << Pawn(Owner).ViewRotation;
+
+		for (i=0; i<ArrayCount(Plocs); i++)
+			Plocs[i] = LastLoc + (WorldLoc-LastLoc) / ArrayCount(Plocs) * i;
 
 		// from skulls
 		// seekLoc = (skullPos >> Pawn(Owner).ViewRotation) + eyeLoc + tempSeekLoc;
@@ -107,7 +111,7 @@ state GenParticles
 			for (i=0; i<(numPoints-1); i++)
 			{
 				pFX.GetParticleParams(i,pFX.Params);
-				pFX.Params.Position = (Plocs[i] >> Pawn(Owner).ViewRotation) + EyeLoc;
+				pFX.Params.Position = ((Plocs[i]) >> Pawn(Owner).ViewRotation) + EyeLoc;
 				pFX.SetParticleParams(i, pFX.Params);
 			}
 		}
@@ -138,7 +142,8 @@ state Idle
 	}
 	
 	Begin:
-		pfx.Destroy();
+		if (pfx != None)
+			pfx.Destroy();
 }
 
 
@@ -161,4 +166,6 @@ defaultproperties
      PlayerViewScale=0.1
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     DeathMessage="%k ravaged %o with with a word of power."
+     AltDeathMessage="%k corrupted %o with a word of power."
 }

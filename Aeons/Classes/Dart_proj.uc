@@ -5,7 +5,7 @@ class Dart_proj expands WeaponProjectile;
 
 var ParticleFX Trail;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 
@@ -18,10 +18,10 @@ function PreBeginPlay()
 	Velocity = Vector(Rotation) * speed;
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( Trail != none )
-		Trail.bShuttingDown = true;
+		Trail.Shutdown();
 	
 	Trail = None;
 }

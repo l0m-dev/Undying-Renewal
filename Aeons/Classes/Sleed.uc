@@ -576,4 +576,6 @@ defaultproperties
      Style=STY_AlphaBlend
      Mesh=SkelMesh'Aeons.Meshes.Sleed_m'
      CollisionHeight=16
+     MenuName="Sleed"
+     CreatureDeathVerb="swarmed"
 }

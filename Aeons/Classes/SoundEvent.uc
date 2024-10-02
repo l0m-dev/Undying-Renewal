@@ -41,7 +41,7 @@ var int SndIDs[8];
 var Actor OtherActor;
 var int SndIndex;
 
-var AeonsPlayer Player;
+var PlayerPawn Player;
 
 function Destroyed()
 {
@@ -57,14 +57,6 @@ function Destroyed()
 	}
 }
 
-function FindPlayer()
-{
-	ForEach AllActors(class 'AeonsPlayer', Player)
-	{
-		break;
-	}
-}
-
 state() Play_a_Sound
 {
 	function BeginState()
@@ -75,7 +67,7 @@ state() Play_a_Sound
 		}
 	}
 	
-	function PlaySounds()
+	function PlaySounds(Actor Other)
 	{
 		local int i;
 		local float rad;
@@ -121,7 +113,7 @@ state() Play_a_Sound
 
 	function Trigger( actor Other, pawn EventInstigator )
 	{
-		PlaySounds();
+		PlaySounds(None);
 		if ( bTrigTimerPlay )
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
 	}
@@ -130,7 +122,7 @@ state() Play_a_Sound
 	{
 		if ( bAutoTimerPlay || bTrigTimerPlay )
 		{
-			PlaySounds();
+			PlaySounds(None);
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
 		} else {
 			StopSound(SndID);
@@ -140,7 +132,7 @@ state() Play_a_Sound
 	}
 
 	Begin:
-		
+
 }
 
 state() Play_a_Sound_on_the_Player
@@ -210,8 +202,7 @@ state() Play_a_Sound_on_the_Player
 	{
 		if ( bAutoTimerPlay || bTrigTimerPlay )
 		{
-			FindPlayer();
-			if (Player != none)
+			ForEach AllActors(class 'PlayerPawn', Player)
 				PlaySounds(Player);
 
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
@@ -290,11 +281,9 @@ state() Play_a_Sound_on_the_Players_Camera
 
 	function Trigger( actor Other, pawn EventInstigator )
 	{
-		local PlayerPawn Player;
 		ForEach AllActors(class 'PlayerPawn', Player)
-			break;
+			PlaySounds(Player);
 
-		PlaySounds(Player);
 		if ( bTrigTimerPlay )
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
 	}
@@ -303,8 +292,7 @@ state() Play_a_Sound_on_the_Players_Camera
 	{
 		if ( bAutoTimerPlay || bTrigTimerPlay )
 		{
-			FindPlayer();
-			if (Player != none)
+			ForEach AllActors(class 'PlayerPawn', Player)
 				PlaySounds(Player);
 
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
@@ -321,6 +309,8 @@ state() Play_a_Sound_on_the_Players_Camera
 
 state Idle
 {
+	function PlaySounds( Actor Other ); // Fixes failed to find function
+
 	function Trigger( actor Other, pawn EventInstigator );
 
 	Begin:
@@ -344,4 +334,5 @@ defaultproperties
      DrawScale=0.5
      CollisionRadius=384
      bCollideActors=False
+     NetUpdateFrequency=1
 }

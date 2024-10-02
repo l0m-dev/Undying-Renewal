@@ -30,7 +30,7 @@ function GibRadius( float DamageRadius, vector HitLocation, DamageInfo DInfo, pa
 {
 	local actor Victims;
 
-	if (!RGORE())
+	if (!RGORE() || DInfo.DamageType == 'LBG_Concussive')
 		return;
 
 	if( DInfo.DamageRadius == 0.0 )

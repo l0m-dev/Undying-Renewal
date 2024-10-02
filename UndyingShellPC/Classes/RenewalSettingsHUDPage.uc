@@ -1,10 +1,22 @@
-class RenewalSettingsHUDPage extends RenewalSettingsBasePage;
+class RenewalSettingsHUDPage extends UMenuRenewalBasePage;
 
 var UWindowCheckbox AltHudCheck;
 var UWindowCheckbox AutoShowObjectivesCheck;
 var UWindowCheckbox ShowUsedManaCheck;
 //var UWindowHSliderControl HudScaleSlider;
 var UWindowComboControl HudSizeCombo;
+
+var localized string AltHudText;
+var localized string AltHudHelp;
+var localized string AutoShowObjectivesText;
+var localized string AutoShowObjectivesHelp;
+var localized string ShowUsedManaText;
+var localized string ShowUsedManaHelp;
+var localized string HudSizeText;
+var localized string HudSizeHelp;
+var localized string HudSizeSmall;
+var localized string HudSizeNormal;
+var localized string HudSizeBig;
 
 function Created()
 {
@@ -24,9 +36,9 @@ function Created()
 	HudSizeCombo.EditBoxWidth = 90;
 	HudSizeCombo.SetFont(F_Normal);
 	HudSizeCombo.SetEditable(False);
-	HudSizeCombo.AddItem("Small", "0.9");
-	HudSizeCombo.AddItem("Normal", "1.0");
-	HudSizeCombo.AddItem("Big", "1.1");
+	HudSizeCombo.AddItem(HudSizeSmall, "0.9");
+	HudSizeCombo.AddItem(HudSizeNormal, "1.0");
+	HudSizeCombo.AddItem(HudSizeBig, "1.1");
 	
 	GetSettings();
 }

@@ -781,4 +781,6 @@ defaultproperties
      SoundRadius=32
      CollisionRadius=24
      CollisionHeight=34
+     MenuName="Howler"
+     CreatureDeathVerb="decapitated"
 }

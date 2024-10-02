@@ -11,7 +11,7 @@ var Actor A;
 function ZoneChange(ZoneInfo NewZone)
 {
 	if (NewZone.bWaterZone)
-		bShuttingDown = true;
+		Shutdown();
 }
 
 simulated function BeginPlay()
@@ -95,10 +95,10 @@ state SlowShutDown
 			ForEach AllActors(class 'ParticleFX',A)
 			{
 				if (A.Owner == self)
-					A.bShuttingDown = true;
+					A.Shutdown();
 			}
 	
-			bShuttingDown = true;
+			Shutdown();
 		}
 	}
 
@@ -112,7 +112,7 @@ state SlowShutDown
 */
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	A.Destroy();
 }

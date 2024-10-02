@@ -14,28 +14,55 @@ var vector InitialLoc, TargetLoc;
 var() sound EndSound[3];
 var() sound StartSound[3];
 
-function PreBeginPlay()
+var float BreakAwayDistance;
+
+var transient Actor Triggerer;
+
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	InitialRot = rotation;
 	InitialLoc = Location;
+	Triggerer = None;
+
+	SetTimer(1.0, true);
 }
 
-function Trigger(Actor Other, Pawn EventInstigator)
+simulated function Timer()
 {
+	if (Triggerer != None)
+	{
+		if ( VSize(Triggerer.Location - Location) >= BreakAwayDistance || Triggerer.bDeleteMe )
+		{
+			UnTrigger(Triggerer, none);
+		}
+	}
+}
+
+simulated function Trigger(Actor Other, Pawn EventInstigator)
+{
+	if (Triggerer == None)
+	{
+		Triggerer = Other;
+	}
 	if ((DrawScale < 1) && (GetStateName() != 'Grow'))
 		GotoState('Grow');
 }
 
-function UnTrigger(Actor Other, Pawn EventInstigator)
+simulated function UnTrigger(Actor Other, Pawn EventInstigator)
 {
+	if (Triggerer != None && Other != Triggerer)
+	{
+		return;
+	}
+	Triggerer = None;
 	if ((DrawScale > 0) && (GetStateName() != 'Shrink'))
 		GotoState('Shrink');
 }
 
-auto State Idle
+auto simulated State Idle
 {
-	function BeginState()
+	simulated function BeginState()
 	{
 		bHidden = true;
 	}
@@ -48,14 +75,14 @@ auto State Idle
 
 state Grow
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{	
 		DrawScale += DeltaTime * RandRange(3.0, 6.0);
 		if (DrawScale >= 1)
 			GotoState('HoldBig');
 	}
 	
-	function BeginState()
+	simulated function BeginState()
 	{
 		SetRotation(RotRand());
 		DesiredRotation = InitialRot;
@@ -65,9 +92,9 @@ state Grow
 
 state HoldSmall
 {
-	function Tick(float DeltaTime);
+	simulated function Tick(float DeltaTime);
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		DrawScale = 0;
 		bHidden = true;
@@ -76,8 +103,8 @@ state HoldSmall
 
 state HoldBig
 {
-	function Tick(float DeltaTime);
-	function BeginState()
+	simulated function Tick(float DeltaTime);
+	simulated function BeginState()
 	{
 		PlaySound (EndSound[Rand(3)],SLOT_Misc,RandRange(0.25, 0.75),,384.0,1.0 + RandRange(-0.2, 0.2));
 		DrawScale = 1;
@@ -88,14 +115,14 @@ state HoldBig
 
 state Shrink
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{	
 		DrawScale -= DeltaTime * RandRange(3.0, 6.0);
 		if (DrawScale <= 0)
 			GotoState('HoldSmall');
 	}
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		PlaySound (StartSound[Rand(3)],,RandRange(0.25, 0.75),,384.0,1.0 + RandRange(-0.2, 0.2));
 
@@ -107,9 +134,14 @@ state Shrink
 
 defaultproperties
 {
+     BreakAwayDistance=256
      Physics=PHYS_Rotating
      RotationRate=(Pitch=60000,Yaw=60000,Roll=60000)
      DrawType=DT_Mesh
      Mesh=SkelMesh'Aeons.Meshes.BreakAwayStone0_m'
+     bFixedRotationDir=True
      bRotateToDesired=True
+     NetPriority=1.4
+     RemoteRole=ROLE_SimulatedProxy
+     bNoDelete=True
 }

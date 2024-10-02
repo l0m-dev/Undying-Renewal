@@ -40,10 +40,6 @@ function Created()
 	ListClass = class'UWindowPulldownMenuItem';
 	SetAcceptsFocus();
 	Super.Created();
-	ItemHeight = LookAndFeel.Pulldown_ItemHeight;
-	VBorder = LookAndFeel.Pulldown_VBorder;
-	HBorder = LookAndFeel.Pulldown_HBorder;
-	TextBorder = LookAndFeel.Pulldown_TextBorder;
 }
 
 function Clear()
@@ -130,7 +126,11 @@ function BeforePaint(Canvas C, float X, float Y)
 	local float W, H, MaxWidth;
 	local int Count;
 	local UWindowPulldownMenuItem I;
-	
+
+	ItemHeight = LookAndFeel.Pulldown_ItemHeight*Root.ScaleY;
+	VBorder = LookAndFeel.Pulldown_VBorder*Root.ScaleY;
+	HBorder = LookAndFeel.Pulldown_HBorder*Root.ScaleY;
+	TextBorder = LookAndFeel.Pulldown_TextBorder*Root.ScaleY;
 	
 	MaxWidth = 100;
 	Count = 0;

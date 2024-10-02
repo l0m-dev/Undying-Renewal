@@ -37,7 +37,7 @@ var Sequence Seq;				// My current sequence.
 var bool bInLoop;
 var bool bDisabled;
 
-function CheckSoundProps(out SoundProps SP)
+simulated function CheckSoundProps(out SoundProps SP)
 {
 	if (SP.Volume == 0) SP.Volume = 1;
 	if (SP.Radius == 0) SP.Radius = 2048;
@@ -46,7 +46,7 @@ function CheckSoundProps(out SoundProps SP)
 	if (SP.VolumeDelta == 0) SP.VolumeDelta = 0.2;
 }
 
-function int GetKeyNum(int i)
+simulated function int GetKeyNum(int i)
 {
 	// log("Incoming Key = "$i$" NumKeys = "$NumKeys$" result = "$Clamp(i, 0, NumKeys-1), 'Misc');
 	// return i;
@@ -86,6 +86,7 @@ state() TriggerToggle
 	}
 Open:
 	//log("UndMover in TriggerToggle state OPEN TAG ", 'Misc');
+	bClosed = false;
 	if ( DelayTime > 0 )
 	{
 		bDelaying = true;
@@ -122,7 +123,7 @@ simulated function SetPendingSequence(int i)
 }
 
 // Interpolation ended.
-function InterpolateEnd( actor Other )
+simulated function InterpolateEnd( actor Other )
 {
 	local byte OldKeyNum;
 	local Actor A;
@@ -159,12 +160,7 @@ function InterpolateEnd( actor Other )
 					PlaySound(Seq.soundEnd,,Seq.SoundStartProps.volume,,Seq.SoundStartProps.Radius,Seq.SoundStartProps.pitch);
 				}
 	
-				AmbientSound = None;
-				if ( (ClientUpdate == 0) && (Level.NetMode != NM_Client) )
-				{
-					RealPosition = Location;
-					RealRotation = Rotation;
-				}
+				FinishedInterpolating();
 			}
 		} else if ( (KeyNum > Seq.SeqStartKeyframe) && (KeyNum < Seq.SeqEndKeyframe) ) {
 			// we are in the middle of the sequence.
@@ -201,12 +197,7 @@ function InterpolateEnd( actor Other )
 					PlaySound(Seq.soundEnd,,Seq.SoundStartProps.volume,,Seq.SoundStartProps.Radius,Seq.SoundStartProps.pitch);
 				 }
 
-				AmbientSound = None;
-				if ( (ClientUpdate == 0) && (Level.NetMode != NM_Client) )
-				{
-					RealPosition = Location;
-					RealRotation = Rotation;
-				}
+				FinishedInterpolating();
 			}
 		} else if ( (KeyNum > Seq.SeqStartKeyframe) && (KeyNum < Seq.SeqEndKeyframe) ) {
 			// we are in the middle of the sequence.
@@ -306,6 +297,7 @@ function DoOpen()
 		Seq.SoundStartProps.pitch = 1;
 	PlaySound(OpeningSound,,Seq.SoundStartProps.volume,,Seq.SoundStartProps.Radius,Seq.SoundStartProps.pitch);
 	AmbientSound = MoveAmbientSound;
+	NetUpdateFrequency = default.NetUpdateFrequency;
 }
 
 // Close the mover.
@@ -322,7 +314,7 @@ function DoClose()
 		if (Seq.SoundStartProps.pitch == 0)
 			Seq.SoundStartProps.pitch = 1;
 		PlaySound( ClosingSound,,Seq.SoundStartProps.volume,,Seq.SoundStartProps.Radius,Seq.SoundStartProps.pitch);
-	AmbientSound = MoveAmbientSound;
+		AmbientSound = MoveAmbientSound;
 	} else if ( (Seq.SeqStartKeyframe == Seq.SeqEndKeyframe) && (KeyNum != Seq.SeqCloseKeyframe) ) {
 		if ( GetStateName() == 'TriggerToggle' )
 			PlayStartEvents();
@@ -333,6 +325,7 @@ function DoClose()
 		PlaySound( ClosingSound,,Seq.SoundStartProps.volume,,Seq.SoundStartProps.Radius,Seq.SoundStartProps.pitch);
 		AmbientSound = MoveAmbientSound;
 	}
+	NetUpdateFrequency = default.NetUpdateFrequency;
 }
 
 defaultproperties

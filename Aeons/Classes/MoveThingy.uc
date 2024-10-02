@@ -12,7 +12,8 @@ function Trigger(Actor Other, Pawn Instigator)
 	if ( MoveTag != 'none' )
 		ForEach AllActors (class 'Actor', A, MoveTag)
 		{
-			log("MoveThingy Moving "$A.name, 'Misc');
+			if (A.RemoteRole == ROLE_SimulatedProxy)
+				A.RemoteRole = ROLE_DumbProxy;
 			A.SetLocation(Location);
 		}
 }

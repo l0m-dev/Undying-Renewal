@@ -3,6 +3,9 @@
 //=============================================================================
 class LanternLight expands Light;
 
+// set bHidden to False to allow replication
+// set DrawType to DT_None to hide sprite
+
 defaultproperties
 {
      bStatic=False
@@ -17,4 +20,6 @@ defaultproperties
      LightRadius=16
      LightRadiusInner=10
      LightPeriod=4
+     bHidden=False
+     DrawType=DT_None
 }

@@ -32,5 +32,4 @@ defaultproperties
      AmpColors(2)=(R=255,G=255,B=255)
      AmpColors(3)=(R=255,G=255,B=255)
      AmpColors(4)=(R=255,G=255,B=255)
-     RemoteRole=ROLE_DumbProxy
 }

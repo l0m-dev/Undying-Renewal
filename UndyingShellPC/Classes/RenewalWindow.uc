@@ -4,7 +4,7 @@ class RenewalWindow extends UWindowDialogClientWindow
 var UMenuPageControl Pages;
 var UWindowSmallCloseButton CloseButton;
 
-var localized string GamePlayTab, HUDTab, ControlsTab;
+var localized string GameplayTab, HUDTab, ControlsTab, GraphicsTab;
 var UWindowPageControlPage Network;
 
 var string StatusBarText;
@@ -25,17 +25,17 @@ function UWindowPageControlPage AddScrollPage(string Caption, class<UWindowDialo
 function Created() 
 {
 	bLeaveOnScreen = True; // if it can be shown in game
-	bAlwaysOnTop = True;
+	//bAlwaysOnTop = True;
 
 	Cursor = Root.DefaultNormalCursor;
 	
 	Pages = UMenuPageControl(CreateWindow(class'UMenuPageControl', 0, 0, 1, 1));
 	Pages.SetMultiLine(True);
 
-	AddScrollPage(GamePlayTab, class'RenewalSettingsGamePage');
+	AddScrollPage(GameplayTab, class'RenewalSettingsGamePage');
 	AddScrollPage(HUDTab, class'RenewalSettingsHUDPage');
-	AddScrollPage(ControlsTab, class'RenewalSettingsControlsBasePage');
-	//AddScrollPage("Renewal Controls", class'RenewalSettingsControlsPage');
+	AddScrollPage(ControlsTab, class'RenewalSettingsControlsPage');
+	AddScrollPage(GraphicsTab, class'RenewalSettingsGraphicsPage');
 
 	CloseButton = UWindowSmallCloseButton(CreateControl(class'UWindowSmallCloseButton', 0, 0, 1, 1));
 	
@@ -73,7 +73,7 @@ function Paint(Canvas C, float X, float Y)
 	}
 
 	T = GetLookAndFeelTexture();
-	DrawUpBevel( C, 0, LookAndFeel.TabUnselectedM.H, WinWidth, WinHeight-LookAndFeel.TabUnselectedM.H, T);
+	DrawUpBevel( C, 0, LookAndFeel.TabUnselectedM.H*Root.ScaleY, WinWidth, WinHeight-LookAndFeel.TabUnselectedM.H*Root.ScaleY, T);
 
 	C.Font = Root.Fonts[F_Normal];
 	C.DrawColor.r = 0;
@@ -108,7 +108,8 @@ function Close(optional bool bByParent)
 
 defaultproperties
 {
-     GamePlayTab="Game"
+     GameplayTab="Game"
      HUDTab="HUD"
      ControlsTab="Controls"
+     GraphicsTab="Graphics"
 }

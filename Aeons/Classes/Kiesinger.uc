@@ -282,7 +282,7 @@ function RemoveVortexParticles()
 	ForEach AllActors(class 'Actor', A)
 		if ( A.Owner == self )
 			if ( A.IsA('MandorlaParticleFX') )
-				ParticleFX(A).bShuttingDown = true;
+				ParticleFX(A).Shutdown();
 }
 
 function DestroyVortex()
@@ -1172,4 +1172,6 @@ defaultproperties
      TransientSoundRadius=1500
      CollisionHeight=57
      Mass=2000
+     MenuName="Keisinger"
+     CreatureDeathVerb="eldritched"
 }

@@ -72,17 +72,17 @@ function CheckRange()
 	}
 	else
 	{
-		ThumbStart = ((Pos - MinPos) * (WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight))) / (MaxPos + MaxVisible - MinPos);
-		ThumbHeight = (MaxVisible * (WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight))) / (MaxPos + MaxVisible - MinPos);
+		ThumbStart = ((Pos - MinPos) * (WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY))) / (MaxPos + MaxVisible - MinPos);
+		ThumbHeight = (MaxVisible * (WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY))) / (MaxPos + MaxVisible - MinPos);
 
-		if(ThumbHeight < LookAndFeel.Size_MinScrollbarHeight) 
-			ThumbHeight = LookAndFeel.Size_MinScrollbarHeight;
+		if(ThumbHeight < LookAndFeel.Size_MinScrollbarHeight*Root.ScaleY) 
+			ThumbHeight = LookAndFeel.Size_MinScrollbarHeight*Root.ScaleY;
 		
-		if(ThumbHeight + ThumbStart > WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight))
+		if(ThumbHeight + ThumbStart > WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY))
 		{
-			ThumbStart = WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight) - ThumbHeight;
+			ThumbStart = WinHeight - (2*LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY) - ThumbHeight;
 		}
-		ThumbStart = ThumbStart + LookAndFeel.Size_ScrollbarButtonHeight;
+		ThumbStart = ThumbStart + LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY;
 	}
 }
 
@@ -97,13 +97,13 @@ function BeforePaint(Canvas C, float X, float Y)
 {
 	UpButton.WinTop = 0;
 	UpButton.WinLeft = 0;
-	UpButton.WinWidth = LookAndFeel.Size_ScrollbarWidth;
-	UpButton.WinHeight = LookAndFeel.Size_ScrollbarButtonHeight;
+	UpButton.WinWidth = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
+	UpButton.WinHeight = LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY;
 
-	DownButton.WinTop = WinHeight - LookAndFeel.Size_ScrollbarButtonHeight;
+	DownButton.WinTop = WinHeight - LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY;
 	DownButton.WinLeft = 0;
-	DownButton.WinWidth = LookAndFeel.Size_ScrollbarWidth;
-	DownButton.WinHeight = LookAndFeel.Size_ScrollbarButtonHeight;
+	DownButton.WinWidth = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
+	DownButton.WinHeight = LookAndFeel.Size_ScrollbarButtonHeight*Root.ScaleY;
 
 	CheckRange();
 }

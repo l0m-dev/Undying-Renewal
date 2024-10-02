@@ -13,7 +13,8 @@ var const enum ETextureFormat
 	TEXF_RGB32,
 	TEXF_RGB64,
 	TEXF_DXT1,
-	TEXF_RGB24
+	TEXF_RGB24,
+	TEXF_RGBA8
 } Format;
 
 // Palette.

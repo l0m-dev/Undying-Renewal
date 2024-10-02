@@ -176,7 +176,8 @@ var	const	vector	Floor;			// Normal of floor pawn is standing on (only used
 									//	by PHYS_Spider)
 var float			SplashTime;		// time of last splash
 var float           Climb;			// Rate of climb.
-var(Movement) float ClimbRate;		// Ability of pawn to climb. //fix remove these if using Legend climbing
+//var(Movement) float ClimbRate;	// Ability of pawn to climb. //fix remove these if using Legend climbing
+var float 			TurnAnimRate;	// Speed of Turn_Left and Turn_Right animations used by RotateToView (Turn_180 is exluded for now)
 var float           ClimbDirection;	// Direction along the rotation of the climb.
 var vector			VelocityBias;	// Direction to bias velocity.
 
@@ -381,7 +382,7 @@ replication
 	reliable if ( (!bDemoRecording || (bClientDemoRecording && bClientDemoNetFunc)) && Role == ROLE_Authority )
 		ClientVoiceMessage;
 	reliable if ( (!bDemoRecording || (bClientDemoRecording && bClientDemoNetFunc) || (Level.NetMode==NM_Standalone && IsA('PlayerPawn'))) && Role == ROLE_Authority )
-		ClientMessage, TeamMessage, ReceiveLocalizedMessage;
+		ClientMessage, TeamMessage, ReceiveLocalizedMessage, ChatMessage;
 
 	// Functions the client calls on the server.
 	unreliable if( Role<ROLE_Authority )
@@ -393,6 +394,9 @@ replication
 
 	unreliable if( Role<ROLE_Authority )
 		Climb, ClimbDirection;
+
+	unreliable if( Role==ROLE_Authority )
+		SplatterHUD, PlayDamageEffect;
 }
 
 // Latent Movement.
@@ -1110,6 +1114,7 @@ function SetDefaultDisplayProperties()
 event ClientMessage( coerce string S, optional name Type, optional bool bBeep );
 event TeamMessage( PlayerReplicationInfo PRI, coerce string S, name Type, optional bool bBeep );
 event ReceiveLocalizedMessage( class<LocalMessage> Message, optional int Switch, optional PlayerReplicationInfo RelatedPRI_1, optional PlayerReplicationInfo RelatedPRI_2, optional Object OptionalObject );
+event ChatMessage( PlayerReplicationInfo PRI, coerce string S, name Type, optional color Color );
 
 function BecomeViewTarget()
 {
@@ -1123,7 +1128,7 @@ event FellOutOfWorld()
 		return;
 	Health = -1;
 	SetPhysics(PHYS_None);
-	Weapon = None;
+	//Weapon = None; // commented out since the weapon is not destroyed
 	Died(None, 'Fell', Location, DInfo);
 }
 
@@ -1273,7 +1278,17 @@ function AddVelocity( vector NewVelocity)
 
 function ClientSetLocation( vector NewLocation, rotator NewRotation )
 {
-	ClientSetRotation( NewRotation );
+	ViewRotation      = NewRotation;
+	If ( (ViewRotation.Pitch > RotationRate.Pitch) && (ViewRotation.Pitch < 65536 - RotationRate.Pitch) )
+	{
+		If (ViewRotation.Pitch < 32768)
+			NewRotation.Pitch = RotationRate.Pitch;
+		else
+			NewRotation.Pitch = 65536 - RotationRate.Pitch;
+	}
+
+	NewRotation.Roll  = 0;
+	SetRotation( NewRotation );
 	SetLocation( NewLocation );
 }
 
@@ -1285,10 +1300,12 @@ function ClientSetRotation( rotator NewRotation )
 	SetRotation( NewRotation );
 }
 
-function ClientDying(name DamageType, vector HitLocation, DamageInfo DInfo)
+function ClientDying(name DamageType, vector HitLocation, DamageInfo DInfo, optional name DyingState, optional name DyingStateLabel)
 {
+	if (DyingState == '')
+		DyingState = 'Dying';
 	PlayDying(DamageType, HitLocation, DInfo);
-	GotoState('Dying');
+	GotoState(DyingState, DyingStateLabel);
 }
 
 function ClientReStart()
@@ -1299,6 +1316,9 @@ function ClientReStart()
 	BaseEyeHeight = Default.BaseEyeHeight;
 	EyeHeight = BaseEyeHeight;
 	PlayLocomotion( vect(0,0,0) );
+
+	//if ( Level.Netmode == NM_Client && Health <= 0 )
+	//	Health = Default.Health;
 
 	if ( Region.Zone.bWaterZone && (PlayerRestartState == 'PlayerWalking') )
 	{
@@ -1359,12 +1379,26 @@ exec function NextItem()
 function Inventory FindInventoryType( class DesiredClass )
 {
 	local Inventory Inv;
+	local int Count;
 
-	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )   
+	for( Inv=Inventory; Inv!=None && Count < 1000; Inv=Inv.Inventory )
+	{
 		if ( Inv.class == DesiredClass )
 			return Inv;
+		Count++;
+	}
+
+	// Search for subclasses if exact class wasn't found
+	Count = 0;
+	for ( Inv = Inventory; Inv != None && Count < 1000; Inv = Inv.Inventory )
+	{
+		if ( ClassIsChildOf(Inv.Class, DesiredClass) )
+			return Inv;
+		Count++;
+	}
+
 	return None;
-} 
+}
 
 // Add Item to this pawn's inventory. 
 // Returns true if successfully added, false if not.
@@ -1543,12 +1577,12 @@ function ChangedDefSpell()
     }
 }
 
-exec function AddManaCapacity(int i)
+/*exec*/ function AddManaCapacity(int i)
 {
 	ManaCapacity = Clamp((ManaCapacity + i), 0, 200);
 }
 
-exec function AddMana(int i, optional bool bForceIncrease)
+/*exec*/ function AddMana(int i, optional bool bForceIncrease)
 {
 	Mana += i;
 	if ( !bForceIncrease )
@@ -1558,7 +1592,7 @@ exec function AddMana(int i, optional bool bForceIncrease)
 	}
 }
 
-exec function bool UseMana(int i)
+/*exec*/ function bool UseMana(int i)
 {
 	if ( i > Mana )
     {
@@ -1639,6 +1673,7 @@ singular event BaseChange()
 		DInfo = getDamageInfo();
 		DInfo.Damage = (1-Velocity.Z/400)* Mass/Base.Mass;
 		DInfo.DamageType = 'stomped';
+		DInfo.Deliverer = self;
 		if ( Base.AcceptDamage(DInfo) )
 			Base.TakeDamage( Self,Location,0.5 * Velocity , DInfo);
 		JumpOffPawn();
@@ -1647,6 +1682,7 @@ singular event BaseChange()
 	{
 		DInfo.Damage = -2* Mass/decorMass * Velocity.Z/400;
 		DInfo.DamageType = 'stomped';
+		DInfo.Deliverer = self;
 		decorMass = FMax(Decoration(Base).Mass, 1);
 		if ( Base.AcceptDamage(DInfo) )
 			Base.TakeDamage(Self, Location, 0.5 * Velocity, DInfo);
@@ -1674,6 +1710,8 @@ simulated event Destroyed()
 	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )   
 		Inv.Destroy();
 	Weapon = None;
+	AttSpell = None;
+	DefSpell = None;
 	Inventory = None;
 	if ( bIsPlayer && (Level.Game != None) )
 		Level.Game.logout(self);
@@ -1727,6 +1765,10 @@ event PreBeginPlay()
 	// Should we do this?	MJG: disable Health modification based on DrawScale
 //	Health = Default.Health * DrawScale/Default.DrawScale;
 
+	if ( BaseEyeHeight == 0 )
+		BaseEyeHeight = 0.8 * CollisionHeight;
+	EyeHeight = BaseEyeHeight;
+
 	if (bIsPlayer)
 	{
 		if (PlayerReplicationInfoClass != None)
@@ -1738,9 +1780,6 @@ event PreBeginPlay()
 
 	if (!bIsPlayer) 
 	{
-		if ( BaseEyeHeight == 0 )
-			BaseEyeHeight = 0.8 * CollisionHeight;
-		EyeHeight = BaseEyeHeight;
 		if (Fatness == 0) //vary monster fatness slightly if at default
 			Fatness = 120 + Rand(8) + Rand(8);
 	}
@@ -1847,7 +1886,7 @@ function PlayLocomotion( vector dVector )
 				// Left strafe.
 				if ( InWater() )
 				{
-					if ( MoveAnim('swim_strafe_left') )
+					if ( MoveAnim('swim') ) // swim_strafe_left
 						return;
 				}
 				else if ( InCrouch() )
@@ -1866,7 +1905,7 @@ function PlayLocomotion( vector dVector )
 				// Right strafe.
 				if ( InWater() )
 				{
-					if ( MoveAnim('swim_strafe_right') )
+					if ( MoveAnim('swim') ) // swim_strafe_right
 						return;
 				}
 				else if ( InCrouch() )
@@ -1903,7 +1942,7 @@ function PlayLocomotion( vector dVector )
 		{
 			// Reverse.
 			if ( InWater() )
-				MoveAnim('swim_backwards');
+				MoveAnim('swim'); // swim_backwards
 			else if ( InCrouch() )
 				MoveAnim('crouch_walk_backwards');
 			else if ( IsWalking( dVector ) )
@@ -1928,7 +1967,7 @@ function bool InCrouch()
 
 function bool InWater()
 {
-	return Region.Zone.bWaterZone;
+	return FootRegion.Zone.bWaterZone && !bIsClimbing; // added bIsClimbing check since this function is used for animation only
 }
 
 function bool IsWalking( vector dir )
@@ -2108,16 +2147,11 @@ function FireWeapon();
 /* TraceShot - used by instant hit weapons, and monsters 
 */
 // TODO: perhaps HitJoint should be passed out via parameter list as is with HitLocation, HitNormal
-function actor TraceShot(out vector HitLocation, out vector HitNormal, vector EndTrace, vector StartTrace)
+function actor TraceShot(out vector HitLocation, out vector HitNormal, out int HitJoint, vector EndTrace, vector StartTrace)
 {
 	local actor Other;
-	local int HitJoint;
 
 	Other = Trace( HitLocation, HitNormal, HitJoint, EndTrace, StartTrace, True, True );
-	if ( Other != None )
-	{
-		Other.LastJointHit = HitJoint;
-	}
 
 	return Other;
 }
@@ -2192,7 +2226,7 @@ function PlaySpellSwitch(Spell NewSpell);
 //added by KSherr
 function PlayRising();      //from crouch
 
-function bool AddParticleToJoint( int i )
+simulated function bool AddParticleToJoint( int i )
 {
 	return (i >= 0) && (i < NumJoints());
 }
@@ -2266,7 +2300,7 @@ function GrabDecoration()
 			if ( Mover(HitActor).bUseTriggered )
 				HitActor.Trigger( self, self );
 		}		
-		else if ( (Decoration(HitActor) != None)  && ((weapon == None) || (weapon.Mass < 20)) )
+		else if ( (Decoration(HitActor) != None)  ) // && ((weapon == None) || (weapon.Mass < 20))
 		{
 			CarriedDecoration = Decoration(HitActor);
 			if ( !CarriedDecoration.bPushable || (CarriedDecoration.Mass > 40) 
@@ -2464,7 +2498,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 	bSplatterHUD = true;
 	if ( Role < ROLE_Authority )
 	{
-		log(self$" client damage type "$DInfo.DamageType$" by "$InstigatedBy);
+		//log(self$" client damage type "$DInfo.DamageType$" by "$InstigatedBy);
 		return;
 	}
 
@@ -2484,17 +2518,21 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		actualDamage = Level.Game.ReduceDamage(DInfo.Damage, DInfo.DamageType, self, InstigatedBy);
 		if ( bIsPlayer )
 		{
-			log("bIsPlayer and Damage = "$DInfo.Damage);
+			//log("bIsPlayer and Damage = "$DInfo.Damage);
 			if ( !bAcceptDamage && !bAcceptMagicDamage ) //God mode
 				actualDamage = 0;
 			else if (Inventory != None) //then check if carrying armor
 				actualDamage = Inventory.ReduceDamage(actualDamage, DInfo.DamageType, HitLocation);
-			else
-				actualDamage = DInfo.Damage;
+			//else
+			//	actualDamage = DInfo.Damage;
 		}
 		else if ( (InstigatedBy != None) &&
 					(InstigatedBy.IsA(Class.Name) || self.IsA(InstigatedBy.Class.Name)) )
-			ActualDamage = ActualDamage * FMin(1 - ReducedDamagePct, 0.35); 
+		{
+			// reduces damage to pawns of the same class
+			if (RGC())
+				ActualDamage = ActualDamage * FMin(1 - ReducedDamagePct, 0.35); 
+		}
 		else if ( (!bAcceptDamage && !bAcceptMagicDamage) || 
 			((ReducedDamageType != '') && (ReducedDamageType == DInfo.DamageType)) )
 			actualDamage = actualDamage * (1 - ReducedDamagePct);
@@ -2504,6 +2542,9 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		{
 			DInfo.DamageLocation = HitLocation;
 		}
+
+		// small gameplay change: all damage to the player is a whole number now because of ReduceDamage returning an integer
+		DInfo.Damage = actualDamage;
 		actualDamage = (AdjustDamageByLocation( DInfo )).Damage;
 
 		intDamage = int(actualDamage);
@@ -2550,11 +2591,11 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 
 		ActualDamage *= DInfo.DamageMultiplier;
 		
-		log("Reducing health by = "$actualDamage);
+		//log("Reducing health by = "$actualDamage);
 		Health -= actualDamage;
 		Mana = max( Mana - DInfo.ManaCost, 0 );
 
-		if ( ( InstigatedBy != none ) && InstigatedBy.IsA('PlayerPawn') )
+		if ( Level.NetMode != NM_DedicatedServer && ( InstigatedBy != none ) && InstigatedBy.IsA('PlayerPawn') )
 			PlayerPawn(InstigatedBy).MyHud.LastDamageInflicted = actualDamage;
 		if (CarriedDecoration != None)
 			DropDecoration();
@@ -2589,7 +2630,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 				if ( bIsPlayer )
 				{
 					HidePlayer();
-					GotoState('Dying');
+					PlayerDied('Dying', '', instigatedBy, 'Gibbed', Location, DInfo);
 				}
 				else
 				{
@@ -2608,7 +2649,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 					PlayerPawn(self).Killer = InstigatedBy;
 					InstigatedBy.SetTargetPawn(self);
 					InstigatedBy.PerformSK(self);
-					GotoState('SpecialKill');
+					PlayerDied('SpecialKill', '', instigatedBy, DInfo.damageType, HitLocation, DInfo);
 				} else {
 					//log(self$" died");
 					NextState = '';
@@ -2620,7 +2661,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 					Died(instigatedBy, DInfo.damageType, HitLocation, DInfo);
 				}
 			}
-		} else {
+		} else if (Level.NetMode == NM_Standalone ) { // disable for multiplayer, not really needed
 			// we are already dead
 			//Warn(self$" took regular damage while already dead");
 			if ( Gibbed( DInfo.DamageType ) )	// only gib if gibable
@@ -2640,7 +2681,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 					}
 					else
 					{
-						gibbedBy( InstigatedBy );
+						gibbedBy( InstigatedBy ); // will call Died
 						Destroy();
 					}
 				}
@@ -2714,6 +2755,8 @@ function bool Decapitate(optional vector Dir)
 	else
 		B.Velocity = vect(0,0,256);
 
+	ReplicateDetachLimb(self, 'Head', B.Velocity, B.DesiredRotation);
+
 	if (PersistentBlood != none)
 	{
 		PBlood = spawn(PersistentBlood,,,JointPlace(NeckName).pos);
@@ -2728,6 +2771,17 @@ function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo
 	local pawn OtherPawn;
 	local actor A;
 
+	if ( bIsPlayer )
+	{
+		PlayerDied('Dying', '', Killer, damageType, HitLocation, DInfo);
+		return;
+	}
+
+	if ( bDeleteMe )
+		return; //already destroyed
+	if ( Level.NetMode==NM_Client )
+		return;
+
 	// mutator hook to prevent deaths
 	// WARNING - don't prevent bot suicides - they suicide when really needed
 	if ( Level.Game.BaseMutator.PreventDeath(self, Killer, damageType, HitLocation) )
@@ -2735,8 +2789,6 @@ function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo
 		Health = max(Health, 1); //mutator should set this higher
 		return;
 	}
-	if ( bDeleteMe )
-		return; //already destroyed
 	Health = Min(0, Health);
 	for ( OtherPawn=Level.PawnList; OtherPawn!=None; OtherPawn=OtherPawn.nextPawn )
 		OtherPawn.Killed(Killer, self, damageType);
@@ -2781,6 +2833,59 @@ function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo
 		//GotoState('StuckToWall');
 }
 
+function PlayerDied(name DyingState, optional name DyingStateLabel, optional pawn Killer, optional name damageType, optional vector HitLocation, optional DamageInfo DInfo)
+{
+	local pawn OtherPawn;
+	local actor A;
+
+	if ( bDeleteMe )
+		return; //already destroyed
+	if ( Level.NetMode==NM_Client )
+		return;
+
+	// allow state changes even if the state is the same because the label might be different
+	if ( GetStateName() != DyingState )
+	{
+		// mutator hook to prevent deaths
+		// WARNING - don't prevent bot suicides - they suicide when really needed
+		if ( Level.Game.BaseMutator.PreventDeath(self, Killer, damageType, HitLocation) )
+		{
+			Health = max(Health, 1); //mutator should set this higher
+			return;
+		}
+		Health = Min(0, Health);
+		for ( OtherPawn=Level.PawnList; OtherPawn!=None; OtherPawn=OtherPawn.nextPawn )
+			OtherPawn.Killed(Killer, self, damageType);
+		if ( CarriedDecoration != None )
+			DropDecoration();
+		level.game.Killed(Killer, self, damageType);
+		//log(class$" dying");
+		if( Event != '' )
+			foreach AllActors( class 'Actor', A, Event )
+			{
+				if ( A.IsA('Trigger') )
+				{
+					if ( Trigger(A).bPassThru )
+						Trigger(A).PassThru(self);
+				}
+				A.Trigger( Self, Killer );
+			}
+
+		if ( !self.IsA('PlayerPawn') )
+			Level.Game.DiscardInventory(self);
+		Velocity.Z *= 1.3;
+
+		PlayDying(DamageType, HitLocation, DInfo);
+	}
+	
+	if ( Level.Game.bGameEnded )
+		return;
+	if ( RemoteRole == ROLE_AutonomousProxy )
+		ClientDying(DamageType, HitLocation, DInfo, DyingState, DyingStateLabel);
+	
+	GotoState(DyingState, DyingStateLabel);
+}
+
 function bool Gibbed(name damageType)
 {
 }
@@ -2819,7 +2924,7 @@ function string KillMessage( name damageType, pawn Other )
 	local string message;
 
 	message = Level.Game.CreatureKillMessage(damageType, Other);
-	return (Other.PlayerReplicationInfo.PlayerName$message$namearticle$menuname);
+	return (Other.PlayerReplicationInfo.PlayerName$message/*$namearticle*/$menuname); // removed namearticle since undying doesn't use it
 }
 
 function damageAttitudeTo(pawn Other);
@@ -3108,7 +3213,7 @@ ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneC
 	}
 }
 
-exec function PlayerStateTrigger(optional float rSpeed, optional float aRate)
+function PlayerStateTrigger(optional float rSpeed, optional float aRate)
 {
 
 }
@@ -3239,7 +3344,6 @@ defaultproperties
      ManaCapacity=100
      ManaRefreshAmt=1
      ManaRefreshTime=0.2
-     ClimbRate=3
      OrthoZoom=40000
      FovAngle=90
      Health=100
@@ -3282,6 +3386,8 @@ defaultproperties
      bBlockActors=True
      bBlockPlayers=True
      bProjTarget=True
+     bFixedRotationDir=True
      bRotateToDesired=True
      NetPriority=2
+     TurnAnimRate=1.0
 }

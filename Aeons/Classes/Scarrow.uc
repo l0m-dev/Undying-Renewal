@@ -67,6 +67,8 @@ var float					LanternResistanceTime;
 
 const LanternResistanceDelay = 15.0;
 
+// idle_appear_start is very weird in multiplayer
+
 //****************************************************************************
 // Animation trigger functions.
 //****************************************************************************
@@ -97,7 +99,7 @@ function PlayDying( name damage, vector HitLocation, DamageInfo DInfo )
 
 function PlayShadowed()
 {
-	PlayAnim( 'idle_appear_start', 0.0, MOVE_None,, 0.0 );
+	PlayIdleAppearStart(true);
 }
 
 function PlayMindshatterDamage()
@@ -107,9 +109,26 @@ function PlayMindshatterDamage()
 
 function SnapToIdle()
 {
-	PlayAnim( 'idle_appear_start', 0.0, MOVE_None,, 0.0 );
+	PlayIdleAppearStart(true);
 }
 
+function PlayIdleAppearStart(bool bMoveNone)
+{
+	if (Level.NetMode == NM_Standalone)
+	{
+		if (bMoveNone)
+			PlayAnim( 'idle_appear_start', 0.0, MOVE_None,, 0.0 );
+		else
+			PlayAnim( 'idle_appear_start',,,, 0.0 );
+	}
+	else
+	{
+		ReappearFade();
+		UnShade();
+
+		PlaySound_P("Appear PVar=0.25 V=1.3 VVar=0.1");
+	}
+}
 
 //****************************************************************************
 // Sound trigger functions.
@@ -583,7 +602,7 @@ MORPH:
 	SetLocation( ComputeTeleportLocation( PatrolPoint.Location ) );
 	SetRotation( PatrolPoint.Rotation );
 	DesiredRotation = Rotation;
-	PlayAnim( 'idle_appear_start',,,, 0.0 );
+	PlayIdleAppearStart(false);
 	FinishAnim();
 	PlayAnim( 'idle_appear_end' );
 	FinishAnim();
@@ -1025,7 +1044,7 @@ INSHADOW:
 //	else
 //		DebugInfoMessage( " FindAmbushPoint() found NONE" );
 
-	PlayAnim( 'idle_appear_start',,,, 0.0 );
+	PlayIdleAppearStart(false);
 	FinishAnim();
 	PlayAnim( 'idle_appear_end' );
 	FinishAnim();
@@ -1081,7 +1100,7 @@ state AIShadowAppear
 BEGIN:
 	OpacityEffector.SetFade( FadedOpacity, 0.0 );
 	WaitForLanding();
-	PlayAnim( 'idle_appear_start',,,, 0.0 );
+	PlayIdleAppearStart(false);
 	Sleep( 0.01 );
 	bHidden = false;
 	FinishAnim();
@@ -1207,4 +1226,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Scarrow_m'
      CollisionRadius=60
      CollisionHeight=60
+     MenuName="Scarrow"
+     CreatureDeathVerb="voided"
 }

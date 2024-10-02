@@ -28,7 +28,7 @@ simulated function Tick(float DeltaTime)
 		FindPlayer();
 	}
 	
-	if ( Player != None )
+	if ( Player != None && BaseTexture != None )
 	{
 		if ((Player.ScryeTimer>(Player.ScryeFullTime/2))&&(!bWasScrying))
 		{

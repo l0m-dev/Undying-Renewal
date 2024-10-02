@@ -26,7 +26,7 @@ function Created()
 	DescriptionEdit.SetFont(F_Normal);
 	DescriptionEdit.SetNumericOnly(False);
 	DescriptionEdit.SetMaxLength(300);
-	DescriptionEdit.EditBoxWidth = 100;
+	DescriptionEdit.EditBoxWidth = 200;
 
 	UpdateDescriptionCheck = UWindowCheckbox(CreateControl(class'UWindowCheckbox', 10, 30, 136, 1));
 	UpdateDescriptionCheck.SetText(UpdateDescriptionText);
@@ -74,8 +74,24 @@ function BeforePaint(Canvas C, float X, float Y)
 {
 	Super.BeforePaint(C, X, Y);
 
-	DescriptionEdit.WinWidth = WinWidth - 20;
-	DescriptionEdit.EditBoxWidth = WinWidth - 140;
+	//DescriptionEdit.WinWidth = WinWidth - 20*Root.ScaleY;
+	//DescriptionEdit.EditBoxWidth = WinWidth - 140*Root.ScaleY;
+
+	DescriptionEdit.WinLeft = 10*Root.ScaleY;
+	DescriptionEdit.WinTop = 10*Root.ScaleY;
+	DescriptionEdit.WinWidth = 320*Root.ScaleY;
+	UpdateDescriptionCheck.WinLeft = 10*Root.ScaleY;
+	UpdateDescriptionCheck.WinTop = 30*Root.ScaleY;
+	UpdateDescriptionCheck.WinWidth = 136*Root.ScaleY;
+	IPEdit.WinLeft = 10*Root.ScaleY;
+	IPEdit.WinTop = 50*Root.ScaleY;
+	IPEdit.WinWidth = 220*Root.ScaleY;
+	GamePortEdit.WinLeft = 10*Root.ScaleY;
+	GamePortEdit.WinTop = 70*Root.ScaleY;
+	GamePortEdit.WinWidth = 160*Root.ScaleY;
+	QueryPortEdit.WinLeft = 10*Root.ScaleY;
+	QueryPortEdit.WinTop = 90*Root.ScaleY;
+	QueryPortEdit.WinWidth = 160*Root.ScaleY;
 }
 
 function Notify(UWindowDialogControl C, byte E)

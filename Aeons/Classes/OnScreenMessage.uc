@@ -19,13 +19,8 @@ var() bool bCenterIndividualLines;
 function Trigger ( Actor Other, Pawn Instigator )
 {
 	// log("Triggered  ......... ...........        ......................",'Misc');
-	ForEach AllActors(class 'AeonsPlayer', Player)
-	{
-		break;
-	}
 
-	if ( Player != none )
-		GotoState('Holding');
+	GotoState('Holding');
 }
 
 state Holding
@@ -34,14 +29,17 @@ state Holding
 	{
 		if (Text[1] == "")
 		{
-			Player.ScreenMessage(Text[0], DisplayTime);
+			ForEach AllActors(class 'AeonsPlayer', Player)
+			{
+				Player.ScreenMessage(Text[0], DisplayTime);
+			}
 			GotoState('');
 		} else {
 			if ( FadeToBlack )
 				Player.ClientAdjustGlow(-1.0,vect(0,0,0));
 
 			// log("Found Player Too ...................",'Misc');
-			Player.OverlayActor = self;
+			Player.OverlayActor = self; // not replicated
 			SetTimer(DisplayTime, false);
 		}
 	}
@@ -62,7 +60,7 @@ state Holding
 		
 }
 
-function RenderOverlays(Canvas Canvas)
+simulated function RenderOverlays(Canvas Canvas)
 {
 	// log ("Render Overlays .........");
 	if ( Player != none )

@@ -124,6 +124,8 @@ AUTOGENERATE_NAME(PlayerReady)
 AUTOGENERATE_NAME(PostLoadGame)
 AUTOGENERATE_NAME(StartLevel)
 AUTOGENERATE_NAME(AddSubtitle)
+AUTOGENERATE_NAME(ChatMessage)
+AUTOGENERATE_NAME(ClientTravelCleanupServer)
 
 #ifndef NAMES_ONLY
 
@@ -1025,7 +1027,7 @@ public:
     BITFIELD bClientDemoRecording:1;
     BITFIELD bClientDemoNetFunc:1;
     BITFIELD bShowDebugInfo:1;
-    INT LastJointHit GCC_PACK(4);
+    INT FREE_VARIABLE GCC_PACK(4);
     class UClass* RenderIteratorClass;
     class URenderIterator* RenderInterface;
     DECLARE_FUNCTION(execMultiply_ColorFloat);
@@ -1067,8 +1069,8 @@ public:
     DECLARE_FUNCTION(execFinishInterpolation);
     DECLARE_FUNCTION(execSetLimbTangible);
     DECLARE_FUNCTION(execApplyMod);
-    DECLARE_FUNCTION(execDetachLimb);
-    DECLARE_FUNCTION(execDestroyLimb);
+    DECLARE_FUNCTION(execDetachLimbNative);
+    DECLARE_FUNCTION(execDestroyLimbNative);
     DECLARE_FUNCTION(execAddDynamic);
     DECLARE_FUNCTION(execClearTargets);
     DECLARE_FUNCTION(execClearTarget);
@@ -1545,6 +1547,7 @@ public:
     BITFIELD bDelaying:1;
     BITFIELD bClientPause:1;
     BITFIELD bPlayerOnly:1;
+    BITFIELD bClosed:1;
     class ATrigger* RecommendedTrigger GCC_PACK(4);
     FVector SimOldPos;
     INT SimOldRotPitch;
@@ -1828,6 +1831,7 @@ public:
     class ASavedMove* NextMove;
     FLOAT TimeStamp;
     FLOAT Delta;
+    BYTE MergeCount;
     BITFIELD bRun:1 GCC_PACK(4);
     BITFIELD bDuck:1;
     BITFIELD bPressedJump:1;
@@ -1838,6 +1842,9 @@ public:
     BITFIELD bFireDefSpell:1;
     BITFIELD bForceFireDefSpell:1;
     FVector Acceleration GCC_ALIGN(16);
+    FVector SavedLocation;
+    FVector SavedVelocity;
+    FRotator SavedViewRotation;
     DECLARE_CLASS(ASavedMove,AInfo,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(ASavedMove)
 };
@@ -1933,7 +1940,7 @@ public:
         Parms.Other=Other;
         ProcessEvent(FindFunctionChecked(ENGINE_ActorEntered),&Parms);
     }
-    DECLARE_CLASS(AZoneInfo,AInfo,0|CLASS_NativeReplication,Engine)
+    DECLARE_CLASS(AZoneInfo,AInfo,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(AZoneInfo)
 };
 
@@ -2077,6 +2084,8 @@ public:
     class ASpawnNotify* SpawnNotify GCC_PACK(4);
     TArray<class UClass*> PreloadClasses;
     BITFIELD bLoadBootShellPSX2:1 GCC_PACK(4);
+    class AGameReplicationInfo* GRI GCC_PACK(4);
+    class ARenewalConfig* RenewalConfig;
     DECLARE_FUNCTION(execGetAddressURL);
     DECLARE_FUNCTION(execGetLocalURL);
     DECLARE_FUNCTION(execGetTotalWind);
@@ -2088,7 +2097,7 @@ public:
         Parms.bItems=bItems;
         ProcessEvent(FindFunctionChecked(ENGINE_ServerTravel),&Parms);
     }
-    DECLARE_CLASS(ALevelInfo,AZoneInfo,0|CLASS_Config|CLASS_NativeReplication,Engine)
+    DECLARE_CLASS(ALevelInfo,AZoneInfo,0|CLASS_Config,Engine)
     NO_DEFAULT_CONSTRUCTOR(ALevelInfo)
 };
 
@@ -2218,7 +2227,6 @@ public:
     class UClass* StatLogClass;
     INT DemoBuild;
     INT DemoHasTuts;
-    class ARenewalConfig* RenewalConfig;
     DECLARE_FUNCTION(execParseKillMessage);
     DECLARE_FUNCTION(execGetNetworkNumber);
     void eventAcceptInventory(class APawn* PlayerPawn)
@@ -2711,6 +2719,13 @@ struct APawn_eventPlayerTimeout_Parms
 struct APawn_eventChangedWeapon_Parms
 {
 };
+struct APawn_eventChatMessage_Parms
+{
+    class APlayerReplicationInfo* PRI;
+    FString S;
+    FName Type;
+    FColor Color;
+};
 struct APawn_eventReceiveLocalizedMessage_Parms
 {
     class UClass* Message;
@@ -2873,7 +2888,7 @@ public:
     FVector Floor;
     FLOAT SplashTime;
     FLOAT Climb;
-    FLOAT ClimbRate;
+    FLOAT TurnAnimRate;
     FLOAT ClimbDirection;
     FVector VelocityBias;
     FLOAT OrthoZoom;
@@ -3107,6 +3122,15 @@ public:
     {
         ProcessEvent(FindFunctionChecked(ENGINE_ChangedWeapon),NULL);
     }
+    void eventChatMessage(class APlayerReplicationInfo* PRI, const FString& S, FName Type, FColor Color)
+    {
+        APawn_eventChatMessage_Parms Parms;
+        Parms.PRI=PRI;
+        Parms.S=S;
+        Parms.Type=Type;
+        Parms.Color=Color;
+        ProcessEvent(FindFunctionChecked(ENGINE_ChatMessage),&Parms);
+    }
     void eventReceiveLocalizedMessage(class UClass* Message, INT Switch, class APlayerReplicationInfo* RelatedPRI_1, class APlayerReplicationInfo* RelatedPRI_2, class UObject* OptionalObject)
     {
         APawn_eventReceiveLocalizedMessage_Parms Parms;
@@ -3183,6 +3207,7 @@ enum EActError
     ACT_TransmitError       =8,
     ACT_MAX                 =9,
 };
+#define UCONST_SmoothAdjustLocationTime 0.35f
 
 struct APlayerPawn_eventPlayerCalcView_Parms
 {
@@ -3214,6 +3239,9 @@ struct APlayerPawn_eventPostRender_Parms
 struct APlayerPawn_eventPreRender_Parms
 {
     class UCanvas* Canvas;
+};
+struct APlayerPawn_eventClientTravelCleanupServer_Parms
+{
 };
 struct APlayerPawn_eventPreClientTravel_Parms
 {
@@ -3430,6 +3458,15 @@ public:
     INT DemoViewYaw;
     FLOAT LastPlaySound;
     BITFIELD bEnableSubtitles:1 GCC_PACK(4);
+    FLOAT MaxResponseTime GCC_PACK(4);
+    FVector PreAdjustLocation;
+    FVector AdjustLocationOffset;
+    FLOAT AdjustLocationAlpha;
+    FLOAT LastClientTimestamp;
+    FVector LastClientLocation;
+    BITFIELD bDisableMovementBuffering:1 GCC_PACK(4);
+    BYTE SentMergeCount GCC_PACK(4);
+    BYTE MergeCount;
     DECLARE_FUNCTION(execGUIExit);
     DECLARE_FUNCTION(execGUIEnter);
     DECLARE_FUNCTION(execRunActuator);
@@ -3492,6 +3529,10 @@ public:
         APlayerPawn_eventPreRender_Parms Parms;
         Parms.Canvas=Canvas;
         ProcessEvent(FindFunctionChecked(ENGINE_PreRender),&Parms);
+    }
+    void eventClientTravelCleanupServer()
+    {
+        ProcessEvent(FindFunctionChecked(ENGINE_ClientTravelCleanupServer),NULL);
     }
     void eventPreClientTravel()
     {
@@ -3801,6 +3842,7 @@ public:
     class UTexture* MFTexture;
     class UTexture* MuzzleFlare;
     FLOAT FlareOffset;
+    FStringNoInit AltDeathMessage;
     void eventOwnerDead()
     {
         ProcessEvent(FindFunctionChecked(ENGINE_OwnerDead),NULL);
@@ -3874,7 +3916,9 @@ public:
     class UTexture* MFTexture1;
     BYTE FlashStyle0;
     BYTE FlashStyle1;
-    DECLARE_CLASS(AWeapon,AInventory,0|CLASS_NativeReplication,Engine)
+    FLOAT WeaponFov;
+    FStringNoInit AltDeathMessage;
+    DECLARE_CLASS(AWeapon,AInventory,0,Engine)
     NO_DEFAULT_CONSTRUCTOR(AWeapon)
 };
 
@@ -3974,16 +4018,6 @@ public:
     FLOAT HeadShotMult;
     DECLARE_CLASS(AProjectile,AVisible,0|CLASS_Transient,Engine)
     NO_DEFAULT_CONSTRUCTOR(AProjectile)
-};
-
-
-class ENGINE_API UPrimitive : public UObject
-{
-public:
-    FBox BoundingBox;
-    FSphere BoundingSphere;
-    DECLARE_CLASS(UPrimitive,UObject,0,Engine)
-    NO_DEFAULT_CONSTRUCTOR(UPrimitive)
 };
 
 #define UCONST_MF_HAS_LOD_DISTANCE 0x10000000
@@ -4184,8 +4218,8 @@ AUTOGENERATE_FUNCTION(AActor,3970,execSetPhysics);
 AUTOGENERATE_FUNCTION(AActor,301,execFinishInterpolation);
 AUTOGENERATE_FUNCTION(AActor,417,execSetLimbTangible);
 AUTOGENERATE_FUNCTION(AActor,421,execApplyMod);
-AUTOGENERATE_FUNCTION(AActor,410,execDetachLimb);
-AUTOGENERATE_FUNCTION(AActor,409,execDestroyLimb);
+AUTOGENERATE_FUNCTION(AActor,410,execDetachLimbNative);
+AUTOGENERATE_FUNCTION(AActor,409,execDestroyLimbNative);
 AUTOGENERATE_FUNCTION(AActor,426,execAddDynamic);
 AUTOGENERATE_FUNCTION(AActor,408,execClearTargets);
 AUTOGENERATE_FUNCTION(AActor,407,execClearTarget);

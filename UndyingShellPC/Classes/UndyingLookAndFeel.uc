@@ -1,41 +1,41 @@
 class UndyingLookAndFeel extends UWindowLookAndFeel;
 
-#exec TEXTURE IMPORT NAME=MetalActiveFrame FILE=Textures\M_ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalInactiveFrame FILE=Textures\M_InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalActiveFrameS FILE=Textures\M_ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalInactiveFrameS FILE=Textures\M_InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingActiveFrame FILE=Textures\Undying_ActiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalInactiveFrame FILE=Textures\M_InactiveFrame.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingActiveFrameS FILE=Textures\Undying_ActiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
+//#exec TEXTURE IMPORT NAME=MetalInactiveFrameS FILE=Textures\M_InactiveFrameS.bmp GROUP="Icons" FLAGS=2 MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalMisc FILE=Textures\M_Misc.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalButton FILE=Textures\M_SmallButton.pcx GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMisc FILE=Textures\Undying_Misc.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingButton FILE=Textures\Undying_SmallButton.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalMenuArea FILE=Textures\M_MenuArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalClientArea FILE=Textures\M_ClientArea.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuTL FILE=Textures\M_MenuTL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuT FILE=Textures\M_MenuT.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuTR FILE=Textures\M_MenuTR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuL FILE=Textures\M_MenuL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuR FILE=Textures\M_MenuR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuBL FILE=Textures\M_MenuBL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuB FILE=Textures\M_MenuB.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuBR FILE=Textures\M_MenuBR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHL FILE=Textures\M_MenuHL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHM FILE=Textures\M_MenuHM.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuHR FILE=Textures\M_MenuHR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalMenuLine FILE=Textures\M_MenuLine.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuArea FILE=Textures\Undying_MenuArea.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingClientArea FILE=Textures\Undying_ClientArea.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuTL FILE=Textures\Undying_MenuTL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuT FILE=Textures\Undying_MenuT.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuTR FILE=Textures\Undying_MenuTR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuL FILE=Textures\Undying_MenuL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuR FILE=Textures\Undying_MenuR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuBL FILE=Textures\Undying_MenuBL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuB FILE=Textures\Undying_MenuB.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuBR FILE=Textures\Undying_MenuBR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuHL FILE=Textures\Undying_MenuHL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuHM FILE=Textures\Undying_MenuHM.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuHR FILE=Textures\Undying_MenuHR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingMenuLine FILE=Textures\Undying_MenuLine.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalBarL FILE=Textures\M_BarL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarTile FILE=Textures\M_BarTile.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarMax FILE=Textures\M_BarMax.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarWin FILE=Textures\M_BarWin.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarL FILE=Textures\Undying_BarL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarTile FILE=Textures\Undying_BarTile.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarMax FILE=Textures\Undying_BarMax.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarWin FILE=Textures\Undying_BarWin.bmp GROUP="Icons" MIPS=OFF
 
 
-#exec TEXTURE IMPORT NAME=MetalBarInL FILE=Textures\M_BarInL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarInR FILE=Textures\M_BarInR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarInM FILE=Textures\M_BarInM.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarInL FILE=Textures\Undying_BarInL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarInR FILE=Textures\Undying_BarInR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarInM FILE=Textures\Undying_BarInM.bmp GROUP="Icons" MIPS=OFF
 
-#exec TEXTURE IMPORT NAME=MetalBarOutL FILE=Textures\M_BarOutL.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarOutR FILE=Textures\M_BarOutR.bmp GROUP="Icons" MIPS=OFF
-#exec TEXTURE IMPORT NAME=MetalBarOutM FILE=Textures\M_BarOutM.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarOutL FILE=Textures\Undying_BarOutL.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarOutR FILE=Textures\Undying_BarOutR.bmp GROUP="Icons" MIPS=OFF
+#exec TEXTURE IMPORT NAME=UndyingBarOutM FILE=Textures\Undying_BarOutM.bmp GROUP="Icons" MIPS=OFF
 
 var() Region	SBUpUp;
 var() Region	SBUpDown;
@@ -69,6 +69,13 @@ var float ScaleX, ScaleY;
 const SIZEBORDER = 3;
 const BRSIZEBORDER = 15;
 
+function Setup()
+{
+	// fallback
+	ScaleX = 1.0;
+	ScaleY = 1.0;
+}
+
 /* Framed Window Drawing Functions */
 function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 {
@@ -82,16 +89,16 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 	T = W.GetLookAndFeelTexture();
 
 	R = FrameTL;
-	W.DrawStretchedTextureSegment( C, 0, 0, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	W.DrawStretchedTextureSegment( C, 0, 0, R.W, R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = FrameT;
 	W.DrawStretchedTextureSegment( C, FrameTL.W, 0, 
 									W.WinWidth - FrameTL.W
 									- FrameTR.W,
-									R.H, R.X, R.Y, R.W, R.H, T );
+									R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = FrameTR;
-	W.DrawStretchedTextureSegment( C, W.WinWidth - R.W, 0, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	W.DrawStretchedTextureSegment( C, W.WinWidth - R.W, 0, R.W, R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 	
 
 	if(W.bStatusBar)
@@ -102,45 +109,45 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 	R = FrameL;
 	W.DrawStretchedTextureSegment( C, 0, FrameTL.H,
 									R.W,  
-									W.WinHeight - FrameTL.H
-									- Temp.H,
+									W.WinHeight - (FrameTL.H
+									+ Temp.H)*W.Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	R = FrameR;
 	W.DrawStretchedTextureSegment( C, W.WinWidth - R.W, FrameTL.H,
 									R.W,  
-									W.WinHeight - FrameTL.H
-									- Temp.H,
+									W.WinHeight - (FrameTL.H
+									- Temp.H)*W.Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	if(W.bStatusBar)
 		R = FrameSBL;
 	else
 		R = FrameBL;
-	W.DrawStretchedTextureSegment( C, 0, W.WinHeight - R.H, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	W.DrawStretchedTextureSegment( C, 0, W.WinHeight - R.H*W.Root.ScaleY, R.W, R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	if(W.bStatusBar)
 	{
 		R = FrameSB;
-		W.DrawStretchedTextureSegment( C, FrameBL.W, W.WinHeight - R.H, 
+		W.DrawStretchedTextureSegment( C, FrameBL.W, W.WinHeight - R.H*W.Root.ScaleY, 
 										W.WinWidth - FrameSBL.W
 										- FrameSBR.W,
-										R.H, R.X, R.Y, R.W, R.H, T );
+										R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 	}
 	else
 	{
 		R = FrameB;
-		W.DrawStretchedTextureSegment( C, FrameBL.W, W.WinHeight - R.H, 
+		W.DrawStretchedTextureSegment( C, FrameBL.W, W.WinHeight - R.H*W.Root.ScaleY, 
 										W.WinWidth - FrameBL.W
 										- FrameBR.W,
-										R.H, R.X, R.Y, R.W, R.H, T );
+										R.H*W.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 	}
 
 	if(W.bStatusBar)
 		R = FrameSBR;
 	else
 		R = FrameBR;
-	W.DrawStretchedTextureSegment( C, W.WinWidth - R.W, W.WinHeight - R.H, R.W, R.H, R.X, R.Y, 
+	W.DrawStretchedTextureSegment( C, W.WinWidth - R.W, W.WinHeight - R.H*W.Root.ScaleY, R.W, R.H*W.Root.ScaleY, R.X, R.Y, 
 									R.W, R.H, T );
 
 
@@ -156,7 +163,7 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 	}
 
 
-	W.ClipTextWidth(C, FrameTitleX, FrameTitleY, 
+	W.ClipTextWidth(C, FrameTitleX, FrameTitleY*W.Root.ScaleY, 
 					W.WindowTitle, W.WinWidth - 22);
 
 	if(W.bStatusBar) 
@@ -166,7 +173,7 @@ function FW_DrawWindowFrame(UWindowFramedWindow W, Canvas C)
 		C.DrawColor.g = 0;
 		C.DrawColor.b = 0;
 
-		W.ClipTextWidth(C, 6, W.WinHeight - 13, W.StatusBarText, W.WinWidth - 22);
+		W.ClipTextWidth(C, 6, W.WinHeight - 13*W.Root.ScaleY, W.StatusBarText, W.WinWidth - 22);
 
 		C.DrawColor.r = 255;
 		C.DrawColor.g = 255;
@@ -180,12 +187,12 @@ function FW_SetupFrameButtons(UWindowFramedWindow W, Canvas C)
 
 	T = W.GetLookAndFeelTexture();
 
-	W.CloseBox.WinLeft = W.WinWidth - CloseBoxOffsetX - CloseBoxUp.W;
-	W.CloseBox.WinTop = CloseBoxOffsetY;
+	W.CloseBox.WinLeft = W.WinWidth - CloseBoxOffsetX*W.Root.ScaleY - CloseBoxUp.W*W.Root.ScaleY;
+	W.CloseBox.WinTop = CloseBoxOffsetY*W.Root.ScaleY;
 
-	W.CloseBox.SetSize(CloseBoxUp.W, CloseBoxUp.H);
+	W.CloseBox.SetSize(CloseBoxUp.W*W.Root.ScaleY, CloseBoxUp.H*W.Root.ScaleY);
 	W.CloseBox.bUseRegion = True;
-	W.CloseBox.RegionScale = ScaleY;
+	W.CloseBox.RegionScale = W.Root.ScaleY;
 
 	W.CloseBox.UpTexture = T;
 	W.CloseBox.DownTexture = T;
@@ -202,13 +209,13 @@ function Region FW_GetClientArea(UWindowFramedWindow W)
 {
 	local Region R;
 
-	R.X = FrameL.W;
-	R.Y	= FrameT.H;
-	R.W = W.WinWidth - (FrameL.W + FrameR.W);
+	R.X = FrameL.W*W.Root.ScaleY;
+	R.Y	= FrameT.H*W.Root.ScaleY;
+	R.W = W.WinWidth - (FrameL.W + FrameR.W)*W.Root.ScaleY;
 	if(W.bStatusBar) 
-		R.H = W.WinHeight - (FrameT.H + FrameSB.H);
+		R.H = W.WinHeight - (FrameT.H + FrameSB.H)*W.Root.ScaleY;
 	else
-		R.H = W.WinHeight - (FrameT.H + FrameB.H);
+		R.H = W.WinHeight - (FrameT.H + FrameB.H)*W.Root.ScaleY;
 
 	return R;
 }
@@ -244,32 +251,20 @@ function DrawClientArea(UWindowClientWindow W, Canvas C)
 	ScaleX = W.Root.ScaleX;//W.Root.WinWidth / 800.0;
 	ScaleY = W.Root.ScaleY;//W.Root.WinHeight / 600.0;
 	
-	Size_TabAreaHeight = default.Size_TabAreaHeight * ScaleY;
-	Size_ScrollbarWidth = default.Size_ScrollbarWidth * ScaleY;
-	Size_ScrollbarButtonHeight = default.Size_ScrollbarButtonHeight * ScaleY;
-	ComboBtnUp.W = default.ComboBtnUp.W * ScaleY;
-	/*
-	TabSelectedL.H = default.TabSelectedL.H * ScaleY;
-	TabSelectedM.H = default.TabSelectedM.H * ScaleY;
-	TabSelectedR.H = default.TabSelectedR.H * ScaleY;
-
-	TabUnselectedL.H = default.TabUnselectedL.H * ScaleY;
-	TabUnselectedM.H = default.TabUnselectedM.H * ScaleY;
-	TabUnselectedR.H = default.TabUnselectedR.H * ScaleY;
-	*/
+	//ComboBtnUp.W = default.ComboBtnUp.W * ScaleY;
 	
-	W.DrawClippedTexture(C, 0, 0, Texture'MetalMenuTL');
-	W.DrawStretchedTexture(C, 2, 0, W.WinWidth-4, 2, Texture'MetalMenuT');
-	W.DrawClippedTexture(C, W.WinWidth-2, 0, Texture'MetalMenuTR');
+	W.DrawStretchedTexture(C, 0, 0, 2*ScaleY, 2*ScaleY, Texture'UndyingMenuTL');
+	W.DrawStretchedTexture(C, 2*ScaleY, 0, W.WinWidth-4*ScaleY, 2*ScaleY, Texture'UndyingMenuT');
+	W.DrawStretchedTexture(C, W.WinWidth-2*ScaleY, 0, 2*ScaleY, 2*ScaleY, Texture'UndyingMenuTR');
 
-	W.DrawClippedTexture(C, 0, W.WinHeight-2, Texture'MetalMenuBL');
-	W.DrawStretchedTexture(C, 2, W.WinHeight-2, W.WinWidth-4, 2, Texture'MetalMenuB');
-	W.DrawClippedTexture(C, W.WinWidth-2, W.WinHeight-2, Texture'MetalMenuBR');
+	W.DrawStretchedTexture(C, 0, W.WinHeight-2*ScaleY, 2*ScaleY, 2*ScaleY, Texture'UndyingMenuBL');
+	W.DrawStretchedTexture(C, 2*ScaleY, W.WinHeight-2*ScaleY, W.WinWidth-4*ScaleY, 2*ScaleY, Texture'UndyingMenuB');
+	W.DrawStretchedTexture(C, W.WinWidth-2, W.WinHeight-2, 2*ScaleY, 2*ScaleY, Texture'UndyingMenuBR');
 
-	W.DrawStretchedTexture(C, 0, 2, 2, W.WinHeight-4, Texture'MetalMenuL');
-	W.DrawStretchedTexture(C, W.WinWidth-2, 2, 2, W.WinHeight-4, Texture'MetalMenuR');
+	W.DrawStretchedTexture(C, 0, 2*ScaleY, 2*ScaleY, W.WinHeight-4*ScaleY, Texture'UndyingMenuL');
+	W.DrawStretchedTexture(C, W.WinWidth-2*ScaleY, 2*ScaleY, 2*ScaleY, W.WinHeight-4*ScaleY, Texture'UndyingMenuR');
 
-	W.DrawStretchedTexture(C, 2, 2, W.WinWidth-4, W.WinHeight-4, Texture'MetalClientArea');
+	W.DrawStretchedTexture(C, 2*ScaleY, 2*ScaleY, W.WinWidth-4*ScaleY, W.WinHeight-4*ScaleY, Texture'UndyingClientArea');
 }
 
 
@@ -282,7 +277,7 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 	C.Font = W.Root.Fonts[W.Font];
 	W.TextSize(C, W.Text, TW, TH);
 	
-	W.WinHeight = 12*ScaleY + MiscBevelT[2].H + MiscBevelB[2].H;
+	W.WinHeight = (12 + MiscBevelT[2].H + MiscBevelB[2].H)*ScaleY;
 
 	switch(W.Align)
 	{
@@ -303,32 +298,32 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 	W.EditAreaDrawY = (W.WinHeight - 2) / 2;
 	W.TextY = (W.WinHeight - TH) / 2;
 
-	W.EditBox.WinLeft = W.EditAreaDrawX + MiscBevelL[2].W;
-	W.EditBox.WinTop = MiscBevelT[2].H;
-	W.Button.WinWidth = ComboBtnUp.W;
+	W.EditBox.WinLeft = W.EditAreaDrawX + MiscBevelL[2].W*ScaleY;
+	W.EditBox.WinTop = MiscBevelT[2].H*ScaleY;
+	W.Button.WinWidth = ComboBtnUp.W*ScaleY;
 
 	if(W.bButtons)
 	{
-		W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W - SBLeftUp.W - SBRightUp.W;
-		W.EditBox.WinHeight = W.WinHeight - MiscBevelT[2].H - MiscBevelB[2].H;
-		W.Button.WinLeft = W.WinWidth - ComboBtnUp.W - MiscBevelR[2].W - SBLeftUp.W - SBRightUp.W;
+		W.EditBox.WinWidth = (W.EditBoxWidth - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W - SBLeftUp.W - SBRightUp.W)*ScaleY;
+		W.EditBox.WinHeight = W.WinHeight - (MiscBevelT[2].H + MiscBevelB[2].H)*ScaleY;
+		W.Button.WinLeft = W.WinWidth - (ComboBtnUp.W + MiscBevelR[2].W + SBLeftUp.W + SBRightUp.W)*ScaleY;
 		W.Button.WinTop = W.EditBox.WinTop;
 
-		W.LeftButton.WinLeft = W.WinWidth - MiscBevelR[2].W - SBLeftUp.W - SBRightUp.W;
+		W.LeftButton.WinLeft = W.WinWidth - (MiscBevelR[2].W + SBLeftUp.W + SBRightUp.W)*ScaleY;
 		W.LeftButton.WinTop = W.EditBox.WinTop;
-		W.RightButton.WinLeft = W.WinWidth - MiscBevelR[2].W - SBRightUp.W;
+		W.RightButton.WinLeft = W.WinWidth - (MiscBevelR[2].W + SBRightUp.W)*ScaleY;
 		W.RightButton.WinTop = W.EditBox.WinTop;
 
-		W.LeftButton.WinWidth = SBLeftUp.W;
-		W.LeftButton.WinHeight = SBLeftUp.H;
-		W.RightButton.WinWidth = SBRightUp.W;
-		W.RightButton.WinHeight = SBRightUp.H;
+		W.LeftButton.WinWidth = SBLeftUp.W*ScaleY;
+		W.LeftButton.WinHeight = SBLeftUp.H*ScaleY;
+		W.RightButton.WinWidth = SBRightUp.W*ScaleY;
+		W.RightButton.WinHeight = SBRightUp.H*ScaleY;
 	}
 	else
 	{
-		W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W;
-		W.EditBox.WinHeight = W.WinHeight - MiscBevelT[2].H - MiscBevelB[2].H;
-		W.Button.WinLeft = W.WinWidth - ComboBtnUp.W - MiscBevelR[2].W;
+		W.EditBox.WinWidth = (W.EditBoxWidth - MiscBevelL[2].W - MiscBevelR[2].W - ComboBtnUp.W)*ScaleY;
+		W.EditBox.WinHeight = W.WinHeight - (MiscBevelT[2].H + MiscBevelB[2].H)*ScaleY;
+		W.Button.WinLeft = W.WinWidth - (ComboBtnUp.W + MiscBevelR[2].W)*ScaleY;
 		W.Button.WinTop = W.EditBox.WinTop;
 	}
 	W.Button.WinHeight = W.EditBox.WinHeight;
@@ -336,7 +331,6 @@ function Combo_SetupSizes(UWindowComboControl W, Canvas C)
 
 function Combo_Draw(UWindowComboControl W, Canvas C)
 {
-	// done
 	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth*ScaleY, W.WinHeight, Misc, 2);
 
 	if(W.Text != "")
@@ -351,18 +345,18 @@ function Combo_Draw(UWindowComboControl W, Canvas C)
 
 function ComboList_DrawBackground(UWindowComboList W, Canvas C)
 {
-	W.DrawClippedTexture(C, 0, 0, Texture'UMenu.MetalMenuTL');
-	W.DrawStretchedTexture(C, 4, 0, W.WinWidth-8, 4, Texture'UMenu.MetalMenuT');
-	W.DrawClippedTexture(C, W.WinWidth-4, 0, Texture'UMenu.MetalMenuTR');
+	W.DrawStretchedTexture(C, 0, 0, 4*ScaleY, 4*ScaleY, Texture'UndyingShellPC.UndyingMenuTL');
+	W.DrawStretchedTexture(C, 4, 0, W.WinWidth-8, 4, Texture'UndyingShellPC.UndyingMenuT');
+	W.DrawStretchedTexture(C, W.WinWidth-4, 0, 4*ScaleY, 4*ScaleY, Texture'UndyingShellPC.UndyingMenuTR');
 
-	W.DrawClippedTexture(C, 0, W.WinHeight-4, Texture'UMenu.MetalMenuBL');
-	W.DrawStretchedTexture(C, 4, W.WinHeight-4, W.WinWidth-8, 4, Texture'UMenu.MetalMenuB');
-	W.DrawClippedTexture(C, W.WinWidth-4, W.WinHeight-4, Texture'UMenu.MetalMenuBR');
+	W.DrawStretchedTexture(C, 0, W.WinHeight-4, 4*ScaleY, 4*ScaleY, Texture'UndyingShellPC.UndyingMenuBL');
+	W.DrawStretchedTexture(C, 4, W.WinHeight-4, W.WinWidth-8, 4, Texture'UndyingShellPC.UndyingMenuB');
+	W.DrawStretchedTexture(C, W.WinWidth-4, W.WinHeight-4, 4*ScaleY, 4*ScaleY, Texture'UndyingShellPC.UndyingMenuBR');
 
-	W.DrawStretchedTexture(C, 0, 4, 4, W.WinHeight-8, Texture'UMenu.MetalMenuL');
-	W.DrawStretchedTexture(C, W.WinWidth-4, 4, 4, W.WinHeight-8, Texture'UMenu.MetalMenuR');
+	W.DrawStretchedTexture(C, 0, 4, 4, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuL');
+	W.DrawStretchedTexture(C, W.WinWidth-4, 4, 4, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuR');
 
-	W.DrawStretchedTexture(C, 4, 4, W.WinWidth-8, W.WinHeight-8, Texture'UMenu.MetalMenuArea');
+	W.DrawStretchedTexture(C, 4, 4, W.WinWidth-8, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuArea');
 }
 
 function ComboList_DrawItem(UWindowComboList Combo, Canvas C, float X, float Y, float W, float H, string Text, bool bSelected)
@@ -378,9 +372,9 @@ function ComboList_DrawItem(UWindowComboList Combo, Canvas C, float X, float Y, 
 
 	if(bSelected)
 	{
-		Combo.DrawStretchedTexture(C, X, Y, 4*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHL');
-		Combo.DrawStretchedTexture(C, X + 4*ScaleY, Y, W - 8*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHM');
-		Combo.DrawStretchedTexture(C, X + W - 4*ScaleY, Y, 4*ScaleY, 16*ScaleY, Texture'UMenu.MetalMenuHR');
+		Combo.DrawStretchedTexture(C, X, Y, 4*ScaleY, 16*ScaleY, Texture'UndyingShellPC.UndyingMenuHL');
+		Combo.DrawStretchedTexture(C, X + 4*ScaleY, Y, W - 8*ScaleY, 16*ScaleY, Texture'UndyingShellPC.UndyingMenuHM');
+		Combo.DrawStretchedTexture(C, X + W - 4*ScaleY, Y, 4*ScaleY, 16*ScaleY, Texture'UndyingShellPC.UndyingMenuHR');
 		C.DrawColor.R = 0;
 		C.DrawColor.G = 0;
 		C.DrawColor.B = 0;
@@ -400,7 +394,7 @@ function Checkbox_SetupSizes(UWindowCheckbox W, Canvas C)
 	local float TW, TH;
 
 	W.TextSize(C, W.Text, TW, TH);
-	W.WinHeight = Max(TH+1, 16*ScaleY);
+	W.WinHeight = Max(TH+1*ScaleY, 16*ScaleY);
 	W.bStretched = True;
 	
 	switch(W.Align)
@@ -445,7 +439,7 @@ function Combo_GetButtonBitmaps(UWindowComboButton W)
 	T = W.GetLookAndFeelTexture();
 	
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -465,7 +459,7 @@ function Combo_SetupLeftButton(UWindowComboLeftButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -485,7 +479,7 @@ function Combo_SetupRightButton(UWindowComboRightButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -510,12 +504,12 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 	C.Font = W.Root.Fonts[W.Font];
 	W.TextSize(C, W.Text, TW, TH);
 	
-	W.WinHeight = (12 + MiscBevelT[B].H + MiscBevelB[B].H) * ScaleY;
+	W.WinHeight = (12 + MiscBevelT[B].H + MiscBevelB[B].H) * W.Root.ScaleY;
 	
 	switch(W.Align)
 	{
 	case TA_Left:
-		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth*ScaleY;
+		W.EditAreaDrawX = W.WinWidth - W.EditBoxWidth*W.Root.ScaleY;
 		W.TextX = 0;
 		break;
 	case TA_Right:
@@ -523,7 +517,7 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 		W.TextX = W.WinWidth - TW;
 		break;
 	case TA_Center:
-		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth*ScaleY) / 2;
+		W.EditAreaDrawX = (W.WinWidth - W.EditBoxWidth*W.Root.ScaleY) / 2;
 		W.TextX = (W.WinWidth - TW) / 2;
 		break;
 	}
@@ -531,15 +525,15 @@ function Editbox_SetupSizes(UWindowEditControl W, Canvas C)
 	W.EditAreaDrawY = (W.WinHeight - 2) / 2;
 	W.TextY = (W.WinHeight - TH) / 2;
 
-	W.EditBox.WinLeft = W.EditAreaDrawX + MiscBevelL[B].W;
-	W.EditBox.WinTop = MiscBevelT[B].H;
-	W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[B].W - MiscBevelR[B].W;
-	W.EditBox.WinHeight = W.WinHeight - MiscBevelT[B].H - MiscBevelB[B].H;
+	W.EditBox.WinLeft = W.EditAreaDrawX + MiscBevelL[B].W*ScaleY;
+	W.EditBox.WinTop = MiscBevelT[B].H*ScaleY;
+	W.EditBox.WinWidth = W.EditBoxWidth*ScaleY - MiscBevelL[B].W*ScaleY - MiscBevelR[B].W*ScaleY;
+	W.EditBox.WinHeight = W.WinHeight - MiscBevelT[B].H*ScaleY - MiscBevelB[B].H*ScaleY;
 }
 
 function Editbox_Draw(UWindowEditControl W, Canvas C)
 {
-	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth*ScaleY, W.WinHeight, Misc, EditBoxBevel);
+	W.DrawMiscBevel(C, W.EditAreaDrawX, 0, W.EditBoxWidth*W.Root.ScaleY, W.WinHeight, Misc, EditBoxBevel);
 
 	if(W.Text != "")
 	{
@@ -587,16 +581,16 @@ function Tab_DrawTab(UWindowTabControlTabArea Tab, Canvas C, bool bActiveTab, bo
 	if(bActiveTab)
 	{
 		R = TabSelectedL;
-		Tab.DrawStretchedTextureSegment( C, X, Y, R.W, R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+		Tab.DrawStretchedTextureSegment( C, X, Y, R.W, R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		R = TabSelectedM;
 		Tab.DrawStretchedTextureSegment( C, X+TabSelectedL.W, Y, 
 										W - TabSelectedL.W
 										- TabSelectedR.W,
-										R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+										R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		R = TabSelectedR;
-		Tab.DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+		Tab.DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		C.Font = Tab.Root.Fonts[Tab.F_Bold];
 		C.DrawColor.R = 0;
@@ -612,16 +606,16 @@ function Tab_DrawTab(UWindowTabControlTabArea Tab, Canvas C, bool bActiveTab, bo
 	else
 	{
 		R = TabUnselectedL;
-		Tab.DrawStretchedTextureSegment( C, X, Y, R.W, R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+		Tab.DrawStretchedTextureSegment( C, X, Y, R.W, R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		R = TabUnselectedM;
 		Tab.DrawStretchedTextureSegment( C, X+TabUnselectedL.W, Y, 
 										W - TabUnselectedL.W
 										- TabUnselectedR.W,
-										R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+										R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		R = TabUnselectedR;
-		Tab.DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H*ScaleY, R.X, R.Y, R.W, R.H, T );
+		Tab.DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H*Tab.Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 		C.Font = Tab.Root.Fonts[Tab.F_Normal];
 		C.DrawColor.R = 0;
@@ -643,7 +637,7 @@ function SB_SetupUpButton(UWindowSBUpButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -663,7 +657,7 @@ function SB_SetupDownButton(UWindowSBDownButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -685,7 +679,7 @@ function SB_SetupLeftButton(UWindowSBLeftButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -705,7 +699,7 @@ function SB_SetupRightButton(UWindowSBRightButton W)
 	T = W.GetLookAndFeelTexture();
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -730,7 +724,7 @@ function SB_VDraw(UWindowVScrollbar W, Canvas C)
 	
 	if(!W.bDisabled)
 	{
-		W.DrawUpBevel( C, 0, W.ThumbStart, Size_ScrollbarWidth,	W.ThumbHeight, T);
+		W.DrawUpBevel( C, 0, W.ThumbStart, Size_ScrollbarWidth*W.Root.ScaleY,	W.ThumbHeight, T);
 	}
 }
 
@@ -746,7 +740,7 @@ function SB_HDraw(UWindowHScrollbar W, Canvas C)
 	
 	if(!W.bDisabled) 
 	{
-		W.DrawUpBevel( C, W.ThumbStart, 0, W.ThumbWidth, Size_ScrollbarWidth, T);
+		W.DrawUpBevel( C, W.ThumbStart, 0, W.ThumbWidth, Size_ScrollbarWidth*W.Root.ScaleY, T);
 	}
 }
 
@@ -757,13 +751,13 @@ function Tab_SetupLeftButton(UWindowTabControlLeftButton W)
 	T = W.GetLookAndFeelTexture();
 
 
-	W.WinWidth = Size_ScrollbarButtonHeight;
-	W.WinHeight = Size_ScrollbarWidth;
-	W.WinTop = Size_TabAreaHeight - W.WinHeight;
+	W.WinWidth = Size_ScrollbarButtonHeight*W.Root.ScaleY;
+	W.WinHeight = Size_ScrollbarWidth*W.Root.ScaleY;
+	W.WinTop = Size_TabAreaHeight*ScaleY - W.WinHeight;
 	W.WinLeft = W.ParentWindow.WinWidth - 2*W.WinWidth;
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -782,13 +776,13 @@ function Tab_SetupRightButton(UWindowTabControlRightButton W)
 
 	T = W.GetLookAndFeelTexture();
 
-	W.WinWidth = Size_ScrollbarButtonHeight;
-	W.WinHeight = Size_ScrollbarWidth;
-	W.WinTop = Size_TabAreaHeight - W.WinHeight;
+	W.WinWidth = Size_ScrollbarButtonHeight*W.Root.ScaleY;
+	W.WinHeight = Size_ScrollbarWidth*W.Root.ScaleY;
+	W.WinTop = Size_TabAreaHeight*ScaleY - W.WinHeight;
 	W.WinLeft = W.ParentWindow.WinWidth - W.WinWidth;
 
 	W.bUseRegion = True;
-	W.RegionScale = ScaleY;
+	W.RegionScale = W.Root.ScaleY;
 
 	W.UpTexture = T;
 	W.DownTexture = T;
@@ -803,14 +797,14 @@ function Tab_SetupRightButton(UWindowTabControlRightButton W)
 
 function Tab_SetTabPageSize(UWindowPageControl W, UWindowPageWindow P)
 {
-	P.WinLeft = 2;
-	P.WinTop = W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H) + 3;
-	P.SetSize(W.WinWidth - 4, W.WinHeight-(W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)) - 6);
+	P.WinLeft = 2*ScaleY;
+	P.WinTop = W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)*ScaleY + 3*ScaleY;
+	P.SetSize(W.WinWidth - 4*ScaleY, W.WinHeight-(W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)*ScaleY) - 6*ScaleY);
 }
 
 function Tab_DrawTabPageArea(UWindowPageControl W, Canvas C, UWindowPageWindow P)
 {
-	W.DrawUpBevel( C, 0, W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H), W.WinWidth, W.WinHeight-(W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)), W.GetLookAndFeelTexture());
+	W.DrawUpBevel( C, 0, W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)*ScaleY, W.WinWidth, W.WinHeight-(W.TabArea.WinHeight-(TabSelectedM.H-TabUnselectedM.H)*ScaleY), W.GetLookAndFeelTexture());
 }
 
 function Tab_GetTabSize(UWindowTabControlTabArea Tab, Canvas C, string Text, out float W, out float H)
@@ -820,31 +814,31 @@ function Tab_GetTabSize(UWindowTabControlTabArea Tab, Canvas C, string Text, out
 	C.Font = Tab.Root.Fonts[Tab.F_Bold];
 
 	Tab.TextSize( C, Text, TW, TH );
-	W = TW + Size_TabSpacing;
-	H = Size_TabAreaHeight;
+	W = TW + Size_TabSpacing*ScaleY;
+	H = Size_TabAreaHeight*ScaleY;
 }
 
 function Menu_DrawMenuBar(UWindowMenuBar W, Canvas C)
 {
-	W.DrawClippedTexture(C, 0, 0, Texture'UMenu.MetalBarL');
-	W.DrawStretchedTexture( C, 16, 0, W.WinWidth - 32, 16, Texture'UMenu.MetalBarTile');
-	W.DrawClippedTexture(C, W.WinWidth - 16, 0, Texture'UMenu.MetalBarWin');
+	W.DrawClippedTexture(C, 0, 0, Texture'UndyingShellPC.UndyingBarL');
+	W.DrawStretchedTexture( C, 16, 0, W.WinWidth - 32, 16, Texture'UndyingShellPC.UndyingBarTile');
+	W.DrawClippedTexture(C, W.WinWidth - 16, 0, Texture'UndyingShellPC.UndyingBarWin');
 }
 
 function Menu_DrawMenuBarItem(UWindowMenuBar B, UWindowMenuBarItem I, float X, float Y, float W, float H, Canvas C)
 {
 	if(B.Selected == I)
 	{
-		B.DrawClippedTexture(C, X, 0, Texture'MetalBarInL');
-		B.DrawClippedTexture(C, X+W-1, 0, Texture'MetalBarInR');
-		B.DrawStretchedTexture(C, X+1, 0, W-2, 16, Texture'MetalBarInM');
+		B.DrawClippedTexture(C, X, 0, Texture'UndyingBarInL');
+		B.DrawClippedTexture(C, X+W-1, 0, Texture'UndyingBarInR');
+		B.DrawStretchedTexture(C, X+1, 0, W-2, 16, Texture'UndyingBarInM');
 	}
 	else
 	if (B.Over == I)
 	{
-		B.DrawClippedTexture(C, X, 0, Texture'MetalBarOutL');
-		B.DrawClippedTexture(C, X+W-1, 0, Texture'MetalBarOutR');
-		B.DrawStretchedTexture(C, X+1, 0, W-2, 16, Texture'MetalBarOutM');
+		B.DrawClippedTexture(C, X, 0, Texture'UndyingBarOutL');
+		B.DrawClippedTexture(C, X+W-1, 0, Texture'UndyingBarOutR');
+		B.DrawStretchedTexture(C, X+1, 0, W-2, 16, Texture'UndyingBarOutM');
 	}
 
 	C.Font = B.Root.Fonts[F_Normal];
@@ -857,17 +851,17 @@ function Menu_DrawMenuBarItem(UWindowMenuBar B, UWindowMenuBarItem I, float X, f
 
 function Menu_DrawPulldownMenuBackground(UWindowPulldownMenu W, Canvas C)
 {
-	W.DrawClippedTexture(C, 0, 0, Texture'UMenu.MetalMenuTL');
-	W.DrawStretchedTexture(C, 4, 0, W.WinWidth-8, 4, Texture'UMenu.MetalMenuT');
-	W.DrawClippedTexture(C, W.WinWidth-4, 0, Texture'UMenu.MetalMenuTR');
+	W.DrawClippedTexture(C, 0, 0, Texture'UndyingShellPC.UndyingMenuTL');
+	W.DrawStretchedTexture(C, 4, 0, W.WinWidth-8, 4, Texture'UndyingShellPC.UndyingMenuT');
+	W.DrawClippedTexture(C, W.WinWidth-4, 0, Texture'UndyingShellPC.UndyingMenuTR');
 
-	W.DrawClippedTexture(C, 0, W.WinHeight-4, Texture'UMenu.MetalMenuBL');
-	W.DrawStretchedTexture(C, 4, W.WinHeight-4, W.WinWidth-8, 4, Texture'UMenu.MetalMenuB');
-	W.DrawClippedTexture(C, W.WinWidth-4, W.WinHeight-4, Texture'UMenu.MetalMenuBR');
+	W.DrawClippedTexture(C, 0, W.WinHeight-4, Texture'UndyingShellPC.UndyingMenuBL');
+	W.DrawStretchedTexture(C, 4, W.WinHeight-4, W.WinWidth-8, 4, Texture'UndyingShellPC.UndyingMenuB');
+	W.DrawClippedTexture(C, W.WinWidth-4, W.WinHeight-4, Texture'UndyingShellPC.UndyingMenuBR');
 
-	W.DrawStretchedTexture(C, 0, 4, 4, W.WinHeight-8, Texture'UMenu.MetalMenuL');
-	W.DrawStretchedTexture(C, W.WinWidth-4, 4, 4, W.WinHeight-8, Texture'UMenu.MetalMenuR');
-	W.DrawStretchedTexture(C, 4, 4, W.WinWidth-8, W.WinHeight-8, Texture'UMenu.MetalMenuArea');
+	W.DrawStretchedTexture(C, 0, 4, 4, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuL');
+	W.DrawStretchedTexture(C, W.WinWidth-4, 4, 4, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuR');
+	W.DrawStretchedTexture(C, 4, 4, W.WinWidth-8, W.WinHeight-8, Texture'UndyingShellPC.UndyingMenuArea');
 }
 
 function Menu_DrawPulldownMenuItem(UWindowPulldownMenu M, UWindowPulldownMenuItem Item, Canvas C, float X, float Y, float W, float H, bool bSelected)
@@ -883,7 +877,7 @@ function Menu_DrawPulldownMenuItem(UWindowPulldownMenu M, UWindowPulldownMenuIte
 		C.DrawColor.R = 255;
 		C.DrawColor.G = 255;
 		C.DrawColor.B = 255;
-		M.DrawStretchedTexture(C, X, Y+5, W, 2, Texture'UMenu.MetalMenuLine');
+		M.DrawStretchedTexture(C, X, Y+5*M.Root.ScaleY, W, 2*M.Root.ScaleY, Texture'UndyingShellPC.UndyingMenuLine');
 		return;
 	}
 
@@ -891,9 +885,9 @@ function Menu_DrawPulldownMenuItem(UWindowPulldownMenu M, UWindowPulldownMenuIte
 
 	if(bSelected)
 	{
-		M.DrawClippedTexture(C, X, Y, Texture'UMenu.MetalMenuHL');
-		M.DrawStretchedTexture(C, X + 4, Y, W - 8, 16, Texture'UMenu.MetalMenuHM');
-		M.DrawClippedTexture(C, X + W - 4, Y, Texture'UMenu.MetalMenuHR');
+		M.DrawStretchedTexture(C, X, Y, 4*M.Root.ScaleY, 16*M.Root.ScaleY, Texture'UndyingShellPC.UndyingMenuHL');
+		M.DrawStretchedTexture(C, X + 4*M.Root.ScaleY, Y, W - 8*M.Root.ScaleY, 16*M.Root.ScaleY, Texture'UndyingShellPC.UndyingMenuHM');
+		M.DrawStretchedTexture(C, X + W - 4*M.Root.ScaleY, Y, 4*M.Root.ScaleY, 16*M.Root.ScaleY, Texture'UndyingShellPC.UndyingMenuHR');
 	}
 
 	if(Item.bDisabled) 
@@ -912,12 +906,12 @@ function Menu_DrawPulldownMenuItem(UWindowPulldownMenu M, UWindowPulldownMenuIte
 
 	// DrawColor will render the tick black white or gray.
 	if(Item.bChecked)
-		M.DrawClippedTexture(C, X + 1, Y + 3, Texture'MenuTick');
+		M.DrawClippedTexture(C, X + 1*M.Root.ScaleY, Y + 3*M.Root.ScaleY, Texture'MenuTick');
 
 	if(Item.SubMenu != None)
-		M.DrawClippedTexture(C, X + W - 9, Y + 3, Texture'MenuSubArrow');
+		M.DrawClippedTexture(C, X + W - 9*M.Root.ScaleY, Y + 3*M.Root.ScaleY, Texture'MenuSubArrow');
 
-	M.ClipText(C, X + M.TextBorder + 2, Y + 3, Item.Caption, True);	
+	M.ClipText(C, X + M.TextBorder + 2*M.Root.ScaleY, Y + 3*M.Root.ScaleY, Item.Caption, True);	
 }
 
 function Button_DrawSmallButton(UWindowSmallButton B, Canvas C)
@@ -932,9 +926,9 @@ function Button_DrawSmallButton(UWindowSmallButton B, Canvas C)
 	else
 		Y = 0;
 	
-	B.DrawStretchedTextureSegment(C, 0, 0, 3, 16*ScaleY, 0, Y, 3, 16, Texture'MetalButton');
-	B.DrawStretchedTextureSegment(C, B.WinWidth - 3, 0, 3, 16*ScaleY, 45, Y, 3, 16, Texture'MetalButton');
-	B.DrawStretchedTextureSegment(C, 3, 0, B.WinWidth-6, 16*ScaleY, 3, Y, 42, 16, Texture'MetalButton');
+	B.DrawStretchedTextureSegment(C, 0, 0, 3, 16*ScaleY, 0, Y, 3, 16, Texture'UndyingButton');
+	B.DrawStretchedTextureSegment(C, B.WinWidth - 3, 0, 3, 16*ScaleY, 45, Y, 3, 16, Texture'UndyingButton');
+	B.DrawStretchedTextureSegment(C, 3, 0, B.WinWidth-6, 16*ScaleY, 3, Y, 42, 16, Texture'UndyingButton');
 }
 
 simulated function PlayMenuSound(UWindowWindow W, MenuSound S)
@@ -982,11 +976,11 @@ defaultproperties
      CloseBoxDown=(X=4,Y=43,W=11,H=11)
      CloseBoxOffsetX=2
      CloseBoxOffsetY=2
-     Active=Texture'UMenu.Icons.MetalActiveFrame'
+     Active=Texture'UndyingShellPC.Icons.UndyingActiveFrame'
      Inactive=Texture'UMenu.Icons.MetalInactiveFrame'
-     ActiveS=Texture'UMenu.Icons.MetalActiveFrameS'
+     ActiveS=Texture'UndyingShellPC.Icons.UndyingActiveFrameS'
      InactiveS=Texture'UMenu.Icons.MetalInactiveFrameS'
-     Misc=Texture'UMenu.Icons.MetalMisc'
+     Misc=Texture'UndyingShellPC.Icons.UndyingMisc'
      FrameTL=(W=2,H=16)
      FrameT=(X=32,W=1,H=16)
      FrameTR=(X=126,W=2,H=16)

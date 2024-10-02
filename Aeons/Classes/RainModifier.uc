@@ -95,7 +95,7 @@ function StopSnowing()
 {
 	if ( SnowFX != none )
 	{
-		SnowFX.bShuttingDown = true;
+		SnowFX.Shutdown();
 		SnowFX = none;
 	}
 }
@@ -126,13 +126,13 @@ function StopRaining()
 {
 	if (RainFX != none)
 	{
-		RainFX.bShuttingDown = true;
+		RainFX.Shutdown();
 		RainFX = none;
 	}
 	
 	if (SplashFX != none)
 	{
-		SplashFX.bShuttingDown = true;
+		SplashFX.Shutdown();
 		SplashFX = none;
 	}
 }
@@ -215,6 +215,9 @@ state Raining
 		if ( Owner.Region.Zone.Weather != WEATHER_Rain )
 			UpdateForecast();
 
+		if (RainFX == None)
+			return;
+
 		// Random location within the particle system extents
 		Start = RainFX.Location;
 		Start.x += RandRange(-RainFX.SourceWidth.Base, RainFX.SourceWidth.Base);
@@ -248,7 +251,7 @@ state FallOffRain expands Raining
 		FallOffTimer = 10;
 		if ( SplashFX != none )
 		{
-			SplashFX.bShuttingDown = true;
+			SplashFX.Shutdown();
 			SplashFX = none;
 		}
 	}
@@ -274,9 +277,11 @@ state FallOffRain expands Raining
 				x.z = 0;
 				x = Normal(x);
 
-				RainFX.SetLocation( (Owner.Location + ( x * foo )) + vect(0,0,256) );
+				if (RainFX != None)
+					RainFX.SetLocation( (Owner.Location + ( x * foo )) + vect(0,0,256) );
 				SplashFX.SetLocation(Owner.Location + vect(0,0,-48));
-				RainFX.ParticlesPerSec.Base = RainFX.default.ParticlesPerSec.Base * (FallOffTimer * 0.1);
+				if (RainFX != None)
+					RainFX.ParticlesPerSec.Base = RainFX.default.ParticlesPerSec.Base * (FallOffTimer * 0.1);
 				// log("FallOffRain -- setting particles per sec to "$(RainFX.default.ParticlesPerSec.Base * (FallOffTimer * 0.1)), 'Misc');
 			} else {
 				GetAxes(PlayerPawn(Owner).ViewTarget.Rotation, x, y, z);
@@ -286,7 +291,8 @@ state FallOffRain expands Raining
 				x.z = 0;
 				x = Normal(x);
 
-				RainFX.SetLocation( (PlayerPawn(Owner).ViewTarget.Location + ( x * foo )) + vect(0,0,64) );
+				if (RainFX != None)
+					RainFX.SetLocation( (PlayerPawn(Owner).ViewTarget.Location + ( x * foo )) + vect(0,0,64) );
 				SplashFX.SetLocation(PlayerPawn(Owner).ViewTarget.Location + vect(0,0,-48));
 			}
 		}

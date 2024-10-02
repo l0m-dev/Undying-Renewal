@@ -262,7 +262,7 @@ function StopStaffBlur()
 	if ( StaffBlurFX != none )
 	{
 		StaffBlurFX.SetBase( none );
-		StaffBlurFX.bShuttingDown = true;
+		StaffBlurFX.Shutdown();
 		StaffBlurFX = none;
 	}
 }
@@ -552,4 +552,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Drinen_m'
      CollisionRadius=26
      CollisionHeight=98
+     MenuName="Drinen"
+     CreatureDeathVerb="speared"
 }

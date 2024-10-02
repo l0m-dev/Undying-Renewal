@@ -7,14 +7,17 @@ class JileProjectile expands SPThrownProjectile;
 
 var ParticleFX				TrailFX;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	TrailFX = Spawn( class'JileProjectileFX', self,, Location );
-	TrailFX.SetBase( self );
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		TrailFX = Spawn( class'JileProjectileFX', self,, Location );
+		TrailFX.SetBase( self );
+	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( TrailFX != none )
 		TrailFX.Destroy();

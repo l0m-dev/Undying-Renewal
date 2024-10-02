@@ -3,15 +3,15 @@
 //=============================================================================
 class SkullEyeFireFX expands FireParticleFX;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	SetTimer(1.5, false);
 }
 
-function Timer()
+simulated function Timer()
 {
-	bShuttingDown = true;
+	Shutdown();
 }
 
 defaultproperties

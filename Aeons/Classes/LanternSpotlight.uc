@@ -3,6 +3,9 @@
 //=============================================================================
 class LanternSpotlight expands Light;
 
+// set bHidden to False to allow replication
+// set DrawType to DT_Mesh so Rotation replicates to the client
+
 defaultproperties
 {
      bStatic=False
@@ -18,4 +21,6 @@ defaultproperties
      LightRadiusInner=16
      LightPeriod=4
      LightCone=60
+     bHidden=False
+     DrawType=DT_Mesh
 }

@@ -32,10 +32,10 @@ replication
 	unreliable if( Role==ROLE_Authority && !bNetOwner )
 		RealLocation, RealVelocity;
 	unreliable if( Role==ROLE_AutonomousProxy )
-		ServerMove;
+		ServerMove, PhoenixExpired;
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	bCollideWorld = true;
 	super.PreBeginPlay();
@@ -114,48 +114,56 @@ simulated function Destroyed()
 	local name StateName;
 	
 	StateName = GetStateName();
-	SmokeTrail.bShuttingDown = true;
-	switch (StateName)
+	if (SmokeTrail != None)
+		SmokeTrail.Shutdown();
+
+	if (Level.NetMode != NM_Client)
 	{
-		case 'Flying':
-			if (LifeSpan > 0)
-			{
-				spawn(class 'PhoenixExplosion', Owner,,Location);
-				spawn (class 'MolotovExplosion',Owner,,Location); // added for now
-			} else {
-				if ( ExpireSound != none )
-					PlaySound(ExpireSound,,2,,4096);
-			}
-			break;
-		
-		case 'Release':
-			switch ( CastingLevel )
-			{
-				case 0:
-					spawn(class 'PhoenixExplosion0', Owner,,Location);
-					break;
-		
-				case 1:
-					spawn(class 'PhoenixExplosion1', Owner,,Location);
-					break;
-		
-				case 2:
-					spawn(class 'PhoenixExplosion2', Owner,,Location);
-					break;
-		
-				case 3:
-					spawn(class 'PhoenixExplosion3', Owner,,Location);
-					break;
-		
-				case 4:
-					spawn(class 'PhoenixExplosion4', Owner,,Location);
-					break;
+		switch (StateName)
+		{
+			case 'Flying':
+				if (LifeSpan > 0)
+				{
+					spawn(class 'PhoenixExplosion', Owner,,Location);
+					if (Level.NetMode == NM_Standalone)
+						spawn (class 'MolotovExplosion',Owner,,Location); // added for now
+				} else {
+					if ( ExpireSound != none )
+						PlaySound(ExpireSound,,2,,4096);
+				}
+				if ( (PlayerPawn(Guider) != None) )
+					PlayerPawn(Guider).ViewTarget = None;
+				break;
 			
-				case 5:
-					spawn(class 'PhoenixExplosion5', Owner,,Location);
-					break;
-			}	
-			break;
+			case 'Release':
+				switch ( CastingLevel )
+				{
+					case 0:
+						spawn(class 'PhoenixExplosion0', Owner,,Location);
+						break;
+			
+					case 1:
+						spawn(class 'PhoenixExplosion1', Owner,,Location);
+						break;
+			
+					case 2:
+						spawn(class 'PhoenixExplosion2', Owner,,Location);
+						break;
+			
+					case 3:
+						spawn(class 'PhoenixExplosion3', Owner,,Location);
+						break;
+			
+					case 4:
+						spawn(class 'PhoenixExplosion4', Owner,,Location);
+						break;
+				
+					case 5:
+						spawn(class 'PhoenixExplosion5', Owner,,Location);
+						break;
+				}	
+				break;
+		}
 	}
 	
 	bDestroyed = true;
@@ -400,7 +408,7 @@ simulated function MoveRocket(float DeltaTime, vector CurrentVelocity, rotator G
 	local rotator NewRot;
 	local float SmoothRoll;
 	local vector OldVelocity, X,Y,Z;
-
+	
 	if ( (Role == ROLE_Authority) && ( (Guider == None) || (Guider.Health <= 0)
 				|| (Guider.IsA('PlayerPawn') && (PlayerPawn(Guider).ViewTarget != self)) || Guider.IsInState('FeigningDeath')) )
 	{
@@ -503,6 +511,20 @@ simulated function SavedMove GetFreeMove()
 	}	
 }
 
+// called on client after LifeSpan runs out
+// server doesn't update LifeSpan for RemoteRole==ROLE_AutonomousProxy actors
+// alternatively we can use Tick() to decrease LifeSpan on the server
+event Expired()
+{
+	PhoenixExpired();
+}
+
+function PhoenixExpired()
+{
+	LifeSpan = -1;
+	Destroy();
+}
+
 auto state Flying
 {
 	function Timer()
@@ -538,17 +560,18 @@ auto state Flying
 				&& (ViewPort(PlayerPawn(Instigator).Player) != None) )
 				RemoteRole = ROLE_SimulatedProxy;
 			else
+			{
 				RemoteRole = ROLE_AutonomousProxy;
+			}
 		}
 	}
 }
 
 state Release
 {
-
-	function Tick(float DeltaTime);
+	simulated function Tick(float DeltaTime);
 	
-	function BeginState()
+	simulated function BeginState()
 	{
 		Owner.PlaySound(ReleaseSound,,,,4096);
 		//AmbientSound=ReleaseSound;
@@ -612,7 +635,7 @@ auto state Flying
 		HurtRadius(256.0, 'exploded', MomentumTransfer, Location, getDamageInfo());
 		MakeNoise(1.0);
 		spawn (class 'DefaultParticleExplosionFX',,,Location);
-		ParticleTrail.bShuttingDown = true;
+		ParticleTrail.Shutdown();
 		PhoenixSpell.Bird = none;
 		PhoenixSpell.pCam.gotoState('ShutDownRightNow');
 		// PhoenixSpell.bActivePhoenix = false;
@@ -695,7 +718,7 @@ state Release
 			SpawnMolotovExplosion(Location);
 		}
 
-		ParticleTrail.bShuttingDown = true;
+		ParticleTrail.Shutdown();
 		PhoenixSpell.Bird = none;
 		PhoenixSpell.pCam.gotoState('ShutDown');
 	}
@@ -762,5 +785,9 @@ defaultproperties
      LightSaturation=64
      LightRadius=40
      LightRadiusInner=18
-	 bCollideWorld=False
+     bCollideWorld=False
+     RemoteRole=ROLE_DumbProxy
+     NetPriority=3
+     bNetTemporary=False
+     bAlwaysRelevant=True
 }

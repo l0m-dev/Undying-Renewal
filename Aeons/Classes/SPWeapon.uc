@@ -4,6 +4,8 @@
 class SPWeapon expands Visible
 	abstract;
 
+/* Force-Recompile */
+
 //****************************************************************************
 // Member vars.
 //****************************************************************************
@@ -307,4 +309,5 @@ defaultproperties
      CollisionRadius=4
      CollisionHeight=4
      bGroundMesh=False
+     RemoteRole=ROLE_SimulatedProxy
 }

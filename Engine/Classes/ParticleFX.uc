@@ -4,6 +4,10 @@
 class ParticleFX expands Visible
 	native;
 
+// all level placed ParticleFX's bNoDelete and bAlwaysRelevant are set to true in renewal native code
+// this is to avoid replicating things with bNetInitial
+// all ParticleFX can be Destroy()-ed (even with bNoDelete) but any players joining after that will still see that ParticleFX
+
 //#exec Texture Import File=Textures\Particle.pcx Name=Particle MIPS=On Flags=2 
 //#exec Texture Import File=Textures\ParticleSystem.pcx Name=S_Particle MIPS=On Flags=2
 
@@ -150,6 +154,24 @@ native(433) final function bool GetParticleParams(int Id, ParticleParams Params)
 native(434) final function bool SetParticleParams(int Id, ParticleParams Params);
 native(435) final function bool RecomputeDeltas(int Id);
 
+simulated final function Shutdown()
+{
+	// Cause system to stop emitting particles, then shut down when done.
+	// server doesn't update/render particles so we need to call destroy instead
+	if( Level.NetMode == NM_DedicatedServer )
+		Destroy();
+	else
+		bShuttingDown = true;
+}
+
+/* not necessary since Destroy() is replicated, but on a listen server Destroy() will be delayed
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		bShuttingDown;
+}
+*/
+
 //----------------------------------------------------------------------------
 //	Default Properties
 //----------------------------------------------------------------------------
@@ -180,4 +202,5 @@ defaultproperties
      bUnlit=True
      CollisionRadius=100
      CollisionHeight=100
+     bNetOptional=True
 }

@@ -12,6 +12,12 @@ var() sound GiveSound;
 var ParticleFX fx;
 var ArcaneWhorlFX HandFX;
 
+replication
+{
+	unreliable if (Role == ROLE_Authority)
+		ClientGiveArcaneWhorls;
+}
+
 function BeginPlay()
 {
 	Super.BeginPlay();
@@ -55,6 +61,7 @@ auto state Pickup
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
 			Player = AeonsPlayer(Other);
+			ClientGiveArcaneWhorls(Player);
 			GotoState('GiveWhorl');
 		}
 	}
@@ -70,24 +77,49 @@ state GiveWhorl
 {
 
 	Begin:
-		HandFX = spawn(class 'ArcaneWhorlFX', Player.AttSpell,,Location);
-		HandFX.SetPlayer(Player);
-		Player.OverlayActor = HandFX;
-		Player.AttSpell.BringUp();
-		// fx.bShuttingDown = true;
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			HandFX = spawn(class 'ArcaneWhorlFX', Player.AttSpell,,Location);
+			HandFX.SetPlayer(Player);
+			Player.OverlayActor = HandFX;
+			// fx.Shutdown();
+		}
 		PlaySound(GiveSound);
-		Player.AttSpell.PlayAnim('ArcaneWhorl',1,,,0);
-		Player.AttSpell.FinishAnim();
-		Player.AttSpell.PutDown();
+		AttSpell(Player.AttSpell).PlayOneshotAnim('ArcaneWhorl', 1.0);
 		mMod = ManaModifier(Player.ManaMod);
 		mMod.manaPerSec += 1;
 		mMod.updateManaTimer();
 		Player.ManaWhorlsFound = Clamp(Player.ManaWhorlsFound+1, 0, 5);
 		Player.AttSpell.SetTexture(1, AeonsSpell(Player.AttSpell).SpellHandTextures[Player.ManaWhorlsFound-1]);
 		sleep(2.5);
-		HandFX.bShuttingDown = true;
-		Player.OverlayActor = none;
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			HandFX.Shutdown();
+			Player.OverlayActor = none;
+		}
 		Destroy();
+}
+
+simulated function ClientGiveArcaneWhorls(AeonsPlayer aPlayer)
+{
+	if (Level.NetMode != NM_Client)
+		return;
+		
+	Player = aPlayer;
+	GotoState('ClientGiveWhorl');
+}
+
+simulated state ClientGiveWhorl
+{
+
+	Begin:
+		HandFX = spawn(class 'ArcaneWhorlFX', Player.AttSpell,,Location);
+		HandFX.SetPlayer(Player);
+		Player.OverlayActor = HandFX;
+		Player.AttSpell.SetTexture(1, AeonsSpell(Player.AttSpell).SpellHandTextures[Player.ManaWhorlsFound-1]);
+		sleep(2.5);
+		HandFX.Shutdown();
+		Player.OverlayActor = none;
 }
 
 defaultproperties

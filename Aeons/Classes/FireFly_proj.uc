@@ -35,7 +35,7 @@ replication
 
 simulated function PostNetBeginPlay()
 {
-	logactorstate("postnetbeginplay");
+	//logactorstate("postnetbeginplay");
 	SpawnEffects();
 }
 
@@ -226,7 +226,7 @@ simulated function Destroyed()
 
 	log("firefly_proj: destroyed");
 	if ( pFX != None ) 
-		pFX.bShuttingDown = true;
+		pFX.Shutdown();
 	// spawn(class 'DefaultParticleExplosionFX',,,Location);
 	
 	if ( ft != None )

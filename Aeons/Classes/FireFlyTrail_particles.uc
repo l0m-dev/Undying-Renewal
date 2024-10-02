@@ -3,6 +3,8 @@
 //=============================================================================
 class FireFlyTrail_particles expands SpellParticleFX;
 
+/* Force-Recompile */
+
 state dissipate
 {
 
@@ -38,4 +40,5 @@ defaultproperties
      Elasticity=22
      Textures(0)=Texture'Aeons.Particles.FireFly01'
      LODBias=10
+     RemoteRole=ROLE_SimulatedProxy
 }

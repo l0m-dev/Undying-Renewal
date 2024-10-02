@@ -3,14 +3,14 @@
 //=============================================================================
 class EndSmokeParticleFX expands SmokeParticleFX;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	setTimer(0.75,false);
 }
 
-function Timer()
+simulated function Timer()
 {
-	bShuttingDown = true;
+	Shutdown();
 }
 
 defaultproperties

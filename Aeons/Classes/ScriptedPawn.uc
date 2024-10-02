@@ -309,6 +309,16 @@ var int				LastScriptSound;	//
 var actor					Marker;				// TEMP
 var actor					Marker2;			// TEMP
 
+var localized string CreatureDeathMessage;
+var(DeathMessage) localized string CreatureDeathVerb;
+
+replication
+{
+	//reliable if (Role == ROLE_Authority)
+	//	DebugInfo, DebugInfo2, DebugInfo3;
+	reliable if (Role == ROLE_Authority && bNetInitial)
+		InitHealth;
+}
 
 //****************************************************************************
 // <Begin> Probe functions/messages sent by the engine.
@@ -327,7 +337,7 @@ function EndState()
 }
 
 // Called when engine processes Destroy() call.
-function Destroyed()
+simulated function Destroyed()
 {
 	CleanUp();
 	KillHeldProps();
@@ -389,8 +399,8 @@ function PreBeginPlay()
 {
 	if (RGC())
 	{
-		PhysRate = 1.0 / (Level.Game.Difficulty + 1);
-		RotationRate.Yaw *= Level.Game.Difficulty + 1;
+		TurnAnimRate = 1.0 + float(Level.Game.Difficulty);
+		RotationRate.Yaw = FMin(RotationRate.Yaw + 10000.0 * Level.Game.Difficulty, 65535.0);
 	}
 	super.PreBeginPlay();
 
@@ -485,15 +495,18 @@ function PostBeginPlay()
 {
 	super.PostBeginPlay();
 	
-	if ( Level.NetMode == NM_DedicatedServer )
-	{
-		FadeOutDelay = 0.01;
-		FadeOutTime = 0.01;
-	}
-	
 	// Check and initialize team.
 	if ( TeamTag != '' )
 		InitializeTeam();
+}
+
+simulated function PostNetBeginPlay()
+{
+	Super.PostNetBeginPlay();
+	if (Level.NetMode == NM_Client)
+	{
+		ScryeGlow = Spawn( class'ScryeGlowScriptedFX', self,, Location );
+	}
 }
 
 // Sent during actor initialization.
@@ -588,7 +601,7 @@ function InitHeldProps()
 	local int	i;
 	local place	MyJointPlace;
 
-	for ( i=0; i<4; i++ )
+	for ( i=0; i<ArrayCount(MyProp); i++ )
 	{
 		if ( MyPropInfo[i].Prop != none )
 		{
@@ -604,9 +617,14 @@ function InitHeldProps()
 function KillHeldProps()
 {
 	local int i;
-	for( i=0; i<4; i++ )
-		if (MyProp[i] != none)
+	for( i=0; i<ArrayCount(MyProp); i++ )
+	{
+		if ( MyProp[i] != none )
+		{
 			MyProp[i].Destroy();
+			MyProp[i] = none;
+		}
+	}
 }
 
 function DropProp()
@@ -788,14 +806,25 @@ function EffectorHearNoise( actor Sensed )
 // Sent when this actor can see the player.
 function SeePlayer( actor Other )
 {
-	local float		PVis;
-
+	local float		PVis, PDist;
 	PVis = PlayerVisibility( AeonsPlayer(Other) );
 	if ( PVis < 1.0 )
 		VisionEffector.SetSensorLevel( FMin( VisionEffector.GetSensorLevel(), PVis ) );
 	if ( PowderEffect > 0.0 )
 		return;
 	VisionEffector.Stimulate( 0.4 * PVis, Other );
+	if (Level.NetMode != NM_Standalone && PVis > 0 && Pawn(Other) != None && Other != Enemy)
+	{
+		if (AttitudeTo(Pawn(Other)) == ATTITUDE_Hate)
+		{
+			if (PreCheckEncounter(Other))
+			{
+				PDist = PathDistanceTo(Other);
+				if (PDist > 0.0 && PDist < PathDistanceTo(Enemy))
+					SetEnemy(Pawn(Other));
+			}
+		}
+	}
 }
 
 // Sent from the VisionEffector when sensor threshold exceeded.
@@ -1113,10 +1142,10 @@ function WarnAvoidActor( actor Other, float Duration, float Distance, float Thre
 function Killed( pawn Killer, pawn Other, name damageType )
 {
 //	DebugInfoMessage( ".Killed(), Other is " $ Other.name $ ", Enemy is " $ Enemy.name $ ", Killer is " $ Killer.name );
-	if ( ( Other == Enemy ) && ( Killer != none ) )
+	if ( ( Other == Enemy ) && ( Other != none ) )
 	{
 		SetEnemy( none );
-		if ( Other.bIsPlayer )
+		if ( Other.bIsPlayer && Level.NetMode == NM_Standalone )
 		{
 			if ( Killer == self )
 			{
@@ -1149,6 +1178,12 @@ function Killed( pawn Killer, pawn Other, name damageType )
 	// Handle team member being killed.
 	if ( bIsTeamMember && ( Killer != none ) )
 		TeamMemberKilled( Other );
+}
+
+//Typically implemented in subclass
+function string KillMessage( name damageType, pawn Other )
+{
+	return class'GameInfo'.Static.ParseKillMessage(menuname, Other.PlayerReplicationInfo.PlayerName, CreatureDeathVerb, CreatureDeathMessage);
 }
 
 function Trigger( actor Other, pawn EventInstigator )
@@ -1651,7 +1686,7 @@ function PlayRetreatVocal()
 //****************************************************************************
 
 // Clean up before destroying.
-function CleanUp()
+simulated function CleanUp()
 {
 	if ( RangedWeapon != none )
 	{
@@ -1777,16 +1812,23 @@ function SpawnGibbedCarcass( vector Dir )
 				if (Dir == vect(0, 0, 0))
 					return;
 				Gib = DetachLimb(JointName(i), Class 'BodyPart');
-				//	Gib.Velocity = Vel;
-				//else
-				//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
-				Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
-				Gib.Velocity.Z = 64;
-				Gib.DesiredRotation = RotRand();
-				Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+				if (Gib != None)
+				{
+					//	Gib.Velocity = Vel;
+					//else
+					//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
+					Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
+					Gib.Velocity.Z = 64;
+					Gib.DesiredRotation = RotRand(true);
+					Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+					
+					ReplicateDetachLimb(self, JointName(i), Gib.Velocity, Gib.DesiredRotation);
+				}
 				
 				//SetBase(self, JointName(i));
 			}
+
+			bHacked = true;
 		}
 	}
 	else
@@ -2112,23 +2154,23 @@ function int SetupGlowJoints( GlowScriptedFX GlowFX )
 	return NumJoints();
 }
 
-function bool AddParticleToJoint( int i )
+simulated function bool AddParticleToJoint( int i )
 {
 	return (i >= 0) && (i < NumJoints());
 }
 
 // Debug.
-function String GetDebugInfo()
+simulated function String GetDebugInfo()
 {
 	return DebugInfo;
 }
 
-function String GetDebugInfo2()
+simulated function String GetDebugInfo2()
 {
 	return DebugInfo2;
 }
 
-function String GetDebugInfo3()
+simulated function String GetDebugInfo3()
 {
 	return DebugInfo3;
 }
@@ -3572,6 +3614,11 @@ function pawn FindPlayer()
 {
 	local pawn	aPawn;
 
+	if (Level.NetMode != NM_Standalone)
+	{
+		return FindClosestPlayer();
+	}
+
 	aPawn = Level.PawnList;
 	while ( aPawn != none )
 	{
@@ -3583,6 +3630,31 @@ function pawn FindPlayer()
 	}
 
 	return none;
+}
+
+function Pawn FindClosestPlayer()
+{
+	local Pawn P;
+	local Pawn Best;
+	local float BestDist, Dist;
+
+	for ( P=Level.PawnList; P!=None; P=P.NextPawn )
+	{
+		if ( PlayerPawn(P) != None && P.bIsPlayer )
+		{
+			//Dist = PathDistanceToPoint(P.Location);
+			Dist = DistanceToPoint(P.Location);
+			//Dist = VSize(P.Location - Location);
+			//Dist = PathDistanceTo( P );
+			if ( Best == None || Dist < BestDist )
+			{
+				BestDist = Dist;
+				Best = P;
+			}
+		}
+	}
+
+	return Best;
 }
 
 function pawn FindAppropriateEnemy()
@@ -3729,7 +3801,7 @@ function float RelativeStrength( pawn Other )
 	if ( Other.IsA('ScriptedPawn') )
 		adjustedOther = 0.5 * ( Other.Health + ScriptedPawn(Other).InitHealth );	// average other's current and default health (result is potential health?)
 	else
-		adjustedOther = 0.5 * ( FMin(Other.Health, 100) + Other.default.Health ); // cap to 100 to prevent issues if player's health overcharged
+		adjustedOther = 0.5 * ( FMin(Other.Health, Other.default.Health) + Other.default.Health ); // cap to Other.default.Health to prevent issues if player's health overcharged
 	compare = 0.01 * float(adjustedOther - adjustedStrength);		// calculate strength factor as 1% of it's health less my health
 	if ( Intelligence == BRAINS_Human )
 	{
@@ -11344,6 +11416,15 @@ state AIFrozenState expands AIDoNothing
 		PlayAnim( '' );
 	}
 
+	function Tick( float DeltaTime )
+	{
+		// fix T-Posing in multiplayer
+		if (Level.NetMode != NM_Standalone)
+			SnapToIdle();
+
+		global.Tick( DeltaTime );
+	}
+
 RESUME:
 Begin:
 	PlayAnim( '' );
@@ -11448,6 +11529,8 @@ state Dying
 	function Invoke( actor Other )
 	{
 		bIsInvoked = true;
+		//bClientAnim = false;
+		//NetUpdateFrequency = default.NetUpdateFrequency;
 
 		// Stop, fix fade-out.
 		StopTimer();
@@ -11481,6 +11564,9 @@ state Dying
 	// Do this after the animation has finished.
 	function PostAnim()
 	{
+		// for whatever reason the death animation loops on the client, prevent that here
+		//bClientAnim = true;
+		//NetUpdateFrequency = 0;
 	}
 
 	// Create an expanding pool of blood.
@@ -11529,7 +11615,7 @@ BEGIN:
 
 	// if he has PersistentBlood going... shut it down.
 	if ( PBlood != none )
-		PBlood.bShuttingDown = true;
+		PBlood.Shutdown();
 
 	if ( Region.Zone.bWaterZone )
 		SetPhysics( PHYS_Falling );
@@ -12096,10 +12182,15 @@ state AIRunScript
 	function CheckRotation()
 	{
 		local vector	DVect;
+		local pawn	P;
+
+		P = FindPlayer();
+		if ( P == None )
+			return;
 
 		if ( bScriptTurret || ( bSpecialTurret && ( VSize(Velocity) < 10.0 ) ) )
 		{
-			DVect = FindPlayer().Location - Location;
+			DVect = P.Location - Location;
 			if ( bCanFly )
 				DVect.Z = DVect.Z * 0.5;
 			else
@@ -12222,7 +12313,8 @@ state AIRunScript
 		if ( ( ASound != none ) && ( ASound != ScriptLastSound ) )
 		{
 			ScriptLastSound = ASound;
-			sID = PlayAnimSound( MouthAnim, ASound, ScriptSoundAmp, SLOT_Talk );
+			if (Level.NetMode == NM_Standalone)
+				sID = PlayAnimSound( MouthAnim, ASound, ScriptSoundAmp, SLOT_Talk );
 			DebugInfoMessage( ".Mumble, PlayAnimSound sID is " $ sID );
 			if ( sID <= 0 )
 				sID = PlaySound( ASound, SLOT_Talk );
@@ -12242,7 +12334,8 @@ state AIRunScript
 		if ( ( ASound != none ) && ( ASound != ScriptLastSound ) )
 		{
 			ScriptLastSound = ASound;
-			sID = PlayAnimSound( MouthAnim, ASound, ScriptSoundAmp, SLOT_Talk, [Flags] Flags );
+			if (Level.NetMode == NM_Standalone)
+				sID = PlayAnimSound( MouthAnim, ASound, ScriptSoundAmp, SLOT_Talk, [Flags] Flags );
 			DebugInfoMessage( ".PlaySpecialSound, PlaySound sID is " $ sID );
 			if ( sID <= 0 )
 				sID = PlaySound( ASound, SLOT_Talk, [Flags] Flags );
@@ -12954,4 +13047,6 @@ defaultproperties
      ShadowRange=512
      TransientSoundVolume=1
      TransientSoundRadius=750
+     CreatureDeathMessage="%k %w %o."
+     CreatureDeathVerb="killed"
 }

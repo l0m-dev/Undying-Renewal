@@ -120,7 +120,7 @@ function Deactivate()
 	ForEach AllActors(class 'ParticleFX', P)
 		if ( P.Owner == Owner )
 		{
-			P.bShuttingDown = true;
+			P.Shutdown();
 		}
 }
 

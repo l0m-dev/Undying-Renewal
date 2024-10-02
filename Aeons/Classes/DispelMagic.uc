@@ -45,7 +45,7 @@ function FireAttSpell( float Value )
 		{
 			cost = manaCostPerLevel[castingLevel];
 
-			if ( Self.IsA('Scrye') && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone'))
+			if ( AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
 				cost = 0;
 
 			SayMagicWords();
@@ -98,7 +98,7 @@ state NormalFire
 			if ( (A != Pawn(Owner)) && (A.Owner != Pawn(Owner)) && (FastTrace(Pawn(Owner).Location, A.Location)) )
 			{
 				OtherLevel = A.Dispel(true);
-				log("DispelMagic.OtherLevel = "$OtherLevel, 'Misc');
+				//log("DispelMagic.OtherLevel = "$OtherLevel, 'Misc');
 				if ( OtherLevel >= 0 )
 				{
 					DispelCost = DispelManaCost(CastingLevel, OtherLevel);
@@ -131,6 +131,7 @@ state NormalFire
 	}
 
 	Begin:
+		bCanClientFire = true;
 		if (AeonsPlayer(Owner).Mana > 80)
 			manaBag = 80;
 		else
@@ -144,9 +145,24 @@ state NormalFire
 		CastDispel();
 		FinishAnim();
 		sleep(RefireRate);
-		PawnOwner.bFireAttSpell = 0;
+		//PawnOwner.bFireAttSpell = 0; // caused shield to activate again if the client was still holding the key down 
 		Finish();
 }
+
+simulated function bool ClientFire( float Value )
+{
+	if ( !AeonsPlayer(Owner).bDispelActive )
+	{
+		PlayFiring();
+
+		if ( Role < ROLE_Authority )
+		{
+			GotoState('ClientFiring');
+		}
+		return true;
+	}
+	return false;
+}	
 
 defaultproperties
 {
@@ -164,4 +180,5 @@ defaultproperties
      PlayerViewMesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     bContinuousFire=False
 }

@@ -77,6 +77,7 @@ defaultproperties
      bActivatable=True
      bDisplayableInv=True
      PickupMessage="You gained an Ether Trap"
+     ItemName="Ether Trap"
      PickupViewMesh=SkelMesh'Aeons.Meshes.EtherTrap_m'
      PickupSound=Sound'Wpn_Spl_Inv.Inventory.I_EtherTrapPU01'
      ActivateSound=Sound'Wpn_Spl_Inv.Inventory.I_EtherTrapUse01'

@@ -7,6 +7,7 @@ var config bool bGameplayChanges;
 var config bool bGore;
 
 var config bool bAutoUseHealthVials;
+var config bool bLimitHealth;
 var config bool bAltHud;
 var config bool bAutoShowObjectives;
 var config bool bShowUsedMana;
@@ -25,6 +26,9 @@ var config float DamageScreenShakeScale;
 
 var config bool bMoreSkippableCutscenes;
 
+var config bool bAnimatedMenu;
+var config bool bSaveThumbnails;
+
 // things that are not configurable
 var config bool bShowScryeHint;
 var config bool bShowQuickSelectHint;
@@ -35,7 +39,7 @@ var bool bDebug2;
 var float fDebug;
 var float fDebug2;
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	// creates config file if there is none
 	SaveConfig();
@@ -48,6 +52,8 @@ defaultproperties
      bGameplayChanges=True
      bGore=True
      bAutoUseHealthVials=True
+     bLimitHealth=True
+	 bSaveThumbnails=True
      bAltHud=False
 	 bShowUsedMana=False
 	 HudScale=1.0
@@ -67,4 +73,5 @@ defaultproperties
 	 fDebug2=1.0
      bAlwaysRelevant=True
      bSavable=False
+     RemoteRole=ROLE_None
 }

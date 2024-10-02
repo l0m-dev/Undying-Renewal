@@ -21,7 +21,7 @@ simulated function PreBeginPlay()
 simulated function Destroyed()
 {
 	if ( trail != None )
-		trail.bShuttingDown = true;
+		trail.Shutdown();
 }
 
 auto state flying

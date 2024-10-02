@@ -35,7 +35,7 @@ function PassThru(Actor Other)
 		return;
 
 	if ( Other.IsA('AeonsPlayer') )
-		if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
+		if ( AeonsPlayer(Other).Weapon != None && AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 			GhelziabahrStone(AeonsPlayer(Other).Weapon).Glow();
 }
 
@@ -48,7 +48,7 @@ function UnTouch(Actor Other)
 {
 	if ( Other.IsA('AeonsPlayer') )
 	{
-		if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
+		if ( AeonsPlayer(Other).Weapon != None && AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 			GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = false;
 			
 		if ( AeonsPlayer(Other).ScryeMod.bActive && AeonsPlayer(Other).bShowScryeHint )
@@ -82,7 +82,7 @@ function Touch( actor Other )
 
 			if ( bDisableAfterPlayerScrye && AeonsPlayer(Other).ScryeMod.bActive ){
 				bEventSeen = true;
-				if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
+				if ( AeonsPlayer(Other).Weapon != None && AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 					GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = false;
 				return;
 			}
@@ -114,7 +114,7 @@ function Touch( actor Other )
 				SetTimer(3, false);
 			}
 			
-			if ( AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
+			if ( AeonsPlayer(Other).Weapon != None && AeonsPlayer(Other).Weapon.IsA('GhelziabahrStone') )
 				GhelziabahrStone(AeonsPlayer(Other).Weapon).bGlowStone = true;
 			Super.Touch(Other);
 		}

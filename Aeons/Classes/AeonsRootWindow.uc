@@ -8,7 +8,9 @@ class AeonsRootWindow extends UWindowRootWindow;
 //#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
 
-// needed to compile, otherwise throws missing audio_x, do not use!
+// moved these to UWindowRootWindow but they are still needed here to compile, otherwise the compiler throws: missing audio_x
+// these are completely separate variables, which ones you access depends on the variable type and there is no inheritance
+// AeonsRootWindow(Root).ScaleX and UWindowRootWindow(Root).ScaleX have their own separate values
 var float ScaleX, ScaleY;
 
 var UWindowWindow MainMenu;
@@ -21,6 +23,14 @@ var vector ScreenPosition, LastScreenPosition;
 var float FlameSoundTimer;
 
 var UWindowWindow ActiveWindow;
+
+function BeginPlay() 
+{
+	Super.BeginPlay();
+
+	ScaleX = WinWidth / OriginalWidth;
+	ScaleY = WinHeight / OriginalHeight;
+}
 
 function Created() 
 {
@@ -85,6 +95,12 @@ function Created()
 
 	if ( !bFoundBookKey )
 		GetPlayerOwner().ConsoleCommand("SET Input"@"F3"@"ShowBook");
+
+	// bind cancel for multiplayer
+	if ( GetPlayerOwner().ConsoleCommand( "KEYBINDING F10" ) == "" )
+	{
+		GetPlayerOwner().ConsoleCommand("SET Input F10 CANCEL");
+	}
 }
 
 function NotifyBeforeLevelChange()
@@ -102,6 +118,9 @@ function NotifyBeforeLevelChange()
 function Resized()
 {
 	Super.Resized();
+	
+	ScaleX = WinWidth / OriginalWidth;
+	ScaleY = WinHeight / OriginalHeight;
 	
 	if ( MainMenu != None )
 		MainMenu.Resized();
@@ -250,6 +269,11 @@ function DrawMouse(Canvas C)
 			C.DrawClippedActorFixedFov(CursorFX, 90, false, C.SizeX/GUIScale, C.SizeY/GUIScale, 0, 0, true);
 	}
 
+}
+
+function Texture GetLookAndFeelTexture()
+{
+	Return LookAndFeel.ActiveS;
 }
 
 defaultproperties

@@ -29,7 +29,6 @@ class LoadSaveWindow expands ShellWindow;
 //Dynamic #exec Texture Import File=Black.tga	Mips=Off
 //Dynamic #exec Texture Import File=Screenshot4.tga	Mips=Off
 
-
 var string ScreenShotName;
 var ShellBitmap ScreenShot;
 
@@ -62,6 +61,17 @@ var int SelectedSlot;
 var bool RememberBootShell;
 
 var sound ChangeSound;
+
+var string OldServerSavesList;
+
+var int SaveDelay;
+var bool bMultiplayer;
+var bool bDynamicScreenshot;
+var bool bDynamicScreenshotLoaded;
+
+var localized string QuickSaveText;
+var localized string SaveText;
+var localized string EmptyText;
 
 //----------------------------------------------------------------------------
 
@@ -236,15 +246,22 @@ function Created()
 
 //screenshot
 	ScreenShot = ShellBitmap(CreateWindow(class'ShellBitmap', 10,10,10,10));
-	ScreenShot.T = Texture(DynamicLoadObject("Screens.Generic", class'texture'));;//Dynamic texture'Black';//Screenshot3';
-	ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
+	
 	ScreenShot.Template = NewRegion(425,46,116,88);
 	ScreenShot.bStretch = true;
 	ScreenShot.Manager = Self;
 	
 	SelectedSlot = -1;
+	SaveDelay = -1;
+
+	bDynamicScreenshot = GetPlayerOwner().GetRenewalConfig().bSaveThumbnails;
+
+	UpdateScreenshot(true);
 
 	UpdateButtons();
+
+	if (GetPlayerOwner().Level.NetMode != NM_Standalone)
+		GetPlayerOwner().GetSaveGameListMultiplayer();
 
 	Root.Console.bBlackout = True;
 
@@ -407,7 +424,7 @@ function SelectSlot( int Slot )
 		Delete.bDisabled = false;
 		Save.bDisabled = false;
 		Load.bDisabled = false;
-	}
+		}
 
 	// you can't save over quicksave slot since the only way we distinguish between quicksave and others 
 	// is that the quicksave is always slot 0
@@ -415,7 +432,7 @@ function SelectSlot( int Slot )
 		Save.bDisabled = true;
 */
 
-	MapNametoScreenShot( MapNames[SelectedSlot] );
+	UpdateScreenshot(false);
 	
 
 /*
@@ -498,7 +515,10 @@ function DoSave()
 
 	PlayNewScreenSound();
 
-	SaveSlot = SelectedSlot;
+	if ( Slots[SelectedSlot] >= 0 ) 
+		SaveSlot = Slots[SelectedSlot];
+	else
+		SaveSlot = SelectedSlot;
 	
 	/*
 	if ( Slots[SelectedSlot] >= 0 ) 
@@ -512,7 +532,11 @@ function DoSave()
 	AeonsRootWindow(Root).MainMenu.Close();
 
 	//log("calling SaveGame " $ SaveSlot );
-	GetPlayerOwner().ConsoleCommand("SaveGame " $ SaveSlot);
+	GetPlayerOwner().ConsoleCommand("admin SaveGame " $ SaveSlot);
+
+	// done in native code now so it works when saving in any way
+	//if (!bMultiplayer)
+	//	class'Utility'.static.Screenshot(GetPlayerOwner(), "..\\Save\\" $ SaveSlot $ "\\Save.bmp", true, true);
 }
 
 //----------------------------------------------------------------------------
@@ -521,8 +545,11 @@ function DoDelete()
 {
 	if (SelectedSlot >= 0)
 	{
-		GetPlayerOwner().ConsoleCommand("DeleteGame " $ Slots[SelectedSlot]);	
+		GetPlayerOwner().ConsoleCommand("admin DeleteGame " $ Slots[SelectedSlot]);
+		UpdateScreenshot(true);
 		UpdateButtons();
+		if (GetPlayerOwner().Level.NetMode != NM_Standalone)
+			GetPlayerOwner().GetSaveGameListMultiplayer();
 	}
 	else
 		Log("LoadSaveWindow: DoDelete: invalid slot " $ SelectedSlot);
@@ -550,7 +577,7 @@ function DoLoad()
 	if ( slot >= 0 )
 	{
 		log("calling LoadGame " $ slot );
-		GetPlayerOwner().ConsoleCommand("LoadGame " $ slot);	
+		GetPlayerOwner().ConsoleCommand("admin LoadGame " $ slot);	
 	}
 	else
 	{
@@ -617,7 +644,7 @@ function BeforePaint(Canvas C, float X, float Y)
 			Load.bDisabled = true;
 		}
 		// else if it's a quicksave
-		else if ( Slots[SelectedSlot] == 0 )
+		else if ( Slots[SelectedSlot] == 0 && GetPlayerOwner().Level.NetMode == NM_Standalone )
 		{
 			Delete.bDisabled = false;
 			Save.bDisabled = true;
@@ -680,12 +707,18 @@ function Paint(Canvas C, float X, float Y)
 	{
 	}
 
+	if (GetPlayerOwner().Level.NetMode != NM_Standalone && AeonsPlayer(GetPlayerOwner()).ServerSavesList != OldServerSavesList)
+	{
+		OldServerSavesList = AeonsPlayer(GetPlayerOwner()).ServerSavesList;
+		UpdateButtons();
+	}
+
 	Super.PaintSmoke(C, Save, SmokingWindows[0], SmokingTimers[0]);
 	Super.PaintSmoke(C, Load, SmokingWindows[1], SmokingTimers[1]);
 	Super.PaintSmoke(C, Delete, SmokingWindows[2], SmokingTimers[2]);
 	Super.PaintSmoke(C, Cancel, SmokingWindows[3], SmokingTimers[3]);
 
-	/* Dynamic 
+	if (bDynamicScreenshot)
 	{
 		if ( SaveDelay == 0 ) 
 		{
@@ -697,7 +730,6 @@ function Paint(Canvas C, float X, float Y)
 		if ( SaveDelay >= 1 ) 
 			SaveDelay--;
 	}
-	*/
 }
 
 //----------------------------------------------------------------------------
@@ -720,7 +752,7 @@ function ParseSavedGameList( string LoadGameList )
 	i=0;
 	while ( (token > 0) && (i<arraycount(SaveStrings)) )
 	{		
-		CurrentSave = Left(SaveString, token-1);			
+		CurrentSave = Left(SaveString, token);			
 
 		//log("token=" $ token $ " CurrentString=" $ CurrentSave);
 
@@ -793,11 +825,54 @@ function MapNametoScreenShot(string MapName)
 		ScreenShotName = "Screens.Generic"; 
 
 
-	log("MapNametoScreenSHot: ScreenShotName = " $ ScreenShotName);
+	//log("MapNametoScreenSHot: ScreenShotName = " $ ScreenShotName);
 	ScreenShot.T = Texture(DynamicLoadObject(ScreenShotName, class'texture'));
+	ScreenShot.R = NewRegion(0,0,116,88);
+	bDynamicScreenshotLoaded = false;
 
-	log("MapNametoScreenSHot: ScreenShot.T = " $ ScreenShot.T);
+	//log("MapNametoScreenSHot: ScreenShot.T = " $ ScreenShot.T);
 
+}
+
+function UpdateScreenshot(bool bClear)
+{
+	local bool bMultiplayer;
+	local texture NewTex;
+
+	// don't wait for garbage collector to destroy the loaded textures
+	if (ScreenShot.T != None && bDynamicScreenshotLoaded)
+		class'Utility'.static.DestroyTexture(ScreenShot.T);
+
+	if (bClear)
+	{
+		ScreenShot.T = Texture(DynamicLoadObject("Screens.Generic", class'texture'));;//Dynamic texture'Black';//Screenshot3';
+		ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
+		bDynamicScreenshotLoaded = false;
+		return;
+	}
+
+	bMultiplayer = GetPlayerOwner().Level.NetMode != NM_Standalone;
+
+	if (bMultiplayer || !bDynamicScreenshot)
+	{
+		MapNametoScreenShot( MapNames[SelectedSlot] );
+		return;
+	}
+
+	if (bDynamicScreenshot)
+	{
+		NewTex = class'Utility'.static.LoadBMPFromFile(class'Utility'.static.GetSavePath() $ "\\" $ Slots[SelectedSlot] $ "\\Save.bmp");
+		if (NewTex != None)
+		{
+			ScreenShot.T = NewTex;
+			ScreenShot.R = NewRegion(0,0,256,256);
+			bDynamicScreenshotLoaded = true;
+		}
+		else
+		{
+			MapNametoScreenShot( MapNames[SelectedSlot] );
+		}
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -809,19 +884,24 @@ function UpdateButtons()
 	local string Temp;
 	local string SaveMap, SaveTime;
 
-	SaveList = GetPlayerOwner().GetSaveGameList();
+	bMultiplayer = GetPlayerOwner().Level.NetMode != NM_Standalone;
+
+	if (bMultiplayer)
+		SaveList = OldServerSavesList;
+	else
+		SaveList = GetPlayerOwner().GetSaveGameList();
 	
 	// after this call SaveStrings are filled with each save's information
 	ParseSavedGameList(SaveList);
 
+	log("LoadSaveWindow: UpdateButtons: SaveList = " $ SaveList);
+
 	FreeSlot = -1;
 
-	log("LoadSaveWindow: UpdateButtons: SaveList = " $ SaveList);
-	
 	for ( i=0; i<ArrayCount(SaveGameButtons); i++ )
 	{
 		SaveGameButtons[i].Align = TA_Center;
-		SaveGameButtons[i].Text = "E m p t y " @ (i + CurrentRow + 1);
+		SaveGameButtons[i].Text = EmptyText @ (i + CurrentRow + 1);
 	}
 	
 	for ( i=0; i<ArrayCount(SaveStrings); i++ )
@@ -839,6 +919,9 @@ function UpdateButtons()
 			Temp = Left(SaveStrings[i], Token);
 			//log("slot = " $ Temp);
 			slotIndex = int(Temp);
+			if ( slotIndex < 0 || slotIndex >= ArrayCount(Slots) )
+				continue;
+			
 			Slots[slotIndex] = slotIndex;
 
 			// keep track of highest save slot
@@ -853,23 +936,25 @@ function UpdateButtons()
 			
 			MapNames[slotIndex] = SaveMap;
 
-			//log("map name  = " $ SaveMap);
+			log("map name  = " $ SaveMap);
 
 			SaveTime = Right(Temp, Len(Temp)-Token-1);
-			SaveTime = Left(SaveTime, Len(SaveTime)-1);
 
-			//log("save time = " $ SaveTime);
+			log("save time = " $ SaveTime);
 			
 			listIndex = slotIndex - CurrentRow;
 			
 			if (listIndex < 0 || listIndex >= ArrayCount(SaveGameButtons))
 				continue;
 			
-			if ( slotIndex == 0 ) 
-				SaveGameButtons[listIndex].Text = SaveTime $ " (Quicksave) - " $ SaveMap;
+			if ( slotIndex == 0 && !bMultiplayer )
+				SaveGameButtons[listIndex].Text = QuickSaveText;
 			else
-				SaveGameButtons[listIndex].Text = SaveTime $ " - " $ SaveMap;
-			
+				SaveGameButtons[listIndex].Text = SaveText;
+
+			SaveGameButtons[listIndex].Text = FormatString(SaveGameButtons[listIndex].Text, "%time", SaveTime);
+			SaveGameButtons[listIndex].Text = FormatString(SaveGameButtons[listIndex].Text, "%map", SaveMap);
+
 			SaveGameButtons[listIndex].Align = TA_Left;
 		}
 		//Log("SaveGameButtons[" $ i $ "].Text=" $ SaveGameButtons[i].Text $ " Alignment=" $ SaveGameButtons[i].Align);
@@ -886,7 +971,14 @@ function ShowWindow()
 {
 	Super.ShowWindow();
 
+	bDynamicScreenshot = GetPlayerOwner().GetRenewalConfig().bSaveThumbnails;
+
+	UpdateScreenshot(true);
+
 	UpdateButtons();
+
+	if (GetPlayerOwner().Level.NetMode != NM_Standalone)
+		GetPlayerOwner().GetSaveGameListMultiplayer();
 }
 
 //----------------------------------------------------------------------------
@@ -1012,4 +1104,7 @@ defaultproperties
      BackNames(3)="UndyingShellPC.LoadSave_3"
      BackNames(4)="UndyingShellPC.LoadSave_4"
      BackNames(5)="UndyingShellPC.LoadSave_5"
+     QuickSaveText="%time (Quicksave) - %map"
+     SaveText="%time - %map"
+     EmptyText="E m p t y "
 }

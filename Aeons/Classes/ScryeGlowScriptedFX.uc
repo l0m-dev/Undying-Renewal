@@ -10,6 +10,13 @@ var() color NormalColor;
 
 var color col;
 var bool bShowHealth;
+var bool bActive;
+
+replication
+{
+	unreliable if (Role == ROLE_Authority)
+		bShowHealth, bActive;
+}
 
 function PreBeginPlay()
 {
@@ -23,7 +30,7 @@ function PreBeginPlay()
 	SetTimer(1, true);
 }
 
-function color DeriveColor()
+simulated function color DeriveColor()
 {
 	local color c, blk;
 	local float pct, RelativeHealth;
@@ -61,7 +68,7 @@ function Timer()
 }
 
 
-function UpdateParticles()
+simulated function UpdateParticles()
 {
 	local int i;
 	
@@ -94,19 +101,33 @@ state Activated
 		{
 			Destroy();
 			// GotoState('Deactivated');
-		} else
+		}
+		else
+		{
+			bActive = true;
 			UpdateParticles();
+		}
 	}
 
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		UpdateParticles();
+		if (Level.NetMode == NM_Client && !bActive)
+			GotoState('Deactivated');
 	}
 }
 
 auto state Deactivated
 {
-	function Tick(float DeltaTime);
+	function BeginState()
+	{
+		bActive = false;
+	}
+	simulated function Tick(float DeltaTime)
+	{
+		if (Level.NetMode == NM_Client && bActive)
+			GotoState('Activated');
+	}
 }
 
 defaultproperties
@@ -121,4 +142,5 @@ defaultproperties
      bTimedTick=True
      MinTickTime=0.05
      bScryeOnly=True
+     RemoteRole=ROLE_None
 }

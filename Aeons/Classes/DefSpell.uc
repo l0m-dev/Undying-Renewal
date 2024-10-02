@@ -9,6 +9,12 @@ class DefSpell extends AeonsSpell
 var int localCastingLevel;
 var Pawn PawnOwner;
 
+replication
+{
+	reliable if( Role==ROLE_Authority )
+		ClientIdleDefSpell;
+}
+
 //=============================================================================
 // Inventory travelling across servers.
 
@@ -35,7 +41,7 @@ function bool processCastingLevel()
 	if ( Super.ProcessCastingLevel() )
 	{
 		// Bump the casting Level up by 1 if the player has the Ghelzibahar Stone Active.
-		if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
+		if ( PlayerPawn(Owner).Weapon != None && PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
 		{
 			amplitudeBonus = 1;
 			//GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(Clamp((castingLevel + amplitudeBonus), 0, 5));
@@ -146,7 +152,7 @@ function Finish()
         PawnOwner.ChangedSpell();
         GotoState('Idle2');
     }
-    else if ( PawnOwner.bFireDefSpell != 0 )
+    else if ( PawnOwner.bFireDefSpell != 0 && bContinuousFire )
         Global.FireDefSpell(0);
     else 
         GotoState('Idle');
@@ -199,7 +205,7 @@ function FireDefSpell( float Value )
 function GhelzUse(int cost)
 {
 	// Ghelziabahr use
-	if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
+	if ( PlayerPawn(Owner).Weapon != None && PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
 		GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(localCastingLevel);
 }
 
@@ -207,6 +213,16 @@ function ForceFire()
 {
 	//Log("DefSpell: Global ForceFire");
 	FireDefSpell(0);
+}
+
+simulated function ClientIdleDefSpell()
+{
+    if (Level.NetMode != NM_Client)
+		return;
+	
+	//log("DefSpell: ClientIdleDefSpell");
+	if (GetStateName() != 'ClientIdle')
+		GotoState('ClientIdle');
 }
 
 // OVERRIDABLES FROM Spell CLASS TO NOT MODIFY Engine PACKAGE
@@ -219,6 +235,8 @@ state Idle2
 
 		if (AeonsPlayer(Owner).DefSpell == None)
 			AeonsPlayer(Owner).DefSpell = self;
+
+        ClientIdleDefSpell();
 	}
 }
 

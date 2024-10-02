@@ -1,47 +1,94 @@
 class DefensiveSpells extends Mutator
 	transient;
 
-function ModifyLogin(out class<playerpawn> SpawnClass, out string Portal, out string Options)
-{
-	Log("SpawnClass: " $ SpawnClass);
-
-	if (string(SpawnClass) == "Aeons.Patrick")
-	{
-		//SpawnClass = class'PatrickQuake';
-	}
-
-	//Log("Changing spawn class to: " $ SpawnClass);
-
-	if ( NextMutator != None )
-		NextMutator.ModifyLogin(SpawnClass, Portal, Options);
-}
-
 function ModifyPlayer(Pawn Other)
 {
-	local PlayerPawn P;
-	P = PlayerPawn(Other);
-
-	if (Other.PlayerReplicationInfo != None)
-		BroadcastMessage("The player"@Other.PlayerReplicationInfo.PlayerName@"respawned!");
-
-	if (NextMutator != None)
-		NextMutator.ModifyPlayer(Other);
-}
-
-function Timer()
-{
-	local AeonsPlayer aPlayer;
+	local AeonsPlayer AP;
+	local Spell newSpell;
 	
-	Super.Timer();
+	AP = AeonsPlayer(Other);
 
-	foreach AllActors(class'AeonsPlayer', aPlayer)
+	if (AP != None)
 	{
-		aPlayer.DefAll();
-		aPlayer.bDrawStealth = true;
-	}
-}
+		AP.bDrawStealth = true;
 
-function PostBeginPlay()
-{
-	SetTimer(1.5, false);
+		if (AP.Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.Mindshatter');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.PowerWord'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.PowerWord');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.Ward'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.Ward');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.Firefly'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.Firefly');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.IncantationOfSilence'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.IncantationOfSilence');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.Phase'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.Phase');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+
+		if (AP.Inventory.FindItemInGroup(class'Aeons.ShalasVortex'.default.InventoryGroup) == none)
+		{
+			newSpell = Spawn(class'Aeons.ShalasVortex');
+			if( newSpell != None )
+			{
+				newSpell.GiveTo(AP);
+				newSpell.LocalCastingLevel = 4;
+				newSpell.CastingLevel = 4;
+			}
+		}
+	}
+
+	Super.ModifyPlayer(Other);
 }

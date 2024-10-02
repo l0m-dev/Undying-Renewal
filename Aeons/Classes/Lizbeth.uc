@@ -106,6 +106,8 @@ class Lizbeth expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=death_creature_special TIME=0.644 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=death_creature_special TIME=0.801 FUNCTION=C_BareFS
 
+// set bAlwaysRelevant to True to make her relevant behind the gate at Grounds_Mausoleum_Approach
+
 
 //****************************************************************************
 // Member vars.
@@ -239,6 +241,7 @@ function PreBeginPlay()
 		FrenzyGroundSpeed = 600;
 		DamageRadius = 160;
 		MeleeRange = 200;
+		ReactToDamageThreshold = 10;
 	}
 	super.PreBeginPlay();
 	FrenzyTime = 0.0;
@@ -387,6 +390,7 @@ function ThrowRock( Projectile ThisRock )
 		ThisRock.Velocity = vector(WeaponAimAt( Enemy, ThisRock.Location, 0.5, true, ThisRock.Speed )) * ThisRock.Speed;
 		ThisRock.SetPhysics( PHYS_Falling );
 		ThisRock.Enable( 'Tick' );
+		ThisRock.RemoteRole = ROLE_DumbProxy;
 	}
 }
 
@@ -477,6 +481,14 @@ function AdjustDamage( out DamageInfo DInfo )
 	}
 	if( DInfo.JointName == 'head' )
 		DInfo.JointName = 'root';
+}
+
+function ReactToDamage( pawn Instigator, DamageInfo DInfo )
+{
+	if( FRand() < 0.5 && RGC() )
+		return;
+
+	Super.ReactToDamage(Instigator, DInfo);
 }
 
 function Tick( float DeltaTime )
@@ -766,6 +778,8 @@ state LizbethBossFightWeakened expands AIScriptedState
 
 	function BeginState()
 	{
+		local Scythe Scythe;
+
 		super.BeginState();
 		DamageThresholdState = '';	// Don't go to any other states when damage threshold reached.
 
@@ -793,7 +807,24 @@ state LizbethBossFightWeakened expands AIScriptedState
 		RotationRate.Yaw = Default.RotationRate.Yaw;
 		GroundSpeed = Default.GroundSpeed;
 		AccelRate = Default.AccelRate;
+
+		//foreach RadiusActors( class'Scythe', Scythe, 768 )
+		//{
+		//	if (Scythe.Owner != None)
+		//		Scythe.NotifyScytheNeeded(true);
+		//}
 	}
+
+	//function EndState()
+	//{
+	//	local Scythe Scythe;
+	//
+	//	foreach RadiusActors( class'Scythe', Scythe, 768 )
+	//	{
+	//		if (Scythe.Owner != None)
+	//			Scythe.NotifyScytheNeeded(false);
+	//	}
+	//}
 
 Damaged:
 Resume:
@@ -1170,4 +1201,7 @@ defaultproperties
      CollisionRadius=20
      CollisionHeight=52
      Mass=2000
+     bAlwaysRelevant=True
+     MenuName="Lizbeth"
+     CreatureDeathVerb="ghouled"
 }

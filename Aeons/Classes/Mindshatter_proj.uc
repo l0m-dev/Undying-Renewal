@@ -86,10 +86,18 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 				// AeonsPlayer(Other).MindshatterMod.castingLevel = 3;
 				AeonsPlayer(Other).MindshatterMod.gotoState('Activated');
 				AeonsPlayer(Other).MindshatterMod.manaCost = manaCost;
+				if (Level.NetMode == NM_DedicatedServer)
+					MindshatterModifier(AeonsPlayer(Other).MindshatterMod).ClientActivated(castingLevel);
 				spawn(class 'MindshatterExplosionFX',,,Other.Location + Eyeheight, Rotator(Velocity));
 				Other.ProjectileHit( Instigator, HitLocation, vect(0,0,0), self, GetDamageInfo() );
 				//smkPuff = spawn(class 'SmokePuff',,,Location);
 				//smkPuff.drawScale = 5;
+
+				//if (RGC())
+				//{
+				//	if ( SlothModifier(AeonsPlayer(Other).SlothMod) != none )
+				//		SlothModifier(AeonsPlayer(Other).SlothMod).Activate();
+				//}
 			} 
 			else if ( Other.IsA('ScriptedPawn')) 
 			{ // && (HitLocation.Z - Other.Location.Z > 0.62 * Other.CollisionHeight) ) {	// need joint based headshot detection here
@@ -183,7 +191,7 @@ simulated function Explode(vector HitLocation, vector HitNormal)
 		}
 		// mTrail.Gravity = dir * ;
 		mTrail.bUpdate = true;
-		mtrail.bShuttingDown = true;
+		mtrail.Shutdown();
 	} else {
 		log("numWarps > 0");
 		// dir = something else

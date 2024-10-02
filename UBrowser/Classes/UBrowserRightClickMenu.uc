@@ -18,18 +18,16 @@ function Created()
 {
 	Super.Created();
 	
-	//Info = AddMenuItem(InfoName, None);
+	Info = AddMenuItem(InfoName, None);
 	Copy = AddMenuItem(CopyName, None);
 	Play = AddMenuItem(PlayName, None);
 	//OpenLocation = AddMenuItem(OpenLocationName, None);
 	AddMenuItem("-", None);
 	AddFavoriteItems();
 	AddMenuItem("-", None);
-	RefreshServer = AddMenuItem(RefreshServerName, None);
-	PingAll = AddMenuItem(PingAllName, None);
+	//RefreshServer = AddMenuItem(RefreshServerName, None);
+	//PingAll = AddMenuItem(PingAllName, None);
 	Refresh = AddMenuItem(RefreshName, None);
-	
-	Grid.ShowInfo(List);
 }
 
 function AddFavoriteItems()
@@ -54,15 +52,15 @@ function ExecuteItem(UWindowPulldownMenuItem I)
 	case Refresh:
 		Grid.Refresh();
 		break;
-	case PingAll:
-		Grid.RePing();
-		break;
-	case RefreshServer:
-		Grid.RefreshServer();
-		break;
-	case OpenLocation:
-		UBrowserMainWindow(Grid.GetParent(class'UBrowserMainWindow')).ShowOpenWindow();
-		break;
+	//case PingAll:
+	//	Grid.RePing();
+	//	break;
+	//case RefreshServer:
+	//	Grid.RefreshServer();
+	//	break;
+	//case OpenLocation:
+	//	UBrowserMainWindow(Grid.GetParent(class'UBrowserMainWindow')).ShowOpenWindow();
+	//	break;
 	case Copy:
 		GetPlayerOwner().CopyToClipboard("unreal://"$List.IP$":"$string(List.GamePort));
 		break;		
@@ -78,7 +76,7 @@ function ShowWindow()
 	Copy.bDisabled = List == None || List.GamePort == 0;
 
 	Favorites.bDisabled = List == None;
-	RefreshServer.bDisabled = List == None;
+	//RefreshServer.bDisabled = List == None;
 	Selected = None;
 
 	Super.ShowWindow();

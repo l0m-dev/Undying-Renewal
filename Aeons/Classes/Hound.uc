@@ -785,4 +785,6 @@ defaultproperties
      CollisionRadius=60
      CollisionHeight=60
      Mass=1000
+     MenuName="Hound"
+     CreatureDeathVerb="ravaged"
 }

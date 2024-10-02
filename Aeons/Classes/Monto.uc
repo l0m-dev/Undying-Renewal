@@ -638,7 +638,7 @@ state AIEnergyBlast expands AIFarAttackAnim
 		{
 			if ( BlastFX[lp].PFX != none )
 			{
-				BlastFX[lp].PFX.bShuttingDown = true;
+				BlastFX[lp].PFX.Shutdown();
 				BlastFX[lp].PFX = none;
 			}
 		}
@@ -1017,4 +1017,6 @@ defaultproperties
      CollisionRadius=120
      CollisionHeight=120
      bGroundMesh=False
+     MenuName="Monto"
+     CreatureDeathVerb="digested"
 }

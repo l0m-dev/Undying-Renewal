@@ -27,6 +27,7 @@ simulated function BeginPlay()
 {
 	// Remember initial light type and set new one.
 	Disable( 'Tick' );
+	NetUpdateFrequency = 2;
 	InitialBrightness = LightBrightness;
 	if( bInitiallyOn )
 	{
@@ -46,11 +47,14 @@ simulated function BeginPlay()
 function Tick( float DeltaTime )
 {
 	Alpha += Direction * DeltaTime / ChangeTime;
+
+	NetUpdateFrequency = default.NetUpdateFrequency;
 	
 	if( Alpha > 1.0 )
 	{
 		Alpha = 1.0;
 		Disable( 'Tick' );
+		NetUpdateFrequency = 2;
 		if( SavedTrigger != None )
 			SavedTrigger.EndEvent();
 	}
@@ -58,6 +62,7 @@ function Tick( float DeltaTime )
 	{
 		Alpha = 0.0;
 		Disable( 'Tick' );
+		NetUpdateFrequency = 2;
 		if( SavedTrigger != None )
 			SavedTrigger.EndEvent();
 	}
@@ -173,4 +178,5 @@ defaultproperties
      RemoteRole=ROLE_SimulatedProxy
      Texture=Texture'Engine.S_TrigLight'
      bMovable=True
+     bAlwaysRelevant=True
 }

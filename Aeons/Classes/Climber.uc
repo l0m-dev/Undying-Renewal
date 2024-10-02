@@ -19,6 +19,7 @@ function Touch(Actor Other)
 		if ( Other.IsA('PlayerPawn') )
 		{
 			PlayerPawn(Other).bForceClimb = true;
+			PlayerPawn(Other).bCanFly = true;
 		}
 	}
 }
@@ -37,7 +38,10 @@ function UnTouch(Actor Other)
 					bTouchingAnotherClimber = true;
 			}
 			if ( !bTouchingAnotherClimber )
+			{
 				PlayerPawn(Other).bForceClimb = false;
+				PlayerPawn(Other).bCanFly = false;
+			}
 		}
 	}
 }

@@ -29,7 +29,7 @@ var travel bool bActive;
 replication
 {
 	// Variables the server should send to the client.
-	reliable if( Role==ROLE_Authority && bNetOwner)
+	reliable if( Role==ROLE_Authority && bNetOwner )
 		CastingLevel, bActive;
 }
 
@@ -50,4 +50,6 @@ defaultproperties
      bHidden=True
      DrawType=DT_None
      bTravel=True
+     RemoteRole=ROLE_None
+     NetUpdateFrequency=10
 }

@@ -74,11 +74,18 @@ var() bool bCausesDamage;
 var() bool bTraceActors;
 var LightningLight lts[4];		// Dynamic lights for the lightning shaft
 var float DmgTime, DmgRem;		// 
+
+replication
+{
+	reliable if (Role == ROLE_Authority && bNetInitial)
+		Start, End;
+}
+
 // ===========================================================================
 // function Init();
 function Init( float Seconds, vector StartPoint, vector EndPoint );
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	DmgTime = 1.0 / float(DamagePerSec);
 	numKnots = 32;
@@ -92,7 +99,7 @@ function PreBeginPlay()
 	Super.PreBeginPlay();
 }
 
-function UpdateMetalDecal(vector Loc, vector n)
+simulated function UpdateMetalDecal(vector Loc, vector n)
 {
 	if (MetalDecal != none)
 	{
@@ -102,7 +109,7 @@ function UpdateMetalDecal(vector Loc, vector n)
 	}
 }
 
-function ChangePFX(class<ParticleFX> pClass, vector Loc, vector N, optional Texture HitTexture)
+simulated function ChangePFX(class<ParticleFX> pClass, vector Loc, vector N, optional Texture HitTexture)
 {
 	local vector spawnLocation;
 
@@ -111,7 +118,7 @@ function ChangePFX(class<ParticleFX> pClass, vector Loc, vector N, optional Text
 		if (pFX.class.name != pClass.name)
 		{
 			spawnLocation = pFX.Location;
-			pFX.bShuttingDown = true;
+			pFX.Shutdown();
 			pFX = spawn(pClass,,,SpawnLocation, Rotator(N));
 			if (HitTexture != none)
 				pFX.ColorStart.Base = HitTexture.MipZero;
@@ -122,7 +129,7 @@ function ChangePFX(class<ParticleFX> pClass, vector Loc, vector N, optional Text
 	}
 }
 
-function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
+simulated function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 {
 	local int i;
 
@@ -134,7 +141,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				ChangePFX(FXSurfType.FX_Glass, Loc, N, HitTexture);
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -144,7 +151,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				ChangePFX(FXSurfType.FX_Water, Loc, N, HitTexture);
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -200,7 +207,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				ChangePFX(FXSurfType.FX_Sand, Loc, N, HitTexture);
 				D = Spawn(FXSurfType.D_Sand,,,loc,rotator(N));
 				D.AttachToSurface(Normal(loc - LastStrike));
-				sFX.bShuttingDown = true;
+				sFX.Shutdown();
 				sFX = none;
 				if (MetalDecal != none) MetalDecal.Destroy();
 				break;
@@ -212,7 +219,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				break;
@@ -232,7 +239,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -244,7 +251,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -278,7 +285,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 	}
 }
 
-function Strike(vector Start, vector End)
+simulated function Strike(vector Start, vector End)
 {
 	local int i, numPoints;
 	local vector loc;
@@ -332,7 +339,7 @@ function DamageInfo GetDamageInfo(optional name DamageType)
 	return DInfo;	
 }
 
-function bool IsWaterZone(vector loc)
+simulated function bool IsWaterZone(vector loc)
 {
 	local int id;
 	local ZoneInfo Z;
@@ -346,7 +353,7 @@ function bool IsWaterZone(vector loc)
 	}
 }
 
-function vector GetZoneChangeLoc(vector Start, vector End, float Resolution )
+simulated function vector GetZoneChangeLoc(vector Start, vector End, float Resolution )
 {
 	local vector iVec, Dir, ZLoc;		// our temp test vector location
 	local int NumIncrements, i, InitialID;
@@ -370,7 +377,7 @@ function vector GetZoneChangeLoc(vector Start, vector End, float Resolution )
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, float Width)
+simulated function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, float Width)
 {
 	local int i, HitJoint, Flags, numPoints, hp, TotalAmplitude;
 	local float scalar, RScale;
@@ -489,7 +496,7 @@ function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, flo
 				ChangePFX(FXSurfType.FX_Water, End, vect(0,0,1));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				pFX.SetLocation(End);
@@ -504,7 +511,7 @@ function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, flo
 					}
 				}
 			} else if (pFX != none) {
-				pFX.bShuttingDown = true;
+				pFX.Shutdown();
 				pFX = none;
 			}
 		}
@@ -515,9 +522,9 @@ function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, flo
 	}
 }
 
-auto state Holding
+auto simulated state Holding
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		local vector x, y, z;
 		
@@ -529,7 +536,7 @@ auto state Holding
 		UpdateShaft(DeltaTime, Owner.Location, Owner.Location + (x*512) , 10, 4);
 	}
 	
-	function Timer()
+	simulated function Timer()
 	{
 		gotoState('Release');
 	}
@@ -546,7 +553,7 @@ auto state Holding
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-function CleanUp()
+simulated function CleanUp()
 {
 	local int i;
 
@@ -563,23 +570,23 @@ function CleanUp()
 	}
 	if (sFX != none)
 	{
-		sFX.bShuttingDown = true;
+		sFX.Shutdown();
 		sFX = none;
 	}
 
 	if (pFX != none)
 	{
-		pFX.bShuttingDown = true;
+		pFX.Shutdown();
 		pFX = none;
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	CleanUp();
 }
 
-state Release
+simulated state Release
 {
 Begin:
 	CleanUp();
@@ -596,4 +603,5 @@ defaultproperties
      bTraceActors=True
      bCollideActors=True
      bCollideWorld=True
+     RemoteRole=ROLE_SimulatedProxy
 }

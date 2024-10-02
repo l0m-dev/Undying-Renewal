@@ -933,6 +933,7 @@ state AISpecialKill
 
 		Spawn( class'Gibs',,, SK_TargetPawn.Location, rotator(vect(0,0,100)) );
 		SK_TargetPawn.DestroyLimb( 'spine1' );
+		ReplicateDestroyLimb( SK_TargetPawn, 'spine1' );
 		SK_TargetPawn.PlayAnim( 'death_gun_backhead' );
 	}
 
@@ -1000,4 +1001,6 @@ defaultproperties
      CollisionRadius=22
      CollisionHeight=57
      Mass=2000
+     MenuName="Ambrose"
+     CreatureDeathVerb="butchered"
 }

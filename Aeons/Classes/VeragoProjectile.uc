@@ -19,7 +19,7 @@ function PreBeginPlay()
 }
 */
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( TrailFX != none )
 		TrailFX.Destroy();
@@ -115,4 +115,5 @@ defaultproperties
      DrawScale=0.225
      CollisionRadius=6
      CollisionHeight=6
+     bNetTemporary=False
 }

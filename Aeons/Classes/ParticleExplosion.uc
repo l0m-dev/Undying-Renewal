@@ -11,7 +11,7 @@ var() class<Actor> MiscSpawnClass2;
 
 var int NumBits;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local int i;
 	local vector dir;
@@ -19,19 +19,19 @@ function PreBeginPlay()
 	super.PreBeginPlay();
 	
 	if (MiscSpawnClass1 != none)
-		Spawn(MiscSpawnClass1,,,Location);
+		TearOff(Spawn(MiscSpawnClass1,,,Location));
 
 	if (MiscSpawnClass2 != none)
-		Spawn(MiscSpawnClass2,,,Location);
+		TearOff(Spawn(MiscSpawnClass2,,,Location));
 
 	numBits = RandRange(MaxBits, MinBits);
 	
-	spawn(class 'WeaponLight',,,Location);
+	TearOff(spawn(class 'WeaponLight',,,Location));
 	for (i=0; i<numBits; i++)
 	{
 		dir = Normal(vect(0,0,1) + (VRand() * 0.5));
 		dir.z *= 0.35;
-		spawn( ProjClass,,,Location, Rotator(Dir) );
+		TearOff(spawn( ProjClass,,,Location, Rotator(Dir) ));
 	}
 }
 

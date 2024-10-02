@@ -46,7 +46,7 @@ simulated event RenderOverlays( canvas Canvas )
 			Canvas.DrawColor.B = 255;
 			Canvas.SetPos(Canvas.ClipX * 0.5 - (x*0.5), Canvas.ClipY * 0.76);
 		}
-		Canvas.Style = ERenderStyle.STY_AlphaBlend;
+		Canvas.Style = ERenderStyle.STY_Normal;
 		Canvas.bNoSmooth = false;
 		Canvas.DrawText( DisplayedMessage, false );
 	}

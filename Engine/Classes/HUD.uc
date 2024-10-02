@@ -107,6 +107,7 @@ simulated function DrawSubtitles(Canvas C);
 // Messaging.
 
 simulated function Message( PlayerReplicationInfo PRI, coerce string Msg, name N );
+simulated function ChatMessage( PlayerReplicationInfo PRI, coerce string Msg, name N, optional color Color );
 simulated function LocalizedMessage( class<LocalMessage> Message, optional int Switch, optional PlayerReplicationInfo RelatedPRI_1, optional PlayerReplicationInfo RelatedPRI_2, optional Object OptionalObject, optional string CriticalString );
 
 simulated function PlayReceivedMessage( string S, string PName, ZoneInfo PZone )
@@ -203,7 +204,7 @@ defaultproperties
      HudMode=1
      Crosshair=1
      HUDConfigWindowType="UMenu"
-     WhiteColor=(G=128,B=255)
+     WhiteColor=(G=128,B=255,A=255)
      LetterboxAspectRatio=0.12
      LetterboxFadeRate=1.5
 	 bEnableLetterBox=True

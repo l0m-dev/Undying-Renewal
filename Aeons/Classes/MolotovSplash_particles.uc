@@ -8,7 +8,7 @@ class MolotovSplash_particles expands MolotovFire_particles;
 function ZoneChange(ZoneInfo NewZone)
 {
 	if (NewZone.bWaterZone)
-		bShuttingDown = true;
+		Shutdown();
 }
 
 state() startup
@@ -84,7 +84,7 @@ state Spreading
 
 		setTimer(0.2,true);
 		sleep((FRand() * 4) + 3);
-		bShuttingDown = true;
+		Shutdown();
 		// gotoState('Extinguish');
 }
 

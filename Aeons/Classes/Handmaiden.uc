@@ -127,7 +127,8 @@ function UpdateBethany()
 	{
 		foreach AllActors( class'Bethany', aBethany ) { pBethany = aBethany; }
 
-		DebugInfoMessage( ".UpdateBethany() found Bethany named " $ pBethany.name $ "." );
+		if ( pBethany != none )
+			DebugInfoMessage( ".UpdateBethany() found Bethany named " $ pBethany.name $ "." );
 	}
 }
 
@@ -536,7 +537,7 @@ function RemoveVortexParticles()
 	ForEach AllActors(class 'Actor', A)
 		if ( A.Owner == self )
 			if ( A.IsA('MandorlaParticleFX') )
-				ParticleFX(A).bShuttingDown = true;
+				ParticleFX(A).Shutdown();
 }
 
 function DestroyVortex()
@@ -881,6 +882,7 @@ state AISpecialKill
 
 		Spawn( class'Gibs',,, SK_TargetPawn.Location, rotator(vect(0,0,100)) );
 		SK_TargetPawn.DestroyLimb( 'spine1' );
+		ReplicateDestroyLimb( SK_TargetPawn, 'spine1' );
 		SK_TargetPawn.PlayAnim( 'death_gun_backhead' );
 	}
 
@@ -975,4 +977,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Handmaiden_m'
      CollisionHeight=57
      bGroundMesh=False
+     MenuName="Handmaiden"
+     CreatureDeathVerb="hexed"
 }

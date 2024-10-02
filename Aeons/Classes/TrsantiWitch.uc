@@ -124,7 +124,10 @@ function CastShield()
 		return;
 	Shield = Spawn( class'SPShield', self,, Location, Rotation );
 	if ( Shield != none )
-		Shield.Offset = ShieldOffset;
+	{
+		Shield.PrePivot = ShieldOffset;
+		Shield.SetBase(Self);
+	}
 }
 
 function bool NeedShieldCast()
@@ -295,4 +298,6 @@ defaultproperties
      SoundSet=Class'Aeons.TrsantiWitchSoundSet'
      FootSoundClass=Class'Aeons.SandalFootSoundSet'
      Mesh=SkelMesh'Aeons.Meshes.TrsantiWitch_m'
+     MenuName="Trsanti Witch"
+     CreatureDeathVerb="bewitched"
 }

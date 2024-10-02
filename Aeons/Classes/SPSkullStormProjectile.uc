@@ -8,14 +8,17 @@ class SPSkullStormProjectile expands SpellProjectile;
 var ParticleFX				TrailFX;
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	TrailFX = Spawn( class'SkullStorm_Particles', self,, Location );
-	TrailFX.SetBase( self );
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		TrailFX = Spawn( class'SkullStorm_Particles', self,, Location );
+		TrailFX.SetBase( self );
+	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( TrailFX != none )
 		TrailFX.Destroy();

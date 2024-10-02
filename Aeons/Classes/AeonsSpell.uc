@@ -53,9 +53,11 @@ class AeonsSpell extends Spell
 //=============================================================================
 
 var bool bCanClientFire;
+var bool bContinuousFire;
 var() name HandAnim;
 var() texture SpellHandTextures[5];
 var() sound CantripSound, NoManaSound;
+
 
 //////////////////////////////////////////////////////////////////////////////
 //	Replication
@@ -65,18 +67,34 @@ replication
     // Things the server should send to the client.
     Reliable if ( bNetOwner && (Role == ROLE_Authority) )
 		bCanClientFire, HandAnim;		
+
+	unreliable if ( Role == ROLE_Authority )
+		FailedSpellCast, PlayOneshotAnim;
+}
+
+function BeginPlay()
+{
+	Super.BeginPlay();
+
+	if (Level.NetMode != NM_Standalone)
+	{
+		bCanClientFire = true;
+	}
 }
 
 simulated event RenderOverlays( canvas Canvas )
 {
-	if ( AeonsPlayer(Owner).Opacity == 1.0 )
+	if ( AeonsPlayer(Owner) != None )
 	{
-		if (AeonsPlayer(Owner).bRenderWeapon)
-			Opacity = FClamp(Opacity + 0.05, 0, 1);
-		else
-			Opacity = FClamp(Opacity - 0.05, 0, 1);
-	} else {
-		Opacity = FClamp(AeonsPlayer(Owner).Opacity, 0.15, 1);
+		if ( AeonsPlayer(Owner).Opacity == 1.0 )
+		{
+			if (AeonsPlayer(Owner).bRenderWeapon)
+				Opacity = FClamp(Opacity + 0.05, 0, 1);
+			else
+				Opacity = FClamp(Opacity - 0.05, 0, 1);
+		} else {
+			Opacity = FClamp(AeonsPlayer(Owner).Opacity, 0.15, 1);
+		}
 	}
 
 	super.RenderOverlays(Canvas);
@@ -106,7 +124,7 @@ function bool AngleCheck(vector Loc, vector A, vector B, float angleThreshold)
 	return ( cos(angleThreshold) < angle );
 }
 
-function FailedSpellCast()
+simulated function FailedSpellCast()
 {
 	// Pawn(Owner).ClientMessage("No Mana ... foooo!");
 	Owner.PlaySound(NoManaSound);
@@ -144,7 +162,7 @@ function FirePyro()
 	GotoState('NormalFire');
 }
 
-function FireCantrip()
+simulated function FireCantrip()
 {
 	local vector dir;
 	
@@ -156,7 +174,6 @@ function FireCantrip()
 simulated function bool ClientFire( float Value )
 {
 	//logTime("AeonsSpell: ClientFire: ... bCanClientFire = "$bCanClientFire);
-
 	if ( bCanClientFire && ((Role == ROLE_Authority) || (Pawn(Owner).Mana >= ManaCostPerLevel[castingLevel])) )
 	{
 /*		if ( (PlayerPawn(Owner) != None) 
@@ -185,16 +202,69 @@ simulated function bool ClientFire( float Value )
 
 //----------------------------------------------------------------------------
 
+simulated function PlayPostSelect()
+{
+    bCanClientFire = true;
+}
+
 state NormalFire
 {
+	function BeginState()
+	{
+		Super.BeginState();
+		bCanClientFire = true;
+	}
 	function EndState()
 	{
 		//Log("AeonsSpell: state NormalFire: EndState: setting bCanClientFire to TRUE");
+		//bCanClientFire = true;
+	}
+}
+
+state Active
+{
+	function BeginState()
+	{
+		Super.BeginState();
 		bCanClientFire = true;
 	}
 }
 
 //============================================================================
+
+State ClientIdle
+{
+	simulated function BeginState()
+	{
+		PlayIdleAnim();
+		// force it to true for now
+		if ( Pawn(Owner) != None && Pawn(Owner).AttSpell == Self )
+			bCanClientFire = True;
+		if ( bCanClientFire && (PlayerPawn(Owner) != None) )
+		{
+			if ( (Pawn(Owner).bFireAttSpell != 0) )
+			{
+				Global.ClientFire(0);
+				return;
+			}
+		}
+		enable('Tick');
+	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		Global.Tick(DeltaTime);
+
+		if ( bCanClientFire && (PlayerPawn(Owner) != None) && PlayerPawn(Owner).AttSpell == self )
+		{
+			if ( Pawn(Owner).bFireAttSpell != 0 )
+			{
+				Global.ClientFire(0);
+				return;
+			}
+		}
+	}
+}
 
 state ClientFiring
 {
@@ -235,6 +305,35 @@ state ClientFiring
 */
 }
 
+simulated state ClientSpellAnim
+{
+	simulated function bool ClientFire(float Value)
+	{
+		return false;
+	}
+	
+	Begin:
+		bInControl = true;
+		FinishAnim();
+		bInControl = false;
+		GotoState('ClientFinishing');
+}
+
+simulated function PlayOneshotAnim(name Anim, float Rate)
+{
+	if (Level.NetMode == NM_Client)
+	{
+		PlayAnim(Anim,Rate,,,0);
+		GotoState('ClientSpellAnim');
+	}
+	else
+	{
+		BringUp();
+		PlayAnim(Anim,Rate,,,0);
+		Finish();
+	}
+}
+
 //----------------------------------------------------------------------------
 
 state PostAmplify
@@ -263,4 +362,5 @@ defaultproperties
      NoManaSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_NoMana01'
      PlayerViewMesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      bNoSmooth=False
+     bContinuousFire=True
 }

@@ -57,7 +57,7 @@ state Activated
 {
 	function Activate()
 	{
-		if ( !PlayerPawn(Owner).HeadRegion.Zone.bWaterZone && (PlayerPawn(Owner).Health >= 0) )
+		if ( !PlayerPawn(Owner).HeadRegion.Zone.bWaterZone && !PlayerPawn(Owner).HeadRegion.Zone.bNeutralZone && (PlayerPawn(Owner).Health >= 0) )
 		{
 			NumCopies --;
 			DynamiteDrop(class 'DynamiteAmmo', 300, false, true);
@@ -122,7 +122,7 @@ function DynamiteAmmo DynamiteDrop(class<Ammo> AmmoClass, float ProjSpeed, bool 
 	Owner.PlaySound(Sound'Wpn_Spl_Inv.Inventory.E_Wpn_DynaFuse01', SLOT_None, 2.0);
 	
 	dProj = DynamiteFire(class 'Dynamite_proj', 300, false, false);
-	dProj.SpinRate(1.0);
+	//dProj.SpinRate(1.0);
 	dProj.bFuseLit = true;
 	dProj.FuseLen = 3;
 	dProj.GotoState('Throw');
@@ -383,7 +383,7 @@ state NewClip
 		ClearAnims();
 		
 		if ( FuseFX != None ) 
-			FuseFX.bShuttingDown = true;
+			FuseFX.Shutdown();
 
 		sleep(reloadTime * (1.0/RefireMult));
 		//Owner.PlaySound(Misc1Sound, SLOT_None,2.0);

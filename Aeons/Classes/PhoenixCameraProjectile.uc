@@ -11,9 +11,13 @@ var float Dist, len;
 
 auto state Hover 
 {
-	function Tick(float DeltaTime)	
+	simulated function Tick(float DeltaTime)	
 	{
+		if (Level.NetMode == NM_DedicatedServer)
+			return;
 		if ( Owner != none ) {
+			if (Level.NetMode == NM_Client && Owner.IsA('Phoenix_Proj') && Owner.GetStateName() != 'Release')
+				Owner.GotoState('Release');
 			SetRotation(Rotator(Owner.Location - Location));
 			LastRot = Rotation;
 			Dist = VSize(Owner.Location - Location);
@@ -34,7 +38,7 @@ auto state Hover
 		}
 	}
 
-	function Timer()
+	simulated function Timer()
 	{
 		ForEach AllActors(class 'PlayerPawn', Player)
 		{
@@ -48,4 +52,6 @@ auto state Hover
 
 defaultproperties
 {
+	bNetTemporary=False
+	bAlwaysRelevant=True
 }

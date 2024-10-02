@@ -8,7 +8,7 @@ class SPThrownProjectile expands FallingProjectile;
 
 
 // return TRUE if player's shield protects them, FALSE if not.
-function bool CheckPlayerShield( actor Player, vector HitLocation )
+simulated function bool CheckPlayerShield( actor Player, vector HitLocation )
 {
 	local vector vd, playerCoord1, playerCoord2, PlayerLocation;
 	local AeonsPlayer AP;
@@ -48,16 +48,16 @@ function bool CheckPlayerShield( actor Player, vector HitLocation )
 	}
 }
 
-function HitPlayer( actor Player, vector HitLocation )
+simulated function HitPlayer( actor Player, vector HitLocation )
 {
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Disable( 'Tick' );
 }
 
-function DamageInfo getDamageInfo( optional name DamageType )
+simulated function DamageInfo getDamageInfo( optional name DamageType )
 {
 	local DamageInfo DInfo;
 
@@ -77,11 +77,11 @@ function DamageInfo getDamageInfo( optional name DamageType )
 	return DInfo;
 }
 
-function Explode( vector HitLocation, vector HitNormal )
+simulated function Explode( vector HitLocation, vector HitNormal )
 {
 	// spawn effect
 	if ( Trail != none )
-		Trail.bShuttingDown = true;
+		Trail.Shutdown();
 	Destroy();
 }
 
@@ -92,21 +92,21 @@ auto state HeldState
 
 state FallingState
 {
-	function Tick( float DeltaTime )
+	simulated function Tick( float DeltaTime )
 	{
 		if ( VSize(Velocity) < 4 )
 		{
 			SetCollision( false );
 			if ( Trail != none )
 			{
-				Trail.bShuttingDown = true;
+				Trail.Shutdown();
 				Trail = none;
 			}
 			SetPhysics( PHYS_Falling );
 		}
 	}
 
-	simulated function ProcessTouch( actor Other, vector HitLocation )
+	function ProcessTouch( actor Other, vector HitLocation )
 	{
 		if ( Other == Owner )
 			return;
@@ -140,7 +140,7 @@ state Stopped
 	{
 		ClearAnims();
 		if ( Trail != none )
-			Trail.bShuttingDown = true;
+			Trail.Shutdown();
 		SetPhysics( PHYS_None );
 		SetCollision( false, false, false );
 		Velocity = vect(0,0,0);

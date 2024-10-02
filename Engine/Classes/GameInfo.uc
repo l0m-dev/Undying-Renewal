@@ -122,9 +122,6 @@ var class<StatLog>				StatLogClass;
 var globalconfig int DemoBuild;
 var globalconfig int DemoHasTuts;
 
-// Settings
-var RenewalConfig RenewalConfig;
-
 //------------------------------------------------------------------------------
 // Admin
 
@@ -161,6 +158,9 @@ function AdminLogout( PlayerPawn P )
 
 function PreBeginPlay()
 {
+	// reset default value
+	class'LevelInfo'.default.bDontAllowSavegame = false;
+
 	StartTime = 0;
 	SetGameSpeed(GameSpeed);
 	Level.bNoCheating = bNoCheating;
@@ -171,6 +171,8 @@ function PreBeginPlay()
 	else
 		GameReplicationInfo = Spawn(class'GameReplicationInfo');
 	InitGameReplicationInfo();
+
+	Level.GRI = GameReplicationInfo;
 }
 
 function PostBeginPlay()
@@ -683,7 +685,10 @@ function ProcessServerTravel( string URL, bool bItems )
 	log("ProcessServerTravel:"@URL);
 	foreach AllActors( class'PlayerPawn', P )
 		if( NetConnection(P.Player)!=None )
+		{
+			P.ClientTravelCleanupServer();
 			P.ClientTravel( URL, TRAVEL_Relative, bItems );
+		}
 		else
 		{	
 			LocalPlayer = P;
@@ -830,7 +835,7 @@ event playerpawn Login
 	local NavigationPoint StartSpot;
 	local PlayerPawn      NewPlayer, TestPlayer;
 	local Pawn            PawnLink;
-	local string          InName, InPassword, InSkin, InFace, InChecksum;
+	local string          InName, InPassword, InSkin, InFace, InChecksum, InMesh;
 	local byte            InTeam;
 
 	// Make sure there is capacity. (This might have changed since the PreLogin call).
@@ -861,6 +866,7 @@ event playerpawn Login
 	InSkin	   = ParseOption ( Options, "Skin"    );
 	InFace     = ParseOption ( Options, "Face"    );
 	InChecksum = ParseOption ( Options, "Checksum" );
+	InMesh	   = ParseOption ( Options, "Mesh" );
 
 	log( "Login:" @ InName );
 	if( InPassword != "" )
@@ -922,6 +928,7 @@ event playerpawn Login
 	}
 
 	NewPlayer.static.SetMultiSkin(NewPlayer, InSkin, InFace, InTeam);
+	NewPlayer.static.SetMultiMesh(NewPlayer, InMesh);
 
 	// Set the player's ID.
 	NewPlayer.PlayerReplicationInfo.PlayerID = CurrentID++;
@@ -954,7 +961,7 @@ event playerpawn Login
 
 	// If we are a server, broadcast a welcome message.
 	if( Level.NetMode==NM_DedicatedServer || Level.NetMode==NM_ListenServer )
-		BroadcastMessage( NewPlayer.PlayerReplicationInfo.PlayerName$EnteredMessage, false );
+		BroadcastMessage( NewPlayer.PlayerReplicationInfo.PlayerName$EnteredMessage, false, 'login' );
 
 	// Teleport-in effect.
 	StartSpot.PlayTeleportEffect( NewPlayer, true );
@@ -969,13 +976,20 @@ event playerpawn Login
 	if ( !NewPlayer.IsA('Spectator') )
 		NumPlayers++;
 
+	NewPlayer.home = StartSpot; // reuse variable to store StartSpot for use in PostLogin
+
 	if ( PlayerStart(StartSpot) != None && PlayerStart(StartSpot).bCutScene )
-		StartCutScene(NewPlayer);
+	{
+		// sicne we moved StartCutScene to PostLogin, spawn a dummy actor to keep dupe inventory glitch
+		Spawn(class'Effects',,, StartSpot.Location).Destroy();
+	}
 
 	return newPlayer;
 }	
 
 function StartCutScene(PlayerPawn Player);
+function CutsceneManagerPlayerLogin(PlayerPawn Player, bool bCutSceneStartSpot);
+function CutsceneManagerPlayerLogout(PlayerPawn Player);
 
 //
 // Called after a successful login. This is the first place
@@ -986,10 +1000,17 @@ event PostLogin( playerpawn NewPlayer )
 	local Pawn P;
 	local Playerpawn ppawn;
 
+	if ( NetConnection(NewPlayer.Player) == None && Level.NetMode == NM_ListenServer ) // give admin to the local player on a listen server
+		NewPlayer.bAdmin = true;
+
+	NewPlayer.PlayerReplicationInfo.bAdmin = NewPlayer.bAdmin; // make sure it's updated because it can change (like with -alladmins)
+
 	// Start player's music.
 	NewPlayer.ClientSetMusic( Level.Song, Level.SongSection, Level.CdTrack, MTRAN_Fade );
 	if ( Level.NetMode != NM_Standalone )
 	{
+		NewPlayer.ClientSetLocalAnims();
+		
 		// replicate skins
 		for ( P=Level.PawnList; P!=None; P=P.NextPawn )
 			if ( P.bIsPlayer && (P != NewPlayer) )
@@ -1008,19 +1029,12 @@ event PostLogin( playerpawn NewPlayer )
 					if ( NewPlayer.bIsMultiSkinned )
 						PlayerPawn(P).ClientReplicateSkins(NewPlayer.MultiSkins[0], NewPlayer.MultiSkins[1], NewPlayer.MultiSkins[2], NewPlayer.MultiSkins[3]);
 					else
-						PlayerPawn(P).ClientReplicateSkins(NewPlayer.Skin);	
+						PlayerPawn(P).ClientReplicateSkins(NewPlayer.Skin);
 				}						
 			}
 	}
-}
 
-function RenewalConfig GetRenewalConfig()
-{
-	// RenewalConfig is transient to keep backwards compatibility so spawn it if it's None
-	// don't spawn anything on Login, StartCutscene does that and it duplicates inventory when loading a save (not fixing this for speedrunning purposes)
-	if (RenewalConfig == None)
-		RenewalConfig = Spawn(class'RenewalConfig');
-	return RenewalConfig;
+	CutsceneManagerPlayerLogin(NewPlayer, PlayerStart(NewPlayer.home) != None && PlayerStart(NewPlayer.home).bCutScene);
 }
 
 //
@@ -1049,12 +1063,15 @@ function Logout( pawn Exiting )
 			NumPlayers--;
 	}
 	if( bMessage && Exiting.PlayerReplicationInfo != None &&(Level.NetMode==NM_DedicatedServer || Level.NetMode==NM_ListenServer) )
-		BroadcastMessage( Exiting.PlayerReplicationInfo.PlayerName$LeftMessage, false );
+		BroadcastMessage( Exiting.PlayerReplicationInfo.PlayerName$LeftMessage, false, 'logout' );
 
 	if ( LocalLog != None )
 		LocalLog.LogPlayerDisconnect(Exiting);
 	if ( WorldLog != None )
 		WorldLog.LogPlayerDisconnect(Exiting);
+
+	if ( Exiting.IsA('PlayerPawn') )
+		CutsceneManagerPlayerLogout(PlayerPawn(Exiting));
 }
 
 //
@@ -1256,20 +1273,63 @@ function Killed( pawn Killer, pawn Other, name damageType )
 			}
 			if (!bSpecialDamage)
 			{
-				if ( damageType == 'Fell' )
-					BroadcastLocalizedMessage(DeathMessageClass, 2, Other.PlayerReplicationInfo, None);
-				else if ( damageType == 'Eradicated' )
-					BroadcastLocalizedMessage(DeathMessageClass, 3, Other.PlayerReplicationInfo, None);
-				else if ( damageType == 'Drowned' )
-					BroadcastLocalizedMessage(DeathMessageClass, 4, Other.PlayerReplicationInfo, None);
-				else if ( damageType == 'Burned' )
-					BroadcastLocalizedMessage(DeathMessageClass, 5, Other.PlayerReplicationInfo, None);
-				else if ( damageType == 'Corroded' )
-					BroadcastLocalizedMessage(DeathMessageClass, 6, Other.PlayerReplicationInfo, None);
-				else if ( damageType == 'Mortared' )
-					BroadcastLocalizedMessage(DeathMessageClass, 7, Other.PlayerReplicationInfo, None);
-				else
-					BroadcastLocalizedMessage(DeathMessageClass, 1, Other.PlayerReplicationInfo, None);
+				switch ( damageType )
+				{
+					case 'Fell':
+						BroadcastLocalizedMessage(DeathMessageClass, 2, Other.PlayerReplicationInfo, None);
+						break;
+					case 'Drowned':
+						BroadcastLocalizedMessage(DeathMessageClass, 4, Other.PlayerReplicationInfo, None);
+						break;
+					case 'Crushed':
+						BroadcastLocalizedMessage(DeathMessageClass, 7, Other.PlayerReplicationInfo, None);
+						break;
+					case 'Stomped':
+						BroadcastLocalizedMessage(DeathMessageClass, 8, Other.PlayerReplicationInfo, None);
+						break;
+					case 'scythe':
+					case 'scythedouble':
+						// todo: scythe deathmessage
+						BroadcastLocalizedMessage(DeathMessageClass, 1, Other.PlayerReplicationInfo, None);
+						break;
+					case 'bullet':
+					case 'pellet':
+					case 'spear':
+					case 'gen_physical':
+						BroadcastLocalizedMessage(DeathMessageClass, 1, Other.PlayerReplicationInfo, None);
+						break;
+					case 'silverbullet': // move?
+					case 'chargedspear':
+					case 'LightningBoltOfGods':
+					case 'sphereofcold':
+					case 'chargedsphereofcold':
+					case 'ectoplasm':
+					case 'creepingrot':
+					case 'powerword':
+					case 'gen_magical':
+						// todo: magic deathmessage?
+						BroadcastLocalizedMessage(DeathMessageClass, 1, Other.PlayerReplicationInfo, None);
+						break;
+					case 'Burned':
+					case 'fire':
+					case 'gen_fire':
+						BroadcastLocalizedMessage(DeathMessageClass, 5, Other.PlayerReplicationInfo, None);
+						break;
+					case 'electrical':
+						BroadcastLocalizedMessage(DeathMessageClass, 6, Other.PlayerReplicationInfo, None);
+						break;
+					case 'Exploded':
+					case 'dyn_concussive':
+					case 'skull_concussive':
+					case 'sigil_concussive':
+					case 'lbg_concussive':
+					case 'phx_concussive':
+					case 'gen_concussive':
+						BroadcastLocalizedMessage(DeathMessageClass, 3, Other.PlayerReplicationInfo, None);
+						break;
+					default:
+						BroadcastLocalizedMessage(DeathMessageClass, 1, Other.PlayerReplicationInfo, None);
+				}
 			}
 		} 
 		else 
@@ -1393,8 +1453,12 @@ function RegisterMessageMutator(Mutator M)
 function int ReduceDamage( int Damage, name DamageType, pawn injured, pawn instigatedBy )
 {
 	if( injured.Region.Zone.bNeutralZone )
-		return 0;	
-	return Damage;
+		return 0;
+
+	if ( instigatedBy == None)
+		return Damage;
+
+	return (Damage * instigatedBy.DamageScaling);
 }
 
 //
@@ -1543,6 +1607,17 @@ function SendPlayer( PlayerPawn aPlayer, string URL )
 //
 function PlayTeleportEffect( actor Incoming, bool bOut, bool bSound);
 
+// Player Can be restarted ?
+function bool PlayerCanRestart( PlayerPawn aPlayer )
+{
+	return true;
+}
+
+function bool PlayerCanRestartGame( PlayerPawn aPlayer )
+{
+	return (aPlayer.bAdmin || Level.Netmode==NM_Standalone);
+}
+
 //
 // Restart the game.
 //
@@ -1599,6 +1674,8 @@ function EndGame( string Reason )
 		WorldLog.Destroy();
 		WorldLog = None;
 	}
+
+	BroadcastMessage("Ending game:" @ Reason);
 }
 
 function bool SetEndCams(string Reason)

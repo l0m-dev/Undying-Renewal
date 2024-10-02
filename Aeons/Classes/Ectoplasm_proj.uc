@@ -3,6 +3,9 @@
 //=============================================================================
 class Ectoplasm_proj expands SpellProjectile;
 
+// set DrawType to DT_Mesh so Rotation replicates to the client
+// removed randomness in multiplayer since it's simulated: disabled spread and clones
+
 // User exposed variables
 var() 	bool 	bSpawnClones; 					// spawn a cloned particle
 var() 	float 	spawnClonesProbability;			// probability to spawn a cloned projectile at the time of re-evaluation
@@ -26,7 +29,7 @@ var 	ScriptedFX  Shaft;
 var		float 		SeekWt;
 
 // ==============================================================================
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	// Create the trail effect and attach it to the projectile
 //	ectoTrail = Spawn(class 'EctoplasmTrail_particles',,, Location, Rotation);
@@ -50,16 +53,18 @@ function PreBeginPlay()
 simulated function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	ectoTrail = Spawn(class 'EctoplasmTrail_particles',self);
-	//ectoTrail = Spawn(class 'AeonsParticleFX',self);
-	//ectoTrail.SetPhysics(PHYS_Trailer);
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		ectoTrail = Spawn(class 'EctoplasmTrail_particles',self);
+		//ectoTrail = Spawn(class 'AeonsParticleFX',self);
+		//ectoTrail.SetPhysics(PHYS_Trailer);
+	}
 }
-
 
 simulated function Destroyed()
 {
 	if ( ectoTrail != None )
-		ectoTrail.bShuttingDown = true;
+		ectoTrail.Shutdown();
 }
 
 simulated function ParticleHitFX(vector HitLocation, vector HitNormal)
@@ -106,7 +111,7 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 			}
 		}
 
-		log ("Ecto Iterations: " $ i);
+		//log ("Ecto Iterations: " $ i);
 
 		if ( bCanSpawn )
 		{
@@ -120,7 +125,7 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 
 				insideWallDistance = VSize(spawnLocation - HitLocation);
 
-				log ("Success! Inside Distance- " $ insideWallDistance);
+				//log ("Success! Inside Distance- " $ insideWallDistance);
 				ecto = Spawn(class 'Ectoplasm_proj',,, (spawnLocation + (Normal(InitialDir) * 16)), rotator(InitialDir));
 				ecto.InitialDir = InitialDir;
 
@@ -138,22 +143,22 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 				Destroy();
 				
 			} else {
-				log ("Ectoplasm: Spawn Location Failed");
+				//log ("Ectoplasm: Spawn Location Failed");
 				super.HitWall(HitNormal, Wall,TextureID);
 			}
 		} else {
-			log ("Ectoplasm: Spawn Ability Failed");
+			//log ("Ectoplasm: Spawn Ability Failed");
 			super.HitWall(HitNormal, Wall,TextureID);
 		}
 	} else {
-		log ("Ectoplasm: Casting Level Failed");
+		//log ("Ectoplasm: Casting Level Failed");
 		super.HitWall(HitNormal, Wall,TextureID);
 	}
 }
 
-auto state Flying
+auto simulated state Flying
 {
-	function BeginState()
+	simulated function BeginState()
 	{
 		SetTimer(0.05,True);
 		i = 0;
@@ -179,7 +184,7 @@ auto state Flying
 			super.ProcessTouch (Other, HitLocation);
 	}
 
-	function Timer()
+	simulated function Timer()
 	{
 		local rotator RandRot;
 		local float deviation, MagnitudeVel;
@@ -208,13 +213,15 @@ auto state Flying
 			SeekingDir = Normal( (SeekingDir * SeekWt) + (currentDir * (1.0 - SeekWt)) );
 			deviation *= 0.5;
 		}
-	
-		randomDir = (VRand() * (FRand() * deviation)) * 0.25;
+
+		if (Level.NetMode == NM_Standalone)
+			randomDir = (VRand() * (FRand() * deviation)) * 0.25;
+		
 		Velocity = Normal(seekingDir + randomDir) * speedPerLevel[CastingLevel];
 		SetRotation(rotator(Velocity));
 
 		// spawning clones of itself
-		if ( (FRand() < 0.025) && (numClones < MaxClones) )
+		if ( Level.NetMode == NM_Standalone && (FRand() < 0.025) && (numClones < MaxClones) )
 		{
 			ecto = Spawn(class 'Ectoplasm_proj',,,Location, Rotation);
 			ecto.seekPawn = seekPawn;		// mjg: clones should get this info, right?
@@ -234,7 +241,7 @@ function int Dispel(optional bool bCheck)
 	if ( bCheck )
 		return CastingLevel;
 	
-	ectoTrail.bShuttingDown = true;
+	ectoTrail.Shutdown();
 	Destroy();
 }
 
@@ -284,7 +291,7 @@ defaultproperties
      ExploWallOut=8
      ExplosionDecal=Class'Aeons.EctoDecal'
      LifeSpan=1
-     DrawType=DT_None
+     DrawType=DT_Mesh
      Style=STY_None
      Texture=None
      DrawScale=0.3

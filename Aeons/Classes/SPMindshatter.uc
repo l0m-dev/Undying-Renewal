@@ -8,6 +8,14 @@ class SPMindshatter expands SPWeapon;
 //****************************************************************************
 var() int					ProjAmplitude;		//
 
+function PreBeginPlay()
+{
+     if (RGC())
+     {
+          Accuracy = 1.0;
+     }
+     super.PreBeginPlay();
+}
 
 //****************************************************************************
 // Inherited member funcs.

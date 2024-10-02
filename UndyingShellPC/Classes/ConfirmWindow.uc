@@ -179,15 +179,15 @@ function Paint(Canvas C, float X, float Y)
 			return;
 	}
 	
-	TileWidth = WinWidth / 3;
-	TileHeight = WinHeight / 2;
+	TileWidth = InnerWidth / 3;
+	TileHeight = InnerHeight / 2;
 
 	C.DrawColor = BackColor;
 	
 	C.bNoSmooth = true;
 
-	DrawStretchedTextureSegment( C, TileWidth/2, TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
-	DrawStretchedTextureSegment( C, TileWidth/2+TileWidth, TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[1] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth/2, InnerTop + TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
+	DrawStretchedTextureSegment( C, InnerLeft + TileWidth/2+TileWidth, InnerTop + TileHeight/2, TileWidth, TileHeight, 0, 0, 256, 256, Back[1] );
 
 	C.DrawColor = C.Default.DrawColor;
 	

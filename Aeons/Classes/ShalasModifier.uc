@@ -16,10 +16,10 @@ var AeonsPlayer Player;
 
 //----------------------------------------------------------------------------
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
-	if (Owner.IsA('AeonsPlayer'))
+	if (Owner != None && Owner.IsA('AeonsPlayer'))
 		Player = AeonsPlayer(Owner);
 	Col = vect(0.5,1,0.5) * 100;	// hud change color
 	Str = 0.05;						// HUD change strength
@@ -126,7 +126,7 @@ state Deactivated
 		ForEach AllActors(class 'Actor', A)
 			if ( A.Owner == Pawn(Owner) )
 				if ( A.IsA('MandorlaParticleFX') )
-					ParticleFX(A).bShuttingDown = true;
+					ParticleFX(A).Shutdown();
 	}
 
 	Begin:
@@ -154,5 +154,4 @@ auto state Idle
 defaultproperties
 {
      EffectSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ShalaLoop01'
-     RemoteRole=ROLE_None
 }

@@ -30,17 +30,17 @@ function Created()
 
 	Super.Created();
 
-	InfoWindow = UBrowserInfoWindow(Root.CreateWindow(class'UBrowserInfoWindow', 10, 40, 310, 170));
+	InfoWindow = UBrowserInfoWindow(Root.CreateWindow(class'UBrowserInfoWindow', 10*Root.ScaleY, 40*Root.ScaleY, 310*Root.ScaleY, 170*Root.ScaleY));
 	InfoWindow.HideWindow();
 
 	PageControl = UWindowPageControl(CreateWindow(class'UWindowPageControl', 0, 0, WinWidth, WinHeight));
 	PageControl.SetMultiLine(True);
 
 	// Add MOTD
-	MC = class<UBrowserUpdateServerWindow>(DynamicLoadObject(UpdateServerClass, class'Class'));
-	//MOTD = PageControl.AddPage(MOTDName, MC);
+	//MC = class<UBrowserUpdateServerWindow>(DynamicLoadObject(UpdateServerClass, class'Class'));
+//	MOTD = PageControl.AddPage(MOTDName, MC);
 
-	IRC = PageControl.AddPage(IRCName, class'UBrowserIRCWindow');
+	//IRC = PageControl.AddPage(IRCName, class'UBrowserIRCWindow');
 
 	// Add favorites
 	FC = class<UBrowserFavoriteServers>(DynamicLoadObject(FavoriteServersClass, class'Class'));
@@ -190,7 +190,9 @@ function SaveConfigs()
 defaultproperties
 {
      LANTabName="UBrowserLAN"
-     ServerListNames(0)=UBrowserLAN
+     ServerListNames(0)=UBrowserInternet
+     ServerListNames(1)=UBrowserLAN
+     ServerListNames(2)=UBrowserAll
      bKeepMasterServer=True
      FavoritesName="Favorites"
      IRCName="Chat"

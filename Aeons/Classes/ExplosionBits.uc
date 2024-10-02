@@ -3,11 +3,13 @@
 //=============================================================================
 class ExplosionBits expands FallingProjectile;
 
+/*
 simulated function PostNetBeginPlay()
 {
 	Log("TrailClass=" $ TrailClass);
 	Super.PostNetBeginPlay();
 }
+*/
 
 /*
 function PreBeginPlay()

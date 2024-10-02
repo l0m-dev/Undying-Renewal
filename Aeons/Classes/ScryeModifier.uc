@@ -22,7 +22,8 @@ function TravelPostAccept()
 		GotoState( 'Activated', 'AlreadyActive' );
 	else {
 		PlayerPawn(Owner).ScryeTimer = 0;
-		GotoState( 'Idle' );
+		//GotoState( 'Idle' ); // doesn't exist
+		GotoState('');
 		AmbientSound = None;
 	}
 }
@@ -75,6 +76,7 @@ state Activated
 			if (bGlowOn)
 			{
 				gotoState('Deactivated');
+				AeonsPlayer(Owner).ClientSetScryeModActive(false);
 			}
 		} else {
 			if ( !bGlowOn )
@@ -211,6 +213,94 @@ state Deactivated
 		CallEndEvent();
 }
 
+//----------------------------------------------------------------------------
+
+simulated state ClientActivated
+{
+	simulated function BeginState()
+	{
+		ForEach AllActors(class 'ScriptedPawn', P)
+		{
+			// log ("Considering "$P.name$" to turn on glow", 'Misc');
+			if ( P.bScryeGlow )
+			{
+				// log (""$P.name$" turning on glow", 'Misc');
+				if (CastingLevel > 2)
+					P.ScryeGlow.bShowHealth = true;
+				else
+					P.ScryeGlow.bShowHealth = false;
+				P.ScryeGlow.GotoState('Activated');
+				bGlowOn = true;
+			}
+		}
+	}
+
+	simulated function Timer()
+	{
+		ForEach AllActors(class 'ScriptedPawn', P)
+		{
+			if ( P.bScryeGlow )
+			{
+				if (CastingLevel > 2)
+					P.ScryeGlow.bShowHealth = true;
+				else
+					P.ScryeGlow.bShowHealth = false;
+				P.ScryeGlow.GotoState('Activated');
+				bGlowOn = true;
+			}
+		}
+	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		if (Owner == None)
+			return;
+		
+		if ( !bGlowOn )
+		{
+			ForEach AllActors(class 'ScriptedPawn', P)
+			{
+				if ( P.bScryeGlow )
+				{
+					P.ScryeGlow.bHidden = false;
+				}
+			}
+			bGlowOn = true;
+		}
+
+		if ( PlayerPawn(Owner).ScryeTimer < 0.2f )
+		{
+			gotoState('ClientDeactivated');
+		}
+	}
+
+	Begin:
+		sleep(0.25);
+		
+		setTimer(0.25, true);
+}
+
+simulated state ClientDeactivated
+{
+	simulated function BeginState()
+	{
+		ForEach AllActors(class 'ScriptedPawn', P)
+		{
+			P.ScryeGlow.GotoState('Deactivated');
+		}
+		bGlowOn = false;
+	}
+
+	Begin:
+		if (Owner == None)
+			stop;
+
+		//AeonsPlayer(Owner).bScryeActive = false;
+
+		//sleep(0.4);
+		//CallEndEvent();
+}
+
 defaultproperties
 {
      EndEvent=EndScrye
@@ -218,4 +308,5 @@ defaultproperties
      EndSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ScryeEnd01'
 	 SoundRadius=255
      SoundVolume=96
+     RemoteRole=ROLE_SimulatedProxy
 }

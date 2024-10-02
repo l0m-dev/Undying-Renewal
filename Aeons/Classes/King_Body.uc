@@ -2,6 +2,9 @@
 // King_Body.
 //=============================================================================
 class King_Body expands King_Part;
+
+/* Force-Recompile */
+
 //#exec MESH IMPORT MESH=King_Body_m SKELFILE=King_Body.ngf
 
 //#exec MESH NOTIFY SEQ=headshoots TIME=0.5 FUNCTION=SetHeadOut
@@ -388,8 +391,6 @@ function name NearestBrainJoint( vector HitLocation )
 function bool IsVulnerableJoint( name Joint )
 {
 	local int i;
-
-	return true; // make all joints vulnerable
 
 	for( i=0; i < NumVulnerableJoints; ++i )
 		if( Joint == VulnerableJoint[i] )
@@ -812,4 +813,5 @@ defaultproperties
      SoundSet=Class'Aeons.KingSoundSet'
      Style=STY_AlphaBlend
      Mesh=SkelMesh'Aeons.Meshes.King_Body_m'
+     bAlwaysRelevant=True
 }

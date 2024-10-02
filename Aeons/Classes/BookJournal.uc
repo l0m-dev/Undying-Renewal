@@ -61,7 +61,7 @@ var int TextureStatus[4];
 
 //----------------------------------------------------------------------------
 
-function ForceLoad()
+simulated function ForceLoad()
 {
 	local texture foo;
 
@@ -78,7 +78,7 @@ function ForceLoad()
 
 //----------------------------------------------------------------------------
 
-function UpdateObjectives()
+simulated function UpdateObjectives()
 {
 	local int i;
 	local AeonsPlayer AP;
@@ -123,24 +123,75 @@ function UpdateObjectives()
 	}
 }
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	local JournalEntry TempEntry;
 
 	Super.PostBeginPlay();
 
-	if ( ObjectivesEntry == None )
+	if ( ObjectivesEntry == None && Level.NetMode != NM_DedicatedServer )
 	{
 		ObjectivesEntry = Spawn(class'ObjectivesJournal');
+		ObjectivesEntry.RemoteRole = ROLE_None;
 	}
 
 	//fix why is this happening ?  After postbeginplay, but before GiveTo() Mesh gets assigned PlayerViewMesh and Scale gets PlayerViewScale ?????
 	//	PlayerViewMesh = Mesh;
 	//	PlayerViewScale = DrawScale;
+
+	bAlwaysRelevant = false;
 }
 
+simulated function PostNetBeginPlay()
+{
+	if (Level.NetMode == NM_Client && Owner != None && ViewPort(PlayerPawn(Owner).Player) != None)
+	{
+		TestRep();
+	}
+}
 
-function TravelPostAccept()
+/*
+simulated function Tick(float a)
+{
+	if (Level.NetMode == NM_Client)
+	{
+		if (AeonsPlayer(Owner).Book==Self)
+		{
+			TestRep();
+			Disable('Tick');
+		}
+	}
+}
+*/
+
+simulated function TestRep()
+{
+	local JournalEntry TempEntry;
+	local int i;
+	local Class<JournalEntry> JournalEntryClass;
+	
+	for ( i=0; i<NumJournals; i++ )
+	{
+		if (( JournalsClassesRep[i] != none)) 
+		{
+			//JournalEntryClass = Class<JournalEntry>(DynamicLoadObject(string(JournalsClassesRep[i]), class'Class'));
+			JournalEntryClass = JournalsClassesRep[i];
+			if ( JournalEntryClass != None )
+			{
+				TempEntry = Spawn(JournalEntryClass);
+				if (TempEntry != None)
+				{
+					if (!AddEntry( TempEntry, true ))
+					{
+						TempEntry.Destroy();
+					}
+				}
+			}
+		}
+	}
+}
+
+simulated function TravelPostAccept()
 {
 	local JournalEntry TempEntry;
 	local int i;
@@ -153,6 +204,7 @@ function TravelPostAccept()
 		if (( JournalNames[i] != "")&&( Journals[i] == None )) 
 		{
 			JournalEntryClass = Class<JournalEntry>(DynamicLoadObject(JournalNames[i], class'Class'));
+			JournalsClassesRep[i] = JournalEntryClass;
 
 			if ( JournalEntryClass != None )
 			{
@@ -166,11 +218,10 @@ function TravelPostAccept()
 			}
 		}
 	}
-
 }
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local int i;
 	local JournalEntry TempEntry;
@@ -190,6 +241,17 @@ function PreBeginPlay()
 
 
 simulated function Destroyed()
+{
+	ClearNotifyActor();
+
+	if ( ObjectivesEntry != None )
+	{
+		ObjectivesEntry.Destroy();
+		ObjectivesEntry = None;
+	}
+}
+
+simulated function ClearNotifyActor()
 {
 	Textures[0].NotifyActor = None;
 	Textures[1].NotifyActor = None;
@@ -307,7 +369,7 @@ simulated event RenderTexture(ScriptedTexture Tex)
 	}
 }
 
-function RefreshPages()
+simulated function RefreshPages()
 {
 	local JournalEntry Entry;
 	local int i;
@@ -337,7 +399,7 @@ function RefreshPages()
 			NewestUnread = None;
 			for (i = 0; i < NumJournals; i++)
 			{
-				if (!Journals[i].bRead)
+				if (Journals[i] != None && !Journals[i].bRead)
 					NewestUnread = Journals[i];
 			}
 
@@ -357,7 +419,7 @@ function RefreshPages()
 	Textures[3].NotifyActor = self;
 }
 
-function JournalEntry GetJournalEntry( int Index ) 
+simulated function JournalEntry GetJournalEntry( int Index ) 
 {
 	if ( Index == -1 ) 
 		return ObjectivesEntry;

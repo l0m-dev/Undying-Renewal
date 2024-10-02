@@ -22,17 +22,20 @@ event StartLevel()
 {
 	local PlayerPawn Player;
 	
-	ForEach AllActors(class 'PlayerPawn', Player)
-	{
-		break;
-	}
-
 	if ( ItemName == "" )
 		ItemName = GetItemName(string(Class));
 
 	if ( ConditionalEvent != 'none' )
-		if ( Player.CheckGameEvent(ConditionalEvent) )
-			Destroy();
+	{
+		ForEach AllActors(class 'PlayerPawn', Player)
+		{
+			if ( Player.CheckGameEvent(ConditionalEvent) )
+			{
+				Destroy();
+				break;
+			}
+		}
+	}
 	
 	Super.StartLevel();
 }
@@ -89,42 +92,41 @@ auto state Pickup
 		
 		ForEach AllActors(class 'PlayerPawn', P)
 		{
-			Touch(P);
-			//break;
+			break;
 		}
 
-		//if ( p!= none )
-		//	Touch(P);
+		if ( p!= none )
+			Touch(P);
 	}
 
 	// When touched by an actor.
 	function Touch( actor Other )
 	{
-		local PlayerPawn P;
+		local AeonsPlayer AP;
 		
 		// If touched by a player pawn, let him pick this up.
 		if( ValidTouch(Other) )
 		{
 			// show the book with our Entry
-			if ( AeonsPlayer(Other) != None )
+			ForEach AllActors(class 'AeonsPlayer', AP)
 			{
-				if(!AeonsPlayer(Other).GiveJournal(JournalClass, bShowImmediate))
-					return;
+				if(!AP.GiveJournal(JournalClass, bShowImmediate))
+					continue;
 				
 				if (Level.Game.LocalLog != None)
-					Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
+					Level.Game.LocalLog.LogPickup(Self, AP);
 				if (Level.Game.WorldLog != None)
-					Level.Game.WorldLog.LogPickup(Self, Pawn(Other));
-				//SpawnCopy(Pawn(Other));
+					Level.Game.WorldLog.LogPickup(Self, AP);
+				//SpawnCopy(Pawn(AP));
 				if ( PickupMessageClass == None )
-					Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
+					AP.ClientMessage(PickupMessage, 'Pickup');
 				else
-					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
+					AP.ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 
-				Other.PlaySound (PickupSound);
+				AP.PlaySound (PickupSound);
 				
 				if ( bPlayWritingSound )
-					Other.PlaySound (JournalWritingSound, [Volume] 1.5);
+					AP.PlaySound (JournalWritingSound, [Volume] 1.5);
 			}
 			
 			//if ( Level.Game.Difficulty > 1 )
@@ -193,7 +195,7 @@ auto state Pickup
 			SetTimer(30, false);
 		else if ( Level.bStartup )
 		{
-			bAlwaysRelevant = true;
+			//bAlwaysRelevant = true;
 			NetUpdateFrequency = 8;
 		}
 	}

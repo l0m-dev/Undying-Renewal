@@ -173,4 +173,5 @@ defaultproperties
      SoundSet=Class'Aeons.KingSoundSet'
      Style=STY_Masked
      Mesh=SkelMesh'Aeons.Meshes.King_L_Mandible_m'
+     bAlwaysRelevant=True
 }

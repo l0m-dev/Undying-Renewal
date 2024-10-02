@@ -114,7 +114,7 @@ function Init( pawn Target )
 
 function Explode()
 {
-	LogStack();
+	//LogStack();
 	Spawn( class'SPPhoenixExplosion', pawn(Owner),, Location );
 	Destroy();
 }
@@ -255,4 +255,6 @@ defaultproperties
      DrawScale=0.1
      CollisionRadius=20
      CollisionHeight=16
+     MenuName="Phoenix"
+     CreatureDeathVerb="armageddoned"
 }

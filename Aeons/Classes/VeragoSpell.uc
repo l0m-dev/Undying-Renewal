@@ -28,6 +28,8 @@ function PostBeginPlay()
 	super.PostBeginPlay();
 	NumKnots = 32;
 	DrawScale = 2;
+	if ( RGC() )
+		DamageTimer = 0.1;
 }
 
 function Destroyed()

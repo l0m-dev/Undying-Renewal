@@ -55,9 +55,34 @@ var() bool bAngularSpreadWidth;
 var() float AngularSpreadHeight;
 var() bool bAngularSpreadHeight;
 
-function Trigger(Actor Other, Pawn Instigator)
+var bool bTriggered;
+
+replication
+{
+	unreliable if (Role == ROLE_Authority)
+		bTriggered;
+}
+
+simulated function Tick(float DeltaTime)
+{
+	if (Level.NetMode != NM_Client)
+	{
+		Disable('Tick');
+		return;
+	}
+
+	if (bTriggered)
+	{
+		Trigger(None, None);
+		bTriggered = false;
+	}
+}
+
+simulated function Trigger(Actor Other, Pawn Instigator)
 {
 	local int i;
+
+	bTriggered = true;
 
 	ForEach AllActors(class 'ParticleFX', PFX, Event)
 	{
@@ -84,4 +109,8 @@ function Trigger(Actor Other, Pawn Instigator)
 defaultproperties
 {
      Texture=Texture'Aeons.System.ParticleSysMod'
+     bNoDelete=True
+     RemoteRole=ROLE_SimulatedProxy
+     bAlwaysRelevant=True
+     NetUpdateFrequency=4
 }

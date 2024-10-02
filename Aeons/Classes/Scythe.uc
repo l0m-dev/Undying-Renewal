@@ -72,19 +72,31 @@ var bool bMad;
 var bool bThirsty;
 var bool bThirstyFiring;
 
+replication
+{
+	reliable if( Role==ROLE_Authority )
+		ClientSetAbsorb, EndBlur;
+	
+	reliable if( Role==ROLE_Authority && bNetOwner )
+		bBerserk;
+}
+
 //=============================================================================
 function PreBeginPlay()
 {
 	super.preBeginPlay();
 	Damage = 40;
 }
+
+/*
 function PostBeginPlay()
 {
 	super.PostBeginPlay();
 	//AmmoType.AmmoAmount = 9999;
 }
+*/
 
-function Berserk()
+simulated function Berserk()
 {
 	if (bBerserk && bThirsty)
 		return;
@@ -104,7 +116,7 @@ function Berserk()
 
 simulated function StartBlur()
 {
-	if ( Level.NetMode == NM_DedicatedServer ) 
+	if ( !IsLocalActor() )
 		return;
 
 	Trail = Spawn (class 'ScytheBlurFX',,,JointPlace('EndBlade').pos);
@@ -112,7 +124,7 @@ simulated function StartBlur()
 	Trail.bHidden = true;
 }
 
-function AddMomentum()
+simulated function AddMomentum()
 {
 	local vector X, Y, Z, HitLocation, HitNormal, start, end;
 	local int HitJoint;
@@ -123,6 +135,7 @@ function AddMomentum()
 	Trace(HitLocation, HitNormal, HitJoint, end, start);
 	if (HitLocation != vect(0,0,0) || Owner.Physics == PHYS_Walking)
 	{
+		
 		GetAxes(PlayerPawn(Owner).ViewRotation, X, Y, Z);
 		x.z = 0;
 		PlayerPawn(Owner).GroundFriction = 2;
@@ -130,15 +143,16 @@ function AddMomentum()
 	}
 }
 
-
-
 simulated function EndBlur()
 {
 	if ( Level.NetMode == NM_DedicatedServer ) 
 		return;
 
 	if (Trail != none)
-		Trail.bShuttingDown = true;
+	{
+		Trail.Shutdown();
+		Trail = none;
+	}
 }
 
 /*
@@ -166,7 +180,7 @@ function PreSurfaceStrike()
 
 function Drink(){}
 
-simulated function PlaySelect()
+function PlaySelect()
 {
 	//LogActorState("AeonsWeapon: PlaySelect");
 	bForceFire = false;
@@ -175,14 +189,9 @@ simulated function PlaySelect()
 		PlayAnim('Select');//rb ,1.0,0.0);
 }
 
-simulated function PlaySelectSound()
+function PlaySelectSound()
 {
 	Owner.PlaySound(SelectSound, SLOT_Misc, 1.0);
-}
-
-function TweenDown()
-{
-	Super.TweenDown();
 }
 
 function SurfaceStrike()
@@ -263,15 +272,26 @@ function SurfaceStrike()
 	}
 }
 
-function FireWeapon()
+function PlayFireSoundServer()
+{
+	if (bBerserk)
+		Owner.PlayOwnedSound(AltFireSound);
+	else
+		Owner.PlayOwnedSound(FireSound);
+}
+
+simulated function FireWeapon()
 {
 	local float Value;
 
-	if ( PlayerPawn(Owner) != None )
-		PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		if ( PlayerPawn(Owner) != None )
+			PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
 
-	if ( !bRapidFire && (FiringSpeed > 0) )
-		Pawn(Owner).PlayRecoil(FiringSpeed);
+		if ( !bRapidFire && (FiringSpeed > 0) )
+			Pawn(Owner).PlayRecoil(FiringSpeed);
+	}
 
 	if ( bInstantHit )
 		TraceFire(Value);
@@ -285,23 +305,33 @@ function FireWeapon()
 	if ( AeonsPlayer(Owner).bWeaponSound )
 	{
 	    AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280 * 3);
-		if (bBerserk)
-		    Owner.PlaySound(AltFireSound);
+		if (Level.NetMode == NM_Client)
+		{
+			if (bBerserk)
+				Owner.PlaySound(AltFireSound);
+			else
+				Owner.PlaySound(FireSound);
+		}
 		else
-		    Owner.PlaySound(FireSound);
+		{
+			PlayFireSoundServer();
+		}
 	}
 
 	bPointing=True;
 	
 	//ClientFire(Value);
 
-	if ( Owner.bHidden )
-		CheckVisibility();
+	if (Level.NetMode != NM_Client)
+	{
+		if ( Owner.bHidden )
+			CheckVisibility();
 
-	if (!bThirsty)
-		gotoState('NormalFire');
+		if (!bThirsty)
+			gotoState('NormalFire');
 
-	MeleeAttack(128);
+		MeleeAttack(128);
+	}
 	
 	if ( bBerserk )
 		AddMomentum();
@@ -328,7 +358,8 @@ simulated function PlayFiring()
 {
 	SwingTime = Level.TimeSeconds;
 
-	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fScythe = 1.0;
+	if (Level.NetMode != NM_Client)
+		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fScythe = 1.0;
 	
 	if ( bBerserk ) {
 		PlayAnim( 'Fire_Slow', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
@@ -339,11 +370,18 @@ simulated function PlayFiring()
 
 //----------------------------------------------------------------------------
 
+simulated function PlayIdleAnim()
+{
+	LoopAnim('StillIdle', [TweenTime] 0.0);
+}
+
+//----------------------------------------------------------------------------
+
 state NormalFire
 {
 	function Fire(float F){}
 
-	function AnimEnd()
+	simulated function AnimEnd()
 	{
 		// Log("Scythe: state NormalFire: AnimEnd", 'Misc');
 		Finish();
@@ -356,9 +394,9 @@ state NormalFire
 		FinishAnim();
 
 		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) && (AeonsPlayer(Owner).GetStateName() != 'PlayerFlying'))
-			LoopAnim('MoveIdle', RefireMult);
+			LoopAnim('MoveIdle', RefireMult, [TweenTime] 0.0);
 		else
-			LoopAnim('StillIdle', RefireMult);
+			LoopAnim('StillIdle', RefireMult, [TweenTime] 0.0);
 
 		//log ("...Scythe: FinishAnim() completed ... sleeping for "$(refireRate * (1.0 / RefireMult)), 'Misc');
 		Sleep(refireRate * (1.0 / RefireMult));
@@ -459,9 +497,6 @@ function MeleeAttack(float Range)
 	if ( (AeonsPlayer(Owner).GetStateName() == 'DialogScene') || (AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene') || (AeonsPlayer(Owner).GetStateName() == 'SpecialKill'))
 		return;
 	
-	if (RGORE())
-		Patrick(Owner).DetachJoint(PawnImpactSound, Range);
-	
 	BladeLocB = jointPlace('Blade5').pos;
 	
 	GetAxes(Pawn(Owner).ViewRotation, x, y, z);
@@ -510,8 +545,8 @@ function MeleeAttack(float Range)
 		
 		JointName = Other.JointName(PlayerPawn(Owner).EyeTraceJoint);
 
-		if (Level.bDebugMessaging)
-			PlayerPawn(Owner).ClientMessage(""$JointName);
+		//if (Level.bDebugMessaging)
+		//	PlayerPawn(Owner).ClientMessage(""$JointName);
 		
 		// log( "" $ name $ " registered valid hit on " $ Other.name $ ", joint " $ JointName $ ".", 'Misc');
 			
@@ -726,6 +761,9 @@ function MeleeAttack(float Range)
 		}
 	}
 
+	if (RGORE())
+		Patrick(Owner).DetachJoint(PawnImpactSound, Range);
+
 	// momentum = (Other.Location - Owner.Location) * 300/Other.Mass;
 	// Other.Velocity += momentum;
 }
@@ -736,8 +774,8 @@ function bool HackLimb(ScriptedPawn SP, name JointName, vector Dir)
 	local Actor B;
 	local bool bNoHack;
 
-	if (Level.bDebugMessaging)
-		Pawn(Owner).CLientMessage("JointName = "$JointName);
+	//if (Level.bDebugMessaging)
+	//	Pawn(Owner).CLientMessage("JointName = "$JointName);
 	
 	switch ( SP.Class.Name )
 	{
@@ -768,9 +806,11 @@ function bool HackLimb(ScriptedPawn SP, name JointName, vector Dir)
 	B = SP.DetachLimb(JointName, Class 'BodyPart');
 
 	B.Velocity = (Dir + vect(0,0,0.25)) * 256;
-	B.DesiredRotation = RotRand();
+	B.DesiredRotation = RotRand(true);
 	B.bBounce = true;
 	B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+
+	ReplicateDetachLimb(SP, JointName, B.Velocity, B.DesiredRotation);
 
 	SP.bHacked = true;
 	SP.Hacked(PlayerPawn(Owner));
@@ -821,7 +861,7 @@ state Idle
 	{
 		if ( PlayerPawn(Owner).Mana <= 1 )
 		{
-			if (RGC())
+			if (RGC() && Level.NetMode == NM_Standalone)
 			{
 				if (!bMad)
 				{
@@ -845,36 +885,36 @@ state Idle
 			{
 				BloodDrip.ParticlesPerSec.Base -= 1;
 			} else {
-				BloodDrip.bShuttingDown = true;
+				BloodDrip.Shutdown();
 				BloodDrip = none;
 			}
 		}
 
 		//if ( AnimSequence != 'SelfDamage')
 			//LoopAnim('StrayCycle',RefireMult);
-		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) && (AeonsPlayer(Owner).GetStateName() != 'PlayerFlying') )
-			loopAnim('MoveIdle', RefireMult);
-		else
-			loopAnim('StillIdle', RefireMult);
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone && Owner.GetStateName() != 'PlayerFlying' )
+				loopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+			else
+				loopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+		}
 	}
 
 	simulated function Timer()
 	{
 		local Sound S;
 
-		log("Player's ViewTarget is : "$PlayerPawn(Owner).ViewTarget, 'Misc');
+		//log("Player's ViewTarget is : "$PlayerPawn(Owner).ViewTarget, 'Misc');
 		//if ( bOverdrive )
 		//	GotoState(GetStateName(), 'AttackOwner');
 	}
 
 	Begin:
-		if (Trail != none)
-		{
-			Trail.bShuttingDown = true;
-			Trail = none;
-		}
+		ClientIdleWeapon();
+		EndBlur();
 		Enable('Tick');
-		SetTimer(8 + FRand()*5,true);
+		//SetTimer(8 + FRand()*5,true);
 }
 
 state AbsorbHealth
@@ -884,7 +924,10 @@ state AbsorbHealth
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
-		SndID = PlaySound(AbsorbHealthSound);
+		if (Level.NetMode != NM_DedicatedServer)
+			SndID = PlaySound(AbsorbHealthSound);
+		else
+			ClientSetAbsorb(true);
 		
 		if (bBerserk)
 			Global.Berserk();
@@ -893,7 +936,10 @@ state AbsorbHealth
 	function EndState()
 	{
 		PlayerPawn(Owner).bReloading = false;
-		StopSound(SndID);
+		if (Level.NetMode != NM_DedicatedServer)
+			StopSound(SndID);
+		else
+			ClientSetAbsorb(false);
 	}
 
 	function Tick(float DeltaTime)
@@ -910,7 +956,7 @@ state AbsorbHealth
 			{
 				BloodDrip.ParticlesPerSec.Base -= 1;
 			} else {
-				BloodDrip.bShuttingDown = true;
+				BloodDrip.Shutdown();
 				BloodDrip = none;
 			}
 		}
@@ -938,11 +984,7 @@ state AbsorbHealth
 	Begin:
 		log ("HealthRefreshAmt = "$HealthRefreshAmt, 'Misc');
 		Timer1 = Level.TimeSeconds + 0.5;
-		if (Trail != none)
-		{
-			Trail.bShuttingDown = true;
-			Trail = none;
-		}
+		EndBlur();
 		PlayAnim('Eat');
 		FinishAnim();
 		SetTimer(0.2, true);
@@ -1002,6 +1044,23 @@ state Mad
 		Finish();
 }
 
+/*
+event NotifyScytheNeeded(bool bNeeded)
+{
+	
+	if (bNeeded)
+	{
+		PlaySound(BerserkONSound);
+		AddParticles();
+	}
+	else
+	{
+		PlaySound(BerserkOFFSound);
+		RemoveParticles();
+	}
+}
+*/
+
 function AddParticles()
 {
 	local int NumJoints, i;
@@ -1029,7 +1088,7 @@ function RemoveParticles()
 	ForEach AllActors(class 'Actor', A)
 		if ( A.Owner == self )
 			if ( A.IsA('BloodyMandorlaParticleFX') )
-				ParticleFX(A).bShuttingDown = true;
+				ParticleFX(A).Shutdown();
 }
 
 state BloodThirst
@@ -1059,7 +1118,7 @@ state BloodThirst
 
 		StopSound(SndID);
 
-		BloodDrip.bShuttingDown = true;
+		BloodDrip.Shutdown();
 		BloodDrip = none;
 
 		RemoveParticles();
@@ -1106,6 +1165,45 @@ state BloodThirst
 		Enable('Tick');
 }
 
+simulated function ClientSetAbsorb(bool bAbsorb)
+{
+	if (bAbsorb)
+		GotoState('ClientAbsorbHealth');
+	else
+		GotoState('ClientIdle');
+}
+
+state ClientAbsorbHealth
+{
+	ignores Berserk;
+
+	simulated function bool ClientFire(float Value)
+	{
+		return false;
+	}
+
+	simulated function AnimEnd()
+	{		
+		//GotoState('ClientIdle');
+		Global.AnimEnd();
+	}
+
+	simulated function EndState()
+	{
+		bForceFire = false;
+
+		StopSound(SndID);
+	}
+
+	simulated function BeginState()
+	{
+		bForceFire = false;
+		LoopAnim('Resting');
+
+		SndID = PlaySound(AbsorbHealthSound);
+	}
+}
+
 defaultproperties
 {
      HardSounds(0)=Sound'Impacts.SurfaceSpecific.E_Wpn_ScyHitHard01'
@@ -1141,11 +1239,13 @@ defaultproperties
      PlayerViewMesh=SkelMesh'Aeons.Meshes.Scythe1st_m'
      PlayerViewScale=0.1
      PickupViewMesh=SkelMesh'Aeons.Meshes.Scythe_m'
-     PickupViewScale=0.1
+     PickupViewScale=1
      ThirdPersonMesh=SkelMesh'Aeons.Meshes.Scythe_m'
      PickupSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScyPU01'
      ActivateSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_ScySelect01'
      ImpactSoundClass=Class'Aeons.DynImpact'
-     Mesh=SkelMesh'Aeons.Meshes.Scythe_m'
-     DrawScale=0.1
+     Mesh=SkelMesh'Aeons.Meshes.Scythe1st_m'
+     DrawScale=1
+     DeathMessage="%k reaped %o with the scythe."
+     AltDeathMessage="%k cleaved %o with the scythe."
 }

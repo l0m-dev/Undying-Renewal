@@ -10,14 +10,14 @@ var float inc;
 var() float BobAmount;
 var() float Period;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	InitialLocation = Location;
 	Period = (1.0 / FClamp(Period, 0.25, 9999));
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local vector Loc;
 	local rotator r;
@@ -37,4 +37,6 @@ defaultproperties
      Period=0.5
      DrawType=DT_Mesh
      Mesh=SkelMesh'Aeons.Meshes.ScytheProp_m'
+     RemoteRole=ROLE_SimulatedProxy
+     bStatic=False
 }

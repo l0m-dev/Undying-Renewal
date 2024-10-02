@@ -31,5 +31,4 @@ defaultproperties
      AnimSequence=Idle
      DrawType=DT_Mesh
      Style=STY_Normal
-	 bClientAnim=False
 }

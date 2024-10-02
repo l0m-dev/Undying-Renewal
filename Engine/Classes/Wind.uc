@@ -4,9 +4,11 @@
 class Wind expands Invisible
 	native;
 
+/* Force-Recompile */
+
 // Wind parameters are very similar to light parameters.
 var(Wind) float	WindSpeed;				// Units per second; can be negative.
-var(Wind) byte	WindRadius,				// World rad = WindRadius²
+var(Wind) byte	WindRadius,				// World rad = WindRadiusï¿½
 				WindRadiusInner,		// As with lights, fraction of max effect
 				WindFluctuation,		// Fractional amount of random change
 				WindFlucPeriod;			// Speed of change, arbitrary scale
@@ -31,4 +33,5 @@ defaultproperties
      bHidden=True
      bDirectional=True
      Texture=Texture'Engine.S_Flag'
+     bNoDelete=True
 }

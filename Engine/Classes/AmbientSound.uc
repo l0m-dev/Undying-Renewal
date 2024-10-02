@@ -7,6 +7,8 @@ class AmbientSound extends Keypoint;
 // Import the sprite.
 //#exec Texture Import File=Textures\Ambient.pcx Name=S_Ambient Mips=On Flags=2
 
+// added bNoDelete because some AmbientSounds had bStatic set to false in the editor (ex. in Grounds_Cottage)
+
 var Sound StoredSound;
 var() bool bInitiallyOn;
 var() bool bFadeOut;
@@ -144,4 +146,6 @@ defaultproperties
      Texture=Texture'Engine.S_Ambient'
      SoundRadius=40
      SoundVolume=190
+     bNoDelete=True
+     NetUpdateFrequency=10
 }

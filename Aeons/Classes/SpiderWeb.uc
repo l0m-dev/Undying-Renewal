@@ -5,8 +5,12 @@ class SpiderWeb expands Effects;
 //#exec MESH IMPORT MESH=SpiderWeb_m SKELFILE=SpiderWeb.ngf
 //#exec MESH MODIFIERS Cloth:ClothCollide
 
+/* Force-Recompile */
+
 defaultproperties
 {
+     bNoDelete=True
+     bClientAnim=True
      DrawType=DT_Mesh
      Style=STY_Masked
      Mesh=SkelMesh'Aeons.Meshes.SpiderWeb_m'

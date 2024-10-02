@@ -17,7 +17,7 @@ var Pawn SeekPawn;
 var() float DamageMult;
 var() sound ChainSound;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	if (RGC())
 	{

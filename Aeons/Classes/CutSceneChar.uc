@@ -19,15 +19,9 @@ var sound foo;
 var vector InitialLoc;
 var Actor SceneCamera;
 
-replication
+function PreBeginPlay()
 {
-	reliable if (Role == ROLE_Authority)
-		CutsceneID, CSSeqPlaySoundGlobal, CSSeqVolume, CSSeqStrength, CSDialogTimes, CSDialogSeq, CSSounds, AnimName,
-		bAnimOverrideHide, SceneCamera;
-}
-
-simulated function PreBeginPlay()
-{
+	local int i;
 	super.PreBeginPlay();
 	InitialLoc = Location;
 }
@@ -44,7 +38,7 @@ function Hide()
 	bHidden = true;
 }
 
-simulated function PlayTake(int i)
+function PlayTake(int i)
 {
 	SetupTake(CutsceneID,i);
 	Take = i;
@@ -52,35 +46,93 @@ simulated function PlayTake(int i)
 	// if ( Take == 0 )
 		// 	Age = 0;
 	if (AnimName[Take] == 'Destroy')
+	{
 		Destroy();
+		return;
+	}
 		
-	if ( bAnimOverrideHide )
-	{	
+	// AudioTrackCutScene has no animations
+	if (DrawType == DT_Mesh)
+	{
+		if ( bAnimOverrideHide )
+		{	
+			if (AnimName[Take] != 'none')
+			{
+				UnHide();
+			} else {
+				Hide();
+			}
+		}
+			
 		if (AnimName[Take] != 'none')
 		{
 			UnHide();
-		} else {
-			Hide();
+			PlayAnim(AnimName[Take],,MOVE_AnimAbs,,0);
+			ApplyAnim();
 		}
-	}
-		
-	if (AnimName[Take] != 'none')
-	{
-		UnHide();
-		PlayAnim(AnimName[Take],,MOVE_AnimAbs,,0);
-		ApplyAnim();
+
+		ResetLightCache();
 	}
 
-	ResetLightCache();
 	GotoState('PlayCSTake');
 }
 
-simulated function Tick(float DeltaTime)	
+function SkipToTake(int NewTake, float NewAge)
+{
+	local int i;
+
+	for (i = 0; i < NewTake; i++)
+	{
+		SetupTake(CutsceneID,i); // can play sounds
+		if (AnimName[i] == 'Destroy')
+		{
+			Destroy();
+			return;
+		}
+
+		if (DrawType == DT_Mesh)
+		{
+			if ( bAnimOverrideHide )
+			{	
+				if (AnimName[i] != 'none')
+				{
+					UnHide();
+				} else {
+					Hide();
+				}
+			}
+				
+			if (AnimName[i] != 'none')
+			{
+				UnHide();
+				PlayAnim(AnimName[i],,MOVE_AnimAbs,,0);
+				ApplyAnim();
+			}
+
+			ResetLightCache();
+		}
+	}
+
+	Take = NewTake;
+		
+	if (DrawType == DT_Mesh)
+	{
+		ResetLightCache();
+	}
+
+	Age = NewAge;
+	while ( CSDialogTimes[NextDialogIdx] != 0 && Age >= CSDialogTimes[NextDialogIdx] && NextDialogIdx < ArrayCount(CSDialogTimes))
+	{
+		NextDialogIdx ++; 
+	}
+}
+
+function Tick(float DeltaTime)	
 {
 	Age += DeltaTime;
 }
 
-simulated state PlayCSTake
+state PlayCSTake
 {
 
 	function Tick(float DeltaTime)	
@@ -93,7 +145,8 @@ simulated state PlayCSTake
 		{
 			if ( Age >= CSDialogTimes[NextDialogIdx] )
 			{
-				PlayAnimSound( CSDialogSeq[NextDialogIdx], CSSounds[NextDialogIdx],CSSeqStrength[NextDialogIdx],,CSSeqVolume[NextDialogIdx],,1, 1.0);
+				if (DrawType == DT_Mesh)
+					PlayAnimSound( CSDialogSeq[NextDialogIdx], CSSounds[NextDialogIdx],CSSeqStrength[NextDialogIdx],,CSSeqVolume[NextDialogIdx],,1, 1.0);
 				SceneCamera.PlaySound (CSSounds[NextDialogIdx],,CSSeqVolume[NextDialogIdx]);
 
 				/*
@@ -123,7 +176,8 @@ defaultproperties
      DrawType=DT_Mesh
      ShadowImportance=1
      bGroundMesh=False
-	 RemoteRole=ROLE_SimulatedProxy
-	 bAlwaysRelevant=True
-	 bNetInitial=True
+     bClientAnim=True
+     bNoDelete=True
+     RemoteRole=ROLE_Authority
+     bNetTemporary=True
 }

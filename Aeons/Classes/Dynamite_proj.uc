@@ -93,6 +93,8 @@ simulated function PostBeginPlay()
 	Super.PostBeginPlay();
 	Velocity = speed * Vector(Rotation);
 	SetTimer(fuseLen, false);
+
+	SpinRate(1.0);
 }
 
 simulated function Timer()
@@ -247,7 +249,7 @@ state Blow
 			SetTimer(0.35, false);
 		else
 		{
-			Disable('TakeDamage');
+			//Disable('TakeDamage');
 			StopSound(sndID);
 			Destroy();
 		}
@@ -255,7 +257,7 @@ state Blow
 
 	simulated function Timer()
 	{
-			Disable('TakeDamage');
+			//Disable('TakeDamage');
 			Destroy();
 	}
 /*
@@ -279,16 +281,16 @@ simulated function Expired()
 		wind.Destroy();
 	stopSound(sndID);
 	if ( fuseFX != None )
-		fuseFX.bShuttingDown = true;
+		fuseFX.Shutdown();
 	if ( fuseFX2 != None )
-		fuseFX2.bShuttingDown = true;
+		fuseFX2.Shutdown();
 
 }
 */
 
 simulated function Destroyed()
 {
-	Warn("SoundID=" $ SndID);
+	//Warn("SoundID=" $ SndID);
 
 	if (Wind != none)
 		Wind.Destroy();
@@ -296,16 +298,19 @@ simulated function Destroyed()
 	if ( sndID > 0 )
 		StopSound(sndID);
 	
-	if ( fuseFX != None )
-		FuseFX.bShuttingDown = true;
+	if ( Level.NetMode != NM_DedicatedServer ) 
+	{
+		if ( fuseFX != None )
+			FuseFX.Shutdown();
 
-	if ( fuseFX2 != None )
-		FuseFX2.bShuttingDown = true;
+		if ( fuseFX2 != None )
+			FuseFX2.Shutdown();
+	}
 
 	if ( Region.Zone.bWaterZone )
-		Spawn (class 'UnderwaterExplosionFX',,,Location);
+		TearOff(Spawn (class 'UnderwaterExplosionFX',,,Location));
 	else
-		Spawn (class 'DynamiteExplosion',Pawn(Owner),,Location);
+		Spawn (class 'DynamiteExplosion',Pawn(Owner),,Location); // doesn't need TearOff, destroyed instantly
 
 	MakeNoise( 5.0, 2560.0 );
 }
@@ -367,4 +372,5 @@ defaultproperties
      LightHue=33
      LightRadius=18
      bBounce=True
+     bClientAnim=True
 }

@@ -20,6 +20,12 @@ var bool bPlayedWhoosh;
 
 var float StickTime;
 
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		bCharged;
+}
+
 simulated function PostBeginPlay()
 {
 	local ScriptedPawn		GPawn;
@@ -112,7 +118,7 @@ auto state Flying
 	simulated function ZoneChange(ZoneInfo NewZone)
 	{
 		if (NewZone.bWaterZone)
-			ParticleFX(a).bShuttingDown = true;
+			ParticleFX(a).Shutdown();
 	}
 
 	simulated function ProcessTouch (Actor Other, Vector HitLocation)
@@ -122,7 +128,7 @@ auto state Flying
 		local bool bGenBlood;
 
 		
-		logactorstate("processtouch");
+		//logactorstate("processtouch");
 //		if ( Role == ROLE_Authority )
 //		{
 			if (Other != Owner)
@@ -363,9 +369,9 @@ state stuck
 		local texture HitTexture;
 
 		LightType = LT_None;
-		if ( bCharged && !Owner.IsA('King_Part'))
+		if ( bCharged && (Owner == None || !Owner.IsA('King_Part')) )
 		{
-			if (Owner.IsA('Patrick'))
+			if (Owner != None && Owner.IsA('Patrick'))
 				SetOwner(none);
 
 			if ( (Owner != none) )
@@ -382,11 +388,34 @@ state stuck
 			
 			HitTexture = TraceTexture(End, start, Flags);
 
+			// try 4 more times
+			// RGC()? this just makes lbg more consistent
+			if ( HitTexture.name != 'S_SkyZone' )
+			{
+				End = Start + vect(-64,0,65536);
+				HitTexture = TraceTexture(End, start + vect(-64,0,0), Flags);
+			}
+			if ( HitTexture.name != 'S_SkyZone' )
+			{
+				End = Start + vect(64,0,65536);
+				HitTexture = TraceTexture(End, start + vect(64,0,0), Flags);
+			}
+			if ( HitTexture.name != 'S_SkyZone' )
+			{
+				End = Start + vect(0,-64,65536);
+				HitTexture = TraceTexture(End, start + vect(0,-64,0), Flags);
+			}
+			if ( HitTexture.name != 'S_SkyZone' )
+			{
+				End = Start + vect(0,64,65536);
+				HitTexture = TraceTexture(End, start + vect(0,64,0), Flags);
+			}
+
 			if ( HitTexture.name == 'S_SkyZone' )
 			{
 				Trace(HitLocation, HitNormal, HitJoint, End, Start, false);
 				
-				if ( VSize(HitLocation-start) > 8192)
+				//if ( VSize(HitLocation-start) > 8192 )
 					HitLocation = Start + vect(0,0,8192);
 
 				Lbg = Spawn(class 'LightningBoltOfTheGods',,,start);
@@ -411,8 +440,16 @@ state stuck
 						Owner.SetPhysics(PHYS_None);
 					}
 				}
-		
-				GotoState(GetStateName(), 'Hold');
+				
+				if (Owner != None)
+				{
+					ScriptedPawn(Owner).StopMovement();
+					Pawn(Owner).LoopAnim('Death_PowerWord_Cycle',2,,,0);
+				}
+				Spawn (class 'Aeons.LBGExplosion',,,start + vect(0,0,32));
+				if ( Owner != None && Owner.AcceptDamage(GetDamageInfo()) )
+					Pawn(Owner).TakeDamage( none, Owner.Location, vect(0,0,0), GetDamageInfo('LightningBoltOfGods'));
+				Destroy();
 			} else if ( Wound != none ) {
 				GotoState('Shatter');
 			} else {
@@ -433,19 +470,11 @@ state stuck
 		if ( Wind != None )
 			Wind.Destroy();
 		if ( a!=None )
-			ParticleFX(a).bShuttingDown = true;
+			ParticleFX(a).Shutdown();
 		SetCollision(false, false, false);
+		MaxSpeed = 0;
 		SetTimer(0.15,false);
 	}
-
-	Hold:
-		ScriptedPawn(Owner).StopMovement();
-		Pawn(Owner).LoopAnim('Death_PowerWord_Cycle',2,,,0);
-		Sleep(0.15);
-		Spawn (class 'Aeons.LBGExplosion',,,Location + vect(0,0,32));
-		if ( Owner.AcceptDamage(GetDamageInfo()) )
-			Pawn(Owner).TakeDamage( none, Owner.Location, vect(0,0,0), GetDamageInfo('LightningBoltOfGods'));
-		Destroy();
 
 	Begin:
 		

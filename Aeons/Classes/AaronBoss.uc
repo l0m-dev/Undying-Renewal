@@ -225,9 +225,11 @@ function BlockScythe()
 		Velocity = vect(0,0,64);
 	}
 	B.Velocity = Velocity;
-	B.DesiredRotation = RotRand();
+	B.DesiredRotation = RotRand(true);
 	B.bBounce = true;
 	B.SetCollisionSize((B.CollisionRadius * 0.35), (B.CollisionHeight * 0.15));
+
+	ReplicateDetachLimb(self, 'R_Elbow', B.Velocity, B.DesiredRotation);
 
 	Spawn(class 'InstantScytheWound',self,,HitLocation);
 	Wound = Spawn(class 'ScytheWound',self,,HitLocation);
@@ -905,4 +907,6 @@ defaultproperties
      CollisionRadius=20
      CollisionHeight=60
      Mass=2000
+     MenuName="Aaron"
+     CreatureDeathVerb="possesed"
 }

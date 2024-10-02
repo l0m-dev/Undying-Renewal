@@ -70,10 +70,13 @@ state ShuttingDown
 		//		if ( A.IsA('ParticleFX') )
 		//			ParticleFX(A).Destroy();
 
-		Pawn(Owner).Lighting[1].TextureMask = 0;
-		Pawn(Owner).Lighting[1].Diffuse = White;
-		Pawn(Owner).Lighting[1].SpecularHilite = Black;
-		Pawn(Owner).Lighting[1].SpecularWidth = 0;
+		if (Owner != None)
+		{
+			Pawn(Owner).Lighting[1].TextureMask = 0;
+			Pawn(Owner).Lighting[1].Diffuse = White;
+			Pawn(Owner).Lighting[1].SpecularHilite = Black;
+			Pawn(Owner).Lighting[1].SpecularWidth = 0;
+		}
 	}
 	
 	function Drip()
@@ -86,29 +89,32 @@ state ShuttingDown
 	{
 		local Actor A;
 		
-		ForEach AllActors(class 'Actor', A)
-			if ( A.Owner == Pawn(Owner) )
-				if ( A.IsA('ParticleFX') )
-					ParticleFX(A).Strength = FClamp(ParticleFX(A).Strength + 0.02, 0, 1);
+		if (Owner != None)
+		{
+			ForEach AllActors(class 'Actor', A)
+				if ( A.Owner == Pawn(Owner) )
+					if ( A.IsA('ParticleFX') )
+						ParticleFX(A).Strength = FClamp(ParticleFX(A).Strength + 0.02, 0, 1);
 
-		if (Pawn(Owner).Lighting[1].Diffuse.R < 255)
-			Pawn(Owner).Lighting[1].Diffuse.R += 1;
+			if (Pawn(Owner).Lighting[1].Diffuse.R < 255)
+				Pawn(Owner).Lighting[1].Diffuse.R += 1;
 
-		if (Pawn(Owner).Lighting[1].Diffuse.G < 255)
-			Pawn(Owner).Lighting[1].Diffuse.G += 1;
+			if (Pawn(Owner).Lighting[1].Diffuse.G < 255)
+				Pawn(Owner).Lighting[1].Diffuse.G += 1;
 
-		if (Pawn(Owner).Lighting[1].Diffuse.B < 255)
-			Pawn(Owner).Lighting[1].Diffuse.B += 1;
+			if (Pawn(Owner).Lighting[1].Diffuse.B < 255)
+				Pawn(Owner).Lighting[1].Diffuse.B += 1;
 
-		//R
-		if (Pawn(Owner).Lighting[1].SpecularHilite.R >= 1)
-			Pawn(Owner).Lighting[1].SpecularHilite.R -= 1;
-		//G
-		if (Pawn(Owner).Lighting[1].SpecularHilite.G >= 1)
-			Pawn(Owner).Lighting[1].SpecularHilite.G -= 1;
-		//B
-		if (Pawn(Owner).Lighting[1].SpecularHilite.B >= 1)
-			Pawn(Owner).Lighting[1].SpecularHilite.B -= 1;
+			//R
+			if (Pawn(Owner).Lighting[1].SpecularHilite.R >= 1)
+				Pawn(Owner).Lighting[1].SpecularHilite.R -= 1;
+			//G
+			if (Pawn(Owner).Lighting[1].SpecularHilite.G >= 1)
+				Pawn(Owner).Lighting[1].SpecularHilite.G -= 1;
+			//B
+			if (Pawn(Owner).Lighting[1].SpecularHilite.B >= 1)
+				Pawn(Owner).Lighting[1].SpecularHilite.B -= 1;
+		}
 	}
 
 	function Timer()
@@ -159,6 +165,21 @@ state ShuttingDown
 		enable('Tick');
 		sleep(ScaleDownTimer);
 		gotoState('');
+}
+
+function TravelPreAccept()
+{
+	if ( Owner != none )
+	{
+		if (Owner.IsA('Pawn'))
+		{
+			Pawn(Owner).WetMod = self;
+		} else {
+			Destroy();
+		}
+	} else {
+		Destroy();
+	}
 }
 
 

@@ -33,10 +33,10 @@ function BeforePaint(Canvas C, float X, float Y)
 	if(bMultiLine)
 		TabArea.WinWidth = WinWidth;
 	else
-		TabArea.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth - LookAndFeel.Size_ScrollbarWidth - 10;
+		TabArea.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY - 10*Root.ScaleY;
 
 	TabArea.LayoutTabs(C);
-	WinHeight = (LookAndFeel.Size_TabAreaHeight * TabArea.TabRows) + LookAndFeel.Size_TabAreaOverhangHeight;
+	WinHeight = (LookAndFeel.Size_TabAreaHeight*Root.ScaleY * TabArea.TabRows) + LookAndFeel.Size_TabAreaOverhangHeight*Root.ScaleY;
 	TabArea.WinHeight = WinHeight;
 
 	Super.BeforePaint(C, X, Y);
@@ -65,7 +65,7 @@ function Paint(Canvas C, float X, float Y)
 
 	T = GetLookAndFeelTexture();
 	R = LookAndFeel.TabBackground;
-	DrawStretchedTextureSegment( C, 0, 0, WinWidth, LookAndFeel.Size_TabAreaHeight * TabArea.TabRows, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, 0, 0, WinWidth, LookAndFeel.Size_TabAreaHeight*Root.ScaleY * TabArea.TabRows, R.X, R.Y, R.W, R.H, T );
 }
 
 function UWindowTabControlItem AddTab(string Caption)

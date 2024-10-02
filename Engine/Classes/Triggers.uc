@@ -11,4 +11,5 @@ defaultproperties
      CollisionRadius=40
      CollisionHeight=40
      bCollideActors=True
+     RemoteRole=ROLE_None
 }

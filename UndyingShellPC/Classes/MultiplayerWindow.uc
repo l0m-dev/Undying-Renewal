@@ -77,6 +77,8 @@ function Created()
 	FindGame.OverTexture = texture'find_game_ov';
 	FindGame.DisabledTexture = None;
 
+	FindGame.bDrawShadow = true;
+
 //  CreateGame Button 210 70 160 48
 	CreateGame = ShellButton(CreateWindow(class'ShellButton', 210*RootScaleX, 70*RootScaleY, 154*RootScaleX, 74*RootScaleY));
 
@@ -98,6 +100,8 @@ function Created()
 	CreateGame.DownTexture = texture'create_game_dn';
 	CreateGame.OverTexture = texture'create_game_ov';
 	CreateGame.DisabledTexture = None;
+
+	CreateGame.bDrawShadow = true;
 
 //  PlayerSetup Button 56 228 146 56
 	PlayerSetup = ShellButton(CreateWindow(class'ShellButton', 56*RootScaleX, 228*RootScaleY, 164*RootScaleX, 64*RootScaleY));
@@ -121,6 +125,7 @@ function Created()
 	PlayerSetup.OverTexture = texture'player_setup_ov';
 	PlayerSetup.DisabledTexture = None;
 
+	PlayerSetup.bDrawShadow = true;
 
 //  Back Button 216 384 156 70
 	Back = ShellButton(CreateWindow(class'ShellButton', 216*RootScaleX, 384*RootScaleY, 160*RootScaleX, 64*RootScaleY));
@@ -141,6 +146,7 @@ function Created()
 	//Root.Console.bBlackout = True;
 
 	Resized();
+	FixConfiguredSpeeds();
 }
 
 //----------------------------------------------------------------------------
@@ -239,11 +245,11 @@ function FindGamePressed()
 {
 	// 50, 30, 500, 300 from ut
 	if ( FindGameWindow == None )
-		FindGameWindow = ManagerWindow(Root.CreateWindow(class'UBrowser.UBrowserMainWindow', 100, 100, 200, 200, Root, True));
+		FindGameWindow = ManagerWindow(Root.CreateWindow(class'FindGameWindow', 100, 100, 200, 200, Root, True));
 	else
 		FindGameWindow.ShowWindow();
 	
-	FindGameWindow.BringToFront();
+	//FindGameWindow.BringToFront();
 		
 	PlayNewScreenSound();
 	//HideWindow();
@@ -301,11 +307,47 @@ function Close(optional bool bByParent)
 	HideWindow();
 }
 
-
 function HideWindow()
 {
 	Root.Console.bBlackOut = False;
 	Super.HideWindow();
+}
+
+function ShowWindow()
+{
+	Super.ShowWindow();
+
+	FixConfiguredSpeeds();
+}
+
+function FixConfiguredSpeeds()
+{
+	local int MinNetSpeed;
+
+	MinNetSpeed = 20000;
+
+	if (class'Player'.default.ConfiguredInternetSpeed < MinNetSpeed || class'Player'.default.ConfiguredLanSpeed < MinNetSpeed)
+	{
+		if (class'Player'.default.ConfiguredInternetSpeed < MinNetSpeed)
+		{
+			GetPlayerOwner().Player.ConfiguredInternetSpeed = MinNetSpeed;
+			class'Player'.default.ConfiguredInternetSpeed = MinNetSpeed;
+			GetPlayerOwner().ConsoleCommand("NETSPEED "$MinNetSpeed);
+		}
+		if (class'Player'.default.ConfiguredLanSpeed < MinNetSpeed)
+		{
+			GetPlayerOwner().Player.ConfiguredLanSpeed = MinNetSpeed;
+			class'Player'.default.ConfiguredLanSpeed = MinNetSpeed;
+			GetPlayerOwner().ConsoleCommand("LANSPEED "$MinNetSpeed);
+		}
+
+		GetPlayerOwner().Player.CurrentNetSpeed = MinNetSpeed;
+
+		GetPlayerOwner().Player.SaveConfig();
+		
+		if (GetPlayerOwner().Level.NetMode == NM_Client)
+			GetPlayerOwner().ConsoleCommand("RECONNECT");
+	}
 }
 
 defaultproperties

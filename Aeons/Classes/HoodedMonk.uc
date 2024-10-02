@@ -175,4 +175,6 @@ defaultproperties
      DrawScale=1.1
      CollisionRadius=22
      CollisionHeight=58
+     MenuName="Monk"
+     CreatureDeathVerb="curst"
 }

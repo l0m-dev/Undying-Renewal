@@ -5,6 +5,8 @@ class Coop expands AeonsGameInfo;
 
 var() config bool	bMultiWeaponStay;
 var() config bool	bForceRespawn;
+var() config bool	bAllowRespawn;
+var() config bool	bNoFriendlyFire;
 
 var() globalconfig int	FragLimit; 
 var() globalconfig int	TimeLimit; // time limit in minutes
@@ -18,14 +20,48 @@ var		bool	bGameEnded;
 var		bool	bAlreadyChanged;
 var	  int RemainingTime;
 
-var localized string GlobalNameChange;
-var localized string NoNameChange;
+// Bot related info
+var   int			NumBots;
+var	  int			RemainingBots;
+var() globalconfig int	InitialBots;
+var		ChallengeBotInfo		BotConfig;
+var class<ChallengeBotInfo> BotConfigType;
+
+var() config string FirstMap;
+
+var string LastPortal;
+var CameraProjectile LastCamera; // interferes with None checks because of garbage collection
+
+function PreBeginPlay()
+{
+	Super.PreBeginPlay();
+
+	LastPortal = GameEngine(XLevel.Engine).LastURL.Portal;
+	LastCamera = None;
+
+	if (Level.bLoadBootShellPSX2)
+	{
+		Level.ServerTravel(FirstMap, false);
+	}
+}
+
+function StartLevel()
+{
+	Super.StartLevel();
+
+	LastPortal = GameEngine(XLevel.Engine).LastURL.Portal;
+	LastCamera = None;
+}
 
 function PostBeginPlay()
 {
 	Super.PostBeginPlay();
 	
 	bClassicDeathMessages = True;
+
+	BotConfig = spawn(BotConfigType);
+	if ( (Level.NetMode == NM_Standalone) || bMultiPlayerBots )
+		RemainingBots = InitialBots;
 }
 
 function int GetIntOption( string Options, string ParseString, int CurrentValue)
@@ -34,18 +70,6 @@ function int GetIntOption( string Options, string ParseString, int CurrentValue)
 		return 255;
 
 	return Super.GetIntOption(Options, ParseString, CurrentValue);
-}
-
-function bool IsRelevant(actor Other)
-{
-	// hide all playerpawns
-
-	if ( Other.IsA('PlayerPawn') && !Other.IsA('AeonsSpectator') )
-	{
-		Other.SetCollision(false,false,false);
-		Other.bHidden = true;
-	}
-	return Super.IsRelevant(Other);
 }
 
 function LogGameParameters(StatLog StatLog)
@@ -90,6 +114,7 @@ function SetGameSpeed( Float T )
 		Level.TimeDilation = 2.1 * GameSpeed;
 	else
 		Level.TimeDilation = GameSpeed;
+	SetTimer(Level.TimeDilation, true);
 }
 
 event InitGame( string Options, out string Error )
@@ -147,6 +172,9 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 	if ( instigatedBy == None)
 		return Damage;
 
+	if ( bNoFriendlyFire && instigatedBy.bIsPlayer && injured.bIsPlayer && (instigatedBy != injured) )
+		return 0;
+
 	if ( bHardCoreMode )
 		Damage *= 1.5;
 
@@ -168,12 +196,6 @@ function float PlaySpawnEffect(inventory Inv)
 	return 0.0;
 }
 
-exec function restart()
-{
-	ServerSay("Restarting game...");
-	RestartGame();
-}
-
 function RestartGame()
 {
 	local string NextMap;
@@ -184,6 +206,7 @@ function RestartGame()
 		return;
 
 	log("Restart Game");
+	BroadcastMessage("Restarting game...");
 
 	// these server travels should all be relative to the current URL
 	if ( bChangeLevels && !bAlreadyChanged && (MapListType != None) )
@@ -215,9 +238,8 @@ event playerpawn Login
 )
 {
 	local PlayerPawn NewPlayer;
-	local NavigationPoint StartSpot;
 
-	Log("DeathMatchGame - Login");
+	Log("CoopGame - Login");
 	NewPlayer = Super.Login(Portal, Options, Error, SpawnClass );
 	if ( NewPlayer != None )
 	{
@@ -233,72 +255,78 @@ event playerpawn Login
 	}
 	else
 	{
-		Log("DeathMatchGame - Super.Login failed");
+		Log("CoopGame - Super.Login failed");
 	}
-
-	if ( !NewPlayer.IsA('Spectator') )
-		NumPlayers++;
-
-	// Find a start spot.
-	StartSpot = FindPlayerStart( None, 0, Portal );
-
-	if( StartSpot == None )
-	{
-		Error = FailedPlaceMessage;
-		return None;
-	}
-
-	if ( PlayerStart(StartSpot).bCutScene )
-		StartCutScene(NewPlayer);
 
 	//AeonsPlayer(NewPlayer).TriggerLevelBegin();
 
 	return NewPlayer;
 }
-/*
+
+function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
+{
+	local byte Team;
+
+	if ( (Player != None) && (Player.PlayerReplicationInfo != None) )
+		Team = Player.PlayerReplicationInfo.Team;
+	else
+		Team = InTeam;
+
+	return Super.FindPlayerStart(Player, Team, LastPortal);
+}
+
+function bool ForceAddBot()
+{
+	AddBot();
+}
+
 function bool AddBot()
 {
 	local NavigationPoint StartSpot;
-	local bots NewBot;
+	local bot NewBot;
 	local int BotN;
 
-	//Difficulty = BotConfig.Difficulty;
-	//BotN = BotConfig.ChooseBotInfo();
+	Difficulty = BotConfig.Difficulty;
+	BotN = BotConfig.ChooseBotInfo();
 	
 	// Find a start spot.
 	StartSpot = FindPlayerStart(None, 255);
 	if( StartSpot == None )
 	{
-		log("Could not find starting spot for Bot");
+		//BroadcastMessage("Could not find starting spot for Bot");
 		return false;
 	}
 
 	// Try to spawn the player.
-	//NewBot = Spawn(BotConfig.GetBotClass(BotN),,,StartSpot.Location,StartSpot.Rotation);
-
-	if ( NewBot == None )
+	NewBot = Spawn(class'Bot',,,StartSpot.Location,StartSpot.Rotation);
+	
+	if ( NewBot == None ) {
+		//BroadcastMessage("NewBot is none");
 		return false;
+	}
 
 	if ( (bHumansOnly || Level.bHumansOnly) && !NewBot.bIsHuman )
 	{
 		NewBot.Destroy();
-		log("Failed to spawn bot");
+		//BroadcastMessage("Failed to spawn bot (not human)");
 		return false;
 	}
 
 	StartSpot.PlayTeleportEffect(NewBot, true);
 
 	// Init player's information.
-	//BotConfig.Individualize(NewBot, BotN, NumBots);
+	BotConfig.CHIndividualize(NewBot, BotN, NumBots);
 	NewBot.ViewRotation = StartSpot.Rotation;
 
 	// broadcast a welcome message.
 	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
-	AddDefaultInventory( NewBot );
+	//AddDefaultInventory( NewBot );
+	AcceptInventory(NewBot);
 	NumBots++;
 
 	NewBot.PlayerReplicationInfo.bIsABot = True;
+	NewBot.PlayerReplicationInfo.Team = BotConfig.GetBotTeam(BotN);
 
 	// Set the player's ID.
 	NewBot.PlayerReplicationInfo.PlayerID = CurrentID++;
@@ -308,10 +336,10 @@ function bool AddBot()
 		LocalLog.LogPlayerConnect(NewBot);
 	if (WorldLog != None)
 		WorldLog.LogPlayerConnect(NewBot);
-
+	
 	return true;
 }
-*/
+
 function Logout(pawn Exiting)
 {
 	Super.Logout(Exiting);
@@ -321,13 +349,13 @@ function Timer()
 {
 	Super.Timer();
 
-	//if ( (RemainingBots > 0) && AddBot() )
-		//RemainingBots--;
+	if ( (RemainingBots > 0) && AddBot() )
+		RemainingBots--;
 
 	if ( bGameEnded )
 	{
 		RemainingTime--;
-		if ( RemainingTime < -7 )
+		if ( RemainingTime < -10 )
 			RestartGame();
 	}
 	else if ( TimeLimit > 0 )
@@ -382,205 +410,6 @@ function Timer()
 	}
 }
 
-/* FindPlayerStart()
-returns the 'best' player start for this player to start from.
-Re-implement for each game type
-
-function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
-{
-	local PlayerStart Dest, Candidate[8], Best;
-	local float Score[8], BestScore, NextDist;
-	local pawn OtherPlayer;
-	local int i, num;
-	local Teleporter Tel;
-
-	num = 0;
-	//choose candidates	
-	foreach AllActors( class 'PlayerStart', Dest )
-	{
-		if ( (Dest.bSinglePlayerStart || Dest.bCoopStart) && !Dest.Region.Zone.bWaterZone )
-		{
-			if (num<4)
-				Candidate[num] = Dest;
-			else if (Rand(num) < 4)
-				Candidate[Rand(4)] = Dest;
-			num++;
-		}
-	}
-	
-	if (num>4) num = 4;
-	else if (num == 0)
-		return None;
-		
-	//assess candidates
-	for (i=0;i<num;i++)
-		Score[i] = 4000 * FRand(); //randomize
-		
-	foreach AllActors( class 'Pawn', OtherPlayer )
-	{
-		if (OtherPlayer.bIsPlayer)
-		{
-			for (i=0;i<num;i++)
-			{
-				NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
-				Score[i] += NextDist;
-				if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
-					Score[i] -= 1000000.0;
-			}
-		}
-	}
-	
-	BestScore = Score[0];
-	Best = Candidate[0];
-	for (i=1;i<num;i++)
-	{
-		if (Score[i] > BestScore)
-		{
-			BestScore = Score[i];
-			Best = Candidate[i];
-		}
-	}			
-				
-	return Best;
-}
-*/
-
-function NavigationPoint FindPlayerStart( Pawn Player, optional byte InTeam, optional string incomingName )
-{
-	local PlayerStart Dest, Candidate[4], Best;
-	local float Score[4], BestScore, NextDist;
-	local pawn OtherPlayer;
-	local int i, num;
-	local Teleporter Tel;
-	local NavigationPoint N;
-
-	if( incomingName!="" )
-		foreach AllActors( class 'Teleporter', Tel )
-			if( string(Tel.Tag)~=incomingName )
-				return Tel;
-
-	num = 0;
-	//choose candidates	
-	N = Level.NavigationPointList;
-	While ( N != None )
-	{
-		if ( N.IsA('PlayerStart') && !N.Region.Zone.bWaterZone )
-		{
-			if (num<4)
-				Candidate[num] = PlayerStart(N);
-			else if (Rand(num) < 4)
-				Candidate[Rand(4)] = PlayerStart(N);
-			num++;
-		}
-		N = N.nextNavigationPoint;
-	}
-
-	if (num == 0 )
-		foreach AllActors( class 'PlayerStart', Dest )
-		{
-			if (num<4)
-				Candidate[num] = Dest;
-			else if (Rand(num) < 4)
-				Candidate[Rand(4)] = Dest;
-			num++;
-		}
-
-	if (num>4) num = 4;
-	else if (num == 0)
-		return None;
-		
-	//assess candidates
-	for (i=0;i<num;i++)
-		Score[i] = 4000 * FRand(); //randomize
-		
-	for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
-		if ( OtherPlayer.bIsPlayer && (OtherPlayer.Health > 0) )
-			for (i=0;i<num;i++)
-				if ( OtherPlayer.Region.Zone == Candidate[i].Region.Zone )
-				{
-					NextDist = VSize(OtherPlayer.Location - Candidate[i].Location);
-					if (NextDist < OtherPlayer.CollisionRadius + OtherPlayer.CollisionHeight)
-						Score[i] -= 1000000.0;
-					else if ( (NextDist < 2000) && OtherPlayer.LineOfSightTo(Candidate[i]) )
-						Score[i] -= 10000.0;
-				}
-	
-	BestScore = Score[0];
-	Best = Candidate[0];
-	for (i=1;i<num;i++)
-		if (Score[i] > BestScore)
-		{
-			BestScore = Score[i];
-			Best = Candidate[i];
-		}
-
-	return Best;
-}
-
-function StartCutScene(PlayerPawn Player)
-{
-	local MasterCameraPoint C, MasterPoint;
-
-	// log("..............................................Starting CutScene");
-
-	forEach AllActors(class 'MasterCameraPoint', C, Event)
-	{
-		MasterPoint = C;
-		break;
-	}
-
-	if ( MasterPoint != none )
-		setupCamera(MasterPoint, Player);
-	else
-		log("Aeons.SinglePlayer: Cutscene FAILED to start - no master Point class found!");
-
-}
-
-function setupCamera(MasterCameraPoint MasterPoint, PlayerPawn Player)
-{
-	local vector eyeHeight;
-	local CameraProjectile CamProj;
-
-	if ( !MasterPoint.bAnimatedCamera )
-	{
-		// realtime interpolating camera path
-		if ( MasterPoint.CutSceneLength <= 0 )
-			MasterPoint.CutSceneLength = 10;
-
-		// Hide Player
-		if ( MasterPoint.bHidePlayer )
-			Player.bRenderSelf = false;
-
-		// Lock Player Location
-		if ( MasterPoint.bHoldPlayer )
-			Player.LockPos();
-
-		Player.LetterBox(true);
-
-		// starting at the master point location.. interpolating to the next point
-		CamProj = spawn(class 'CameraProjectile',Player,,MasterPoint.Location,Player.ViewRotation);
-		MasterPoint.getNextPoint();
-		CamProj.ToPoint = MasterPoint.NextPoint;
-		CamProj.FromPoint = MasterPoint;
-		CamProj.MasterPoint = MasterPoint;
-		CamProj.TotalTime = MasterPoint.CutSceneLength;
-		Player.ViewTarget = CamProj;
-		CamProj.StartSequence();
-		//MasterPoint.SetLetterBox(Player);
-	} else {
-		// PreAnimated camera path
-
-		// log("...............................Generating camera projectile");
-		AeonsPlayer(Player).SetFOV(36);
-		CamProj = spawn(class 'CameraProjectile');//,,,MasterPoint.Location, masterPoint.Rotation);
-		CamProj.MasterPoint = MasterPoint;
-		CamProj.SetOwner(Player);
-		Player.DesiredFOV = MasterPoint.GetCamFOVs(0);
-		Player.ViewTarget = CamProj;
-		CamProj.gotoState('PlayCannedAnim');
-	}
-}
-
 /* AcceptInventory()
 Examine the passed player's inventory, and accept or discard each item
 * AcceptInventory needs to gracefully handle the case of some inventory
@@ -597,7 +426,36 @@ function AcceptInventory(pawn PlayerPawn)
 	//PlayerPawn.Weapon = None;
 	//PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
-	PlayerPawn.ConsoleCommand("SetupInv");
+	//PlayerPawn.ConsoleCommand("SetupInv");
+}
+
+//
+// Spawn any default inventory for the player.
+//
+function AddDefaultInventory(pawn PlayerPawn)
+{
+	local AeonsPlayer AP;
+	local Inventory newItem;
+
+	Super.AddDefaultInventory(PlayerPawn);
+
+	if (PlayerPawn.IsA('Spectator'))
+		return;
+
+	AP = AeonsPlayer(PlayerPawn);
+
+	if (AP != None)
+	{
+		if (AP.FindInventoryType(class'Aeons.CoopTranslocator') == none)
+		{
+			newItem = Spawn(class'Aeons.CoopTranslocator',AP,,AP.Location);
+			if( newItem != None )
+			{
+				newItem.GiveTo(AP);
+				newItem.setBase(AP);
+			}
+		}
+	}
 }
 
 function ChangeName( Pawn Other, coerce string S, bool bNameChange )
@@ -622,25 +480,59 @@ function ChangeName( Pawn Other, coerce string S, bool bNameChange )
 		APlayer = APlayer.NextPawn;
 	}
 
-	//if (bNameChange)
-		ServerSay(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S);
+	if (bNameChange)
+		BroadcastMessage(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S, false);
 			
 	Other.PlayerReplicationInfo.PlayerName = S;
 }
 
+function SendPlayer( PlayerPawn aPlayer, string URL )
+{
+	if (bGameEnded)
+		return;
+	Level.ServerTravel( URL, true );
+}
+
+function ProcessServerTravel( string URL, bool bItems )
+{
+	if ( left(URL,5) ~= "start" )
+	{
+		Level.bNextItems          = false;
+		Level.NextURL             = FirstMap;
+		Level.NextSwitchCountdown = 0;
+	}
+
+	//GameEngine(XLevel.Engine).LastURL.Portal = ""; // needed when changing maps with commands, break restarting level after loading a save
+	
+	Super.ProcessServerTravel( URL, bItems );
+}
+
 function bool ShouldRespawn(Actor Other)
 {
+	if ( (Weapon(Other) != None || Spell(Other) != None) && (!bCoopWeaponMode) )
+		return false;
 	return ( (Inventory(Other) != None) && (Inventory(Other).ReSpawnTime!=0.0) );
 }
 
 function bool CanSpectate( pawn Viewer, actor ViewTarget )
 {
-	return ( (Level.NetMode == NM_Standalone) || (Spectator(Viewer) != None) );
+	if (Pawn(ViewTarget).Health <= 0)
+		return false;
+
+	return true;
 }
 
 function Killed(pawn Killer,pawn Other,name DamageType)
 {
     Super.Killed(Killer,Other,DamageType);
+
+	if (Other.bIsPlayer)
+	{
+		if (!bAllowRespawn && !bGameEnded && !AreAnyPlayersAlive())
+		{
+			EndGame("All players dead");
+		}
+	}
 }	
 
 function EndGame( string Reason )
@@ -655,18 +547,143 @@ function EndGame( string Reason )
 	RemainingTime = -1; // use timer to force restart
 }
 
+function bool SetEndCams(string Reason)
+{
+	local pawn aPawn;
+	local PlayerPawn Player;
+	local NavigationPoint StartSpot;
+
+	StartSpot = FindPlayerStart(None, 255);
+
+	for ( aPawn=Level.PawnList; aPawn!=None; aPawn=aPawn.NextPawn )
+	{
+		if (aPawn.IsA('ScriptedPawn'))
+			aPawn.GotoState('AIWait');
+		else
+			aPawn.GotoState('GameEnded');
+		
+		Player = PlayerPawn(aPawn);
+		if ( Player != None )
+		{
+			if ( StartSpot != None )
+			{
+				Player.bBehindView = true;
+				Player.ViewTarget = StartSpot;
+			}
+			PlayWinMessage(Player, false);
+			Player.ClientGameEnded();
+		}
+	}
+
+	return true;
+}
+
+//
+// Called when pawn has a chance to pick Item up (i.e. when 
+// the pawn touches a weapon pickup). Should return true if 
+// he wants to pick it up, false if he does not want it.
+//
+function bool PickupQuery( Pawn Other, Inventory item )
+{
+	local Mutator M;
+	local byte bAllowPickup;
+	local bool ReturnVal;
+	local pawn OtherPlayer;
+	local Inventory Copy;
+	local Weapon CopyWeapon;
+
+	if (Item.IsA('Weapon') || Item.IsA('Spell'))
+	{
+		for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
+		{
+			if ( OtherPlayer.bIsPlayer && OtherPlayer != Other && OtherPlayer.Inventory.FindItemInGroup(item.InventoryGroup) == none )
+			{
+				Copy = spawn(Item.Class,OtherPlayer,,,rot(0,0,0));
+
+				Copy.Instigator = OtherPlayer;
+				Copy.BecomeItem();
+				if (!OtherPlayer.AddInventory(Copy))
+				{
+					Copy.Destroy();
+					continue;
+				}
+
+				if( Copy.IsA('Spell') )
+				{
+					Copy.GotoState('Idle2');
+				}
+				if( Copy.IsA('Weapon') )
+				{
+					CopyWeapon = Weapon(Copy);
+					CopyWeapon.BringUp();
+					CopyWeapon.GiveAmmo(OtherPlayer);
+					CopyWeapon.SetSwitchPriority(OtherPlayer);
+					CopyWeapon.WeaponSet(OtherPlayer);
+				}
+			}
+		}
+	}
+
+	return Super.PickupQuery(Other, Item);
+}
+
+function bool AreAnyPlayersAlive()
+{
+	local Pawn Pawn;
+
+	for ( Pawn=Level.PawnList; Pawn!=None; Pawn=Pawn.NextPawn )	
+		if ( Pawn.bIsPlayer && Pawn.Health > 0 )
+			return true;
+
+	return false;	
+}
+//
+// Restart a player.
+//
+function bool RestartPlayer( pawn aPlayer )	
+{
+	local Actor PrevViewTarget;
+	local bool PrevBehindView;
+
+	if (bAllowRespawn)
+	{
+		return Super.RestartPlayer(aPlayer);
+	}
+
+	// spectate
+	PrevViewTarget = PlayerPawn(aPlayer).ViewTarget;
+	PrevBehindView = PlayerPawn(aPlayer).bBehindView;
+	PlayerPawn(aPlayer).ViewPlayerNum(-1);
+	if (PlayerPawn(aPlayer).ViewTarget == None)
+	{
+		PlayerPawn(aPlayer).ViewTarget = PrevViewTarget;
+		PlayerPawn(aPlayer).bBehindView = PrevBehindView;
+	}
+	
+	//bBehindView = bChaseCam;
+	//if ( ViewTarget == None )
+	//	bBehindView = false;
+
+	return false;
+}
+
 defaultproperties
 {
+     BotConfigType=Class'Aeons.ChallengeBotInfo'
+     InitialBots=2
      bMultiWeaponStay=True
      FragLimit=0
-     GlobalNameChange=" changed name to "
-     NoNameChange=" is already in use"
 	 bCoopWeaponMode=True
      bRestartLevel=False
 	 bSinglePlayer=False
      bDeathMatch=False
      ScoreBoardType=Class'Aeons.UndyingScoreboard'
-     MapPrefix="CO"
-     BeaconName="CO"
-     GameName="Undying Coop"
+     MapPrefix=""
+     BeaconName="COOP"
+     GameName="Coop"
+     bChangeLevels=True
+     FirstMap="Manor_FrontGate"
+     bTeamGame=True
+     bAllowRespawn=False
+     bNoFriendlyFire=True
 }

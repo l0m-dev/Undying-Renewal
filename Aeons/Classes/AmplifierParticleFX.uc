@@ -3,12 +3,29 @@
 //=============================================================================
 class AmplifierParticleFX expands AeonsParticleFX;
 
-function Tick(float DeltaTime)
+simulated function PreBeginPlay()
 {
-	if ((Owner == none) || (Owner.Owner != none))
-	{
-		bShuttingDown = true;
-	}
+     // here bStartup will only be true on the client if it's placed in the level
+     // only if we don't delete ParticleFX client side
+     if (Level.NetMode != NM_Client || Level.bStartup)
+     {
+          // give some time for the particle to be visible, this was done on Tick before
+          SetTimer(MinTickTime, false);
+     }
+     Super.PreBeginPlay();
+}
+
+simulated function Timer()
+{
+     CheckShutdown();
+}
+
+simulated function CheckShutdown()
+{
+     // this is needed because there are some of these particles just placed in a level,
+     // that are meant to disappear, like in Oneiros_City1 
+     if (Owner == None)
+          Shutdown();
 }
 
 defaultproperties

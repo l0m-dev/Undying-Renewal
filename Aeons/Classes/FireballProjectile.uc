@@ -7,16 +7,19 @@ var ParticleFX				MainFX;
 var ParticleFX				TrailFX;
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	MainFX = Spawn( class'FireballParticleFX', self,, Location );
-	MainFX.SetBase( self );
-	TrailFX = Spawn( class'SkullStorm_Particles', self,, Location );
-	TrailFX.SetBase( self );
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		MainFX = Spawn( class'FireballParticleFX', self,, Location );
+		MainFX.SetBase( self );
+		TrailFX = Spawn( class'SkullStorm_Particles', self,, Location );
+		TrailFX.SetBase( self );
+	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( MainFX != none )
 		MainFX.Destroy();

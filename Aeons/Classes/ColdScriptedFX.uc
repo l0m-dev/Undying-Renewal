@@ -5,19 +5,40 @@ class ColdScriptedFX expands ScriptedFX;
 
 var int NumJoints;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	if (Owner == none)
 	{
-		Destroy();
-	} else {
+		if (Level.NetMode != NM_Client)
+			Destroy();
+	}
+	else
+	{
 		NumJoints = Owner.NumJoints();
 	}
 }
 
-function Tick(float deltaTime)
+simulated function PostNetBeginPlay()
+{
+	if (Owner == none)
+	{
+		Destroy();
+	}
+	else
+	{
+		NumJoints = Owner.NumJoints();
+	}
+}
+
+simulated function Tick(float deltaTime)
 {
 	local int i;
+
+	if (Owner == None)
+	{
+		ShutDownFX();
+		return;
+	}
 	
 	for (i=0; i<NumJoints; i++)
 	{
@@ -28,10 +49,10 @@ function Tick(float deltaTime)
 	}
 }
 
-function ShutDown()
+simulated function ShutDownFX()
 {
 	Disable('Tick');
-	bShuttingDown = true;
+	Shutdown();
 }
 
 defaultproperties

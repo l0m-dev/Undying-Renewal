@@ -22,10 +22,16 @@ var bool bAckClickThrough;
 
 var CommandRepeater Repeater;
 
+replication
+{
+	reliable if( Role<ROLE_Authority )
+		SetupInv, setskill, GetGameEvent, SetGameEvent;
+}
+
 //----------------------------------------------------------------------------
 
 
-function UWindowWindow CreateWindow(string ClassName, float Width, float Height)
+function UWindowWindow CreateWindow(string ClassName, float Width, float Height, bool bResetInput)
 {
 	local UWindowWindow Window;
 	local UWindowRootWindow Root;
@@ -42,7 +48,8 @@ function UWindowWindow CreateWindow(string ClassName, float Width, float Height)
 	Height *= Root.ScaleY;
 
 	wconsole.bQuickKeyEnable = True;
-	wconsole.ConsoleCommand("ResetInput");
+	if (bResetInput)
+		wconsole.ConsoleCommand("ResetInput");
 	// we need to do this instead of LaunchUWindow so it works from console
 	// otherwise console state will be Typing and it won't work
 	AeonsConsole(wconsole).bRequestWindow = true; 
@@ -55,13 +62,15 @@ exec function dbg()
 {
 	local UWindowWindow Window;
 
-	Window = CreateWindow("UndyingShellPC.RenewalWindow", 300, 200);
+	Window = CreateWindow("UndyingShellPC.RenewalWindow", 300, 200, true);
 	Window.bLeaveOnScreen = True;
 	Window.SetPropertyText("bDebug", "true");
 }
 
 exec function RepeatCommand(name Command, name HoldDuration, name RepeatDelay)
 {
+	if (Level.NetMode != NM_Standalone)
+		return;
 	if (Repeater == None)
 		Repeater = Spawn(class'CommandRepeater', self);
 	Repeater.Start(string(Command), float(string(HoldDuration)), float(string(RepeatDelay)));
@@ -75,8 +84,7 @@ exec function StopRepeating()
 
 function StartLevel()
 {
-	if ( (Player != None) && (Player.Console != None) )
-		WindowConsole(Player.Console).bShellPauses = False;
+	SetShellPauses(false);
 	CrouchTime = 0;
 	super.StartLevel();
 }
@@ -86,7 +94,7 @@ function TurnOffShadow()
 	ShadowImportance = 0;
 }
 
-function PreBeginPlay()
+event PreBeginPlay()
 {
 	local LightningPoint lp;
 	local vector eyeAdjust;
@@ -115,13 +123,14 @@ function PreBeginPlay()
 	EnableLog('Pickups');
 }
 	
-simulated function PostBeginPlay()
+simulated event PostBeginPlay()
 {
+	// needs to be simulated
 	Super.PostBeginPlay();
-	
-	if (Player != None)
-		WindowConsole(Player.Console).bShellPauses = false;
-	Level.bDontAllowSavegame = false;
+	if (Level.NetMode == NM_Standalone || Level.NetMode != NM_Client)
+		EnableSaveGame();
+	else
+		DisableSaveGame();
 }
 
 function bool IsAlert()
@@ -163,6 +172,12 @@ exec function CastFire()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	eyeOffset.z = eyeHeight;
 	
@@ -181,6 +196,12 @@ exec function CastGlow()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	eyeOffset.z = eyeHeight;
 	
@@ -211,6 +232,10 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 	local vector start, end, eyeOffset, HitLocation, HitNormal, x, y, z;
 	local int HitJoint;
 	local Actor A, B;
+	local Pawn P;
+
+	if (Role < ROLE_Authority)
+		return;
 
 	eyeOffset.z = eyeHeight;
 
@@ -228,9 +253,13 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
 		B.Velocity = (y + vect(0,0,0.25)) * 256;
-		B.DesiredRotation = RotRand();
+		B.DesiredRotation = RotRand(true);
 		B.bBounce = true;
 		B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+
+		ScriptedPawn(A).bHacked = true;
+
+		ReplicateDetachLimb(A, A.JointName(HitJoint), B.Velocity, B.DesiredRotation);
 
 		Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Normal(B.Velocity));
 		if (PawnImpactSound != None)
@@ -243,6 +272,9 @@ exec function DestroyJoint()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if (Role < ROLE_Authority)
+		return;
 	
 	eyeOffset.z = eyeHeight;
 	
@@ -254,6 +286,8 @@ exec function DestroyJoint()
 	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss )
 	{
 		A.DestroyLimb(A.JointName(HitJoint));
+		ScriptedPawn(A).bHacked = true;
+		ReplicateDestroyLimb(A, A.JointName(HitJoint));
 	}
 }
 
@@ -264,6 +298,12 @@ exec function GibHim()
 	local int HitJoint;
 	local Actor A;
 	local DamageInfo DInfo;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	DInfo.DamageType = 'Dyn_Concussive';
 	DInfo.Damage = 200;
@@ -287,7 +327,13 @@ exec function WoundPawn()
 	local int HitJoint;
 	local Actor A;
 	local PersistentWound w;
-		
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+	
 	EyeOffset.z = eyeHeight;
 	
 	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
@@ -310,7 +356,12 @@ exec function Jab()
 	local Actor A;
 	local PersistentWound w;
 	local name JointName;
-		
+	
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	EyeOffset.z = eyeHeight;
 	
@@ -349,6 +400,12 @@ exec function BumpOpacity()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	EyeOffset.z = eyeHeight;
 	
@@ -366,6 +423,12 @@ exec function SendTouch()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	EyeOffset.z = eyeHeight;
 	
@@ -388,6 +451,12 @@ exec function DecOpacity()
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	EyeOffset.z = eyeHeight;
 	
@@ -419,7 +488,7 @@ exec function GetZoneChange()
 function EncroachedBy( actor Other )
 {
 	local vector v;
-	
+
 	if ( Other.IsA('Mover') )
 	{
 		if ( Mover(Other).bTossPlayer )
@@ -446,7 +515,7 @@ state Dying
 	function ServerReStartPlayer()
 	{
 		//log("calling restartplayer in dying with netmode "$Level.NetMode);
-		if ( Level.NetMode == NM_Client )
+		if ( Level.NetMode == NM_Client || !Level.Game.PlayerCanRestart(Self) )
 			return;
 		if( Level.Game.RestartPlayer(self) )
 		{
@@ -457,9 +526,12 @@ state Dying
 			if ( Mesh != None )
 				PlayLocomotion( vect(0,0,0) );	//PlayWaiting();
 			ClientReStart();
+
+			if (AeonsWeapon(Weapon) != None) // fix weapon detaching for othe clients
+				AeonsWeapon(Weapon).AttachWeapon(GetWeaponAttachJoint());
 		}
-		else
-			log("Restartplayer failed");
+		//else
+		//	log("Restartplayer failed");
 	}
 
 	function HidePlayer()
@@ -476,7 +548,8 @@ state Dying
 
 	exec function Fire( optional float F )
 	{
-		if ( (Level.NetMode == NM_Standalone) || (Level.Game.IsA('Coop') && !Coop(Level.Game).bForceRespawn) )
+		/*
+		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
 		{
 			//E3 hack.. should go back to shell, to load menu? 
 			ServerRestartPlayer();
@@ -489,6 +562,15 @@ state Dying
 		}
 		else if ( !bFrozen )
 			ServerReStartPlayer();
+		*/
+
+		bFire = 0;
+		if (Level.NetMode != NM_Standalone && PlayerDeathProjectile(ViewTarget) != None)
+		{
+			// DeathProjectile will handle restarting the player in multiplayer
+			return;
+		}
+		ServerReStartPlayer();
 	}
 
 	
@@ -521,7 +603,7 @@ state Dying
 					ClientLoc,
 					false,
 					false,
-					false,
+					NewbJumpStatus,
 					false,
 					false,
 					false, //bFiredAttSpell,	// false?
@@ -682,12 +764,19 @@ state Dying
 	{
 		if ( (HasteMod != none) && HasteMod.bActive )
 			HasteMod.GotoState('Deactivated');
-		Level.bDontAllowSavegame = true;
-		WindowConsole(Player.Console).bShellPauses = true;
+		DisableSaveGame();
 		bHidden = true;
-		AttSpell.OwnerDead();
-		DefSpell.OwnerDead();
-		ViewTarget = (Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation));
+		if (Level.NetMode != NM_Standalone)
+			SetCollision(false,false,false);
+		if (AttSpell != None)
+			AttSpell.OwnerDead();
+		if (DefSpell != None)
+			DefSpell.OwnerDead();
+		// this should only exist locally
+		if (IsLocalActor())
+		{
+			ViewTarget = Spawn(class 'PlayerDeathProjectile',self,,Location,ViewRotation);
+		}
 		BaseEyeheight = Default.BaseEyeHeight;
 		EyeHeight = BaseEyeHeight;
 //		if ( Carcass(ViewTarget) == None )
@@ -700,33 +789,20 @@ state Dying
 			Super.Timer(); 
 		SetTimer(1.0, false);
 
-		// clean out saved moves
-		while ( SavedMoves != None )
-		{
-			SavedMoves.Destroy();
-			SavedMoves = SavedMoves.NextMove;
-		}
-		if ( PendingMove != None )
-		{
-			PendingMove.Destroy();
-			PendingMove = None;
-		}
+		CleanOutSavedMoves();
+
+		bFire = 0;
+		bFireAttSpell = 0;
+		bFireDefSpell = 0;
+
+		if ( Weapon != None ) // fix weapon detaching for othe clients
+			Weapon.SetBase(None);
 	}
 	
 	function EndState()
 	{
-		WindowConsole(Player.Console).bShellPauses = false;
-		// clean out saved moves
-		while ( SavedMoves != None )
-		{
-			SavedMoves.Destroy();
-			SavedMoves = SavedMoves.NextMove;
-		}
-		if ( PendingMove != None )
-		{
-			PendingMove.Destroy();
-			PendingMove = None;
-		}
+		SetShellPauses(false);
+		CleanOutSavedMoves();
 		Velocity = vect(0,0,0);
 		Acceleration = vect(0,0,0);
 		bBehindView = false;
@@ -736,6 +812,10 @@ state Dying
 		//rb since it was a projectile, this wouldn't activate.        if ( Carcass(ViewTarget) != None )
 		ViewTarget = None;
 		//Log(self$" exiting dying with remote role "$RemoteRole$" and role "$Role);
+
+		bFire = 0;
+		bFireAttSpell = 0;
+		bFireDefSpell = 0;
 	}
 }
 
@@ -763,12 +843,11 @@ state DialogScene expands PlayerWalking
 		bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
+		LoopAnim('Idle');
 
 		Velocity.X = 0.0;
 		Velocity.Y = 0.0;
-		if (WindowConsole(Player.Console) != None)
-			WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
+		DisableSaveGame();
 		bAckClickThrough = false;
 		SetTimer( 0.75, false );		// delay until Fire() will cause click-though
 	}
@@ -776,14 +855,15 @@ state DialogScene expands PlayerWalking
 	function EndState()
 	{
 		UnFreeze();
-		if (WindowConsole(Player.Console) != None)
-			WindowConsole(Player.Console).bShellPauses = false;
-		Level.bDontAllowSavegame = false;
+		EnableSaveGame();
 		bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
-		Weapon.GotoState('Idle');
-		AttSpell.GotoState('Idle');
+		if (Level.NetMode != NM_Client)
+		{
+			Weapon.GotoState('Idle');
+			AttSpell.GotoState('Idle');
+		}
 	}
 
 	function Timer()
@@ -810,7 +890,7 @@ state DialogScene expands PlayerWalking
 			{
 				// hack, LockPlayerTrigger doesn't use letterbox for the first aaron cutscene
 				// we don't want players to skip it
-				if (myHud.bLetterBox && GetRenewalConfig().bMoreSkippableCutscenes)
+				if (SP.Script != none && myHud.bLetterBox && GetRenewalConfig().bMoreSkippableCutscenes)
 					SP.Script.bClickThrough = true;
 				
 				if (SP.Script != none && SP.Script.bClickThrough)
@@ -844,28 +924,31 @@ state GuidingPhoenix expands PlayerWalking
 	
 	function BeginState()
 	{
+		LoopAnim('Idle');
+		
 		Velocity.X = 0.0;
 		Velocity.Y = 0.0;
-		WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
-		Velocity = vect(0,0,0);
+		DisableSaveGame();
+		//Velocity = vect(0,0,0);
 	}
 
 	function EndState()
 	{
 		UnFreeze();
-		WindowConsole(Player.Console).bShellPauses = false;
-		Level.bDontAllowSavegame = false;
+		EnableSaveGame();
 	}
 
 Begin:
 	if ( Physics == PHYS_Falling )
 	{
+		Velocity.X = 0.0;
+		Velocity.Y = 0.0;
 		Sleep( 0.1 );
 		goto 'Begin';
 	}
 	Freeze();
 	Velocity = vect(0,0,0);
+	SetPhysics(PHYS_None);
 }
 
 // ============================================================================
@@ -888,6 +971,7 @@ state FallingDeath expands Dying
 
 	function EndSpecialKill()
 	{
+		/*
 		if ( (Level.NetMode == NM_Standalone) && !Level.Game.bDeathMatch )
 		{
 			//E3 hack.. should go back to shell, to load menu? 
@@ -900,6 +984,8 @@ state FallingDeath expands Dying
 		}
 		else if ( !bFrozen || (FRand() < 0.2) )
 			ServerReStartPlayer();
+		*/
+		ServerReStartPlayer();
 	}
 	
 	function PressedEnter()
@@ -925,8 +1011,7 @@ state FallingDeath expands Dying
 		if ( (HasteMod != none) && HasteMod.bActive )
 			HasteMod.GotoState('Deactivated');
 
-		WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
+		DisableSaveGame();
 		bHidden = false;
 		if (Flight != none)
 			Flight.GotoState('Idle');
@@ -944,17 +1029,7 @@ state FallingDeath expands Dying
 			Super.Timer(); 
 		SetTimer(0.1, false);
 
-		// clean out saved moves
-		while ( SavedMoves != None )
-		{
-			SavedMoves.Destroy();
-			SavedMoves = SavedMoves.NextMove;
-		}
-		if ( PendingMove != None )
-		{
-			PendingMove.Destroy();
-			PendingMove = None;
-		}
+		CleanOutSavedMoves();
 	}
 	
 	Begin:
@@ -965,10 +1040,13 @@ state FallingDeath expands Dying
 		bCanExitSpecialState = true;
 		ClientAdjustGlow(-1.0,vect(0,0,0));
 		Health = 0;
-		sleep(2);
+		sleep(1);
+		if (Level.NetMode != NM_Standalone)
+			HidePlayer();
+		sleep(1);
 		SetPhysics(PHYS_None);
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
+		ClientAdjustGlow(1, vect(0,0,0));
 }
 
 // ========================================================================
@@ -984,8 +1062,7 @@ state FadingDeath expands Dying
 			HasteMod.GotoState('Deactivated');
 
 		// Health = 0;
-		WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
+		DisableSaveGame();
 		bHidden = false;
 		// LoopAnim('Damage_Fire');
 		AttSpell.OwnerDead();
@@ -1001,25 +1078,17 @@ state FadingDeath expands Dying
 			Super.Timer(); 
 		SetTimer(0.1, false);
 
-		// clean out saved moves
-		while ( SavedMoves != None )
-		{
-			SavedMoves.Destroy();
-			SavedMoves = SavedMoves.NextMove;
-		}
-		if ( PendingMove != None )
-		{
-			PendingMove.Destroy();
-			PendingMove = None;
-		}
+		CleanOutSavedMoves();
 	}
 	
 	Begin:
 		ClientAdjustGlow(-1.0,vect(0,0,0));
+		if (Level.NetMode != NM_Standalone)
+			HidePlayer();
 		sleep(2);
 		SetPhysics(PHYS_None);
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
+		ClientAdjustGlow(1, vect(0,0,0));
 }
 
 // ========================================================================
@@ -1032,8 +1101,7 @@ state InstantFadingDeath expands Dying
 	function BeginState()
 	{
 		Health = 0;
-		WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
+		DisableSaveGame();
 		bHidden = false;
 		// LoopAnim('Damage_Fire');
 		AttSpell.OwnerDead();
@@ -1049,36 +1117,34 @@ state InstantFadingDeath expands Dying
 			Super.Timer(); 
 		SetTimer(0.1, false);
 
-		// clean out saved moves
-		while ( SavedMoves != None )
-		{
-			SavedMoves.Destroy();
-			SavedMoves = SavedMoves.NextMove;
-		}
-		if ( PendingMove != None )
-		{
-			PendingMove.Destroy();
-			PendingMove = None;
-		}
+		CleanOutSavedMoves();
 	}
 	
 	Begin:
 		ClientAdjustGlow(-1000.0,vect(0,0,0));
+		if (Level.NetMode != NM_Standalone)
+			HidePlayer();
 		sleep(0);
 		SetPhysics(PHYS_None);
 		ServerRestartPlayer();
-		// ClientAdjustGlow( 1000, vect(1,0,0) );
+		ClientAdjustGlow(1000, vect(0,0,0));
 }
 
 exec function KillNPC()
 {
-	GotoState('FadingDeath');
+	PlayerDied('FadingDeath');
 }
 
 // set the players location
 exec function SetLoc(int x, int y, int z)
 {
 	local vector v;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	v.x = x;
 	v.y = y;
@@ -1091,6 +1157,12 @@ exec function SetLoc(int x, int y, int z)
 exec function SetLocTag(name NewTag)
 {
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	ForEach AllActors(class 'Actor', A, NewTag)
 	{
@@ -1189,6 +1261,12 @@ exec function SetupGameEvents()
 exec function SetupInv()
 {
 	local LevelWeaponSetup lws;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	ForEach AllActors(class 'LevelWeaponSetup', lws )
 	{
@@ -1333,6 +1411,12 @@ exec function LogJournals()
 
 exec function SetSkill(int Skill)
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+	
 	Level.Game.Difficulty = Skill;
 }
 
@@ -1346,22 +1430,26 @@ exec function GetGameEvent(name EventName)
 
 exec function HoundAnim()
 {
-	if ( Weapon.IsA('GhelziabahrStone') )
+	if ( Weapon != None && Weapon.IsA('GhelziabahrStone') )
 	{
 		GhelziabahrStone(Weapon).PlayHoundAnim();
 	}
 }
 
-/*
 exec function SetGameEvent(name EventName, bool NewFlag )
 {
 	local bool Result;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	CheckGameEvent(EventName, NewFlag);
 	Result = CheckGameEvent(EventName);
 	ClientMessage("Game Event Set: "$EventName$" to "$result);
 }
-*/
 
 defaultproperties
 {

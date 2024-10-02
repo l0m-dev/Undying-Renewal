@@ -23,7 +23,7 @@ function PreBeginPlay()
 	Disable('Tick');
 	if (Owner == none)
 	{
-		bShuttingDown = true;
+		Shutdown();
 		log ("Invoking Effect shutting down - Owner is none", 'Misc');
 		return;
 	}
@@ -54,7 +54,7 @@ function Tick(float DeltaTime)
 	
 	if ( Owner == none)
 	{
-		bShuttingDown = true;
+		Shutdown();
 		return;
 	} else {
 	

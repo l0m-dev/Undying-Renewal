@@ -36,8 +36,8 @@ auto state Pickup
 				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
-			efxA.bShuttingDown = true;
-			efxB.bShuttingDown = true;
+			efxA.Shutdown();
+			efxB.Shutdown();
 		}
 	}
 

@@ -3,9 +3,18 @@
 //=============================================================================
 class MontoLightningBolt expands LightningBolt;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
-	log("Monto Lightning Bolt: PreBeginPlay()", 'Misc');
+	//log("Monto Lightning Bolt: PreBeginPlay()", 'Misc');
+}
+
+simulated function PostNetBeginPlay()
+{
+	if (Level.NetMode == NM_Client)
+	{
+		Strike(Start, End);
+		GotoState('Holding');
+	}
 }
 
 function Init( float Seconds, vector StartPoint, vector EndPoint )
@@ -17,7 +26,7 @@ function Init( float Seconds, vector StartPoint, vector EndPoint )
 }
 
 
-function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, float Width)
+simulated function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, float Width)
 {
 	local int i, HitJoint, Flags, numPoints, hp, TotalAmplitude;
 	local float scalar, RScale;
@@ -51,7 +60,8 @@ function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, flo
 
 		// update Lights
 		for (i=0; i<4; i++)
-			lts[i].SetLocation(start + (end-start) * 0.25 * i);
+			if (lts[i] != None)
+				lts[i].SetLocation(start + (end-start) * 0.25 * i);
 
 		if ( len < MinPtDist )
 		{
@@ -111,19 +121,19 @@ function updateShaft(float DeltaTime, vector Start, vector End, float Chaos, flo
 auto state null
 {
 
-	Begin:
-		log("Begin State Null", 'Misc');
+	//Begin:
+	//	log("Begin State Null", 'Misc');
 }
 
-state Holding
+simulated state Holding
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		lastRand = vRand();
 		UpdateShaft(DeltaTime, start, end , 100, 4);
 	}
 	
-	function Timer()
+	simulated function Timer()
 	{
 		gotoState('Release');
 	}
@@ -131,19 +141,20 @@ state Holding
 	Begin:
 		setTimer(1, false);
 		timeDampening = 3.0;
-		log("Begin State Holding", 'Misc');
+		//log("Begin State Holding", 'Misc');
 		
 	End:
 }
 
-state Release
+simulated state Release
 {
-	function BeginState()
+	simulated function BeginState()
 	{
 		local int i;
 		
 		for (i=0; i<4; i++)
-			lts[i].Destroy();
+			if (lts[i] != None)
+				lts[i].Destroy();
 	}
 
 	Begin:
@@ -156,13 +167,13 @@ state Release
 		}
 		if (sFX != none)
 		{
-			sFX.bShuttingDown = true;
+			sFX.Shutdown();
 			sFX = none;
 		}
 
 		if (pFX != none)
 		{
-			pFX.bShuttingDown = true;
+			pFX.Shutdown();
 			pFX = none;
 		}
 		Destroy();

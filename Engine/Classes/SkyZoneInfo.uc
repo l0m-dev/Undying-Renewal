@@ -10,7 +10,7 @@ var() bool bRotating;
 var() float DegreesPerSec;
 var int DeltaRot;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	if ( bRotating )
 	{
@@ -21,7 +21,7 @@ function PreBeginPlay()
 	}
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local rotator r;
 

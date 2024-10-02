@@ -9,6 +9,16 @@ var int JointID;
 
 function PreBeginPlay()
 {
+	SetupEffects();
+}
+
+simulated function PostNetBeginPlay()
+{
+	SetupEffects();
+}
+
+simulated function SetupEffects()
+{
 	if (Owner == none)
 	{
 		Destroy();
@@ -20,13 +30,13 @@ function PreBeginPlay()
 	setTimer(2,false);
 }
 
-function Timer()
+simulated function Timer()
 {
 	Disable('Tick');
-	bShuttingDown = true;
+	Shutdown();
 }
 
-function Tick(float deltaTime)
+simulated function Tick(float deltaTime)
 {
 	local int i;
 	local name JointName;

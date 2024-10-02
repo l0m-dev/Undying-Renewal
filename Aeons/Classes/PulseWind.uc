@@ -11,4 +11,5 @@ defaultproperties
      WindFluctuation=51
      bPermeating=True
      LifeSpan=1
+     bNoDelete=False
 }

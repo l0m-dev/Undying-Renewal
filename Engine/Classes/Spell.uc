@@ -75,6 +75,8 @@ var(MuzzleFlash) texture MFTexture;
 var(MuzzleFlash) texture MuzzleFlare;
 var(MuzzleFlash) float FlareOffset; 
 
+var() Localized string AltDeathMessage;
+
 
 // Network replication
 //
@@ -82,7 +84,9 @@ replication
 {
     // Things the server should send to the client.
     reliable if( Role==ROLE_Authority && bNetOwner )
-        bHideSpell, bInControl, CastingLevel;
+        bHideSpell, bInControl;
+    unreliable if( Role==ROLE_Authority )
+        CastingLevel; // removed bNetOwner for spectating
 }
 
 //=============================================================================
@@ -247,17 +251,22 @@ function bool HandlePickupQuery( inventory Item )
 
 //
 // Change spell to that specificed by F 
+/*
 simulated function Inventory FindItemInGroup( byte F )
-{	
-	if ( InventoryGroup == F )
+{
+	local Inventory Inv;
+	local int Count;
+
+	for( Inv=self; Inv!=None && Count < 1000; Inv=Inv.Inventory )
 	{
-		return self;
+		if ( Inv.InventoryGroup == F )
+			return Inv;
+		Count++;
 	}
-	else if ( Inventory == None )
-		return None;
-	else
-		return Inventory.FindItemInGroup(F);
+
+	return None;
 }
+*/
 
 
 // Either give this inventory to player Other, or spawn a copy
@@ -438,7 +447,7 @@ function FireDefSpell( float Value ){}
 }
 */
 
-function PlayFiring()
+simulated function PlayFiring()
 {
     //Play firing animation and sound
 }
@@ -465,6 +474,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 function TraceFire(float Accuracy, optional out vector HitLocation, optional out vector HitNormal)
 {
     local vector StartTrace, EndTrace, X,Y,Z;
+    local int HitJoint;
     local actor Other;
     local Pawn PawnOwner;
 
@@ -481,7 +491,7 @@ function TraceFire(float Accuracy, optional out vector HitLocation, optional out
         + Accuracy * (FRand() - 0.5 ) * Z * 1000 ;
     X = vector(AdjustedAim);
     EndTrace += (10000 * X); 
-    Other = PawnOwner.TraceShot(HitLocation,HitNormal,EndTrace,StartTrace);
+    Other = PawnOwner.TraceShot(HitLocation,HitNormal,HitJoint,EndTrace,StartTrace);
     ProcessTraceHit(Other, HitLocation, HitNormal, X,Y,Z);
     // log("TraceZoneLocation: "$(Level.getZone(HitLocation)));
 }
@@ -667,7 +677,7 @@ function bool PutDown()
     return true; 
 }
 
-function TweenDown()
+simulated function TweenDown()
 {
     if ( (AnimSequence != '') && (GetAnimGroup(AnimSequence) == 'Select') )
         TweenAnim( AnimSequence );
@@ -675,7 +685,7 @@ function TweenDown()
         PlayAnim('Down');
 }
 
-function TweenSelect()
+simulated function TweenSelect()
 {
     TweenAnim('Select',0.001);
 }
@@ -687,12 +697,12 @@ function PlaySelect()
     PlayerPawn(Owner).MakePlayerNoise(0.5, 640);
 }
 
-function PlayPostSelect()
+simulated function PlayPostSelect()
 {
     //Pawn(Owner).ClientMessage(""$ItemName);
 }
 
-function PlayIdleAnim()
+simulated function PlayIdleAnim()
 {
 }
 
@@ -714,6 +724,7 @@ defaultproperties
      RefireRate=0.5
      MessageNoMana=" out of mana."
      DeathMessage="%o was killed by %k's %w."
+     AltDeathMessage="%o was killed by %k's %w."
      MuzzleScale=4
      FlashLength=0.1
      AutoSwitchPriority=1

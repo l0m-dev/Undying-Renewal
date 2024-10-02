@@ -7,14 +7,14 @@ var float DistToGround, Inc;
 var float FallToKneesTime;
 var vector x, y, z;
 
-function HitWall( vector HitNormal, actor HitWall, byte TextureID )
+simulated function HitWall( vector HitNormal, actor HitWall, byte TextureID )
 {
 	Velocity = HitNormal * (0.5 * VSize(Velocity));
 }
 
 auto state ControlledFall
 {
-	function vector CheckForKing()
+	simulated function vector CheckForKing()
 	{
 		local King_Ass A;
 		local vector Loc;
@@ -26,7 +26,7 @@ auto state ControlledFall
 		return Loc;
 	}
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		local vector v;
 		
@@ -44,7 +44,7 @@ auto state ControlledFall
 		setTimer(2, false);
 	}
 
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		local vector Start, End, HitLocation, HitNOrmal;
 		local int HitJoint;
@@ -65,7 +65,7 @@ auto state ControlledFall
 		SetRotation(Pawn(Owner).ViewRotation);
 	}
 
-	function Timer()
+	simulated function Timer()
 	{
 		GotoState('FallForward');
 	}
@@ -74,9 +74,9 @@ auto state ControlledFall
 		
 }
 
-state FallForward
+simulated state FallForward
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		SetRotation(PlayerPawn(Owner).ViewRotation);
 	}
@@ -86,10 +86,25 @@ state FallForward
 		SetPhysics(PHYS_Falling);
 		Velocity = X * 128;
 		Sleep(3);
-		PlayerPawn(Owner).ClientAdjustGlow(-1.0,vect(0,0,0));
-		Sleep(2);
+		if (PlayerPawn(Owner).Health <= 0)
+		{
+			PlayerPawn(Owner).ClientAdjustGlow(-1.0,vect(0,0,0));
+			Sleep(2);
+		}
+		Destroy();
+}
+
+simulated function Destroyed()
+{
+	if (PlayerPawn(Owner).ViewTarget == Self)
+		PlayerPawn(Owner).ViewTarget = None;
+	if (PlayerPawn(Owner).Health <= 0)
+	{
 		PlayerPawn(Owner).SetPhysics(PHYS_None);
 		PlayerPawn(Owner).ServerRestartPlayer();
+		PlayerPawn(Owner).ClientAdjustGlow(1.0,vect(0,0,0));
+		PlayerPawn(Owner).bShowScores = false;
+	}
 }
 
 defaultproperties
@@ -100,4 +115,6 @@ defaultproperties
      bCollideActors=False
      bBounce=True
      Mass=10
+     RemoteRole=ROLE_None
+     LifeSpan=10
 }

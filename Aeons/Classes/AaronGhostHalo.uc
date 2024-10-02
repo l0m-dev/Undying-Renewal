@@ -9,6 +9,13 @@ function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
+	SetupEffects();
+}
+
+simulated function SetupEffects()
+{
+	Super.SetupEffects();
+
 	if ( Owner == none )
 	{
 		Destroy();
@@ -19,7 +26,12 @@ function PreBeginPlay()
 	SetBase( Owner );
 }
 
-function Tick( float DeltaTime )
+simulated function PostNetBeginPlay()
+{
+	SetupEffects();
+}
+
+simulated function Tick( float DeltaTime )
 {
 	local int	i;
 

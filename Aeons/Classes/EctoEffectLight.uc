@@ -3,6 +3,10 @@
 //=============================================================================
 class EctoEffectLight expands Light;
 
+// serverside
+// set bHidden to False to allow replication
+// set DrawType to DT_None to hide sprite
+
 function Tick(float DeltaTime)
 {
 	if (Owner == none)
@@ -21,4 +25,6 @@ defaultproperties
      LightSaturation=25
      LightRadius=20
      LightRadiusInner=8
+     bHidden=False
+     DrawType=DT_None
 }

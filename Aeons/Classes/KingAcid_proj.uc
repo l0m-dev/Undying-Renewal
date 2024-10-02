@@ -15,7 +15,7 @@ function PreBeginPlay()
 function Destroyed()
 {
 	if (Trail != none)
-		Trail.bShuttingDown = true;
+		Trail.Shutdown();
 }
 
 simulated function ProcessTouch (Actor Other, Vector HitLocation)

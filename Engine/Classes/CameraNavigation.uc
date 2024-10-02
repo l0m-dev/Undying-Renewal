@@ -34,7 +34,7 @@ var() string URL_PSX2;
 
 var CameraNavigation NextPoint, PrevPoint;
 
-function GetNextPoint(optional bool AutoGen)
+simulated function GetNextPoint(optional bool AutoGen)
 {
 	local CameraNavigation A, Points[8], NewPoint;
 	local int NumPoints;
@@ -42,12 +42,15 @@ function GetNextPoint(optional bool AutoGen)
 
 	if ( NextPoint == none )
 	{
-		forEach AllActors(class 'CameraNavigation', A, Event)
-		{
-			if ( (NumPoints < 8) && (A != self) && A.bActive)
+		if ( Event != 'None' )
 			{
-				Points[NumPoints] = A;
-				NumPoints ++;
+			forEach AllActors(class 'CameraNavigation', A, Event)
+			{
+				if ( (NumPoints < 8) && (A != self) && A.bActive)
+				{
+					Points[NumPoints] = A;
+					NumPoints ++;
+				}
 			}
 		}
 	
@@ -66,7 +69,7 @@ function GetNextPoint(optional bool AutoGen)
 				else
 					Loc =  Location;
 	
-				NewPoint = spawn(class 'NavCameraPoint',,,Loc);
+				NewPoint = spawn(class 'NavCameraPointDynamic',,,Loc);
 				NextPoint = NewPoint;
 				NewPoint.PrevPoint = self;
 			} else {
@@ -76,7 +79,7 @@ function GetNextPoint(optional bool AutoGen)
 	}
 }
 
-function GetPrevPoint(optional bool AutoGen)
+simulated function GetPrevPoint(optional bool AutoGen)
 {
 	local CameraNavigation A, Points[8], NewPoint;
 	local int NumPoints;
@@ -84,14 +87,17 @@ function GetPrevPoint(optional bool AutoGen)
 
 	if ( PrevPoint == none )
 	{
-		forEach AllActors(class 'CameraNavigation', A)
+		if ( Event != 'None' )
 		{
-			if (A.Event == Tag)
-				if ( (NumPoints < 8) && (A != self) && A.bActive )
-				{
-					Points[NumPoints] = A;
-					NumPoints ++;
-				}
+			forEach AllActors(class 'CameraNavigation', A)
+			{
+				if (A.Event == Tag)
+					if ( (NumPoints < 8) && (A != self) && A.bActive )
+					{
+						Points[NumPoints] = A;
+						NumPoints ++;
+					}
+			}
 		}
 		
 		if (NumPoints > 0)
@@ -107,7 +113,7 @@ function GetPrevPoint(optional bool AutoGen)
 					Loc = (Location - NextPoint.Location) + Location;
 				else
 					Loc =  Location;
-				NewPoint = spawn(class 'CameraNavigation',,,Loc);
+				NewPoint = spawn(class 'NavCameraPointDynamic',,,Loc);
 				PrevPoint = NewPoint;
 				NewPoint.NextPoint = self;
 			} else {
@@ -142,16 +148,17 @@ function Teleport(PlayerPawn Player)
 	}
 }
 
-function Trigger( Actor Other, Pawn EventInstigator )
+simulated function Trigger( Actor Other, Pawn EventInstigator )
 {
 	bActive = !bActive;
 }
 
 defaultproperties
 {
-	 bAlwaysRelevant=True
-	 RemoteRole=ROLE_SimulatedProxy
      LookWeight=1
      SpeedModifier=1
      DrawScale=0.25
+     RemoteRole=ROLE_None
+     bStatic=False
+     bNoDelete=True
 }

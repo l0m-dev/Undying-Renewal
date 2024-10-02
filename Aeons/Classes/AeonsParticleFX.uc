@@ -3,6 +3,11 @@
 //=============================================================================
 class AeonsParticleFX expands ParticleFX;
 
+// removed bNetTemporary=True
+// no longer need to tick: EnergyKey, Amplifier, HealthVial
+// no longer dumbproxy: SpellParticleFX
+// doesn't need bNetTemporary=False anymore: GiveSpellParticleFX, ScytheWoundFX
+
 //#exec OBJ LOAD FILE=\Aeons\Textures\fxB.utx PACKAGE=fxB
 
 //----------------------------------------------------------------------------
@@ -118,11 +123,20 @@ var		float Alpha, Direction;
 var		float InitialBrightness;
 var		int	  DefaultParticlesPerSecBase, DefaultParticlesPerSecRand;
 
+var bool bAlreadyStarted;
+
 //----------------------------------------------------------------------------
 
-function PreBeginPlay()
+replication
 {
-	Super.PreBeginPlay();
+	unreliable if (Role == ROLE_Authority)
+		bInitiallyOn, Direction;
+}
+
+//----------------------------------------------------------------------------
+
+simulated function PreBeginPlay()
+{
 	bSavable = true;
 }
 
@@ -133,8 +147,22 @@ simulated function BeginPlay()
 
 	// Remember initial light type and set new one.
 	InitialBrightness = LightBrightness;
-	Disable( 'Tick' );
+	if (Level.NetMode != NM_Client || GetStateName() == 'NormalParticles')
+		Disable( 'Tick' );
 	
+	if( bInitiallyOn )
+	{
+		Alpha     = 1.0;
+		Direction = 1.0;
+	} else {
+		Strength = 0;
+		Alpha     = 0.0;
+		Direction = -1.0;
+	}
+}
+
+simulated function PostNetBeginPlay()
+{
 	if( bInitiallyOn )
 	{
 		Alpha     = 1.0;
@@ -179,14 +207,15 @@ simulated function Tick( float DeltaTime )
 	if( Alpha > 1.0 )
 	{
 		Alpha = 1.0;
-		Disable( 'Tick' );
+		if (Level.NetMode != NM_Client || GetStateName() == 'NormalParticles')
+			Disable( 'Tick' );
 	} 
 	else if( Alpha < 0.0 ) 
 	{
 		Alpha = 0.0;
-		Disable( 'Tick' );
+		if (Level.NetMode != NM_Client || GetStateName() == 'NormalParticles')
+			Disable( 'Tick' );
 	}
-
 
 	if( !bDelayFullOn )
 	{
@@ -337,7 +366,16 @@ state() TriggerControl
 //----------------------------------------------------------------------------
 state() NormalParticles
 {
-
+	simulated function StartLevel()
+	{
+		// StartLevel can be called twice if an actor that's initially in the level spawns an actor before its StartLevel is called
+		// it can be called during SpawnActor and then right after the level has started
+		if (!bSpawned && !bAlreadyStarted)
+		{
+			RemoteRole = ROLE_None;
+		}
+		bAlreadyStarted = true;
+	}
 }
 
 
@@ -348,8 +386,8 @@ state() NormalParticles
 defaultproperties
 {
      bInitiallyOn=True
-     bNetTemporary=True
      bTimedTick=True
      MinTickTime=0.15
      InitialState=NormalParticles
+     NetUpdateFrequency=4
 }

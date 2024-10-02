@@ -2,6 +2,9 @@
 // King_Tentacle.
 //=============================================================================
 class King_Tentacle expands King_Part;
+
+// changed default MeleeInfo[0].Damage to 50 to match the values set in the editor, 1000 was never used
+
 //#exec MESH IMPORT MESH=King_Tentacle_m SKELFILE=King_Tentacle.ngf
 
 //#exec MESH NOTIFY SEQ=Attack2 TIME=0.448 FUNCTION=DoNearDamage
@@ -99,9 +102,9 @@ function PreBeginPlay()
 	if (RGC())
 	{
 		DrawScale = 1.25;
-		StayOutOfWaterTime = 15;
-		MeleeRange = 1500;
-		MeleeInfo[0].Damage = 250;
+		StayOutOfWaterTime = default.StayOutOfWaterTime * 2;
+		MeleeRange = default.MeleeRange * 1.2;
+		MeleeInfo[0].Damage = default.MeleeInfo[0].Damage * 0.65; 
 	}
 	super.PreBeginPlay();
 	OutOfWater = true;
@@ -230,7 +233,7 @@ defaultproperties
      MaxTanYaw=1024
      MinTanYaw=-1024
      RootJointName=Tent01
-     MeleeInfo(0)=(Damage=1000,EffectStrength=1,Method=RipSlice)
+     MeleeInfo(0)=(Damage=50,EffectStrength=1,Method=RipSlice)
      DamageRadius=150
      MeleeRange=1250
      SoundSet=Class'Aeons.KingSoundSet'
@@ -238,4 +241,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.King_Tentacle_m'
      CollisionRadius=100
      bCollideSkeleton=False
+     bAlwaysRelevant=True
+     bNetOptional=True
 }

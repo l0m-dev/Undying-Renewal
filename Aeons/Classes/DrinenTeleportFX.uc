@@ -25,7 +25,7 @@ function PreBeginPlay()
 		LastJoint = iJoint;
 	}
 	
-	bShuttingDown = true;
+	Shutdown();
 	// Super.PreBeginPlay();
 }
 

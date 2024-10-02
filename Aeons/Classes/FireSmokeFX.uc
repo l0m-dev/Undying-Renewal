@@ -6,7 +6,7 @@ class FireSmokeFX expands AeonsParticleFX;
 function ZoneChange(ZoneInfo NewZone)
 {
 	if (NewZone.bWaterZone)
-		bShuttingDown = true;
+		Shutdown();
 }
 
 defaultproperties

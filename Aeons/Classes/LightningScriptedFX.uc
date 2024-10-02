@@ -3,7 +3,7 @@
 //=============================================================================
 class LightningScriptedFX expands ScriptedFX;
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	if ( Pawn(Owner) != none )
 	{
@@ -11,7 +11,8 @@ function Tick(float DeltaTime)
 	}
 	else
 	{
-		setRotation(Owner.Rotation);
+		//setRotation(Owner.Rotation);
+          Disable('Tick');
 	}
 }
 

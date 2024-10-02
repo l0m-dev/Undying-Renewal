@@ -127,6 +127,13 @@ state Hold
 		local int i;
 		local vector Loc, start, end;
 
+		if ( (StartActor == none) || (EndActor == none) )
+		{
+			log("Hold: Actors undefined - destroying self", 'Misc');
+			Destroy();
+			return;
+		}
+		
 		start = StartActor.JointPlace(StartJoint).pos;
 		end = EndActor.JointPlace(EndJoint).pos;
 

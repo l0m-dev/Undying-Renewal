@@ -552,4 +552,6 @@ defaultproperties
      CollisionRadius=26
      CollisionHeight=36
      Mass=2000
+     MenuName="Jile"
+     CreatureDeathVerb="composted"
 }

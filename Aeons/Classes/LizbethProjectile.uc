@@ -10,4 +10,5 @@ defaultproperties
      DrawScale=0.085
      CollisionRadius=4
      CollisionHeight=4
+     bNetTemporary=False
 }

@@ -21,4 +21,5 @@ defaultproperties
      SoundRadius=28
      SoundRadiusInner=15
      SoundVolume=110
+     bNetTemporary=False
 }

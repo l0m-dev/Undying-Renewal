@@ -9,21 +9,12 @@ var PlayerPawn Player;
 var() float Strength;
 var() vector Fog;
 
-function FindPlayer()
+function Trigger(Actor Other, Pawn Instigator)
 {
 	ForEach AllActors(class 'PlayerPawn', Player)
 	{
-		break;
+		Player.ClientFlash(Strength, fog);
 	}
-}
-
-function Trigger(Actor Other, Pawn Instigator)
-{
-	if ( Player == none )
-		FindPlayer();
-	
-	if ( Player != none )
-		Player.ClientFlash( Strength, fog);
 }
 
 defaultproperties

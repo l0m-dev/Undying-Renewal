@@ -1,10 +1,24 @@
-class RenewalSettingsGamePage extends RenewalSettingsBasePage;
+class RenewalSettingsGamePage extends UMenuRenewalBasePage;
 
 var UWindowCheckbox GameplayChangesCheck;
 var UWindowCheckbox GoreCheck;
 var UWindowCheckbox AutoUseHealthVialsCheck;
+var UWindowCheckbox LimitHealthCheck;
 var UWindowHSliderControl DamageScreenShakeScaleSlider;
 var UWindowCheckbox MoreSkippableCutscenesCheck;
+
+var localized string GameplayChangesText;
+var localized string GameplayChangesHelp;
+var localized string GoreText;
+var localized string GoreHelp;
+var localized string AutoUseHealthVialsText;
+var localized string AutoUseHealthVialsHelp;
+var localized string LimitHealthText;
+var localized string LimitHealthHelp;
+var localized string DamageScreenShakeScaleText;
+var localized string DamageScreenShakeScaleHelp;
+var localized string MoreSkippableCutscenesText;
+var localized string MoreSkippableCutscenesHelp;
 
 function Created()
 {
@@ -15,6 +29,8 @@ function Created()
 	GoreCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', GoreText, GoreHelp));
 
 	AutoUseHealthVialsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', AutoUseHealthVialsText, AutoUseHealthVialsHelp));
+
+	LimitHealthCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', LimitHealthText, LimitHealthHelp));
 
 	DamageScreenShakeScaleSlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', DamageScreenShakeScaleText, DamageScreenShakeScaleHelp));
 	DamageScreenShakeScaleSlider.SetRange(0.0, 1.0, 0.1);
@@ -32,6 +48,7 @@ function GetSettings()
 	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
 	GoreCheck.bChecked = RenewalConfig.bGore;
 	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
+	LimitHealthCheck.bChecked = RenewalConfig.bLimitHealth;
 	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
 	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
 }
@@ -52,6 +69,9 @@ function Notify(UWindowDialogControl C, byte E)
 			break;
 		case AutoUseHealthVialsCheck:
 			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
+			break;
+		case LimitHealthCheck:
+			RenewalConfig.bLimitHealth = LimitHealthCheck.bChecked;
 			break;
 		case DamageScreenShakeScaleSlider:
 			RenewalConfig.DamageScreenShakeScale = DamageScreenShakeScaleSlider.GetValue();

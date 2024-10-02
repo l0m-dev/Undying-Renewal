@@ -653,6 +653,16 @@ function Paint(Canvas C, float X, float Y)
 	local int SwirlX, SwirlY;
 	local int JournalDelta;
   	local float RootScaleX, RootScaleY;
+	local float Scale;
+	local Vector ScaleVec;
+
+	Scale = Root.WinHeight / Root.WinWidth;
+	ScaleVec = vect(1,1,1);
+
+	// handle aspect ratios smaller than 4/3
+	if (Scale >= 0.75 ) {
+		ScaleVec.X = Scale / 0.75;
+	}
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
@@ -666,6 +676,13 @@ function Paint(Canvas C, float X, float Y)
 	//log("BookWindow: Paint");
 
 	Super.Paint(C, X, Y);
+
+	P = GetPlayerOwner();
+	if ((P != None)&&(AeonsPlayer(P) != None))
+		Book = BookJournal(AeonsPlayer(P).Book);
+
+	if (Book == None)
+		return;
 
 	JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
 	
@@ -684,13 +701,8 @@ function Paint(Canvas C, float X, float Y)
 		C.DrawTileClipped(FireTexture'FX.Swirl', 84*RootScaleX, 84*RootScaleY, 0, 0, 64, 64);
 	}
 	
-	P = GetPlayerOwner();
-
 	if ( AmbientSoundID == 0 )
-		AmbientSoundID = GetPlayerOwner().PlaySound( Sound(DynamicLoadObject("Shell_HUD.Shell_BookAmb", class'Sound')), SLOT_None, 0.5, true, 1600.0, 1.0, 491 );	
-
-	if ((P != None)&&(AeonsPlayer(P) != None))
-		Book = BookJournal(AeonsPlayer(P).Book);
+		AmbientSoundID = P.PlaySound( Sound(DynamicLoadObject("Shell_HUD.Shell_BookAmb", class'Sound')), SLOT_None, 0.5, true, 1600.0, 1.0, 491 );	
 
 	if (Book != None)
 	{	
@@ -698,7 +710,7 @@ function Paint(Canvas C, float X, float Y)
 		{
 			if ( P != None ) 
 			{
-				DrawClippedActorFixedFov( C, book.BookFOV, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
+				DrawClippedActorFixedFov( C, book.BookFOV, InnerWidth/2, InnerHeight/2, book, False, book.BookRotation, book.BookOffset*ScaleVec );//rot(32767,16300,16300), vect(35, 6, 1) ); // (33,2,0)
 			}
 		}
 		else

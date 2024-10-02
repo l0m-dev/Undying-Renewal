@@ -28,7 +28,7 @@ function Destroyed()
 {
 	log (""$self.name$" is destroyed", 'Misc');
 	if (pFX != none)
-		pFX.bShuttingDown = true;
+		pFX.Shutdown();
 }
 
 auto State Seeking

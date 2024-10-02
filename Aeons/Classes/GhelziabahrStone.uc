@@ -31,6 +31,15 @@ var() sound SpawnHoundSound;
 var() texture GlowTexture;
 var bool bGlowStone;
 var float GlowFlashX, GlowFlashY;
+var CoopTranslocator CoopTranslocator;
+
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		Glow;
+	unreliable if (Role == ROLE_Authority && bNetOwner)
+		bGlowStone, CoopTranslocator;
+}
 
 function PostBeginPlay()
 {
@@ -40,19 +49,19 @@ function PostBeginPlay()
 
 function FellOutOfWorld()
 {
-	LogStack();
+	//LogStack();
 	super.FellOutOfWorld();
 }
 
 function EncroachedBy( actor Other )
 {
-	LogStack();
+	//LogStack();
 	super.EncroachedBy( Other );
 }
 
 function Destroyed()
 {
-	LogStack();
+	//LogStack();
 	super.Destroyed();
 }
 
@@ -82,10 +91,17 @@ function addUse(int amt)
 	useMeter += amt;
 	if ( useMeter > SpawnHoundLimit )
 	{
-		useMeter = 0;
-		if ( AeonsPlayer(Owner).SpawnHound() )
+		if ( Spawn( class'Hound',,,Location + FMax( class'Hound'.default.CollisionRadius + CollisionRadius + 50, 72 ) * Vector(Rotation) + vect(0,0,1) * 15 ) != None )
 		{
-			GotoState('HoundAnim');
+			useMeter = 0;
+			if ( AeonsPlayer(Owner).SpawnHound() )
+			{
+				GotoState('HoundAnim');
+			}
+		}
+		else
+		{
+			useMeter -= amt;
 		}
 	}
 }
@@ -154,15 +170,28 @@ function Fire(float F)
 	gotostate('NormalFire');
 }
 
-// Called by the FireAnimation
-function FireWeapon()
+function PlayFireSoundServer()
 {
-	PlaySound(FireSound);
+	PlayOwnedSound(FireSound);
+}
+
+// Called by the FireAnimation
+simulated function FireWeapon()
+{
+	if (Level.NetMode == NM_Client)
+	{
+		PlaySound(FireSound);
+	}
+	else
+	{
+		PlayFireSoundServer();
+	}
 	AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 	MeleeAttack(256);
 	bMuzzleFlash ++;
 
-	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fGhelz = 1.0;
+	if (Level.NetMode != NM_Client)
+		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fGhelz = 1.0;
 	// Test PlayActuator here!!
 	PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_LightShake, 0.4f);
 }
@@ -182,16 +211,15 @@ state NormalFire
 		Finish();
 }
 
-
 state Active
 {
 
 	Begin:
-		SetBase( Owner, 'Revolver_Attach_Hand', 'root' );
+		AttachWeapon(AeonsPlayer(Owner).GetWeaponAttachJoint());
+		// SetBase( Owner, 'Revolver_Attach_Hand', 'root' );
 		// SetBase( Owner, 'L_Wrist', 'root' );
 		bCanClientFire=true;
-		//gotoState('Idle');
-		GotoState('Idle');
+		gotoState('Idle');
 }
 
 state Idle
@@ -201,12 +229,20 @@ state Idle
 	
 	function Fire(float F) 
 	{
+		if (CoopTranslocator != None && CoopTranslocator.TargetPawn != None)
+		{
+			CoopTranslocator.TryTranslocate();
+			return;
+		}
 		gotoState('NormalFire');
 	}
 
 	function bool PutDown()
 	{
-		LogStack();
+		if (CoopTranslocator != None && CoopTranslocator.bActive)
+		{
+			CoopTranslocator.Deactivate();
+		}
 		if ( bWeaponUp )
 			GotoState('DownWeapon');
 		else
@@ -229,14 +265,15 @@ state Idle
 
         if ( bChangeWeapon )
 		{
-			LogActor("bChangeWeapon has been set.");
+			//LogActor("bChangeWeapon has been set.");
             GotoState('DownWeapon');
 		}
-		if ((VSize(Pawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
+		if (Owner != None)
 		{
-			LoopAnim('MoveIdle');
-		} else {
-			LoopAnim('StillIdle');
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				LoopAnim('MoveIdle', [TweenTime] TweenFrom('StillIdle', 0.5));
+			else
+				LoopAnim('StillIdle', [TweenTime] TweenFrom('MoveIdle', 0.5));
 		}
 	}
 
@@ -256,6 +293,7 @@ state Idle
 		goto 'Begin';
 
 	Begin:
+		ClientIdleWeapon();
 		FinishAnim();
 		if ( bChangeWeapon )
 			GotoState('DownWeapon');
@@ -286,16 +324,25 @@ simulated function Glow()
 
 simulated function PlayIdleAnim()
 {
-	LogActorState("PlayIdleAnim: Ghelz");
+	//LogActorState("PlayIdleAnim: Ghelz");
 	bCanClientFire=true;
 
 	if ((VSize(Pawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
 	{
-		LoopAnim('MoveIdle');
+		LoopAnim('MoveIdle', [TweenTime] 0.0);
 	} 
 	else 
 	{
-		LoopAnim('StillIdle');
+		LoopAnim('StillIdle', [TweenTime] 0.0);
+	}
+}
+
+State ClientIdle
+{
+	simulated function BeginState()
+	{
+		PlayIdleAnim();
+		enable('Tick');
 	}
 }
 
@@ -306,16 +353,18 @@ state ClientFiring
 {
 	simulated function AnimEnd()
 	{
-		Log("Ghelz: state ClientFiring: AnimEnd");
+		//Log("Ghelz: state ClientFiring: AnimEnd");
 
-		if ( Pawn(Owner).bFire != 0 )
+		if ( !bCanClientFire )
+			GotoState('ClientIdle');
+		else if ( Pawn(Owner).bFire != 0 )
 			Global.ClientFire(0);
 		else
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
-
+/*
 		if ( (Pawn(Owner) == None) || (Ammotype.AmmoAmount <= 0) )
 		{
 			PlayIdleAnim();
@@ -327,7 +376,7 @@ state ClientFiring
 		{
 			if ( ClipCount <= 0 ) 
 			{
-				//PlayReloading();
+				PlayReloading();
 				GotoState('ClientReload');
 			}
 			else if ( Pawn(Owner).bFire != 0 )
@@ -338,8 +387,17 @@ state ClientFiring
 				GotoState('');
 			}
 		}
-
+*/
 	}
+}
+
+simulated function bool ClientFire( float Value )
+{
+	if (CoopTranslocator != None && CoopTranslocator.TargetPawn != None)
+	{
+		return false;
+	}
+	return Super.ClientFire(Value);
 }
 
 simulated function RenderOverlays( canvas Canvas )
@@ -378,6 +436,9 @@ simulated function RenderOverlays( canvas Canvas )
 		Canvas.Style = FlashStyle0;
 		Canvas.DrawIcon(GlowTexture, MuzzleScale);
 	}
+
+	if (CoopTranslocator != None && CoopTranslocator.bActive)
+		CoopTranslocator.PostRender(Canvas);
 
 	Super.RenderOverlays(Canvas);
 }
@@ -419,6 +480,7 @@ defaultproperties
      MuzzleFlashTexture=Texture'Aeons.MuzzleFlashes.Ghelz_Glow2'
      bTimedTick=True
      MinTickTime=0.05
+     bRotatingPickup=False
      CollisionRadius=8
      CollisionHeight=4
      bGroundMesh=False

@@ -48,7 +48,7 @@ simulated function Destroyed()
 		WallDecal(Location, vect(0,0,1));
 
 	if (trail != none)
-		trail.bShuttingDown = true;
+		trail.Shutdown();
 }
 
 simulated function ProcessBounce(vector HitNormal, optional vector vel)
@@ -207,9 +207,9 @@ state Stopped
 
 	simulated function BeginState()
 	{
-		ClearAnims();
+		//ClearAnims();
 		if (Trail != none)
-			Trail.bShuttingDown = true;
+			Trail.Shutdown();
 		setPhysics(PHYS_None);
 		Velocity = vect(0,0,0);
 		setTimer(3,false);
@@ -218,7 +218,7 @@ state Stopped
 	Begin:
 		ClearAnims();
 		if (Trail != none)
-			Trail.bShuttingDown = true;
+			Trail.Shutdown();
 		setPhysics(PHYS_None);
 		Velocity = vect(0,0,0);
 		setTimer(3,false);

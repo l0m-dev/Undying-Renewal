@@ -337,6 +337,7 @@ function ThrowProj( int Which )
 	{
 		Projs[Which].SetRotation( rotator(ProjTrajectory) );
 		Projs[Which].GotoState( 'Flying' );
+		Projs[Which].RemoteRole = ROLE_DumbProxy;
 //		Projs[Which].Velocity = ProjTrajectory * FVariant( Projs[Which].Speed, Projs[Which].Speed * 0.10 );
 //		Projs[Which].SetPhysics( PHYS_Falling );
 		Projs[Which] = none;
@@ -1346,4 +1347,6 @@ defaultproperties
      CollisionRadius=24
      CollisionHeight=76
      bGroundMesh=False
+     MenuName="Verago"
+     CreatureDeathVerb="devestated"
 }

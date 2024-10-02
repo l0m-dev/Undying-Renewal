@@ -44,10 +44,10 @@ simulated function PostBeginPlay()
 simulated function Destroyed()
 {
 	if ( IceTrail != None )
-		IceTrail.bshuttingDown = true;
+		IceTrail.Shutdown();
 
 	if ( trail != None ) 
-		trail.bShuttingDown = true;
+		trail.Shutdown();
 }
 
 simulated function ProcessTouch (Actor Other, Vector HitLocation)

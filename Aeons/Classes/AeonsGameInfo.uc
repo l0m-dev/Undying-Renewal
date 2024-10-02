@@ -21,11 +21,23 @@ var(DeathMessage) localized string SuicideMessage;
 var(DeathMessage) localized string FallMessage;
 var(DeathMessage) localized string DrownedMessage;
 var(DeathMessage) localized string BurnedMessage;
-var(DeathMessage) localized string CorrodedMessage;
+var(DeathMessage) localized string ElectrocutedMessage;
+var(DeathMessage) localized string CrushedMessage;
+var(DeathMessage) localized string StompedMessage;
 var(DeathMessage) localized string HackedMessage;
 
-var bool bBhopEnabled;
+var localized string GlobalNameChange;
+var localized string NoNameChange;
 
+var CutsceneManager CutsceneManager;
+
+// left for compatibility with family grave
+function int ReduceDamage( int Damage, name DamageType, pawn injured, pawn instigatedBy )
+{
+	return Super.ReduceDamage(Damage, DamageType, injured, instigatedBy);
+}
+
+/*
 function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instigatedBy)
 {
 	if (injured.Region.Zone.bNeutralZone)
@@ -47,24 +59,38 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 			Damage = float(Damage) * (1.1 - 0.1 * injured.skill);
 	}
 	else if ( injured.bIsPlayer )
-		Damage = Damage * (0.4 + 0.2 * instigatedBy.skill);
+		Damage = Damage * (0.4 + 0.2 * instigatedBy.skill);d
 	return (Damage * instigatedBy.DamageScaling);
 }
+*/
 
-exec function bhop()
+function PreBeginPlay()
 {
-	bBhopEnabled = !bBhopEnabled;
-	default.bBhopEnabled = bBhopEnabled;
+	Super.PreBeginPlay();
+
+	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
 }
 
-exec function message (string Msg) {
+function CutsceneManagerPlayerLogin(PlayerPawn Player, bool bCutSceneStartSpot)
+{
+	CutsceneManager.PlayerLogin(Player, bCutSceneStartSpot);
+}
+
+function CutsceneManagerPlayerLogout(PlayerPawn Player)
+{
+	CutsceneManager.PlayerLogout(Player);
+}
+
+exec function AdminSay(string Msg)
+{
 	ServerSay(Msg);
 }
 
-function ServerSay (string Msg) {
+function ServerSay(string Msg)
+{
 	local Patrick P;
 
-	ForEach AllActors (class 'Patrick', P)
+	ForEach AllActors(class 'Patrick', P)
 	{
 		P.ScreenMessage(Msg, 3.0, True);
 	}
@@ -85,22 +111,46 @@ static function string KillMessage( name damageType, pawn Other )
 {
 	local string message;
 	
-	if (damageType == 'Exploded')
-		message = Default.ExplodeMessage;
-	else if (damageType == 'Suicided')
-		message = Default.SuicideMessage;
-	else if ( damageType == 'Fell' )
-		message = Default.FallMessage;
-	else if ( damageType == 'Drowned' )
-		message = Default.DrownedMessage;
-	else if ( damageType == 'Special' )
-		message = Default.SpecialDamageString;
-	else if ( damageType == 'Burned' )
-		message = Default.BurnedMessage;
-	else if ( damageType == 'Corroded' )
-		message = Default.CorrodedMessage;
-	else
-		message = Default.DeathVerb$Default.DeathTerm;
+	switch ( damageType )
+	{
+		case 'Suicided':
+			message = Default.SuicideMessage;
+			break;
+		case 'Fell':
+			message = Default.FallMessage;
+			break;
+		case 'Drowned':
+			message = Default.DrownedMessage;
+			break;
+		case 'Crushed':
+			message = Default.CrushedMessage;
+			break;
+		case 'Stomped':
+			message = Default.StompedMessage;
+			break;
+		case 'Special':
+			message = Default.SpecialDamageString;
+			break;
+		case 'Burned':
+		case 'fire':
+		case 'gen_fire':
+			message = Default.BurnedMessage;
+			break;
+		case 'electrical':
+			message = Default.ElectrocutedMessage;
+			break;
+		case 'Exploded':
+		case 'dyn_concussive':
+		case 'skull_concussive':
+		case 'sigil_concussive':
+		case 'lbg_concussive':
+		case 'phx_concussive':
+		case 'gen_concussive':
+			message = Default.ExplodeMessage;
+			break;
+		default:
+			message = Default.DeathVerb$Default.DeathTerm;
+	}
 		
 	return message;	
 }
@@ -108,17 +158,38 @@ static function string KillMessage( name damageType, pawn Other )
 static function string CreatureKillMessage( name damageType, pawn Other )
 {
 	local string message;
-	
-	if (damageType == 'exploded')
-		message = Default.ExplodeMessage;
-	else if ( damageType == 'Burned' )
-		message = Default.BurnedMessage;
-	else if ( damageType == 'Corroded' )
-		message = Default.CorrodedMessage;
-	else if ( damageType == 'Hacked' )
-		message = Default.HackedMessage;
-	else
-		message = Default.DeathVerb$Default.DeathTerm;
+
+	switch ( damageType )
+	{
+		case 'Hacked':
+		case 'nearattack':
+		case 'scythe':
+		case 'scythedouble':
+			message = Default.HackedMessage;
+			break;
+		case 'Stomped':
+			message = Default.StompedMessage;
+			break;
+		case 'Burned':
+		case 'fire':
+		case 'gen_fire':
+			message = Default.BurnedMessage;
+			break;
+		case 'electrical':
+			message = Default.ElectrocutedMessage;
+			break;
+		case 'Exploded':
+		case 'dyn_concussive':
+		case 'skull_concussive':
+		case 'sigil_concussive':
+		case 'lbg_concussive':
+		case 'phx_concussive':
+		case 'gen_concussive':
+			message = Default.ExplodeMessage;
+			break;
+		default:
+			message = Default.DeathVerb$Default.DeathTerm;
+	}
 
 	return ( message$Default.DeathPrep );
 }
@@ -146,6 +217,32 @@ static function string PlayerKillMessage( name damageType, PlayerReplicationInfo
 	return ( Default.DeathVerb$message$Default.DeathPrep );
 } 	
 
+function BroadcastRegularDeathMessage(pawn Killer, pawn Other, name damageType)
+{
+	local class WeaponClass;
+
+	switch (damageType)
+	{
+		case 'ectoplasm':
+			WeaponClass = class'Ectoplasm';
+			break;
+		case 'skull_concussive':
+			WeaponClass = class'SkullStorm';
+			break;
+		case 'electrical':
+			WeaponClass = class'Lightning';
+			break;
+		case 'powerword':
+			WeaponClass = class'PowerWord';
+			break;
+		default:
+			WeaponClass = Killer.Weapon.Class;
+	}
+	//creepingrot,sigil_concussive
+
+	BroadcastLocalizedMessage(DeathMessageClass, 0, Killer.PlayerReplicationInfo, Other.PlayerReplicationInfo, WeaponClass);
+}
+
 function PlayTeleportEffect( actor Incoming, bool bOut, bool bSound)
 {
 	/* NEEDMOH ==================
@@ -171,6 +268,7 @@ function PlayTeleportEffect( actor Incoming, bool bOut, bool bSound)
 function AddDefaultInventory( pawn PlayerPawn )
 {
 	local Weapon newWeapon;
+	local class<Weapon> WeapClass;
 	local Inventory newItem;
 	local Spell newSpell;
 	local PlayerModifier newPM;
@@ -181,6 +279,15 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 	if( PlayerPawn.IsA('Spectator') )
 		return;
+
+	if( PlayerPawn(PlayerPawn).GetEntryLevelSafe() == PlayerPawn.Level )
+	{
+		// limit tampering with the entry level (like spawning things)
+		PlayerPawn(PlayerPawn).bCheatsEnabled = false;
+
+		// don't give default inventory to prevent things like activating scrye and the ambient sound staying permanently
+		return;
+	}
 
 	// ****************************************************
 	// NEEDAEONS -DEFAULT WEAPON IS NOT ASSIGNED
@@ -197,9 +304,8 @@ function AddDefaultInventory( pawn PlayerPawn )
 	// Player Modifiers --------------------------------------------------------
 	// -------------------------------------------------------------------------
 
-	// give the player a On Screen Message Modifier
-	if ( AeonsPlayer(PlayerPawn).OSMMod == None )
-		AeonsPlayer(PlayerPawn).OSMMod = Spawn(class'Aeons.OnScreenMessageModifier', PlayerPawn);
+	// give the player client side modifiers
+	AeonsPlayer(PlayerPawn).GiveClientSideModifiers();
 
 	// give the player a SlimeModifier
 	if ( AeonsPlayer(PlayerPawn).SlimeMod == None )
@@ -212,10 +318,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 	// Friction Modifier
 	if ( AeonsPlayer(PlayerPawn).FrictionMod == None )
 		AeonsPlayer(PlayerPawn).FrictionMod = Spawn(class'Aeons.FrictionModifier', PlayerPawn);
-
-	// Rain Modifier
-	if ( AeonsPlayer(PlayerPawn).RainMod == None )
-		AeonsPlayer(PlayerPawn).RainMod = Spawn(class'Aeons.RainModifier', PlayerPawn);
 
 	// Player Bloody Footprint Modifier
 	if ( AeonsPlayer(PlayerPawn).BloodMod == None )
@@ -234,20 +336,20 @@ function AddDefaultInventory( pawn PlayerPawn )
 		AeonsPlayer(PlayerPawn).GlowMod = Spawn(class'Aeons.GlowModifier', PlayerPawn);
 
 	// Player Wet Modifier
-	if ( AeonsPlayer(PlayerPawn).WetMod == None )
+	if ( AeonsPlayer(PlayerPawn).WetMod == None && Level.NetMode == NM_Standalone ) // disabled in multiplayer for now
 		AeonsPlayer(PlayerPawn).WetMod = Spawn(class'Aeons.WetModifier', PlayerPawn);
 
 	// Player Fire Modifier
 	if ( AeonsPlayer(PlayerPawn).FireMod == None )
 		AeonsPlayer(PlayerPawn).FireMod = Spawn(class'Aeons.FireModifier', PlayerPawn);
 
-	// Player Damage Physics Modifier
-	if ( AeonsPlayer(PlayerPawn).PlayerDamageMod == None )
-		AeonsPlayer(PlayerPawn).PlayerDamageMod = Spawn(class'Aeons.PlayerDamageModifier', PlayerPawn);
-
 	// Flight Modifier
 	if ( AeonsPlayer(PlayerPawn).Flight == None )
 		AeonsPlayer(PlayerPawn).Flight = Spawn(class'Aeons.FlightModifier', PlayerPawn);
+
+	// give the player a Mindshatter Modifier
+	if ( AeonsPlayer(PlayerPawn).MindshatterMod == None )
+		AeonsPlayer(PlayerPawn).MindshatterMod = Spawn(class'Aeons.MindshatterModifier', PlayerPawn);
 
 	// Mana Modifier
 	if ( AeonsPlayer(PlayerPawn).ManaMod == None )
@@ -269,10 +371,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 	if ( AeonsPlayer(PlayerPawn).SphereOfColdMod == None )
 		AeonsPlayer(PlayerPawn).SphereOfColdMod = Spawn(class'Aeons.SphereOfColdModifier', PlayerPawn);
 
-	// give the player a Mindshatter Modifier
-	if ( AeonsPlayer(PlayerPawn).MindshatterMod == None )
-		AeonsPlayer(PlayerPawn).MindshatterMod = Spawn(class'Aeons.MindshatterModifier', PlayerPawn);
-
 	// give the player a Phase Modifier
 	if ( AeonsPlayer(PlayerPawn).PhaseMod == None )
 		AeonsPlayer(PlayerPawn).PhaseMod = Spawn(class'Aeons.PhaseModifier', PlayerPawn);
@@ -289,7 +387,7 @@ function AddDefaultInventory( pawn PlayerPawn )
 	if ( AeonsPlayer(PlayerPawn).ShalasMod == None )
 		AeonsPlayer(PlayerPawn).ShalasMod = Spawn(class'Aeons.ShalasModifier', PlayerPawn);
 
-	// give the player a Shala's Vortex Modifier
+	// give the player a FireFlyModifier
 	if ( AeonsPlayer(PlayerPawn).FireFlyMod == None )
 		AeonsPlayer(PlayerPawn).FireFlyMod = Spawn(class'Aeons.FireFlyModifier', PlayerPawn);
 
@@ -319,6 +417,23 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 	// give the player all weapons and all spells
 	AeonsPlayer(PlayerPawn).GiveStartupWeapons();
+
+	// Spawn default weapon.
+	WeapClass = BaseMutator.MutatedDefaultWeapon();
+	if( (WeapClass!=None) && (PlayerPawn.FindInventoryType(WeapClass)==None) )
+	{
+		newWeapon = Spawn(WeapClass);
+		if( newWeapon != None )
+		{
+			newWeapon.Instigator = PlayerPawn;
+			newWeapon.BecomeItem();
+			PlayerPawn.AddInventory(newWeapon);
+			newWeapon.BringUp();
+			newWeapon.GiveAmmo(PlayerPawn);
+			newWeapon.SetSwitchPriority(PlayerPawn);
+			newWeapon.WeaponSet(PlayerPawn);
+		}
+	}
 	
 	// give em somethin' to read
 	AeonsPlayer(PlayerPawn).GiveBook();
@@ -356,6 +471,20 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newWeapon.WeaponSet(PlayerPawn);
 	}
 	*/
+
+	BaseMutator.ModifyPlayer(PlayerPawn);
+}
+
+function PlayWinMessage(PlayerPawn Player, bool bWinner)
+{
+	if ( Player.IsA('AeonsPlayer') )
+		AeonsPlayer(Player).PlayWinMessage(bWinner, Player.ViewTarget);
+}
+
+event OnSaveGame(int Slot)
+{
+	//ServerSay("GAME SAVED");
+	BroadcastMessage(class'Console'.default.DoneSaveMessage);
 }
 
 /* NEEDAEONS -Need to add these properties
@@ -365,7 +494,70 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 defaultproperties
 {
+     DeathMessage(0)="killed"
+     DeathMessage(1)="ruled"
+     DeathMessage(2)="smoked"
+     DeathMessage(3)="slaughtered"
+     DeathMessage(4)="annihilated"
+     DeathMessage(5)="put down"
+     DeathMessage(6)="splooged"
+     DeathMessage(7)="perforated"
+     DeathMessage(8)="shredded"
+     DeathMessage(9)="destroyed"
+     DeathMessage(10)="whacked"
+     DeathMessage(11)="canned"
+     DeathMessage(12)="busted"
+     DeathMessage(13)="creamed"
+     DeathMessage(14)="smeared"
+     DeathMessage(15)="shut out"
+     DeathMessage(16)="beaten down"
+     DeathMessage(17)="smacked down"
+     DeathMessage(18)="pureed"
+     DeathMessage(19)="sliced"
+     DeathMessage(20)="diced"
+     DeathMessage(21)="ripped"
+     DeathMessage(22)="blasted"
+     DeathMessage(23)="torn up"
+     DeathMessage(24)="spanked"
+     DeathMessage(25)="eviscerated"
+     DeathMessage(26)="neutered"
+     DeathMessage(27)="whipped"
+     DeathMessage(28)="shafted"
+     DeathMessage(29)="trashed"
+     DeathMessage(30)="smashed"
+     DeathMessage(31)="trounced"
+     DeathModifier(0)="thoroughly "
+     DeathModifier(1)="completely "
+     DeathModifier(2)="absolutely "
+     DeathModifier(3)="totally "
+     DeathModifier(4)="utterly "
+     MajorDeathMessage(0)="ripped a new one"
+     MajorDeathMessage(1)="messed up real bad"
+     MajorDeathMessage(2)="given a new definition of pain"
+     MajorDeathMessage(3)=""
+     MajorDeathMessage(4)=""
+     MajorDeathMessage(5)=""
+     MajorDeathMessage(6)=""
+     MajorDeathMessage(7)=""
+     HeadLossMessage(0)="decapitated"
+     HeadLossMessage(1)="beheaded"
+     DeathVerb=" was "
+     DeathPrep=" by "
+     DeathTerm="killed"
+     ExplodeMessage=" was jibbed"
+     SuicideMessage=" perished."
+     FallMessage=" splatted."
+     DrownedMessage=" met the drown god."
+     BurnedMessage=" was scorched"
+     ElectrocutedMessage=" was shocked"
+     CrushedMessage=" got pulverized."
+     StompedMessage=" was trampled"
+     HackedMessage=" was hacked"
+     GlobalNameChange=" changed name to "
+     NoNameChange=" is already in use"
      DefaultPlayerClass=Class'Aeons.Patrick'
      HUDType=Class'Aeons.AeonsHUD'
      GameReplicationInfoClass=Class'Engine.GameReplicationInfo'
+     DeathMessageClass=Class'Aeons.DeathMessage'
+     DefaultWeapon=Class'Aeons.Revolver'
 }

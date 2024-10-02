@@ -12,7 +12,7 @@ function PreBeginPlay()
 		Destroy();
 }
 
-function Inventory SelectNext()
+simulated function Inventory SelectNext()
 {
 	if ( bActivatable ) 
 	{

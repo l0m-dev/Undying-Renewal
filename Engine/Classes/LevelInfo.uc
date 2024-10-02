@@ -9,8 +9,9 @@
 //=============================================================================
 class LevelInfo extends ZoneInfo
 	native
-	nativereplication
 	config(user);
+
+// removed nativereplication to replicate bAllowFlight and GRI
 
 // Textures.
 //#exec Texture Import File=Textures\DefaultTexture.pcx
@@ -65,7 +66,7 @@ var bool			 bAllowFOV;
 var config bool		 bLowRes;		  // optimize for low resolution (e.g. TV)
 var() bool			 bAllowFlight;
 var globalconfig bool bDebugMessaging;
-var transient bool	 bDontAllowSavegame;
+var transient bool	 bDontAllowSavegame; // set default value to true to completely disable saving (renewal)
 var() bool bSepiaOverlay;
 var() bool bIsCutsceneLevel;
 var() bool bSoftWeatherTransitions;
@@ -153,6 +154,12 @@ var() array<class> PreloadClasses;
 // PS2 -- indicates if boot shell should be loaded on startup
 var() bool bLoadBootShellPSX2;
 
+// GameReplicationInfo
+var GameReplicationInfo GRI;
+
+// Settings
+var RenewalConfig RenewalConfig;
+
 //-----------------------------------------------------------------------------
 // Functions.
 
@@ -181,7 +188,7 @@ native simulated function string GetAddressURL();
 replication
 {
 	reliable if( Role==ROLE_Authority )
-		Pauser, TimeDilation, bNoCheating, bAllowFOV;
+		Pauser, TimeDilation, bNoCheating, bAllowFOV, bAllowFlight, GRI;
 }
 
 //
@@ -200,20 +207,58 @@ event ServerTravel( string URL, bool bItems )
 	}
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
-	DMan = spawn(class 'DecalManager',,,Location);
+
+	SetupDecalManager();
+
+	bDontAllowSavegame = NetMode != NM_Standalone;
 }
 
-function AddDecal()
+simulated function StartLevel()
+{
+	if (NetMode == NM_Client) // needed after loading a game on the client
+	{
+		SetupDecalManager();
+	}
+}
+
+simulated function SetupDecalManager()
+{
+	// this check is not needed anymore after adding CleanupDestroyed to LoadMap
+	// it was needed for clients after loading a save
+	//if (DMan != None && DMan.bDeleteMe)
+	//	DMan = None;
+
+	if (DMan == None)
+	{
+		// levels actually have multiple LevelInfos so this check is necessary
+		foreach AllActors(class'DecalManager', DMan)
+			break;
+	
+		if (DMan == None)
+			DMan = spawn(class 'DecalManager',,,Location);
+	}
+}
+
+simulated function AddDecal()
 {
 	DMan.NumDecals ++;
 }
 
-function RemoveDecal()
+simulated function RemoveDecal()
 {
 	DMan.NumDecals --;
+}
+
+simulated function RenewalConfig GetRenewalConfig()
+{
+	// RenewalConfig is transient to keep backwards compatibility so spawn it if it's None
+	// don't spawn anything on Login, StartCutscene does that and it duplicates inventory when loading a save (not fixing this for speedrunning purposes)
+	if (RenewalConfig == None)
+		RenewalConfig = Spawn(class'RenewalConfig');
+	return RenewalConfig;
 }
 
 defaultproperties

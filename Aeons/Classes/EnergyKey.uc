@@ -5,10 +5,10 @@ class EnergyKey expands Keys;
 
 var ParticleFX efxA, efxB, efxC;
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	super.PostBeginPlay();
-	if ( Owner == None )
+	if ( Owner == None && Level.NetMode != NM_Client )
 	{
 		efxA = spawn(Class'Aeons.FireFlyTrailFX',,,Location);
 		efxA.SetBase(self);
@@ -40,9 +40,12 @@ auto state Pickup
 				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
-			efxA.bShuttingDown = true;
-			efxB.bShuttingDown = true;
-			efxC.bShuttingDown = true;
+			if (efxA != None)
+			{
+				efxA.Shutdown();
+				efxB.Shutdown();
+				efxC.Shutdown();
+			}
 		}
 	}
 

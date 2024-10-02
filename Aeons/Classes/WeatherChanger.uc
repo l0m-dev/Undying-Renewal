@@ -15,18 +15,8 @@ var() enum EWeather
 
 var AeonsPlayer Player;
 
-function FindPlayer()
-{
-	ForEach AllActors(class 'AeonsPlayer', Player)
-	{
-		break;
-	}
-}
-
 function Trigger(Actor Other, Pawn Instigator)
 {
-	FindPlayer();
-
 	Region.Zone.WeatherStrength = WeatherStrength;
 
 	switch ( Weather )
@@ -44,8 +34,10 @@ function Trigger(Actor Other, Pawn Instigator)
 			break;
 	}
 	
-	if ( Player != none )
-		RainModifier(Player.RainMod).UpdateForecast();
+	ForEach AllActors(class 'AeonsPlayer', Player)
+	{
+		Player.ClientUpdateForecast();
+	}
 }
 
 defaultproperties

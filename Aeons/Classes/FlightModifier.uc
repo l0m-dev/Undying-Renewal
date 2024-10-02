@@ -15,8 +15,8 @@ var travel byte InitialVolume;
 //=============================================================================
 replication
 {
-	reliable if ( Role == ROLE_Authority )
-			Fuel;
+	reliable if ( Role == ROLE_Authority && bNetOwner )
+		Fuel;
 }
 //=============================================================================
 
@@ -198,7 +198,7 @@ defaultproperties
      FlyingSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_Fly01'
      SputterSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_FlyLoopEnd01'
      Fuel=60
-     RemoteRole=ROLE_None
+     RemoteRole=ROLE_SimulatedProxy
 	 SoundRadius=255
      SoundVolume=96
 }

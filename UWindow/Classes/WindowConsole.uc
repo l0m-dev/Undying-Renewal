@@ -265,6 +265,7 @@ state UWindow
 			switch (k)
 			{
 			case EInputKey.IK_F9:	// Screenshot
+			case EInputKey.IK_F10:	// Cancel
 				return Global.KeyEvent(Key, Action, Delta);
 				break;
 			case ConsoleKey:
@@ -364,7 +365,7 @@ function LaunchUWindow()
 
 	Viewport.bSuspendPrecaching = True;
 	bUWindowActive = !bQuickKeyEnable;
-	Viewport.bShowWindowsMouse = True;
+	Viewport.bShowWindowsMouse = Viewport.bWindowsMouseAvailable;
 
 	if(bQuickKeyEnable)
 		bNoDrawWorld = False;
@@ -391,7 +392,7 @@ function CloseUWindow()
 {
 	ViewPort.Actor.GUIExit(ViewPort);
 
-	if(!bQuickKeyEnable)
+	if(!bQuickKeyEnable && Viewport.Actor.Level.NetMode == NM_Standalone)
 		Viewport.Actor.SetPause( False );
 
 	Log("WindowConsole: CloseUWindow");
@@ -484,6 +485,8 @@ function RenderUWindow( canvas Canvas )
 	Canvas.DrawColor.r = 255;
 	Canvas.DrawColor.g = 255;
 	Canvas.DrawColor.b = 255;
+
+	Viewport.bShowWindowsMouse = Viewport.bWindowsMouseAvailable;
 
 	if(Viewport.bWindowsMouseAvailable && Root != None)
 	{

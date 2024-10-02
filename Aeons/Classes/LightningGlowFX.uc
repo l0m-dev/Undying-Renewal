@@ -8,7 +8,7 @@ function PreBeginPlay()
 	super.PreBeginPlay();
 	Enable('Tick');
 
-	bShuttingDown = true;
+	Shutdown();
 	GotoState('GenSmoke');
 }
 

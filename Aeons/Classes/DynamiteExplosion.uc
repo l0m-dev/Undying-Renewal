@@ -46,9 +46,9 @@ function CreateExplosion(Pawn Instigator)
 	}
 	
 	// Visual Effects
-	spawn (class 'HotDynamiteExplosionFX'    ,,,Location);
-	spawn (class 'SmokyDynamiteExplosionFX'  ,,,Location);
-	spawn (class 'ParticleDynamiteExplosion' ,,,Location);
+	TearOff(spawn (class 'HotDynamiteExplosionFX'    ,,,Location));
+	TearOff(spawn (class 'SmokyDynamiteExplosionFX'  ,,,Location));
+	TearOff(spawn (class 'ParticleDynamiteExplosion' ,,,Location));
 
 	// Decals
 	GenerateDecal();

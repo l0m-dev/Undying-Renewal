@@ -3,6 +3,8 @@
 //=============================================================================
 class WindAmbientSound expands AmbientSound;
 
+/* Force-Recompile */
+
 var(Sound) int PitchVar;
 var(Sound) float PitchPeriod;
 var(Sound) float PitchPeriodVar;

@@ -7,7 +7,7 @@ class ScryeSoldier expands MonkSoldier;
 //****************************************************************************
 // Inherited functions.
 //****************************************************************************
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local actor		A;
 
@@ -44,4 +44,5 @@ defaultproperties
      PD_GenMediumDecal=None
      PD_GenSmallDecal=None
      bScryeOnly=True
+     CreatureDeathVerb="haunted"
 }

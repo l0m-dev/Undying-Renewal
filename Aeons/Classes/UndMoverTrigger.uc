@@ -194,6 +194,7 @@ function UnTouch( actor Other )
 					{
 						UndMover(A).SetPendingSequence(SequenceExit);
 						A.Trigger( Other, Other.Instigator );
+						//A.UnTrigger( Other, Other.Instigator );
 					}
 				}
 		}

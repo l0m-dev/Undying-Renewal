@@ -39,6 +39,14 @@ var ParticleFX ChargedFX;
 var int SoundID;
 var travel bool bZoomedIn;
 
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		ClientCharge, ClientRemoveCharge;
+	reliable if (Role == ROLE_Authority && bNetOwner)
+		bCharged;
+}
+
 //=============================================================================
 function PreBeginPlay()
 {
@@ -47,7 +55,7 @@ function PreBeginPlay()
 	ProjectileSpeed = class'Spear_proj'.default.speed;
 }
 
-function Charge()
+simulated function Charge()
 {
 	ChargedFX = Spawn(class 'ChargedSpearFX',self,,Location);
 	AeonsPlayer(Owner).OverlayActor = ChargedFX;
@@ -57,13 +65,23 @@ function Charge()
 	ChargeLen = 0;
 }
 
-function RemoveCharge()
+simulated function RemoveCharge()
 {
 	if (ChargedFX != none)
 		ChargedFX.Destroy();
 	AeonsPlayer(Owner).OverlayActor = none;
 	bCharged = false;
 	AmbientSound = None;
+}
+
+simulated function ClientCharge()
+{
+	Charge();
+}
+
+simulated function ClientRemoveCharge()
+{
+	RemoveCharge();
 }
 
 function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
@@ -97,6 +115,10 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 
 	ChargeLen = 0;
 	RemoveCharge();
+	if (Level.NetMode == NM_DedicatedServer)
+	{
+		ClientRemoveCharge();
+	}
 	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSpears = 1.0;
 }
 
@@ -167,6 +189,8 @@ simulated function PlayFiring()
 {
 	// log("PlayFiring Called within the Speargun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+	if (Level.NetMode == NM_Client) // this is a bit earlier than what it should be, leave it for now, needed because FireWeapon is not called on client for some reason
+		PlaySound(FireSound, SLOT_Misc, 4.0);	
 //	if ( Role == ROLE_Authority )
 //		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
@@ -176,7 +200,7 @@ simulated function PlayFiring()
 simulated function PlayIdleAnim()
 {
 	// log("Speargun: PlayIdleAnim");
-	LoopAnim('StillIdle');
+	LoopAnim('StillIdle', [TweenTime] 0.0);
 }
 
 ////////////////////////////////////////////////////////
@@ -187,6 +211,7 @@ state NewClip
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
+		ClientReloadWeapon(ClipCount);
 	}
 
 	function EndState()
@@ -220,7 +245,7 @@ state NewClip
 			FinishAnim();
 			PlaySound(InsertSound,, 0.5);
 			sleep(reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier));
-			logactorstate("sleeping for "$ reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier) $" seconds");		
+			//logactorstate("sleeping for "$ reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier) $" seconds");		
 		}		
 		
 	    // Owner.PlaySound(Misc2Sound, SLOT_None,2.0);
@@ -257,17 +282,24 @@ state Idle
 			ChargeLen += DeltaTime;
 			if ( ChargeLen > ChargeTimer )
 			{
-				log("Speargun: Charge has run out ", 'Misc');
+				//log("Speargun: Charge has run out ", 'Misc');
 				RemoveCharge();
+				if (Level.NetMode == NM_DedicatedServer)
+				{
+					ClientRemoveCharge();
+				}
 			}
 		} else {
 			ChargeLen = 0;
 		}
 
-		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-			loopAnim('MoveIdle', RefireMult);
-		else
-			loopAnim('StillIdle', RefireMult);
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				loopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+			else
+				loopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+		}
 	}
 
 	function bool PutDown()
@@ -292,6 +324,7 @@ state Idle
 		goto 'Begin';
 		
 	Begin:
+		ClientIdleWeapon();
 		enable('Tick');
 		setTimer(8 + FRand()*5,true);
 }
@@ -306,6 +339,10 @@ function Tick(float DeltaTime)
 	if ( ChargeLen >ChargeTimer )
 	{
 		RemoveCharge();
+		if (Level.NetMode == NM_DedicatedServer)
+		{
+			ClientRemoveCharge();
+		}
 	}
 
 	if ( bChangeWeapon )
@@ -315,7 +352,7 @@ function Tick(float DeltaTime)
 
 simulated function PlayReloading()
 {
-	Log("Speargun: PlayReloading");
+	//Log("Speargun: PlayReloading");
 	PlayAnim('DownEmpty',1.0 / AeonsPlayer(Owner).refireMultiplier,,,0);//, RefireMult);
 }
 
@@ -328,15 +365,15 @@ state ClientFiring
 {
 	simulated function AnimEnd()
 	{
-		Log("Speargun: state ClientFiring: AnimEnd");
+		//Log("Speargun: state ClientFiring: AnimEnd");
 
 		if ( (Pawn(Owner) == None) || (Ammotype.AmmoAmount <= 0) )
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 		else if ( !bCanClientFire )
-			GotoState('');
+			GotoState('ClientIdle');
 		else
 		{
 			PlayReloading();
@@ -368,13 +405,14 @@ state ClientReload
 {
 	simulated function bool ClientFire(float Value)
 	{
-		bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
-		return bForceFire;
+		//bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
+		//return bForceFire;
+		return false;
 	}
 
 	simulated function Timer()
 	{
-		Log("Speargun: state ClientReload: Timer");
+		//Log("Speargun: state ClientReload: Timer");
 		PlayAnim('ReloadEnd',1.0 / AeonsPlayer(Owner).refireMultiplier,,,0);
 	}
 
@@ -387,7 +425,7 @@ state ClientReload
 
 	simulated function AnimEnd()
 	{
-		log("Speargun: state ClientReload: AnimEnd for " $AnimSequence);
+		//log("Speargun: state ClientReload: AnimEnd for " $AnimSequence);
 		/*
 		log("Speargun:NormalFire:AnimEnd() called");
 		if ( ((AnimSequence == 'Fire') || (AnimSequence == 'Fire_Morph')) && (AmmoType.AmmoAmount > 0) )
@@ -399,7 +437,7 @@ state ClientReload
 		{
 			//Log("Speargun: state ClientReload: setting timer to " $ RefireRate * AeonsPlayer(Owner).refireMultiplier );
 			//rb new
-			logactorstate("Setting Timer to " $ reloadTime * 1.0 * RefireMult);
+			//logactorstate("Setting Timer to " $ reloadTime * 1.0 * RefireMult);
 			SetTimer(reloadTime * 1.0 * RefireMult * AeonsPlayer(Owner).refireMultiplier, false);
 			//SetTimer(RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
 			return;
@@ -409,13 +447,13 @@ state ClientReload
 		{
 			if ( bForceFire || (Pawn(Owner).bFire != 0) )
 			{
-				log("Speargun: state ClientReload: AnimEnd: Calling ClientFire");
+				//log("Speargun: state ClientReload: AnimEnd: Calling ClientFire");
 				Global.ClientFire(0);
 				return;
 			}
 		}			
 
-		GotoState('');
+		GotoState('ClientIdle');
 		Global.AnimEnd();
 	}
 
@@ -427,7 +465,7 @@ state ClientReload
 	simulated function BeginState()
 	{
 		bForceFire = false;
-		log("ClientReload State: BeginState() function call...");
+		//log("ClientReload State: BeginState() function call...");
 //		GotoState(getStateName(), 'ReloadStart');		
 	}
 /*
@@ -447,7 +485,7 @@ state ClientReload
 
 function PlayReloadSound()
 {
-	log("Speargun: playreloadsound");
+	//log("Speargun: playreloadsound");
 	PlaySound(ReloadSound);
 }
 
@@ -491,7 +529,9 @@ defaultproperties
      PickupViewScale=1.5
      ThirdPersonMesh=SkelMesh'Aeons.Meshes.Speargun3rd_m'
      PickupSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_SpeargunPU1'
-     RotationRate=(Yaw=0)
+     bRotatingPickup=False
      Mesh=SkelMesh'Aeons.Meshes.Speargun3rd_m'
      AmbientGlow=102
+     DeathMessage="%k impaled %o with a speargun."
+     AltDeathMessage="%k punctured %o with a speargun."
 }

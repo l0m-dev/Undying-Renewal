@@ -15,7 +15,7 @@ function Trigger(Actor Other, Pawn Instigator)
 	
 	if (Player != none)
 	{
-		Player.GotoState('InstantFadingDeath');
+		Player.PlayerDied('InstantFadingDeath');
 	}
 }
 

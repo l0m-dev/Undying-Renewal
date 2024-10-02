@@ -434,4 +434,6 @@ defaultproperties
      CollisionRadius=7
      CollisionHeight=6
      Mass=75
+     MenuName="Rat"
+     CreatureDeathVerb="plagued"
 }

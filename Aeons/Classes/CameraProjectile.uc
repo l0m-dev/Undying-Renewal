@@ -8,7 +8,7 @@ class CameraProjectile expands Projectile;
 var byte 	RotMethod;
 var name 	AnimName;
 var bool 	bFirstTick, bHolding;
-var int 	nextDir, i;
+var int 	nextDir, i, Take;
 var name 	Events[4];
 var float 	EventTimes[4], LookWt[2], TScale, TotalPathLen, TotalTime, LenToNextPoint, pDist, LastpDist, FOVs[2], FromSpeed, HoldLen, LastTick;
 var vector 	LookAt[2], T1, T2, P0, P1, P2, P3, FromLoc, LastLoc, LookAtOffset[2];
@@ -22,17 +22,79 @@ var float dt[60];
 var int iDt;
 var bool bSkipped;
 
-function PreBeginPlay()
+var Actor FromPointLookAt;
+var Actor ToPointLookAt;
+
+var ENetRole CurrentRole;
+
+var PlayerPawn Player;
+
+var CutsceneManager CutsceneManager;
+var float CutsceneTakeTime;
+var float CutsceneCameraHoldTime;
+
+replication
+{
+	unreliable if (Role == ROLE_Authority)
+		FromPointLookAt, ToPointLookAt;
+	reliable if (Role == ROLE_Authority && bNetInitial)
+		Take, pDist, ToPoint, FromPoint, TotalTime, MasterPoint;
+}
+
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	// log("..............CameraProjectile : PreBeginPlay()", 'Misc');
 	bFirstTick = true;
 	TScale = 1.0;
+
+	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
 }
 
-function Destroyed()
+simulated function FindPlayer()
+{
+	local PlayerPawn P;
+
+	foreach AllActors(class'PlayerPawn', P)
+	{
+		if(Viewport(P.Player) != None)
+		{
+			Player = P;
+			break;
+		}
+	}
+}
+
+simulated function Destroyed()
 {
 	// log("Camera Destroyed ... ", 'Misc');
+}
+
+// try to find a lookat actor by tag
+// on the client actors without bNoDelete won't have their tag replicated
+// in those cases use the replicated lookat actor
+simulated function Actor FindLookAtActor(name LookAtTag, out Actor ReplicatedLookAtActor)
+{
+	local Actor A;
+
+	ForEach AllActors(class 'Actor', A, LookAtTag)
+	{
+		break;
+	}
+
+	if (Role == ROLE_Authority)
+	{
+		ReplicatedLookAtActor = A;
+	}
+	else if (A == None)
+	{
+		A = ReplicatedLookAtActor;
+
+		if (ReplicatedLookAtActor == None)
+			log("Warning: Couldn't find LookAtActor");
+	}
+
+	return A;
 }
 
 // Start sequence stuff
@@ -48,7 +110,7 @@ simulated function startSequence()
 	log("...............................................New Time:"$(TotalPathLen/Speed), 'Cutscenes');
 	log("...........................................................................", 'Cutscenes');
 
-	// AeonsPlayer(Owner).bHidden = true;
+	// AeonsPlayer(Player).bHidden = true;
 	FromLoc = Location;
 	NextPoint = ToPoint.NextPoint;
 	LastLoc = FromLoc + Normal(FromLoc-ToPoint.Location) * 256;
@@ -57,7 +119,7 @@ simulated function startSequence()
 }
 
 // get the total length of the path that camera will traverse.
-function float GetTotalPathLen(MasterCameraPoint P)
+simulated function float GetTotalPathLen(MasterCameraPoint P)
 {
 	local bool bFoundEnd;
 	local CameraNavigation CP0, CP1, CP2, CP3;
@@ -65,7 +127,6 @@ function float GetTotalPathLen(MasterCameraPoint P)
 	local float PathLen, d1, d2;
 	local Actor A;
 
-	AeonsPlayer(Owner).MasterCamPoint = P;
 	// CP1 is the master point
 	CP1 = P;
 	CP1.getNextPoint(true);
@@ -76,12 +137,12 @@ function float GetTotalPathLen(MasterCameraPoint P)
 
 	// Next Point
 	CP2 = CP1.NextPoint;
-	CP2.GetNextPoint(true);
 	CP2.PrevPoint = CP1;
+	CP2.GetNextPoint(true);
 
 	CP3 = CP2.NextPoint;
-	CP3.GetNextPoint(true);
 	CP3.PrevPoint = CP2;
+	CP3.GetNextPoint(true);
 
 	P0 = CP1.Location;
 	P1 = CP1.Location;
@@ -139,21 +200,13 @@ function float GetTotalPathLen(MasterCameraPoint P)
 						ForEach AllActors(class 'Actor', A, P.PlayerTeleportTag)
 						{
 							// log("Found Actor to move player to : "$A.name, 'Cutscenes');
-							//EyeHeight.z = PlayerPawn(Owner).EyeHeight;
-							PlayerPawn(Owner).SetCollision( false, false, false );
-							PlayerPawn(Owner).SetLocation(A.Location); //-Eyeheight);
-							PlayerPawn(Owner).SetRotation(A.Rotation);
-							PlayerPawn(Owner).ViewRotation = PlayerPawn(Owner).Rotation;
-							PlayerPawn(Owner).SetCollision( true, true, true );
+							//EyeHeight.z = Player.EyeHeight;
+							CutsceneManager.TeleportPlayer(Player, A.Location, A.Rotation);
 							break;
 						}
 					} else {
-						EyeHeight.z = PlayerPawn(Owner).EyeHeight;
-						PlayerPawn(Owner).SetCollision( false, false, false );
-						PlayerPawn(Owner).SetLocation(CP2.Location-Eyeheight);
-						PlayerPawn(Owner).SetRotation(Rotator(CP2.Location-CP2.PrevPoint.Location));
-						PlayerPawn(Owner).ViewRotation = PlayerPawn(Owner).Rotation;
-						PlayerPawn(Owner).SetCollision( true, true, true );
+						EyeHeight.z = default.Player.EyeHeight; // assumes all players have same EyeHeight
+						CutsceneManager.TeleportPlayer(Player, CP2.Location-Eyeheight, Rotator(CP2.Location-CP2.PrevPoint.Location));
 					}
 				}
 
@@ -187,7 +240,7 @@ function float GetTotalPathLen(MasterCameraPoint P)
 }
 
 // This function is called before ComputeSegmentData()
-function ResolvePathPoints()
+simulated function ResolvePathPoints()
 {
 	//log("",'Misc');
 	
@@ -224,7 +277,7 @@ function ResolvePathPoints()
 }
 
 // recompute the segment data - this is done only when we cross over to a new segment.
-function ComputeSegmentData()
+simulated function ComputeSegmentData()
 {
 	local float d1, d2;
 	local vector v0, v1, v2, v3, v4, v5, v6 ,v7, v8;
@@ -240,7 +293,7 @@ function ComputeSegmentData()
 
 	if (ToPoint.bCutToNextPoint)
 		P3 = (P2-P1) + P2;		// If we are cutting to the next point, we derive its tangent from
-	else
+	else if (NextPoint != None) // added none check for client
 		P3 = NextPoint.Location;
 
 	if ( LastPoint != none )
@@ -254,10 +307,10 @@ function ComputeSegmentData()
 				SetRotation(FromPoint.Rotation);
 			} else if ( FromPoint.LookAt != 'none' ) {
 				// Set the camera rotation to look at the actor we  need to be looking at.
-				ForEach AllActors(class 'Actor', A, FromPoint.LookAt)
+				A = FindLookAtActor(FromPoint.LookAt, FromPointLookAt);
+				if (A != None)
 				{
 					SetRotation(Rotator(A.Location - Location));
-					break;	
 				}
 			} else {
 				// we're not looking at anything in particular - start out looking at the next point.
@@ -323,12 +376,14 @@ function ComputeSegmentData()
 		FOVs[1] = 90;
 	
 	if ( ToPoint.LookAt != 'none' )
-		ForEach AllActors(class 'Actor', A, ToPoint.LookAt)
+	{
+		A = FindLookAtActor(ToPoint.LookAt, ToPointLookAt);
+		if (A != None)
 		{
 			LookAt[1] = A.Location;
 			LookWt[1] = ToPoint.LookWeight;
-			break;
 		}
+	}
 	if ( FromPoint.bHold )
 	{
 		HoldLen = FromPoint.HoldLen;
@@ -383,7 +438,7 @@ function ComputeSegmentData()
 	}
 }
 
-function vector GetHermitePoint(vector P1, vector T1, vector P2, vector T2, float u)
+static function vector GetHermitePoint(vector P1, vector T1, vector P2, vector T2, float u)
 {
 	local float h1, h2, h3, h4, t;
 
@@ -416,12 +471,12 @@ simulated state PathInterpolation
 			} else {
 				if ( FromPoint.LookAt != 'none' )
 				{
-					ForEach AllActors(class 'Actor', A, FromPoint.LookAt)
+					A = FindLookAtActor(FromPoint.LookAt, FromPointLookAt);
+					if (A != None)
 					{
 						LookAt[0] = A.Location;
 						LookWt[0] = FromPoint.LookWeight;
 						LookAtOffset[0] = FromPoint.LookAtOffset;
-						break;
 					}
 				} else {
 					LookAt[0] = ToPoint.Location;
@@ -436,12 +491,12 @@ simulated state PathInterpolation
 			} else {
 				if ( ToPoint.LookAt != 'none' )
 				{
-					ForEach AllActors(class 'Actor', A, ToPoint.LookAt)
+					A = FindLookAtActor(ToPoint.LookAt, ToPointLookAt);
+					if (A != None)
 					{
 						LookAt[1] = A.Location;
 						LookWt[1] = ToPoint.LookWeight;
 						LookAtOffset[0] = ToPoint.LookAtOffset;
-						break;
 					}
 				} else {
 					LookAt[1] = NextPoint.Location;
@@ -564,18 +619,22 @@ simulated state PathInterpolation
 			// LookRot.Roll = YawDiff * 4;
 			// DesiredRotation = LookRot;
 			// LookRot = Rotator(NextFrameLoc - Location);
-			
-			AeonsPlayer(Owner).CamDebugRotDiff = (LookRot-Rotation);
-			AeonsPlayer(Owner).CamDebugPosDiff = (NextFrameLoc - Location);
-			AeonsPlayer(Owner).LookAt1 = LookAt[0];
-			AeonsPlayer(Owner).LookAt2 = LookAt[1];
-			AeonsPlayer(Owner).LookDir = LookDir;
-			AeonsPlayer(Owner).pDist = pDist;
-			AeonsPlayer(Owner).DesiredFOV = (FOVs[0] * (1-pDist) + FOVs[1] * pDist);
+
+			if (Level.NetMode != NM_DedicatedServer)
+			{
+				AeonsPlayer(Player).CamDebugRotDiff = (LookRot-Rotation);
+				AeonsPlayer(Player).CamDebugPosDiff = (NextFrameLoc - Location);
+				AeonsPlayer(Player).LookAt1 = LookAt[0];
+				AeonsPlayer(Player).LookAt2 = LookAt[1];
+				AeonsPlayer(Player).LookDir = LookDir;
+				AeonsPlayer(Player).pDist = pDist;
+				AeonsPlayer(Player).DesiredFOV = (FOVs[0] * (1-pDist) + FOVs[1] * pDist);
+			}
 
 			SetRotation(LookRot);
 
-			PlayerPawn(Owner).SetFOVAngle(FOVs[0] * (1-pDist) + FOVs[1] * pDist);
+			if (Level.NetMode != NM_DedicatedServer)
+				Player.SetFOVAngle(FOVs[0] * (1-pDist) + FOVs[1] * pDist);
 			
 			// log(""$pDist$" "$(pDist-LastpDist)$" "$(NextFrameLoc - Location)$" "$LookDir$" "$Rotation,'CameraDebug');
 
@@ -586,22 +645,12 @@ simulated state PathInterpolation
 			{
 				SetLocation( NextFrameLoc);
 			} else {
-				PlayerPawn(Owner).ClientMessage("Out of Level");
+				Player.ClientMessage("Out of Level");
 			}
-
-			if ( !bFirstTick )
-				if (PlayerPawn(Owner).getStateName() != 'PlayerCutScene')
-				{
-					log ("Player State is "$PlayerPawn(Owner).getStateName(), 'Misc');
-					log("CameraProjectile -- path interpolation ... forcing cutscene to end", 'Misc');
-					Destroy();
-					MasterPoint.CompleteCutscene(PlayerPawn(Owner));
-					MasterPoint.Teleport(PlayerPawn(Owner));
-				}
 
 			if ( pDist >= 1.0 || bSkipped )
 			{
-				log ("pDist reached .... ", 'Misc');
+				//log ("pDist reached .... ", 'Misc');
 				bHolding = false;
 				pDist = 0;
 				ResolvePathPoints();
@@ -619,6 +668,7 @@ simulated state PathInterpolation
 				for ( i=0; i<4; i++ )
 				{
 					if ( Events[i] != 'none' )
+					{
 						foreach AllActors( class 'Actor', A, Events[i] )
 						{
 							if ( A.IsA('Trigger') )
@@ -627,7 +677,8 @@ simulated state PathInterpolation
 							}
 							A.Trigger( Self, Self.Instigator );
 						}
-					Events[i] = 'none';
+						Events[i] = 'none';
+					}
 				}
 
 				ResolvePathPoints();
@@ -640,10 +691,10 @@ simulated state PathInterpolation
 			{
 				SetRotation(FromPoint.Rotation);
 			} else if ( FromPoint.LookAt != 'none' ) {
-				ForEach AllActors(class 'Actor', A, FromPoint.LookAt)
+				A = FindLookAtActor(FromPoint.LookAt, FromPointLookAt);
+				if (A != None)
 				{
 					SetRotation(Rotator(A.Location - Location));
-					break;
 				}
 			} else {
 				SetRotation( Rotator(FromPoint.Location - ToPoint.Location) );
@@ -652,19 +703,21 @@ simulated state PathInterpolation
 		}
 	}
 
-	function EndState()
+	simulated function EndState()
 	{
-		PlayerPawn(Owner).bRenderSelf = true;
-		PlayerPawn(Owner).bHidden = false;
+		Player.bRenderSelf = true;
+		Player.bHidden = false;
 
 		if (MasterPoint.bHoldPlayer)
-			PlayerPawn(Owner).UnFreeze();
+			Player.UnFreeze();
 
 		if (ToPoint.bEndCutScene && (pDist > 0.5 || bSkipped))
-			PlayerPawn(Owner).bRenderSelf = true;
+			Player.bRenderSelf = true;
 	}
 
 	Begin:
+		CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+		FindPlayer();
 		// foreach AllActors( class'ScriptedPawn', GPawn,)
 		// 	GPawn.LookTargetNotify( self, 20 );
 
@@ -673,18 +726,6 @@ simulated state PathInterpolation
 
 		LastYaw = rotation.yaw;
 		// get the rotation method to use for the projectile.
-		if ( MasterPoint.bHidePlayer )
-		{
-			PlayerPawn(Owner).bRenderSelf = false;
-			PlayerPawn(Owner).bHidden = true;
-		}
-
-		if (MasterPoint.bHoldPlayer)
-			PlayerPawn(Owner).Freeze();
-	
-		if ( MasterPoint.bLetterBoxed )
-			MasterPoint.SetLetterBox(PlayerPawn(Owner));
-
 		switch ( MasterPoint.RotMethod )
 		{
 			case ROT_Absolute:
@@ -699,132 +740,146 @@ simulated state PathInterpolation
 				RotMethod = 2;
 				break;
 		};
-		PlayerPawn(Owner).GotoState('PlayerCutScene');
-		PlayerPawn(Owner).ViewTarget = self;
 
 		bFirstTick = false;
 }
 
-function SkipIt()
+simulated function SkipIt()
 {
 	bSkipped = true;
 }
-function EndIt()
+simulated function EndIt()
 {
 	// log ("Attempting to End the Cutscene", 'Misc');
 	log("CameraProjectile -- EndIT ... forcing cutscene to end", 'Misc');
-	MasterPoint.CompleteCutscene(PlayerPawn(Owner));
-	MasterPoint.Teleport(PlayerPawn(Owner));
+	MasterPoint.CompleteCutscene(Player);
+	//MasterPoint.Teleport(Player);
+	CutsceneManager.CutsceneCompleted();
 	Destroy();
 }
-function SetTake(int t);
-function NextTake();
-function PrevTake();
+simulated function SetTake(int t);
+simulated function NextTake();
+simulated function PrevTake();
 
 // Play a preanimated sequence
 simulated state PlayCannedAnim
 {
-	function SetTake(int t)
+	simulated function SetTake(int t)
 	{
-		i = t;
+		Take = t;
 	}
 	
-	function NextTake()
+	simulated function NextTake()
 	{
-		i ++;
+		Take ++;
 	}
 
-	function PrevTake()
+	simulated function PrevTake()
 	{
-		i --;
+		Take --;
 	}
 
 	Begin:
+		CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+		FindPlayer();
 		SetTimer(0.5, true) ;
 		SetPhysics(PHYS_None);
-		PlayerPawn(Owner).GotoState('PlayerCutScene');
 
-		PlayerPawn(Owner).bHidden = true;
-
-		AeonsPlayer(Owner).MasterCamPoint = MasterPoint;
-		MasterPoint.StartCutscene();
-		// LetterBox
-		if ( MasterPoint.bLetterBoxed ) {
-			MasterPoint.SetLetterBox(PlayerPawn(Owner));
-			log("LB", 'Misc');
-		} else
-			log("NO LB", 'Misc');
-		
-		for ( i=0;i<MasterPoint.NumTakes;i++ )
+		// check if not starting from Take 0 and setup older takes (for multiplayer) 
+		if (Take > 0 && Level.NetMode != NM_Standalone)
 		{
-			
-			if ( MasterPoint.GetWaitTimer(i) > 0 )
-				Sleep(MasterPoint.GetWaitTimer(i));
+			ForEach AllActors(class 'CutSceneChar', C)
+			{
+				C.SkipToTake(Take, CutsceneManager.CutsceneTime);
+			}
+		}
+
+		// replicated cutscene times
+		CutsceneTakeTime = CutsceneManager.TakeTime;
+		CutsceneCameraHoldTime = CutsceneManager.CameraHoldTime;
+		
+		for ( Take=Take;Take<MasterPoint.NumTakes;Take++ )
+		{
+			CutsceneManager.TakeChanged(Take);
+
+			if ( MasterPoint.GetWaitTimer(Take) > 0 )
+				Sleep(MasterPoint.GetWaitTimer(Take) - CutsceneTakeTime);
 
 			// set the FOV
 			
 			/*
-			if ( AeonsPlayer(Owner).ViewTarget == self )
+			if ( Player.ViewTarget == self )
 			{
 			*/
-			AeonsPlayer(Owner).EyeHeight = 0;
-			AeonsPlayer(Owner).SetFOV(MasterPoint.GetCamFOVs(i));
+			if (Level.NetMode != NM_DedicatedServer)
+			{
+				Player.EyeHeight = 0;
+				AeonsPlayer(Player).SetFOV(MasterPoint.GetCamFOVs(Take));
+			}
 			/*
 			} else {
-				AeonsPlayer(Owner).EyeHeight = AeonsPlayer(Owner).default.EyeHeight;
-				AeonsPlayer(Owner).SetFOV(AeonsPlayer(Owner).DefaultFOV);
+				Player.EyeHeight = Player.default.EyeHeight;
+				AeonsPlayer(Player).SetFOV(Player.DefaultFOV);
 			}
 			*/
 			
 			// cause the Cutscene character to play his take
-			ForEach AllActors(class 'CutSceneChar', C)
+			if (Level.NetMode != NM_DedicatedServer)
 			{
-				C.SceneCamera = self;
-				//if ( MasterPoint.bAutoClearAnims )
-				//	C.PlayAnim('');
-				C.PlayTake(i);
+				ForEach AllActors(class 'CutSceneChar', C)
+				{
+					C.SceneCamera = self;
+					//if ( MasterPoint.bAutoClearAnims )
+					//	C.PlayAnim('');
+					C.PlayTake(Take);
+				}
 			}
 
 			// either play an animation for the camera or set the camera
 			// location and orientation for a period of time.
-			if (MasterPoint.GetAnimName(i) != 'none')
+			if (MasterPoint.GetAnimName(Take) != 'none')
 			{
-				// log("Camera Projectile playing anim : "$MasterPoint.GetAnimName(i)$" for Take: "$i, 'Cutscenes');
-				PlayAnim(MasterPoint.GetAnimName(i),1.0, MOVE_AnimAbs,,0);
+				// log("Camera Projectile playing anim : "$MasterPoint.GetAnimName(Take)$" for Take: "$Take, 'Cutscenes');
+				CurrentRole = Role;
+				Role = ROLE_Authority; // ensure PlayAnim can move the camera
+				PlayAnim(MasterPoint.GetAnimName(Take),1.0, MOVE_AnimAbs,,0);
 				FinishAnim();
+				Role = CurrentRole;
 			} else {
-				if (MasterPoint.GetCamTime(i) > 0)
+				if (MasterPoint.GetCamTime(Take) > 0)
 				{
-					// log("Camera Projectile static position : for Take: "$i, 'Cutscenes');
+					// log("Camera Projectile static position : for Take: "$Take, 'Cutscenes');
 					// Camera Projectile Going to static position
 			
 					// Clear Anims
 					PlayAnim('',,,,0);
 					
 					// New Location
-					SetLocation(MasterPoint.GetCamLoc(i));
+					SetLocation(MasterPoint.GetCamLoc(Take));
 					
 					// New Rotation
-					SetRotation(MasterPoint.GetCamRot(i));
+					SetRotation(MasterPoint.GetCamRot(Take));
 					
 					/*
-					log ("Cutscene Camera Debug: Take "$i, 'Cutscenes');
-					log ("Cutscene Camera Desired Location = "$MasterPoint.GetCamLoc(i), 'Cutscenes');
+					log ("Cutscene Camera Debug: Take "$Take, 'Cutscenes');
+					log ("Cutscene Camera Desired Location = "$MasterPoint.GetCamLoc(Take), 'Cutscenes');
 					log ("Cutscene Camera Location = "$Location, 'Cutscenes');
-					log ("Cutscene Camera Desired Dir = "$vector(MasterPoint.GetCamRot(i)), 'Cutscenes');
+					log ("Cutscene Camera Desired Dir = "$vector(MasterPoint.GetCamRot(Take)), 'Cutscenes');
 					log ("Cutscene Camera Dir = "$vector(Rotation), 'Cutscenes');
 					*/
 					// Hold for the duration of the shot
-					Sleep(MasterPoint.GetCamTime(i));
+					CutsceneManager.CameraHoldStarted();
+					Sleep(MasterPoint.GetCamTime(Take) - CutsceneCameraHoldTime);
 					
 				}
 			}
+
+			CutsceneTakeTime = 0.0;
+			CutsceneCameraHoldTime = 0.0;
 		}
 
 		log("CameraProjectile -- end of a play canned anim cutscene", 'Misc');
-		MasterPoint.CompleteCutscene(PlayerPawn(Owner));
-		MasterPoint.Teleport(PlayerPawn(Owner));
-		// Destroy();
+		EndIt(); // this will also call Destroy()
 }
 
 defaultproperties
@@ -835,5 +890,9 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.camera_m'
      bCollideActors=False
      bCollideWorld=False
-	 RemoteRole=ROLE_None
+     RemoteRole=ROLE_SimulatedProxy
+     bAlwaysRelevant=True
+     bNetTemporary=False
+     NetPriority=3
+     bClientAnim=True
 }

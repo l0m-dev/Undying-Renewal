@@ -844,9 +844,11 @@ function LoseMyHead()
 
 	Velocity = vect(0,0,64);
 	B.Velocity = Velocity;
-	B.DesiredRotation = RotRand();
+	B.DesiredRotation = RotRand(true);
 	B.bBounce = true;
 	B.SetCollisionSize((B.CollisionRadius * 0.35), (B.CollisionHeight * 0.15));
+
+	ReplicateDetachLimb(self, 'head', B.Velocity, B.DesiredRotation);
 
 	Spawn(class 'InstantScytheWound',self,,HitLocation);
 	Wound = Spawn(class 'ScytheWound',self,,HitLocation);
@@ -931,4 +933,6 @@ defaultproperties
      CollisionRadius=24
      CollisionHeight=76
      Mass=2000
+     MenuName="Bethany"
+     CreatureDeathVerb="putrified"
 }

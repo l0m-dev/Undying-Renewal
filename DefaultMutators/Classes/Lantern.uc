@@ -1,28 +1,25 @@
 class Lantern extends Mutator
 	transient;
 
-function Timer()
+function ModifyPlayer(Pawn Other)
 {
-	local AeonsPlayer aPlayer;
+	local AeonsPlayer AP;
 	local Items newItem;
-	
-	Super.Timer();
 
-	foreach AllActors(class'AeonsPlayer', aPlayer)
+	AP = AeonsPlayer(Other);
+
+	if (AP != None)
 	{
-		if (aPlayer.Inventory.FindItemInGroup(class'Aeons.Lantern'.default.InventoryGroup) == none)
+		if (AP.FindInventoryType(class'Aeons.Lantern') == none)
 		{
-			newItem = Spawn(class'Aeons.Lantern',,,aPlayer.Location);
+			newItem = Spawn(class'Aeons.Lantern',,,AP.Location);
 			if( newItem != None )
 			{
-				newItem.GiveTo(aPlayer);
-				newItem.setBase(aPlayer);
+				newItem.GiveTo(AP);
+				newItem.setBase(AP);
 			}
 		}
 	}
-}
 
-function PostBeginPlay()
-{
-	SetTimer(1.5, false);
+	Super.ModifyPlayer(Other);
 }

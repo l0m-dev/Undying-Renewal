@@ -73,7 +73,7 @@ auto state Flying
 	simulated function ZoneChange(ZoneInfo NewZone)
 	{
 		if (NewZone.bWaterZone)
-			ParticleFX(a).bShuttingDown = true;
+			ParticleFX(a).Shutdown();
 	}
 
 	function ProcessTouch (Actor Other, Vector HitLocation)
@@ -220,7 +220,7 @@ state stuck
 	simulated function BeginState()
 	{
 		Wind.Destroy();
-		ParticleFX(a).bShuttingDown = true;
+		ParticleFX(a).Shutdown();
 		SetCollision(false);
 		//PlaySound(StuckSound[Rand(3)]);
 		//if ( PawnOwner != none )

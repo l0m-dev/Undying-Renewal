@@ -22,18 +22,18 @@ function Created()
 {
 	Super.Created();
 
-	RowHeight = 12;
+	RowHeight = 12*Root.ScaleY;
 
-	AddColumn(NameText, 60);
-	AddColumn(FragsText, 30);
-	AddColumn(PingText, 30);
-	AddColumn(TeamText, 30);
+	AddColumn(NameText, 80);
+	AddColumn(FragsText, 50);
+	AddColumn(PingText, 50);
+	AddColumn(TeamText, 50);
 	AddColumn(MeshText, 80);
-	AddColumn(SkinText, 80);
-	AddColumn(FaceText, 60);
-	AddColumn(IDText, 30);
-	ngSecretColumn = AddColumn(ngSecretText, 100);
-	ngSecretWidth = 100;
+	//AddColumn(SkinText, 80);
+	//AddColumn(FaceText, 60);
+	//AddColumn(IDText, 30);
+	//ngSecretColumn = AddColumn(ngSecretText, 100);
+	//ngSecretWidth = 100;
 }
 
 function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float MouseY) 
@@ -47,12 +47,14 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 	local int TopMargin;
 	local int BottomMargin;
 
+	RowHeight = 12*Root.ScaleY;
+
 	if(bShowHorizSB)
-		BottomMargin = LookAndFeel.Size_ScrollbarWidth;
+		BottomMargin = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	else
 		BottomMargin = 0;
 
-	TopMargin = LookAndFeel.ColumnHeadingHeight;
+	TopMargin = LookAndFeel.ColumnHeadingHeight*Root.ScaleY;
 
 	Server = UBrowserInfoClientWindow(GetParent(class'UBrowserInfoClientWindow')).Server;
 	if(Server == None)
@@ -62,23 +64,23 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 	if(PlayerList == None)
 		return;
 	Count = PlayerList.Count();
-	if( Server.GameVer >= 406 )
-	{
-		if( ngSecretColumn.WinWidth <= 1 )
-		{
-			ngSecretColumn.ShowWindow();
-			ngSecretColumn.WinWidth = ngSecretWidth;
-		}
-	}
-	else
-	{
-		if( ngSecretColumn.WinWidth > 1 )
-		{
-			ngSecretWidth = ngSecretColumn.WinWidth;
-			ngSecretColumn.WinWidth = 0;
-			ngSecretColumn.HideWindow();
-		}
-	}
+	//if( Server.GameVer >= 406 )
+	//{
+	//	if( ngSecretColumn.WinWidth <= 1 )
+	//	{
+	//		ngSecretColumn.ShowWindow();
+	//		ngSecretColumn.WinWidth = ngSecretWidth;
+	//	}
+	//}
+	//else
+	//{
+	//	if( ngSecretColumn.WinWidth > 1 )
+	//	{
+	//		ngSecretWidth = ngSecretColumn.WinWidth;
+	//		ngSecretColumn.WinWidth = 0;
+	//		ngSecretColumn.HideWindow();
+	//	}
+	//}
 
 	C.Font = Root.Fonts[F_Normal];
 	Visible = int((WinHeight - (TopMargin + BottomMargin))/RowHeight);

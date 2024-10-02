@@ -1,7 +1,8 @@
 //=============================================================================
 // AeonsMultiplayer.
 //=============================================================================
-class AeonsMultiplayer expands AeonsPlayer;
+class AeonsMultiplayer expands AeonsPlayer
+    abstract;
 
 defaultproperties
 {

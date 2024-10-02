@@ -39,7 +39,7 @@ var int NumToReload;
 // Animation and Sound stuff
 // =============================================================================
 
-function DoubleBarrelToggle()
+simulated function DoubleBarrelToggle()
 {
 	PlaySound(ToggleDoubleBarrel);
 }
@@ -56,7 +56,7 @@ function PlayCloseSound()
 {
 	if ( AeonsPlayer(Owner).bWeaponSound )
 	{
-	    Owner.PlaySound(CloseSound, SLOT_None,2.0);
+	    Owner.PlayOwnedSound(CloseSound, SLOT_None,2.0);
 		AeonsPlayer(Owner).MakePlayerNoise(0.5, 640);
 	}
 }
@@ -65,7 +65,7 @@ function PlayOpenSound()
 {
 	if ( AeonsPlayer(Owner).bWeaponSound )
 	{
-		Owner.PlaySound(OpenSound, SLOT_None,2.0);
+		Owner.PlayOwnedSound(OpenSound, SLOT_None,2.0);
 		AeonsPlayer(Owner).MakePlayerNoise(0.5, 640);
 	}
 }
@@ -118,7 +118,7 @@ function Fire( float Value )
 //----------------------------------------------------------------------------
 simulated function PlayFiring()
 {
-	log("PlayFiring Called within the Shotgun");
+	//log("PlayFiring Called within the Shotgun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
 	if (RGORE())
 	{
@@ -286,18 +286,31 @@ function FireStuff()
 	}
 }
 
+function PlayFireSoundServer()
+{
+	if (bAltAmmo)
+		Owner.PlayOwnedSound(AltFireSound, SLOT_None, 2);
+	else if ( AeonsPlayer(Owner).bDoubleShotgun )
+		Owner.PlayOwnedSound(DoubleFireSound);
+	else	
+		Owner.PlayOwnedSound(FireSound);
+}
 
-function FireWeapon()
+simulated function FireWeapon()
 {
 	local float Value;
 
-	log("Shotgun: FireWeapon");
+	//log("Shotgun: FireWeapon");
 	
-	if ( PlayerPawn(Owner) != None )
-		PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		if ( PlayerPawn(Owner) != None )
+			PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
 
-	if ( !bRapidFire && (FiringSpeed > 0) )
-		Pawn(Owner).PlayRecoil(FiringSpeed);
+		if ( !bRapidFire && (FiringSpeed > 0) )
+			Pawn(Owner).PlayRecoil(FiringSpeed);
+	}
+
 	if ( bInstantHit )
 		TraceFire(Value);
 	else {
@@ -311,35 +324,51 @@ function FireWeapon()
 	if ( AeonsPlayer(Owner).bWeaponSound )
 	{
 	    AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280 * 3);
-		if (bAltAmmo)
-		    Owner.PlaySound(AltFireSound, SLOT_None, 2);
-		else if ( AeonsPlayer(Owner).bDoubleShotgun )
-		    Owner.PlaySound(DoubleFireSound);
-		else	
-			Owner.PlaySound(FireSound);
+		if (Level.NetMode == NM_Client)
+		{
+			if (bAltAmmo)
+				Owner.PlaySound(AltFireSound, SLOT_None, 2);
+			else if ( AeonsPlayer(Owner).bDoubleShotgun )
+				Owner.PlaySound(DoubleFireSound);
+			else	
+				Owner.PlaySound(FireSound);
+		}
+		else
+		{
+			PlayFireSoundServer();
+		}
+	}
+
+	if (bMuzzleFlashParticles && Role < ROLE_Authority)
+	{
+		bMuzzleFlash++;
 	}
 
 	bPointing=True;
-	if ( Owner.bHidden )
-		CheckVisibility();
 
-	gotoState('NormalFire');
+	if (Level.NetMode != NM_Client)
+	{
+		if ( Owner.bHidden )
+			CheckVisibility();
+
+		gotoState('NormalFire');
+	}
 }
 
 //----------------------------------------------------------------------------
 
 simulated function PlayIdleAnim()
 {
-	Log("Shotgun: PlayIdleAnim");
-	LoopAnim('StillIdle');
+	//Log("Shotgun: PlayIdleAnim");
+	LoopAnim('StillIdle', [TweenTime] 0.0);
 }
 
 //----------------------------------------------------------------------------
 
 simulated function PlayReloading()
 {
-	LogTime("Shotgun: PlayReloading");
-	PlayAnim('ReloadStart');
+	//LogTime("Shotgun: PlayReloading");
+	PlayAnim('ReloadStart', RefireMult / AeonsPlayer(Owner).refireMultiplier);
 }
 
 //----------------------------------------------------------------------------
@@ -384,6 +413,7 @@ state NewClip
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
+		ClientReloadWeapon(ClipCount);
 	}
 
 	function EndState()
@@ -440,10 +470,13 @@ state Idle
 {
 	simulated function Tick(float DeltaTime)
 	{
-		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-			loopAnim('MoveIdle', RefireMult);
-		else
-			loopAnim('StillIdle', RefireMult);
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				loopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+			else
+				loopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+		}
 	}
 
 	simulated function Timer()
@@ -461,6 +494,8 @@ state Idle
 		goto 'Begin';
 
 	Begin:
+		ClientIdleWeapon();
+		PlayIdleAnim();
 		if ( Pawn(Owner).bFire != 0 && !Region.Zone.bNeutralZone )
 			Global.Fire(0);
 		enable('Tick');
@@ -475,14 +510,14 @@ state ClientFiring
 {
 	simulated function AnimEnd()
 	{
-		Log("Shotgun: state ClientFiring: AnimEnd");
+		//Log("Shotgun: state ClientFiring: AnimEnd");
 		if ( (Pawn(Owner) == None) || (Ammotype.AmmoAmount <= 0) )
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 		else if ( !bCanClientFire )
-			GotoState('');
+			GotoState('ClientIdle');
 		else
 		{
 			if ( ClipCount <= 0 ) 
@@ -495,7 +530,7 @@ state ClientFiring
 			else
 			{
 				PlayIdleAnim();
-				GotoState('');
+				GotoState('ClientIdle');
 			}
 			
 		}
@@ -529,23 +564,31 @@ state ClientReload
 
 	simulated function bool ClientFire(float Value)
 	{
-		bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
-		return bForceFire;
+		//bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
+		//return bForceFire;
+		return false;
 	}
 
 	simulated function Timer()
 	{
-		PlayAnim('ReloadEnd',1.0/AeonsPlayer(Owner).refireMultiplier,,,0);//fix 1.0 / AeonsPlayer(Owner).refireMultiplier);
-//		PlaySound(CloseSound, SLOT_None, 4.0*AeonsPlayer(Owner).VolumeMultiplier);
+		if (AeonsPlayer(Owner).refireMultiplier >= 0.6 && ClipCount + 1 < ReloadCount) // ClipCount + 1 because it's not updated yet
+		{
+			SetTimer(0.5 * (1/RefireMult * AeonsPlayer(Owner).refireMultiplier), false);
+		}
+		else
+		{
+			PlayAnim('ReloadEnd',1.0/AeonsPlayer(Owner).refireMultiplier,,,0);//fix 1.0 / AeonsPlayer(Owner).refireMultiplier);
+//			PlaySound(CloseSound, SLOT_None, 4.0*AeonsPlayer(Owner).VolumeMultiplier);
+		}
 	}
 
 	simulated function AnimEnd()
 	{
-		log("Shotgun: state ClientReload: AnimEnd: Sequence = " $ AnimSequence);
+		//log("Shotgun: state ClientReload: AnimEnd: Sequence = " $ AnimSequence);
 
 		if ( ((AnimSequence == 'ReloadStart') || (AnimSequence == 'ReloadStart_Morph')) && (AmmoType.AmmoAmount > 0) )
 		{
-			SetTimer(RefireRate * AeonsPlayer(Owner).refireMultiplier, false);//fix RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
+			SetTimer(0.5 * (1/RefireMult * AeonsPlayer(Owner).refireMultiplier), false);//fix RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
 			return;
 		}
 
@@ -557,7 +600,7 @@ state ClientReload
 				return;
 			}
 		}			
-		GotoState('');
+		GotoState('ClientIdle');
 		Global.AnimEnd();
 	}
 
@@ -568,7 +611,7 @@ state ClientReload
 
 	simulated function BeginState()
 	{
-		log("Shotgun: state ClientReload: BeginState");
+		//log("Shotgun: state ClientReload: BeginState");
 		bForceFire = false;
 	}
 }
@@ -636,4 +679,7 @@ defaultproperties
      Event=ShotgunPickedUp
      Mesh=SkelMesh'Aeons.Meshes.Shotgun3rd_m'
      AmbientGlow=102
+     bRotatingPickup=False
+     DeathMessage="%k ravaged %o with buckshot."
+     AltDeathMessage="%k flayed %o with buckshot."
 }

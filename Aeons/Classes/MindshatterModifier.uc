@@ -30,7 +30,13 @@ var travel float effectTimer;
 var float targetFOV;
 var float DefaultFOV;
 
-function SetupValues()
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		ClientActivated, ClientDeactivated;
+}
+
+simulated function SetupValues()
 {
 	EffectLen[0] = 15;
 	EffectLen[1] = 15;
@@ -90,11 +96,17 @@ function SetupValues()
 
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
 	SetupValues();
+	if ( PlayerPawn(Owner) != none )
+		DefaultFOV = PlayerPawn(Owner).DefaultFOV;
+}
+
+simulated function PostNetBeginPlay()
+{
 	if ( PlayerPawn(Owner) != none )
 		DefaultFOV = PlayerPawn(Owner).DefaultFOV;
 }
@@ -110,6 +122,10 @@ state Deactivated
 		// PlayerPawn(Owner).DefaultFOV = DefaultFOV;
 		PlayerPawn(Owner).DesiredFOV = DefaultFOV;
 		// log ("BeginState: PlayerPawn(Owner).DefaultFov = "$PlayerPawn(Owner).DefaultFov, 'Misc');
+
+		AeonsPlayer(Owner).bRenderWeapon = true;
+		bActive = false;
+		effectTimer = 0;
 	}
 	
 	simulated function EndState()
@@ -214,11 +230,6 @@ state Deactivated
 			gotoState('Idle');
 		}
 	}
-
-	Begin:
-		AeonsPlayer(Owner).bRenderWeapon = true;
-		bActive = false;
-		effectTimer = 0;
 }
 
 
@@ -250,13 +261,26 @@ state SPActivated
 // ===================================================================================
 state Activated
 {
-	function BeginState()
+	simulated function BeginState()
 	{
 		log("Mindshatter Modifier being activated - casting level = "$castingLevel, 'Misc');
-		if (Owner.IsA('ScriptedPawn'))
-			gotoState('SPActivated');
-		SetLocation(Owner.Location);
-		PlaySound(ActivateSound,,1);
+		if (Level.NetMode != NM_Client)
+		{
+			if (Owner.IsA('ScriptedPawn'))
+				gotoState('SPActivated');
+			SetLocation(Owner.Location);
+			PlaySound(ActivateSound,,1);
+		}
+
+		bActive = true;
+		AeonsPlayer(Owner).bRenderWeapon = false;
+		// log("Mindshatter activated... my owner is " $Owner.name);
+		if (SndID == -1)
+			SndID = Owner.PlaySound(EffectSound,,1,,,Pitch);
+		log ("Starting Mindshatter Sound: " $ SndID);
+		// setTimer(GetSoundDuration(EffectSound), true);
+		inc = 0; inc2 = 0; inc3 = 0; inc4 = 0; inc5 = 0;
+		EffectTimer = 0;
 	}
 
 	simulated function Timer()
@@ -282,7 +306,8 @@ state Activated
 			gotoState('Deactivated');
 			return;
 		}
-			
+		if (Level.NetMode == NM_DedicatedServer)
+			return;
 		v = vSize(owner.velocity);		// get the velocity of the character
 		inc += 0.02;
 		inc2 += 0.05;
@@ -337,31 +362,49 @@ state Activated
 		}
 	}
 
-	Begin:
-		bActive = true;
-		AeonsPlayer(Owner).bRenderWeapon = false;
-		// log("Mindshatter activated... my owner is " $Owner.name);
-		if (SndID == -1)
-			SndID = Owner.PlaySound(EffectSound,,1,,,Pitch);
-		log ("Starting Mindshatter Sound: " $ SndID);
-		// setTimer(GetSoundDuration(EffectSound), true);
-		inc = 0; inc2 = 0; inc3 = 0; inc4 = 0; inc5 = 0;
-		EffectTimer = 0;
 }
 
 auto state Idle
 {
-	Begin:
+	simulated function BeginState()
+	{
 		if ( !Level.bIsCutsceneLevel )
 			if ( PlayerPawn(Owner) != none )
 			{
 				PlayerPawn(Owner).DesiredFOV = PlayerPawn(Owner).DefaultFOV;
 				bActive = false;
 			}
-		AeonsPlayer(Owner).bRenderWeapon = true;
-		log ("Stopping Mindshatter Sound: " $ SndID);
-		Owner.StopSound(SndID);
-		SndID = -1;
+		if (Level.NetMode != NM_Client)
+		{
+			AeonsPlayer(Owner).bRenderWeapon = true;
+			//log ("Stopping Mindshatter Sound: " $ SndID);
+			Owner.StopSound(SndID);
+			SndID = -1;
+		}
+	}
+}
+
+function int Dispel(optional bool bCheck)
+{
+	if ( !bCheck )
+	{
+		GotoState('Deactivated');
+		if (Level.NetMode == NM_DedicatedServer)
+		{
+			ClientDeactivated();
+		}
+	}
+}
+
+simulated function ClientActivated(byte level)
+{
+	CastingLevel = level;
+	GotoState('Activated');
+}
+
+simulated function ClientDeactivated()
+{
+	GotoState('Deactivated');
 }
 
 defaultproperties
@@ -369,5 +412,5 @@ defaultproperties
      SndID=-1
      ActivateSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_MindHitHead01'
      EffectSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_MindLoop01'
-     bNetTemporary=True
+     RemoteRole=ROLE_SimulatedProxy
 }

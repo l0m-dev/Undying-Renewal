@@ -45,7 +45,7 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 // returns the closest Lit pawn
 ////////////////////////////////////////////
 
-function Pawn getLitPawn(out pawn p, optional float Radius, optional vector Loc)
+simulated function Pawn getLitPawn(out pawn p, optional float Radius, optional vector Loc)
 {
 	local Pawn tPawn;
 	local float len, tLen;
@@ -73,7 +73,7 @@ function Pawn getLitPawn(out pawn p, optional float Radius, optional vector Loc)
 // returns the closest pawn, not the player
 ////////////////////////////////////////////
 
-function Pawn getClosePawn(out pawn p, optional float Radius, optional vector Loc)
+simulated function Pawn getClosePawn(out pawn p, optional float Radius, optional vector Loc)
 {
 	local 	Pawn 		tPawn; // temp pawn
 	local 	float 		len, tLen; // length and temp length
@@ -99,7 +99,7 @@ function Pawn getClosePawn(out pawn p, optional float Radius, optional vector Lo
 
 
 // Put in this state ONLY by the effect of DispelMagic spell effect.
-function int Dispel(optional bool bCheck)
+simulated function int Dispel(optional bool bCheck)
 {
 	if ( bCheck )
 		return CastingLevel;
@@ -108,7 +108,7 @@ function int Dispel(optional bool bCheck)
 	Destroy();
 }
 
-function DamageInfo getDamageInfo(optional name DamageType)
+simulated function DamageInfo getDamageInfo(optional name DamageType)
 {
 	local DamageInfo DInfo;
 
@@ -166,7 +166,7 @@ simulated function genBubbles(vector start, vector dir)
 		bubbles.p.width = 8.0 * (0.1 + (i/64.0 * 0.9));
 		bubbles.setParticleParams(i,bubbles.p);
 	}
-	bubbles.bShuttingDown = true;
+	bubbles.Shutdown();
 }
 
 simulated function bool CheckGenBubbles()
@@ -187,7 +187,7 @@ simulated function bool CheckGenBubbles()
 	return false;
 }
 
-function ZoneChange( ZoneInfo NewZone )
+simulated function ZoneChange( ZoneInfo NewZone )
 {
 	if ( NewZone.bWaterZone )
 	{

@@ -242,7 +242,7 @@ function bool IsRelevant( actor Other )
 	}
 }
 
-function bool CheckConditionalEvent(bool bCondition)
+simulated function bool CheckConditionalEvent(bool bCondition)
 {
 	local PlayerPawn P;
 	local bool bInitialCondition;
@@ -251,9 +251,14 @@ function bool CheckConditionalEvent(bool bCondition)
 	{
 		log("Trigger Checking Conditional GameEvent ... "$ConditionalGameEvent, 'GameEvents');
 		ForEach AllActors(class 'PlayerPawn', P)
-			break;
+		{
+			if (P.CheckGameEvent(ConditionalGameEvent))
+			{
+				bInitialCondition = true;
+				break;
+			}
+		}
 		log("FoundPlayer", 'GameEvents');
-		bInitialCondition = P.CheckGameEvent(ConditionalGameEvent);
 		log("Trigger CheckGameEvent() Returning ... "$(bInitialCondition == bCondition), 'GameEvents');
 		return (bInitialCondition == bCondition);
 	} else {

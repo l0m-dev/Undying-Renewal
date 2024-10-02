@@ -93,7 +93,7 @@ function Paint(Canvas C, float X, float Y)
 			NewWord="";
 			CurrentLine="";
 
-			while ( /*(W < WinWidth) &&*/ (!bFoundEnd) ) // width check prevents wrapping when a word is too long, might want to make this a variable and do it on specific labels only
+			while ( (W < WinWidth) && (!bFoundEnd) ) // width check prevents wrapping when a word is too long, might want to make this a variable and do it on specific labels only
 			{
 				CurrentLine = CurrentLine $ NewWord;
 				

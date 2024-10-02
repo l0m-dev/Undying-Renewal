@@ -5,7 +5,7 @@ class PhoenixEgg expands WeaponProjectile;
 
 var vector SeekLocation;
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local float NewSpeed;
 	local rotator r;
@@ -48,4 +48,5 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.PhoenixAmmo_m'
      DrawScale=0.333
      bCollideActors=False
+     RemoteRole=ROLE_None
 }

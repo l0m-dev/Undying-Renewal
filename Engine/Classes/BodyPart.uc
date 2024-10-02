@@ -3,6 +3,14 @@
 //=============================================================================
 class BodyPart expands Projectile;
 
+simulated function PostBeginPlay()
+{
+	// bugged currently so destroy it
+	// not needed anymore with RemoteRole=ROLE_None
+	//if (Role < ROLE_Authority)
+	//	Destroy();
+}
+
 simulated singular function Touch(Actor Other){}
 simulated function ProcessTouch(Actor Other, Vector HitLocation){}
 
@@ -24,10 +32,12 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 	}
 	
 	Velocity = reflect(-Normal(Velocity), HitNormal);
-	setRotation(Rotator(Velocity));
+	Speed = VSize(Velocity);
+	bFixedRotationDir = false;
+	RandSpin(12500);
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	if ( Owner == None )
 		Destroy();
@@ -45,4 +55,5 @@ defaultproperties
      bBounce=True
      bFixedRotationDir=True
      bRotateToDesired=True
+     RemoteRole=ROLE_None
 }

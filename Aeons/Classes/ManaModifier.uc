@@ -24,9 +24,17 @@ function Tick(float DeltaTime)
 
 	if ( f >= 0.2 )
 	{
-		if ( Owner != None && AeonsPlayer(Owner).Weapon.IsA('Scythe') )
+		if ( Owner != None && AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('Scythe') )
 		{
-			if ( Scythe(AeonsPlayer(Owner).Weapon).bBerserk )
+			if ( Scythe(AeonsPlayer(Owner).Weapon).bThirsty )
+			{
+				if (ScytheMaint != 15)
+				{
+					ScytheMaint = 15;
+					UpdateManaTimer();
+				}
+			}
+			else if ( Scythe(AeonsPlayer(Owner).Weapon).bBerserk )
 			{
 				if (ScytheMaint != 10)
 				{

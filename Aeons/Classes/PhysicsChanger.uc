@@ -10,7 +10,20 @@ function Trigger(Actor Other, Pawn Instigator)
 	ForEach AllActors(class 'Actor', A, Event)
 	{
 		if ((A.Owner == none) || (A.Owner == Level))
-			A.SetPhysics(PHYS_Falling);
+		{
+			if (Inventory(A) != None)
+			{
+				Inventory(A).DropFrom(A.Location);
+			}
+			else
+			{
+				if (RemoteRole == ROLE_SimulatedProxy)
+					RemoteRole = ROLE_DumbProxy;
+
+				A.bSimFall = true;
+				A.SetPhysics(PHYS_Falling);
+			}
+		}
 	}
 
 }

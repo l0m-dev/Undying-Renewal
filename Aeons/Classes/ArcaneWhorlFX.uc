@@ -7,7 +7,7 @@ var name JointNames[64];
 var int NumJoints;
 var AeonsPlayer Player;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local int i;
 	local name JointName;
@@ -16,7 +16,7 @@ function PreBeginPlay()
 	if (Owner == none)
 	{
 		log("Arcane Whorls FX shutting Down because I have no Owner", 'Misc');
-		bShuttingDown = true;
+		Shutdown();
 		return;
 	}
 
@@ -38,12 +38,12 @@ function PreBeginPlay()
 	bUpdate = true;
 }
 
-function SetPlayer(AeonsPlayer P)
+simulated function SetPlayer(AeonsPlayer P)
 {
 	Player = P;
 }
 
-function RenderOverlays(Canvas Canvas)
+simulated function RenderOverlays(Canvas Canvas)
 {
 	local int i;
 
@@ -54,7 +54,7 @@ function RenderOverlays(Canvas Canvas)
 		{
 			if ( Owner == none)
 			{
-				bShuttingDown = true;
+				Shutdown();
 				return;
 			} else {
 			

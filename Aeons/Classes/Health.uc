@@ -18,18 +18,19 @@ var vector InitialLocation;
 var ParticleFX pfx;
 var string MaxHealthMessage;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	MaxHealthMessage = Localize("Aeons.Health", "MaxHealthMessage", "Renewal");
+	Disable('Tick');
 }
 
-function BecomeHealthVial()
+simulated function BecomeHealthVial()
 {
 	bHealthVial = true;
 
 	InitialLocation = Location;
 	
-	if ( Owner == none )
+	if ( Owner == none && Level.NetMode != NM_Client )
 	{
 		pfx = spawn(class 'HealthVialParticleFX',self,,Location);
 		pfx.SetBase(self);
@@ -50,9 +51,11 @@ function BecomeHealthVial()
 	LightHue = 139;
 	LightSaturation = 129;
 	LightRadius = 16;
+	if (Level.NetMode != NM_DedicatedServer)
+		Enable('Tick');
 }
 
-function BecomeHealingRoot()
+simulated function BecomeHealingRoot()
 {
      //PickupMessage = "You gained some Healing Roots";
      PickupViewMesh = SkelMesh'Aeons.Meshes.HealingRoot_m';
@@ -64,14 +67,15 @@ function BecomeHealingRoot()
      //CollisionHeight=44;
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local vector Loc;
 	local rotator r;
 	
 	if ( bHealthVial )
 	{
-		if ( GetStateName() == 'Pickup' )
+		// left for compatibility with broken PHYS_Rotating
+		if ( GetStateName() == 'Pickup' && Physics == PHYS_None )
 		{
 			r = rotation;
 			r.yaw += (4096 * deltaTime);
@@ -83,6 +87,25 @@ function Tick(float DeltaTime)
 			PrePivot.z = cos(inc) * 4;
 		}
 	}
+}
+
+function Destroyed()
+{
+	if ( pfx != none )
+	{
+		pfx.Shutdown();
+		pfx = none;
+	}
+}
+
+function PickupFunction(Pawn Other)
+{
+	if ( pfx != none )
+	{
+		pfx.Shutdown();
+		pfx = none;
+	}
+	super.PickupFunction(Other);
 }
 
 auto state Pickup
@@ -114,12 +137,16 @@ auto state Pickup
 					} else
 						Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 					PlaySound (PickupSound,,2.0);
-					Destroy();
+					if ( Level.Game.ShouldRespawn(self) )
+						GotoState('Sleeping');
+					else
+						Destroy();
 				}
 			} else {
+				// the limmit should be checked in HandlePickupQuery instead
 				if ((Level.Game.Difficulty == 0 && HealthPacks < 15) ||
 				    (Level.Game.Difficulty == 1 && HealthPacks < 10) ||
-				    (Level.Game.Difficulty == 2 && HealthPacks < 5) || !RGC()) {
+				    (Level.Game.Difficulty == 2 && HealthPacks < 5) || !GetRenewalConfig().bLimitHealth) {
 					bContinue = true;
 				} else {
 					Pawn(Other).ClientMessage(MaxHealthMessage, 'Pickup');
@@ -129,6 +156,7 @@ auto state Pickup
 		if ( bContinue && ValidTouch(Other) )
 		{
 			// anything but the player
+			Copy = SpawnCopy(Pawn(Other));
 			if (Level.Game.LocalLog != None)
 				Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
 			if (Level.Game.WorldLog != None)
@@ -137,7 +165,7 @@ auto state Pickup
 				Pawn(Other).SelectedItem=Copy;
 			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
 
-			if (GetRenewalConfig().bShowQuickSelectHint && AP != None && Ap.ShowSelectItemHint(PickupMessage))
+			if (AP != None && GetRenewalConfig().bShowQuickSelectHint && Ap.ShowSelectItemHint(PickupMessage))
 			{
 				// hint was shown successfully
 			}
@@ -149,7 +177,6 @@ auto state Pickup
 					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 			}
 
-			Copy = SpawnCopy(Pawn(Other));
 			Pickup(Copy).PickupFunction(Pawn(Other));
 			AmbientSound = none;
 			if ( Other.IsA('AeonsPlayer') )
@@ -167,11 +194,8 @@ auto state Pickup
 		
 		ForEach AllActors(class 'PlayerPawn', P)
 		{
-			break;
-		}
-
-		if ( p!= none )
 			Touch(P);
+		}
 	}
 
 	function BeginState()

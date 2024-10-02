@@ -7,7 +7,7 @@ var name JointNames[64];
 var int NumJoints;
 var() float	Direction;
 
-function InitJoints( Pawn PawnOwner, bool bForceAdd )
+simulated function InitJoints( Pawn PawnOwner, bool bForceAdd )
 {
 	local int i;
 
@@ -26,7 +26,7 @@ function InitJoints( Pawn PawnOwner, bool bForceAdd )
 	}
 }
 
-function SetupJoints( int startJoint, int endJoint )
+simulated function SetupJoints( int startJoint, int endJoint )
 {
 	local int i;
 
@@ -37,7 +37,7 @@ function SetupJoints( int startJoint, int endJoint )
 	}
 }
 
-function StartLevel()
+simulated function SetupEffects()
 {
 	local int i;
 	local name JointName;
@@ -64,7 +64,18 @@ function StartLevel()
 	}
 }
 
-function Tick(float DeltaTime)
+function StartLevel()
+{
+	if (Level.NetMode != NM_DedicatedServer)
+		SetupEffects();
+}
+
+simulated function PostNetBeginPlay()
+{
+	SetupEffects();
+}
+
+simulated function Tick(float DeltaTime)
 {
 	local int i;
 	
@@ -104,11 +115,13 @@ function Tick(float DeltaTime)
 	}
 }
 
-state ShutDown
+/*
+state ShutDownState
 {
 	Begin:
 		Destroy();
 }
+*/
 
 defaultproperties
 {

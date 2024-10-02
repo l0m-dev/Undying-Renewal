@@ -10,13 +10,13 @@ var(Projectile) sound ExplodeSound;
 var() float HeadShotMult;		// damage multiplier if I score a head shot.
 var bool bInWater;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	spawnLoc = Location;
 	super.PreBeginPlay();
 }
 
-function DamageInfo getDamageInfo(optional name DamageType)
+simulated function DamageInfo getDamageInfo(optional name DamageType)
 {
 	local DamageInfo DInfo;
 
@@ -70,7 +70,7 @@ simulated function name CheckJoint()
 	return 'None';
 }
 
-function bool CheckHeadShotJoint(name JointName)
+simulated function bool CheckHeadShotJoint(name JointName)
 {
 	switch (JointName)
 	{
@@ -161,7 +161,7 @@ simulated function genBubbles(vector start, vector dir)
 		Bubbles.p.length = FRand() * 3.0 * (i/64.0);
 		Bubbles.setParticleParams(i,bubbles.p);
 	}
-	Bubbles.bShuttingDown = true;
+	Bubbles.Shutdown();
 }
 
 simulated function bool CheckGenBubbles()

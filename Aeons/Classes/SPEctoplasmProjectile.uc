@@ -51,7 +51,7 @@ function PostBeginPlay()
 function Destroyed()
 {
 	if ( ectoTrail != None )
-		ectoTrail.bShuttingDown = true;
+		ectoTrail.Shutdown();
 }
 
 function ParticleHitFX(vector HitLocation, vector HitNormal)
@@ -216,7 +216,7 @@ function int Dispel(optional bool bCheck)
 	if ( bCheck )
 		return CastingLevel;
 	
-	ectoTrail.bShuttingDown = true;
+	ectoTrail.Shutdown();
 	Destroy();
 }
 

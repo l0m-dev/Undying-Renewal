@@ -342,8 +342,8 @@ defaultproperties
      ExitSound=Sound'CreatureSFX.SharedHuman.P_SplashOut01'
      bStatic=False
      bHidden=False
-     bNoDelete=False
      InitialState=Triggered_Zone
      Texture=Texture'Aeons.System.DZoneInfo'
      DrawScale=0.5
+     RemoteRole=ROLE_SimulatedProxy
 }

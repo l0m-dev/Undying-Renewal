@@ -45,14 +45,6 @@ var() name PlayerTeleportTag;
 
 // ============================================================================
 
-replication
-{
-	reliable if (Role == ROLE_Authority)
-		bAnimatedCamera, NumTakes, CutSceneLength, AnimName, CamLocations, CamDirs, CamTimes, CamFOVs, CamEvents, StartLocation, StartDirection, WaitTimer, EndEvent,
-		PlayerTeleportTag, RotMethod,
-		bAutoClearAnims, bHidePlayer, bHoldPlayer, bLetterboxed, LetterBoxTimer, LetterBoxAspect, bFromPlayerEyes, bTeleportPlayer, bEscapable;
-}
-
 simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
@@ -142,6 +134,7 @@ simulated function StartCutscene()
 simulated function CompleteCutscene(PlayerPawn Player)
 {
 	local Actor A;
+	local pawn OtherPlayer;
 
 	log ("Completing Cutscene - Level.TimeSeconds = "$Level.TimeSeconds, 'Misc');
 
@@ -158,19 +151,9 @@ simulated function CompleteCutscene(PlayerPawn Player)
 		}
 	}
 
-	if ( URL != "" )
-	{
-		log("URL is "$URL$" PlayerPawn(Owner) is "$PlayerPawn(Owner), 'Cutscenes');
-		
-		Teleport(PlayerPawn(Owner));
-	}
-
 	//if ( bEndGame )
 	//	Player.ShowMenu();
 	//else
-	Player.DesiredFOV = Player.DefaultFOV;
-	Player.bHidden = false;	
-	Player.StopCutScene();
 }
 
 defaultproperties
@@ -184,4 +167,8 @@ defaultproperties
      bHidden=True
      Texture=Texture'Engine.System.CamNav_m'
      DrawScale=1
+     RemoteRole=ROLE_None
+     bNoDelete=True
+     bAlwaysRelevant=True
+     bStatic=False
 }

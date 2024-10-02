@@ -8,14 +8,14 @@ class WaterRing expands RingExplosion;
 var float Rate, ORate;
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	Rate = RandRange(0.02, 0.2);
 	ORate = RandRange(0.5, 1.5);
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	DrawScale += Rate;
 	Opacity -= DeltaTime * ORate;

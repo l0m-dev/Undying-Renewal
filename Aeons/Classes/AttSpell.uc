@@ -16,6 +16,12 @@ var(SpellAI) 	float 	seekWeight[6];
 var(SpellAI) 	float 	SightRadius;
 var Pawn PawnOwner;
 
+replication
+{
+	reliable if( Role==ROLE_Authority )
+		ClientIdleAttSpell;
+}
+
 function bool processCastingLevel()
 {
 	local GhelziabahrStone Ghelz;
@@ -23,7 +29,7 @@ function bool processCastingLevel()
 	if ( Super.ProcessCastingLevel() )
 	{
 		// Bump the casting Level up by 1 if the player has the Ghelzibahar Stone Active.
-		if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
+		if ( PlayerPawn(Owner).Weapon != None && PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
 		{
 			amplitudeBonus = 1;
 			//GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(Clamp((castingLevel + amplitudeBonus), 0, 5));
@@ -141,7 +147,7 @@ function Finish()
         PawnOwner.ChangedSpell();
 		//log("D: ", 'Misc');
 		GotoState('Idle2');
-    } else if ( PawnOwner.bFireAttSpell != 0 ) {
+    } else if ( PawnOwner.bFireAttSpell != 0 && bContinuousFire ) {
 		//log("B: AttSpell:Finish() ... calling Global FireAttSpell()", 'Misc');
         Global.FireAttSpell(0);
 	} else {
@@ -157,7 +163,6 @@ function FireAttSpell( float Value )
 	local bool bPCL;
 	local int cost;
 
-	// LogTime("AttSpell: FireAttSpell");
 	if ( Self.IsA('Pyro') && AeonsPlayer(Owner).Weapon.ItemName == "Molotov" )
 		return;
 
@@ -180,7 +185,7 @@ function FireAttSpell( float Value )
 			{
 				cost = manaCostPerLevel[castingLevel];
 
-				if ( Self.IsA('Scrye') && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone'))
+				if ( Self.IsA('Scrye') && AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
 					cost = 0;
 
 				if ( cost <= PawnOwner.Mana )
@@ -191,7 +196,7 @@ function FireAttSpell( float Value )
 						bFiring = true;
 						GhelzUse(manaCostPerLevel[castingLevel]);
 						PlayFiring();
-						Disable('FireAttSpell');
+						//Disable('FireAttSpell');
 						
 						if ( Owner.bHidden )
 							CheckVisibility();
@@ -224,6 +229,18 @@ simulated function PlayFiring()
 
 state ClientFiring
 {
+	simulated function AnimEnd()
+	{
+		if ( bCanClientFire && (PlayerPawn(Owner) != None) && bContinuousFire )
+		{
+			if ( Pawn(Owner).bFireAttSpell != 0 )
+			{
+				Global.ClientFire(0);
+				return;
+			}
+		}
+		GotoState('ClientFinishing');
+	}
 	simulated function Tick(float DeltaTime)
 	{
 		Super.Tick(DeltaTime);
@@ -231,12 +248,46 @@ state ClientFiring
 		if ( PlayerPawn(owner).bFireAttSpell == 0 )
 		{
 			//LogTime("AttSpell: state ClientFiring: Tick: bFireAttSpell is 0 , exiting state");
-			GotoState('');
-
-			//rb playdown animation  ?
-			PlayDownPosition();
+			GotoState('ClientFinishing');
 		}
 	}
+}
+
+simulated state ClientFinishing
+{
+	simulated function bool ClientFire(float Value)
+	{
+		return false;
+	}
+
+	simulated function AnimEnded() // AnimEnd
+	{
+		//if (AnimSequence == 'Down')
+		//{
+			if ( bCanClientFire && (PlayerPawn(Owner) != None) && bContinuousFire )
+			{
+				if ( Pawn(Owner).bFireAttSpell != 0 )
+				{
+					Global.ClientFire(0);
+					return;
+				}
+			}
+			GotoState('ClientIdle');
+		//}
+	}
+	
+	Begin:
+		FinishAnim();
+
+		PlayDownPosition();
+		FinishAnim();
+		
+		//PlayAnim('DownPosition',,,,0);
+		PlayAnim('Down',,,,0);
+		FinishAnim();
+		if (!bContinuousFire)
+			sleep(RefireRate);
+		AnimEnded();
 }
 
 state ReadyToAmplify
@@ -258,7 +309,7 @@ state ReadyToAmplify
 function GhelzUse(int cost)
 {
 	// Ghelziabahr use
-	if ( PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
+	if ( PlayerPawn(Owner).Weapon != None && PlayerPawn(Owner).Weapon.IsA('GhelziabahrStone') )
 		GhelziabahrStone(PlayerPawn(Owner).Weapon).addUse(localCastingLevel);
 }
 
@@ -268,11 +319,23 @@ function ForceFire()
 	FireAttSpell(0);
 }
 
+simulated function ClientIdleAttSpell()
+{
+	if (Level.NetMode != NM_Client)
+		return;
+	
+	//log("AttSpell: ClientIdleAttSpell");
+	if (GetStateName() != 'ClientIdle')
+		GotoState('ClientIdle');
+}
+
 state Idle2
 {
 	function BeginState()
 	{
 		bFiring = false;
+
+		ClientIdleAttSpell();
 	}
 }
 

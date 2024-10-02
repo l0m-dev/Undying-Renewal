@@ -98,7 +98,7 @@ function ShutDown()
 	{
 		if ( A.IsA('ParticleFX') )
 		{
-			ParticleFX(A).bShuttingDown = true;
+			ParticleFX(A).Shutdown();
 		} else {
 			A.Destroy();
 		}
@@ -115,7 +115,7 @@ function TurnStuffOff()
 		{
 			if ( ATemp[i].IsA('ParticleFX') )
 			{
-				ParticleFX(ATemp[i]).bShuttingDown = true;
+				ParticleFX(ATemp[i]).Shutdown();
 			} else {
 				ATemp[i].Destroy();
 			}

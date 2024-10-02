@@ -49,7 +49,7 @@ function Destroyed()
 	}
 	if ( ( KillTimer > 0.0 ) && ( PlayerPawn(MyKiller) != none ) )
 	{
-		PlayerPawn(MyKiller).GotoState( 'FadingDeath' );
+		PlayerPawn(MyKiller).PlayerDied( 'FadingDeath' );
 	}
 
 	super.Destroyed();
@@ -57,7 +57,7 @@ function Destroyed()
 
 function Trigger( actor Other, pawn EventInstigator )
 {
-	DebugInfoMessage( ".Trigger, Other is " $ Other.name $ ", EventInstigator is " $ EventInstigator.name );
+	DebugInfoMessage( ".Trigger, Other is " $ Other.name $ ", EventInstigator is " $ EventInstigator );
 	ScriptTriggerer = Other;
 	if ( TriggerScriptTag != '' )
 		Script = FindScript( TriggerScriptTag );
@@ -89,7 +89,7 @@ function Tick( float DeltaTime )
 		KillTimer = FMax( KillTimer - DeltaTime, 0.0 );
 		if ( ( KillTimer == 0.0 ) && ( PlayerPawn(MyKiller) != none ) )
 		{
-			PlayerPawn(MyKiller).GotoState( 'FadingDeath' );
+			PlayerPawn(MyKiller).PlayerDied( 'FadingDeath' );
 		}
 	}
 }
@@ -117,10 +117,13 @@ function DisableTeleporters()
 {
 	local Teleporter	T;
 
-	foreach AllActors( class'Teleporter', T )
+	if (Level.NetMode == NM_Standalone)
 	{
-		T.bEnabled = false;
-		T.bForcePlayerTouch = true;
+		foreach AllActors( class'Teleporter', T )
+		{
+			T.bEnabled = false;
+			T.bForcePlayerTouch = true;
+		}
 	}
 }
 

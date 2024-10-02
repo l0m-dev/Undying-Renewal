@@ -34,9 +34,10 @@ state() FallToDeath
 						Player.PlaySound(FallSound,,2, [Flags]480);
 					else
 						Player.PlaySound(sound'Voiceover.Patrick.Pa_Falling',,2, [Flags]480);
-				}
 
-				Player.GotoState('FallingDeath');
+					Player.PlayerDied('FallingDeath');
+				}
+				
 				if (FallTime > 0)
 				{
 					Disable('UnTouch');

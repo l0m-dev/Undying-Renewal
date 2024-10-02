@@ -65,11 +65,13 @@ function Tick(float DeltaTime)
 	}
 }
 
-state ShutDown
+/*
+state ShutDownState
 {
 	Begin:
 		Destroy();
 }
+*/
 
 defaultproperties
 {

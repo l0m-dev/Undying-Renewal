@@ -55,7 +55,7 @@ function bool EncroachingOn( actor Other )
 	return false;
 }
 
-function DamageInfo getDamageInfo(optional name DamageType)
+simulated function DamageInfo getDamageInfo(optional name DamageType)
 {
 	local DamageInfo DInfo;
 
@@ -188,7 +188,7 @@ simulated function ExplodeDecal(vector HitLocation, vector HitNormal)
 
 simulated final function RandSpin(float spinRate)
 {
-	DesiredRotation = RotRand();
+	DesiredRotation = RotRand(true);
 	RotationRate.Yaw = spinRate * 2 *FRand() - spinRate;
 	RotationRate.Pitch = spinRate * 2 *FRand() - spinRate;
 	RotationRate.Roll = spinRate * 2 *FRand() - spinRate;	

@@ -125,8 +125,10 @@ function Fire( float Value )
         PlayFireEmpty();
         if (AmmoType.AmmoAmount > 0)
 		{
-			log("Revolver going to NewClip State A", 'Misc');
+			//log("Revolver going to NewClip State A", 'Misc');
 			GoToState('NewClip');
+			//if (Level.NetMode == NM_DedicatedServer)
+			//	ClientReloadWeapon(true);
 		}
     } 
 	else 
@@ -140,9 +142,9 @@ function Fire( float Value )
 //----------------------------------------------------------------------------
 simulated function PlayFiring()
 {
-	log("PlayFiring Called within the Revolver");
+	//log("PlayFiring Called within the Revolver");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
-	if ( Role == ROLE_Authority )
+	//if ( Role == ROLE_Authority )
 		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
 //	bMuzzleFlash++;
@@ -175,7 +177,7 @@ function PlayClose()
 {
     if ( AeonsPlayer(Owner).bWeaponSound )
     {
-		PlaySound(CloseSound, SLOT_None,4.0* AeonsPlayer(Owner).VolumeMultiplier);
+		PlayOwnedSound(CloseSound, SLOT_None,4.0* AeonsPlayer(Owner).VolumeMultiplier);
 		AeonsPlayer(Owner).MakePlayerNoise(0.5, 640);
 	}
 }
@@ -186,7 +188,7 @@ function PlayOpen()
 {
     if ( AeonsPlayer(Owner).bWeaponSound )
     {
-		PlaySound(OpenSound, SLOT_None,2.0* AeonsPlayer(Owner).VolumeMultiplier);
+		PlayOwnedSound(OpenSound, SLOT_None,2.0* AeonsPlayer(Owner).VolumeMultiplier);
 		AeonsPlayer(Owner).MakePlayerNoise(0.5, 640);
 	}
 }
@@ -211,8 +213,8 @@ function TweenDown()
 
 simulated function PlayIdleAnim()
 {
-	Log("Revolver: PlayIdleAnim");
-	LoopAnim('IdleStill');
+	//Log("Revolver: PlayIdleAnim");
+	LoopAnim('IdleStill', [TweenTime] 0.0);
 }
 
 //----------------------------------------------------------------------------
@@ -244,13 +246,14 @@ state NewClip
 	
 	function BeginState()
 	{
-		Log("Revolver: state NewClip: BeginState");
+		//Log("Revolver: state NewClip: BeginState");
 		PlayerPawn(Owner).bReloading = true;
+		ClientReloadWeapon(ClipCount);
 	}
 
 	function EndState()
 	{
-		Log("Revolver: state NewClip: EndState");
+		//Log("Revolver: state NewClip: EndState");
 		PlayerPawn(Owner).bReloading = false;
 	}
 
@@ -260,7 +263,7 @@ state NewClip
 			GotoState('Idle');
 			Stop;
 		}
-		log ("Revolver Roloading ... Time = "$Level.TimeSeconds,'Misc');
+		//log ("Revolver Roloading ... Time = "$Level.TimeSeconds,'Misc');
 		checkAltAmmo();
 		// TweenDown();
 		
@@ -281,7 +284,7 @@ state NewClip
 	        if ( bChangeWeapon )
 	    		GotoState('DownWeapon');
 
-			LogTime("Revolver: state NewClip: Playing Sound " $ i);
+			//LogTime("Revolver: state NewClip: Playing Sound " $ i);
 			if ( bAltAmmo )
 				/*snID = */PlayOwnedSound(LoadAltShellSound, SLOT_Misc, FClamp(2.0* AeonsPlayer(Owner).VolumeMultiplier, 0.1, 2.0));
 			else
@@ -298,7 +301,7 @@ state NewClip
 				Sleep( GetSoundDuration(LoadShellSound) * AeonsPlayer(Owner).refireMultiplier);
 
 			//FinishSound(snID);
-			LogTime("Revolver: state NewClip: Finished Sound " $ i);
+			//LogTime("Revolver: state NewClip: Finished Sound " $ i);
 		}
 		
 		// sleep(1);
@@ -344,10 +347,13 @@ state Idle
         if ( bChangeWeapon )
             GotoState('DownWeapon');
 
-		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-			loopAnim('IdleMove',RefireMult);
-		else
-			loopAnim('IdleStill',RefireMult);
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				loopAnim('IdleMove',RefireMult, [TweenTime] TweenFrom('IdleStill', 0.5));
+			else
+				loopAnim('IdleStill',RefireMult, [TweenTime] TweenFrom('IdleMove', 0.5));
+		}
 	}
 
 	simulated function Timer()
@@ -365,6 +371,8 @@ state Idle
 		goto 'Begin';
 		
 	Begin:
+		ClientIdleWeapon();
+		PlayIdleAnim();
 		FinishAnim();
 		if ( bChangeWeapon )
 			GotoState('DownWeapon');
@@ -382,14 +390,14 @@ state ClientFiring
 {
 	simulated function AnimEnd()
 	{
-		Log("Revolver: state ClientFiring: AnimEnd");
+		//Log("Revolver: state ClientFiring: AnimEnd");
 		if ( (Pawn(Owner) == None) || (Ammotype.AmmoAmount <= 0) )
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 		else if ( !bCanClientFire )
-			GotoState('');
+			GotoState('ClientIdle');
 		else
 		{
 			if ( ClipCount <= 0 ) 
@@ -402,9 +410,8 @@ state ClientFiring
 			else
 			{
 				PlayIdleAnim();
-				GotoState('');
+				GotoState('ClientIdle');
 			}
-			
 		}
 	}
 }
@@ -435,27 +442,26 @@ state ClientReload
 
 	simulated function bool ClientFire(float Value)
 	{
-		bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
-		return bForceFire;
+		//bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
+		//return bForceFire;
+		return false;
 	}
 
 	simulated function Timer()
 	{
-		log("Revolver: state ClientReload: Timer: ClipCount=" $ ClipCount $ " ReloadCount=" $ ReloadCount); 
-		if ( ClipCount < ReloadCount )
+		//log("Revolver: state ClientReload: Timer: ClipCount=" $ ClipCount $ " ReloadCount=" $ ReloadCount); 
+		if ( ClipCount < ReloadCount && ClipCount < AmmoType.AmmoAmount )
 		{
 			if ( bAltAmmo )
 			{
 				PlaySound(LoadAltShellSound, SLOT_Misc, 2.0*AeonsPlayer(Owner).VolumeMultiplier);
-				//SetTimer(GetSoundDuration(LoadAltShellSounds[0]), false);
-				SetTimer(0.2,false);
+				SetTimer(GetSoundDuration(LoadAltShellSound) * AeonsPlayer(Owner).refireMultiplier,false);
 			}
 			else
 			{
-				log("Revolver: state ClientReload: Timer: PlayingSound"); 
+				//log("Revolver: state ClientReload: Timer: PlayingSound"); 
 				PlaySound(LoadShellSound, SLOT_Misc, 2.0*AeonsPlayer(Owner).VolumeMultiplier);
-				//SetTimer(GetSoundDuration(LoadShellSounds[0]), false);
-				SetTimer(0.2,false);
+				SetTimer(GetSoundDuration(LoadShellSound) * AeonsPlayer(Owner).refireMultiplier, false);
 			}
 
 		}
@@ -468,7 +474,7 @@ state ClientReload
 
 	simulated function AnimEnd()
 	{
-		log("Revolver: state ClientReload: AnimEnd: Sequence = " $ AnimSequence);
+		//log("Revolver: state ClientReload: AnimEnd: Sequence = " $ AnimSequence);
 
 		if ( ((AnimSequence == 'ReloadStart') || (AnimSequence == 'ReloadStart_Morph')) && (AmmoType.AmmoAmount > 0) )
 		{		
@@ -489,7 +495,7 @@ state ClientReload
 				return;
 			}
 		}			
-		GotoState('');
+		GotoState('ClientIdle');
 		Global.AnimEnd();
 	}
 
@@ -500,7 +506,7 @@ state ClientReload
 
 	simulated function BeginState()
 	{
-		log("Revolver: ClientReload State: BeginState() function call...");
+		//log("Revolver: ClientReload State: BeginState() function call...");
 //		GotoState(getStateName(), 'ReloadStart');
 		bForceFire = false;
 	}
@@ -571,8 +577,10 @@ defaultproperties
      PickupSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_RevPU1'
      bTimedTick=True
      MinTickTime=0.05
-     RotationRate=(Yaw=0)
+     bRotatingPickup=False
      Mesh=SkelMesh'Aeons.Meshes.Revolver_m'
      CollisionRadius=16
      CollisionHeight=16
+     DeathMessage="%k ventilated %o with a sixshooter."
+     AltDeathMessage="%k blasted %o with a sixshooter."
 }

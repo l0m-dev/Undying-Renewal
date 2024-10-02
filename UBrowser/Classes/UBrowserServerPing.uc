@@ -341,20 +341,20 @@ state GetStatus
 			else if(Value ~= "WantWorldLog")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(WorldLogText, LocalizeBoolValue(Value));
+				//AddRule(WorldLogText, LocalizeBoolValue(Value));
 			}
 			else if(Value ~= "WorldLog")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				if( Server.GameVer >= 406 )
-				{
-					if( Value ~= "True" )
-						AddRule(WorldLogWorkingText, WorldLogWorkingTrue);
-					else
-						AddRule(WorldLogWorkingText, WorldLogWorkingFalse);
-				}
-				else
-					AddRule(WorldLogText, LocalizeBoolValue(Value));
+				//if( Server.GameVer >= 406 )
+				//{
+				//	if( Value ~= "True" )
+				//		AddRule(WorldLogWorkingText, WorldLogWorkingTrue);
+				//	else
+				//		AddRule(WorldLogWorkingText, WorldLogWorkingFalse);
+				//}
+				//else
+				//	AddRule(WorldLogText, LocalizeBoolValue(Value));
 			}
 			else if(Value ~= "mutators")
 			{
@@ -364,40 +364,40 @@ state GetStatus
 			else if(Value ~= "goalteamscore")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(GoalTeamScoreText, Value);		
+				//AddRule(GoalTeamScoreText, Value);		
 			}
 			else if(Value ~= "minplayers")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				if(Value == "0")
-					AddRule(MultiplayerBotsText, FalseString);
-				else
-					AddRule(MinPlayersText, Value@PlayersText);		
+				//if(Value == "0")
+				//	AddRule(MultiplayerBotsText, FalseString);
+				//else
+				//	AddRule(MinPlayersText, Value@PlayersText);		
 			}
 			else if(Value ~= "changelevels")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(ChangeLevelsText, LocalizeBoolValue(Value));		
+				//AddRule(ChangeLevelsText, LocalizeBoolValue(Value));		
 			}
 			else if(Value ~= "botskill")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(BotSkillText, Value);		
+				//AddRule(BotSkillText, Value);		
 			}
 			else if(Value ~= "maxteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(MaxTeamsText, Value);
+				//AddRule(MaxTeamsText, Value);
 			}
 			else if(Value ~= "balanceteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(BalanceTeamsText, LocalizeBoolValue(Value));
+				//AddRule(BalanceTeamsText, LocalizeBoolValue(Value));
 			}
 			else if(Value ~= "playersbalanceteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(PlayersBalanceTeamsText, LocalizeBoolValue(Value));
+				//AddRule(PlayersBalanceTeamsText, LocalizeBoolValue(Value));
 			}
 			else if(Value ~= "friendlyfire")
 			{
@@ -412,7 +412,7 @@ state GetStatus
 			else if(Value ~= "tournament")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(TournamentText, LocalizeBoolValue(Value));
+				//AddRule(TournamentText, LocalizeBoolValue(Value));
 			}
 			else if(Value ~= "listenserver")
 			{

@@ -177,7 +177,8 @@ state Deactivated
 		//stopSound(sID);
 		
 		//PlaySound(EffectEndSound);
-		ht.bShuttingDown = true;
+		if (ht != None)
+			ht.Shutdown();
 		
 		bActive = false;
 		if ( !bHUDEffect )

@@ -12,7 +12,8 @@ function PreBeginPlay()
 	if ( (Owner != None) && (Owner.IsA('Pawn')) )
 	{
 		// log("PlayerEffects:PreBeginPlay:SetBase");
-		SetBase(Pawn(Owner));
+		if (Physics != PHYS_Trailer)
+			SetBase(Pawn(Owner));
 	} else {
 		// log("PlayerEffects:PreBeginPlay:Destroy");
 		Destroy();

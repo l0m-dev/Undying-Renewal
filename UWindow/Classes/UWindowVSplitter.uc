@@ -18,7 +18,7 @@ function Created()
 	Super.Created();
 	bAlwaysBehind = True;
 	SplitPos = WinHeight / 2;
-	MinWinHeight = 24;
+	MinWinHeight = 24*Root.ScaleY;
 
 	OldWinHeight = WinHeight;
 }
@@ -28,7 +28,7 @@ function Paint(Canvas C, float X, float Y)
 	local Texture T;
 
 	T = GetLookAndFeelTexture();
-	DrawUpBevel(C, 0, SplitPos, WinWidth, 7, T);
+	DrawUpBevel(C, 0, SplitPos, WinWidth, 7*Root.ScaleY, T);
 }
 
 function BeforePaint(Canvas C, float X, float Y) 
@@ -41,7 +41,7 @@ function BeforePaint(Canvas C, float X, float Y)
 		SplitPos = SplitPos + WinHeight - OldWinHeight;
 	}
 
-	SplitPos = FClamp(SplitPos, MinWinHeight, WinHeight - 7 - MinWinHeight);
+	SplitPos = FClamp(SplitPos, MinWinHeight, WinHeight - 7*Root.ScaleY - MinWinHeight);
 	if(MaxSplitPos != 0)
 		SplitPos = FClamp(SplitPos, 0, MaxSplitPos);
 
@@ -53,13 +53,13 @@ function BeforePaint(Canvas C, float X, float Y)
 		TopClientWindow.SetSize(NewW, NewH);
 	}
 
-	NewH = WinHeight - SplitPos - 7;
+	NewH = WinHeight - SplitPos - 7*Root.ScaleY;
 
 	if(NewW != BottomClientWindow.WinWidth || NewH != BottomClientWindow.WinHeight)
 	{
 		BottomClientWindow.SetSize(NewW, NewH);
 	}
-	BottomClientWindow.WinTop = SplitPos + 7;
+	BottomClientWindow.WinTop = SplitPos + 7*Root.ScaleY;
 	BottomClientWindow.WinLeft = 0;
 
 	OldWinHeight = WinHeight;
@@ -69,7 +69,7 @@ function LMouseDown(float X, float Y)
 {
 	Super.LMouseDown(X, Y);
 
-	if(bSizable && (Y >= SplitPos) && (Y <= SplitPos + 7)) 
+	if(bSizable && (Y >= SplitPos) && (Y <= SplitPos + 7*Root.ScaleY)) 
 	{
 		bSizing = True;
 		Root.CaptureMouse();
@@ -79,10 +79,10 @@ function LMouseDown(float X, float Y)
 function MouseMove(float X, float Y)
 {
 
-	if(bSizable && (Y >= SplitPos) && (Y <= SplitPos + 7)) 
+	if(bSizable && (Y >= SplitPos) && (Y <= SplitPos + 7*Root.ScaleY)) 
 		Cursor = Root.VSplitCursor;
 	else
-		Cursor = Root.NormalCursor;
+		Cursor = Root.DefaultNormalCursor;
 
 	if(bSizing && bMouseDown)
 	{

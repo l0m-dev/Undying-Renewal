@@ -7,7 +7,7 @@ var() int SoftDecalLimit;			// number of decals we don't want to go over
 var() int HardDecalLimit;			// number of decals we will never go over
 var int NumDecals;					// num decals in the level right now.
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local Decal D;
 	
@@ -29,10 +29,16 @@ function Tick(float DeltaTime)
 	}
 }
 
+simulated function Destroyed()
+{
+	Level.DMan = None;
+}
+
 defaultproperties
 {
      SoftDecalLimit=100
      HardDecalLimit=200
      bTimedTick=True
      MinTickTime=0.25
+     RemoteRole=ROLE_None
 }

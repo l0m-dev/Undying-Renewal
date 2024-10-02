@@ -136,18 +136,21 @@ function StartLevel()
 {
 	local PlayerPawn Player;
 	
-	ForEach AllActors(class 'PlayerPawn', Player)
-	{
-		break;
-	}
-
 	if ( ItemName == "" )
 		ItemName = GetItemName(string(Class));
 
-	if ( (ConditionalEvent != 'none') && Owner != None && !Owner.IsA('PlayerPawn') )
-		if ( Player != None && Player.CheckGameEvent(ConditionalEvent) )
-			Destroy();
-		
+	if ( (ConditionalEvent != 'none') && (Owner == None || !Owner.IsA('PlayerPawn')) )
+	{
+		ForEach AllActors(class 'PlayerPawn', Player)
+		{
+			if ( Player != None && Player.CheckGameEvent(ConditionalEvent) )
+			{
+				Destroy();
+				break;
+			}
+		}
+	}
+	
 	Super.StartLevel();
 }
 
@@ -427,7 +430,7 @@ function bool HandlePickupQuery( inventory Item )
 
 // This function just returns the next inventory item - it doesn't
 // select it or play any messages liek SelectNext() does
-function Inventory GetNext()
+simulated function Inventory GetNext()
 {
 	if ( bActivatable ) 
 	{
@@ -442,7 +445,7 @@ function Inventory GetNext()
 //
 // Select first activatable item.
 //
-function Inventory SelectNext()
+simulated function Inventory SelectNext()
 {
 	if ( bActivatable ) 
 	{
@@ -474,6 +477,7 @@ function DropFrom(vector StartLocation)
 	RemoteRole = ROLE_DumbProxy;
 	BecomePickup();
 	NetPriority = 2.5;
+	NetUpdateFrequency = 20;
 	bCollideWorld = true;
 	if ( Pawn(Owner) != None )
 		Pawn(Owner).DeleteInventory(self);
@@ -505,13 +509,27 @@ function Use( pawn User );
 // Find an item in inventory that has an Inventory Group matching F.
 
 simulated function Inventory FindItemInGroup( byte F )
-{	
-	if ( InventoryGroup == F )
-		return self;
-	else if ( Inventory == None )
-		return None;
-	else
-		return Inventory.FindItemInGroup(F);
+{
+	local Inventory Inv;
+	local Weapon newWeapon;
+	local int Count;
+
+	for( Inv=self; Inv!=None && Count < 1000; Inv=Inv.Inventory )
+	{
+		if ( Inv.InventoryGroup == F )
+		{
+			newWeapon = Weapon(Inv);
+			if ( newWeapon != None )
+			{
+				newWeapon.checkAltAmmo();
+				newWeapon.bHaveTokens = ((newWeapon.AmmoType == None) || (newWeapon.AmmoType.AmmoAmount > 0));
+			}
+			return Inv;
+		}
+		Count++;
+	}
+
+	return None;
 }
 
 //=============================================================================
@@ -711,14 +729,18 @@ auto state Pickup
 	function Trigger( Actor Other, Pawn EventInstigator )
 	{
 		local PlayerPawn P;
-		
-		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			break;
-		}
 
-		if ( p!= none )
-			Touch(P);
+		if (EventInstigator != None && EventInstigator.IsA('PlayerPawn'))
+		{
+			Touch(EventInstigator);
+		}
+		else
+		{
+			ForEach AllActors(class 'PlayerPawn', P)
+			{
+				Touch(P);
+			}
+		}
 	}
 		
 	// When touched by an actor.
@@ -755,6 +777,7 @@ auto state Pickup
 		local rotator newRot;
 		newRot = Rotation;
 		newRot.pitch = 0;
+		netUpdateFrequency = default.NetUpdateFrequency;
 		SetRotation(newRot);
 		SetTimer(2.0, false);
 	}
@@ -803,7 +826,9 @@ auto state Pickup
 			SetTimer(30, false);
 		else if ( Level.bStartup )
 		{
-			bAlwaysRelevant = true;
+			// if this is set, inventory doesn't replicate properly (owner is None on the client), why?
+			// probably because NoVariablesToReplicate() is used only if bAlwaysRelevant
+			//bAlwaysRelevant = true;
 			NetUpdateFrequency = 8;
 		}
 	}
@@ -918,4 +943,5 @@ defaultproperties
      bCollideActors=True
      bFixedRotationDir=True
      NetPriority=1.4
+     NetUpdateFrequency=10
 }

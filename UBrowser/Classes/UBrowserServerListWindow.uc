@@ -136,7 +136,7 @@ function Created()
 
 	VSplitter = UWindowVSplitter(CreateWindow(class'UWindowVSplitter', 0, 0, WinWidth, WinHeight));
 	VSplitter.SetAcceptsFocus();
-	VSplitter.MinWinHeight = 60;
+	VSplitter.MinWinHeight = 60*Root.ScaleY;
 	VSplitter.HideWindow();
 	InfoWindow = UBrowserMainClientWindow(GetParent(class'UBrowserMainClientWindow')).InfoWindow;
 	InfoClient = UBrowserInfoClientWindow(InfoWindow.ClientArea);
@@ -222,7 +222,7 @@ function Resized()
 	{
 		VSplitter.SetSize(WinWidth, WinHeight);
 		VSplitter.OldWinHeight = VSplitter.WinHeight;
-		VSplitter.SplitPos = VSplitter.WinHeight - Min(VSplitter.WinHeight / 2, 250);
+		VSplitter.SplitPos = VSplitter.WinHeight - Min(VSplitter.WinHeight / 2, 250*Root.ScaleY);
 	}
 	else
 		Grid.SetSize(WinWidth, WinHeight);

@@ -138,6 +138,7 @@ singular function BaseChange()
 		decorMass2 = FMax(Decoration(Base).Mass, 1);
 		DInfo.Damage = (1 - decorMass/decorMass2 * Velocity.Z/30);
 		DInfo.DamageType = 'stomped';
+		DInfo.Deliverer = self;
 		if ( Base.AcceptDamage(DInfo) )
 			Base.TakeDamage( Instigator, Location, 0.2 * Velocity, DInfo);
 		Velocity.Z = 100;

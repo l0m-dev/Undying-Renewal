@@ -10,7 +10,7 @@ class CreateGameWindow expands ShellWindow;
 #exec Texture Import File=CreateGame_1.bmp Mips=Off
 #exec Texture Import File=CreateGame_2.bmp Mips=Off
 //#exec Texture Import File=Video_3.bmp Mips=Off
-//#exec Texture Import File=Video_4.bmp Mips=Off
+#exec Texture Import File=CreateGame_4.bmp Mips=Off
 #exec Texture Import File=CreateGame_5.bmp Mips=Off
 
 //#exec Texture Import File=video_advan_up.bmp Mips=Off
@@ -52,24 +52,28 @@ var ShellButton OK;
 var ShellButton Cancel;
 var ShellButton Down;
 var ShellButton Up;
-var ShellButton Coop, Multiplayer;
-var ShellButton ChangeDedicated;
+var ShellButton Listen, Dedicated;
+var ShellButton GameTypeLabel;
 
-var ShellLabel LocalIPLabel;
-var ShellLabel IpLabel;
+var ShellLabel ServerNameLabel;
+var ShellLabelAutoWrap MapNameLabel;
+
+var ShellLabel DriverLabel;
+var ShellLabel ResLabel;
 
 var ShellSlider MaxPlayersSlider;
 
 var int MaxPlayers;
 
-var string map;
-var string URL;
+var string Map;
+var string MapName;
+var string GameType;
+var string GameTypeName;
 
 var localized string DedicatedText, ListenText;
 
 var sound ChangeSound;
 var bool bInitialized;
-var bool bCoop;
 var bool bDedicated;
 
 var int		SmokingWindows[3];
@@ -77,6 +81,11 @@ var float	SmokingTimers[3];
 
 var string ScreenShotName;
 var ShellBitmap ScreenShot;
+
+var DifficultyWindow DifficultyWindow;
+
+var bool bAdvancedSettingsUpdated;
+var AdvCreateGameGeneralPage AdvGameplayPage;
 
 //----------------------------------------------------------------------------
 
@@ -86,11 +95,6 @@ function Created()
 	local int i;
 	local color TextColor;
 	local float RootScaleX, RootScaleY;
-	
-	if(!bInitialized) {
-		bCoop = true;
-		bDedicated = false;
-	}
 
 	Super.Created();
 	
@@ -102,7 +106,7 @@ function Created()
 
 	Advanced = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
-	Advanced.Template = NewRegion(578,480,160,64);
+	Advanced.Template = NewRegion(566,405,160,64);
 
 	Advanced.TexCoords.X = 0;
 	Advanced.TexCoords.Y = 0;
@@ -121,6 +125,7 @@ function Created()
 	Advanced.DisabledTexture = None;
 
 	// Max Players Slider
+	/*
 	MaxPlayersSlider = ShellSlider(CreateWindow(class'ShellSlider', 515*RootScaleX, 386*RootScaleY, 228*RootScaleX, 26*RootScaleY));
 
 	MaxPlayersSlider.TexCoords = NewRegion(0,0,32,32);
@@ -140,6 +145,7 @@ function Created()
 	MaxPlayersSlider.DownTexture = texture'aeons.cntrl_slidr';
 	MaxPlayersSlider.OverTexture = texture'aeons.cntrl_slidr';
 	MaxPlayersSlider.DisabledTexture = None;
+	*/
 
 // Map buttons
 	for( i=0; i<5; i++ )
@@ -169,7 +175,8 @@ function Created()
 		Maps[i].Font = 4;
 	}
 
-	MapList[ 0] = "SmokeTest";	
+	//MapList[] = "MAX BUTTON LENGTH";
+	MapList[ 0] = "Manor_FrontGate";	
 	MapList[ 1] = "Playground";
 	MapList[ 2] = "Catacombs_Cisterns";
 	MapList[ 3] = "Catacombs_Entrance";
@@ -193,9 +200,6 @@ function Created()
 	MapList[21] = "PiratesCove_TreasureRoom";
 	MapList[22] = "StandingStones_FirstVisit";
 	MapList[23] = "StandingStones_KingFight";
-	
-	map = "SmokeTest";
-	URL = "SmokeTest";
 
 // Map scroll buttons
 	Up =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
@@ -230,81 +234,81 @@ function Created()
 	Down.DisabledTexture = texture'Cntrl_dnbut_ds';
 
 
-// Coop Button
-	Coop = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+// Listen Button
+	Listen = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
-	//Coop.TexCoords.X = NewRegion(0,0,82,36);
+	//Listen.TexCoords.X = NewRegion(0,0,82,36);
 	
 	// position and size in designed resolution of 800x600
-	Coop.Template = NewRegion(550,311,82,36);
+	Listen.Template = NewRegion(550,311,72,36);
 
-	Coop.Manager = Self;
-	Coop.Style = 5;
-	Coop.Text = "Coop";
+	Listen.Manager = Self;
+	Listen.Style = 5;
+	Listen.Text = ListenText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	Coop.SetTextColor(TextColor);
-	Coop.Align = TA_Center;
-	Coop.Font = 4;
+	Listen.SetTextColor(TextColor);
+	Listen.Align = TA_Center;
+	Listen.Font = 4;
 
 
-	Coop.TexCoords = NewRegion(0,0,204,54);
-	Coop.UpTexture =   None;//texture'Video_Coop_up';
-	Coop.DownTexture = None;//texture'Video_Coop_dn';
-	Coop.OverTexture = None;//texture'Video_Coop_ov';
-	Coop.DisabledTexture = None;
+	Listen.TexCoords = NewRegion(0,0,204,54);
+	Listen.UpTexture =   None;//texture'Video_Coop_up';
+	Listen.DownTexture = None;//texture'Video_Coop_dn';
+	Listen.OverTexture = None;//texture'Video_Coop_ov';
+	Listen.DisabledTexture = None;
 
 
 	
-// Multiplayer button	
-	Multiplayer = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+// Dedicated button	
+	Dedicated = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
-	//Multiplayer.TexCoords.X = NewRegion(0,0,82,36);
+	//Dedicated.TexCoords.X = NewRegion(0,0,82,36);
 	
 	// position and size in designed resolution of 800x600
-	Multiplayer.Template = NewRegion(644,309,82,36);
+	Dedicated.Template = NewRegion(626,309,105,36);
 
-	Multiplayer.Manager = Self;
-	Multiplayer.Style = 5;
-	Multiplayer.Text = "Deathmatch";
+	Dedicated.Manager = Self;
+	Dedicated.Style = 5;
+	Dedicated.Text = DedicatedText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	Multiplayer.SetTextColor(TextColor);
-	Multiplayer.TextStyle=1;
-	Multiplayer.Align = TA_Center;
-	Multiplayer.Font = 4;
+	Dedicated.SetTextColor(TextColor);
+	Dedicated.TextStyle=1;
+	Dedicated.Align = TA_Center;
+	Dedicated.Font = 4;
 
-	Multiplayer.TexCoords = NewRegion(0,0,204,54);
-	Multiplayer.UpTexture =			None;
-	Multiplayer.DownTexture =		None;
-	Multiplayer.OverTexture =		None;
-	Multiplayer.DisabledTexture =	None;
+	Dedicated.TexCoords = NewRegion(0,0,204,54);
+	Dedicated.UpTexture =			None;
+	Dedicated.DownTexture =		None;
+	Dedicated.OverTexture =		None;
+	Dedicated.DisabledTexture =	None;
 
 
 // Change Dedicated button	
-	ChangeDedicated = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+	GameTypeLabel = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 	
-	ChangeDedicated.TexCoords = NewRegion(0,0,204,54);
-	ChangeDedicated.Template = NewRegion(556,260,180,48);
+	GameTypeLabel.TexCoords = NewRegion(0,0,204,54);
+	GameTypeLabel.Template = NewRegion(556,260,180,48);
 	
-	ChangeDedicated.Manager = Self;
-	ChangeDedicated.Style = 5;
-	ChangeDedicated.Text = ListenText;
+	GameTypeLabel.Manager = Self;
+	GameTypeLabel.Style = 5;
+	GameTypeLabel.Text = default.GameTypeName;
 
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	ChangeDedicated.SetTextColor(TextColor);
-	ChangeDedicated.TextStyle=1;
-	ChangeDedicated.Align = TA_Center;
-	ChangeDedicated.Font = 4;
+	GameTypeLabel.SetTextColor(TextColor);
+	GameTypeLabel.TextStyle=1;
+	GameTypeLabel.Align = TA_Center;
+	GameTypeLabel.Font = 4;
 
-	ChangeDedicated.UpTexture =		texture'Video_resol_up';
-	ChangeDedicated.DownTexture =		texture'Video_resol_up';
-	ChangeDedicated.OverTexture =		texture'Video_resol_ov';
-	ChangeDedicated.DisabledTexture =	None;
+	GameTypeLabel.UpTexture =		texture'Video_resol_up';
+	GameTypeLabel.DownTexture =		texture'Video_resol_up';
+	GameTypeLabel.OverTexture =		texture'Video_resol_ov';
+	GameTypeLabel.DisabledTexture =	None;
 
 // OK Button
 	OK = ShellButton(CreateWindow(class'ShellButton', 30*RootScaleX, 108*RootScaleY, 138*RootScaleX, 60*RootScaleY));
@@ -350,31 +354,29 @@ function Created()
 	Cancel.OverTexture = texture'Video_cancel_ov';
 	Cancel.DisabledTexture = None;
 
-// Local IP label
-	LocalIPLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+// Server name label
+	ServerNameLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
 
-	LocalIPLabel.Template=NewRegion(566, 183, 158, 38);
-	LocalIPLabel.Manager = Self;
-	LocalIPLabel.Text = "Local IP";
+	ServerNameLabel.Template=NewRegion(566, 190, 158, 38);
+	ServerNameLabel.Manager = Self;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
-	LocalIPLabel.SetTextColor(TextColor);
-	LocalIPLabel.Align = TA_Center;
-	LocalIPLabel.Font = 4;
+	ServerNameLabel.SetTextColor(TextColor);
+	ServerNameLabel.Align = TA_Center;
+	ServerNameLabel.Font = F_Normal;
 
-//Ip label
-	IpLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+// Map name Label
+	MapNameLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
 
-	IpLabel.Template=NewRegion(566, 218, 158, 38);
-	IpLabel.Manager = Self;
-	IpLabel.Text = "127.0.0.1";
+	MapNameLabel.Template=NewRegion(560, 235, 164, 38);
+	MapNameLabel.Manager = Self;
 	TextColor.R = 255;
-	TextColor.G = 255;
-	TextColor.B = 255;
-	IpLabel.SetTextColor(TextColor);
-	IpLabel.Align = TA_Center;
-	IpLabel.Font = 4;
+	TextColor.G = 215;
+	TextColor.B = 0;
+	MapNameLabel.SetTextColor(TextColor);
+	MapNameLabel.Align = TA_Center;
+	MapNameLabel.Font = F_Normal;
 	
 //Map screenshot
 	ScreenShot = ShellBitmap(CreateWindow(class'ShellBitmap', 10,10,10,10));
@@ -384,6 +386,15 @@ function Created()
 	ScreenShot.bStretch = true;
 	ScreenShot.Style = 5;
 	ScreenShot.Manager = Self;
+	MapNametoScreenShot( default.Map );
+
+	if (AdvCreateGame == None )
+	{
+		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 400, 100, 300, 200);
+		AdvCreateGame.HideWindow();
+
+		AdvGameplayPage = AdvCreateGameWindow(AdvCreateGame).GameplayPage;
+	}
 	
 	// initialize resolution list and scroll buttons
 	CurrentRow = 0;
@@ -391,6 +402,10 @@ function Created()
 	Down.bDisabled = false;
 
 	Root.Console.bBlackout = True;
+
+	i = AdvGameplayPage.MapCombo.FindItemIndex("Manor_FrontGate", true);
+	if (i != -1)
+		AdvGameplayPage.MapCombo.SetSelectedIndex(i);
 
 	GetCurrentSettings();
 	RefreshButtons();
@@ -401,8 +416,6 @@ function Created()
 
 function Message(UWindowWindow B, byte E)
 {
-	local string Checksum;
-	
 	switch (E)
 	{
 		case DE_DoubleClick:
@@ -416,44 +429,7 @@ function Message(UWindowWindow B, byte E)
 					break;
 
 				case OK:
-					URL = map $ "?Listen?nosave?-nointro?Difficulty=2" $ "?MaxPlayers=" $ MaxPlayers;
-					
-					if (bCoop)
-						URL = URL $ "?Game=Aeons.Coop";
-					else
-						URL = URL $ "?Game=Aeons.DeathMatchGame";
-					
-					class'StatLog'.Static.GetPlayerChecksum(GetPlayerOwner(), Checksum);
-					
-					if (Checksum == "")
-						URL = URL $ "?Checksum=NoChecksum";
-					else
-						URL = URL $ "?Checksum="$Checksum;
-					
-					if(bDedicated)
-						GetPlayerOwner().ConsoleCommand("RELAUNCH " $ URL $ "-server");
-					else {
-						//GetPlayerOwner().ConsoleCommand("start " $ URL);  
-						//GetPlayerOwner().ConsoleCommand("addall"); // needs a delay...
-	
-						GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
-						
-						//GetPlayerOwner().Level.bLoadBootShellPSX2 = true;
-					}
-
-					PlayNewScreenSound();
-					Close();
-					ParentWindow.Close();
-					
-					MainMenuWindow(AeonsRootWindow(Root).MainMenu).Close();
-					//AeonsRootWindow(Root).MainMenu.Close();
-					//MainMenuWindow(AeonsRootWindow(Root).MainMenu).Multiplayer
-					//MainMenuWindow(AeonsRootWindow(Root).MainMenu).Single.Close();
-					//MainMenuWindow(AeonsRootWindow(Root).MainMenu).StopShellAmbient();
-					
-					//Root.Console.bLocked = False;
-					//Root.Console.CloseUWindow();
-					
+					CreateGamePressed();
 					break;
 
 				case Cancel:
@@ -466,7 +442,7 @@ function Message(UWindowWindow B, byte E)
 				case Maps[2]:
 				case Maps[3]:
 				case Maps[4]:
-					ResolutionClicked(B);	
+					MapClicked(B);	
 					break;
 
 				case Up:
@@ -477,16 +453,16 @@ function Message(UWindowWindow B, byte E)
 					ScrolledDown();
 					break;
 
-				case Coop:
-					SetSingleplayer(true);
+				case GameTypeLabel:
+					GameTypePressed();
 					break;
 
-				case Multiplayer:
-					SetSingleplayer(false);
+				case Listen:
+					SetServerMode(false);
 					break;
-					
-				case ChangeDedicated:
-					ChangeDedicatedPressed();
+
+				case Dedicated:
+					SetServerMode(true);
 					break;
 			}
 			break;
@@ -602,46 +578,49 @@ function OverEffect(ShellButton B)
 	}
 }
 
-function SetSingleplayer( bool SP )
+function GameTypePressed()
 {
-		bCoop = SP;
-
-		if ( bCoop )
-		{
-			Coop.UpTexture = texture'Video_resol_dn';
-			Coop.OverTexture = texture'Video_resol_dn';
-			Coop.DownTexture = texture'Video_resol_dn';
-
-			Multiplayer.UpTexture = texture'Video_resol_up';
-			Multiplayer.OverTexture = texture'Video_resol_ov';
-			Multiplayer.DownTexture = texture'Video_resol_up';
-		}
-		else
-		{
-			Multiplayer.UpTexture = texture'Video_resol_dn';
-			Multiplayer.OverTexture = texture'Video_resol_dn';
-			Multiplayer.DownTexture = texture'Video_resol_dn';
-
-			Coop.UpTexture = texture'Video_resol_up';
-			Coop.OverTexture = texture'Video_resol_ov';
-			Coop.DownTexture = texture'Video_resol_up';
-		}
-}
-
-function ChangeDedicatedPressed()
-{
-	bDedicated = !bDedicated;
+	local int GameIndex;
 	
-	if (bDedicated)
-		ChangeDedicated.Text = DedicatedText;
-	else
-		ChangeDedicated.Text = ListenText;
+	GameIndex = AdvGameplayPage.GameCombo.GetSelectedIndex() + 1;
+
+	if (GameIndex >= AdvGameplayPage.MaxGames)
+		GameIndex = 0;
+
+	AdvGameplayPage.GameCombo.SetSelectedIndex(GameIndex);
 }
 
-function ResolutionClicked(UWindowWindow B)
+function SetServerMode( bool bMode )
 {
-	map = ShellButton(b).Text;
-	MapNametoScreenShot( map );
+	default.bDedicated = bMode;
+
+	if ( default.bDedicated )
+	{
+		Dedicated.UpTexture = texture'Video_resol_dn';
+		Dedicated.OverTexture = texture'Video_resol_dn';
+		Dedicated.DownTexture = texture'Video_resol_dn';
+
+		Listen.UpTexture = texture'Video_resol_up';
+		Listen.OverTexture = texture'Video_resol_ov';
+		Listen.DownTexture = texture'Video_resol_up';
+	}
+	else
+	{
+		Dedicated.UpTexture = texture'Video_resol_up';
+		Dedicated.OverTexture = texture'Video_resol_ov';
+		Dedicated.DownTexture = texture'Video_resol_up';
+
+		Listen.UpTexture = texture'Video_resol_dn';
+		Listen.OverTexture = texture'Video_resol_dn';
+		Listen.DownTexture = texture'Video_resol_dn';
+	}
+}
+
+function MapClicked(UWindowWindow B)
+{
+	default.Map = ShellButton(b).Text;
+	default.MapName = FormatString(default.Map, "_", " ");
+	MapNametoScreenShot( default.Map );
 }
 
 function ScrolledUp()
@@ -694,7 +673,7 @@ function RefreshButtons()
 
 	for( i=0; i<ArrayCount(Maps); i++ )
 	{
-		Maps[i].Text = MapList[CurrentRow + i];
+		Maps[i].SetText(MapList[CurrentRow + i]);
 	}
 
 }
@@ -713,26 +692,45 @@ function MaxPlayersChanged()
 
 function GetCurrentSettings()
 {
-	if ( bCoop )
-	{
-		Coop.UpTexture = texture'Video_resol_dn';
-		Coop.OverTexture = texture'Video_resol_dn';
-		Coop.DownTexture = texture'Video_resol_dn';
+	SetServerMode(default.bDedicated);
+}
 
-		Multiplayer.UpTexture = texture'Video_resol_up';
-		Multiplayer.OverTexture = texture'Video_resol_ov';
-		Multiplayer.DownTexture = texture'Video_resol_up';
-	}
+function CreateGamePressed()
+{
+	local string URL, Checksum;
+
+	URL = default.Map $ "?nosave" $ "?MaxPlayers=" $ MaxPlayers $ "?Game=" $ default.GameType;
+	
+	class'StatLog'.Static.GetPlayerChecksum(GetPlayerOwner(), Checksum);
+	
+	if (Checksum == "")
+		URL = URL $ "?Checksum=NoChecksum";
 	else
-	{
-		Multiplayer.UpTexture = texture'Video_resol_dn';
-		Multiplayer.OverTexture = texture'Video_resol_dn';
-		Multiplayer.DownTexture = texture'Video_resol_dn';
+		URL = URL $ "?Checksum="$Checksum;
 
-		Coop.UpTexture = texture'Video_resol_up';
-		Coop.OverTexture = texture'Video_resol_ov';
-		Coop.DownTexture = texture'Video_resol_up';
+	PlayNewScreenSound();
+	
+	if (!default.bDedicated)
+	{
+		URL = URL $ "?Listen";
+
+		GetPlayerOwner().ConsoleCommand("deletesavelevels");
 	}
+
+	if (DifficultyWindow == None)
+		DifficultyWindow = DifficultyWindow(Root.CreateWindow(class'DifficultyWindow', 100, 100, 200, 200, Self, True));
+	else
+		DifficultyWindow.ShowWindow();
+		
+	DifficultyWindow.StartMap = URL;
+	DifficultyWindow.bDedicated = default.bDedicated;
+
+	//Close();
+	//ParentWindow.Close();
+	//MainMenuWindow(AeonsRootWindow(Root).MainMenu).Close();
+	
+	//Root.Console.bLocked = False;
+	//Root.Console.CloseUWindow();
 }
 
 function AdvCreateGamePressed()
@@ -740,7 +738,7 @@ function AdvCreateGamePressed()
 	PlayNewScreenSound();
 
 	if (AdvCreateGame == None ) 
-		AdvCreateGame = ManagerWindow(Root.CreateWindow(class'AdvCreateGameWindow', 100, 100, 200, 200, Root, True));
+		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 400, 100, 300, 200);
 	else
 		AdvCreateGame.ShowWindow();		
 }
@@ -775,11 +773,11 @@ function Resized()
 	if ( Down != None ) 
 		Down.ManagerResized(RootScaleX, RootScaleY);
 
-	Coop.ManagerResized(RootScaleX, RootScaleY);
-	Multiplayer.ManagerResized(RootScaleX, RootScaleY);
-	LocalIPLabel.ManagerResized(RootScaleX, RootScaleY);
-	IpLabel.ManagerResized(RootScaleX, RootScaleY);
-	ChangeDedicated.ManagerResized(RootScaleX, RootScaleY);
+	Listen.ManagerResized(RootScaleX, RootScaleY);
+	Dedicated.ManagerResized(RootScaleX, RootScaleY);
+	ServerNameLabel.ManagerResized(RootScaleX, RootScaleY);
+	MapNameLabel.ManagerResized(RootScaleX, RootScaleY);
+	GameTypeLabel.ManagerResized(RootScaleX, RootScaleY);
 	ScreenShot.ManagerResized(RootScaleX, RootScaleY);
 	
 	for ( i=0; i<ArrayCount(Maps); i++ )
@@ -803,10 +801,21 @@ function Paint(Canvas C, float X, float Y)
 	Super.PaintSmoke(C, Advanced, SmokingWindows[1], SmokingTimers[1]);
 	Super.PaintSmoke(C, Cancel, SmokingWindows[2], SmokingTimers[2]);
 
+	MapNameLabel.Text = default.MapName;
+	ServerNameLabel.Text = class'Engine.GameReplicationInfo'.default.ServerName;
+	GameTypeLabel.Text = default.GameTypeName;
+
+	if ( default.bAdvancedSettingsUpdated )
+	{
+		default.bAdvancedSettingsUpdated = false;
+
+		default.MapName = FormatString(default.Map, "_", " ");
+		MapNametoScreenShot( default.Map );
+	}
 
 	for ( i=0; i<ArrayCount(Maps); i++ )
 	{
-		if ( map ~= Maps[i].Text )
+		if ( default.Map ~= Maps[i].Text )
 		{
 			//DrawStretchedTexture(C, Maps[i].WinLeft, Maps[i].WinTop, Maps[i].WinWidth, Maps[i].WinHeight, texture'Aeons.Particles.SOft_pfx');		
 			Maps[i].UpTexture = texture'Video_resol_dn';
@@ -826,9 +835,21 @@ function Paint(Canvas C, float X, float Y)
 
 }
 
+function NotifyBeforeLevelChange()
+{
+	Super.NotifyBeforeLevelChange();	
+
+	Close();
+	ParentWindow.Close();
+	MainMenuWindow(AeonsRootWindow(Root).MainMenu).Close();
+}
+
 
 function Close(optional bool bByParent)
 {
+	if (AdvCreateGame != None)
+		AdvCreateGame.HideWindow();
+	
 	HideWindow();
 }
 
@@ -854,13 +875,13 @@ function HideWindow()
 
 defaultproperties
 {
-     DedicatedText="Dedicated Server"
-     ListenText="Listen Server"
+     DedicatedText="Dedicated"
+     ListenText="Listen"
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      BackNames(0)="UndyingShellPC.CreateGame_0"
      BackNames(1)="UndyingShellPC.CreateGame_1"
      BackNames(2)="UndyingShellPC.CreateGame_2"
      BackNames(3)="UndyingShellPC.Video_3"
-     BackNames(4)="UndyingShellPC.Video_4"
+     BackNames(4)="UndyingShellPC.CreateGame_4"
      BackNames(5)="UndyingShellPC.CreateGame_5"
 }

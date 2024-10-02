@@ -113,29 +113,27 @@ function bool ReplaceWith(actor Other, string aClassName)
 	local Actor A;
 	local class<Actor> aClass;
 
-	if ( Other.IsA('Inventory') && (Other.Location == vect(0,0,0)) )
-		return false;
+	if ( aClassName == "" )
+		return true;
+
 	aClass = class<Actor>(DynamicLoadObject(aClassName, class'Class'));
 	if ( aClass != None )
 		A = Spawn(aClass,Other.Owner,Other.tag,Other.Location, Other.Rotation);
-	if ( Other.IsA('Inventory') )
+	if ( Other.IsA('Pickup') )
 	{
-		if ( Inventory(Other).MyMarker != None )
+		if ( Pickup(Other).MyMarker != None )
 		{
-			Inventory(Other).MyMarker.markedItem = Inventory(A);
-			if ( Inventory(A) != None )
+			Pickup(Other).MyMarker.markedItem = Pickup(A);
+			if ( Pickup(A) != None )
 			{
-				Inventory(A).MyMarker = Inventory(Other).MyMarker;
-				A.SetLocation(A.Location 
+				Pickup(A).MyMarker = Pickup(Other).MyMarker;
+				A.SetLocation(A.Location
 					+ (A.CollisionHeight - Other.CollisionHeight) * vect(0,0,1));
 			}
-			Inventory(Other).MyMarker = None;
+			Pickup(Other).MyMarker = None;
 		}
-		else if ( A.IsA('Inventory') )
-		{
-			Inventory(A).bHeldItem = true;
-			Inventory(A).Respawntime = 0.0;
-		}
+		else if ( A.IsA('Pickup') )
+			Pickup(A).Respawntime = 0.0;
 	}
 	if ( A != None )
 	{

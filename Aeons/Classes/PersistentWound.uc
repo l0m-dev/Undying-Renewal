@@ -57,7 +57,7 @@ state Spurting
 
 	simulated function Timer()
 	{
-		P.bShuttingDown = true;
+		P.Shutdown();
 		Destroy();
 	}
 

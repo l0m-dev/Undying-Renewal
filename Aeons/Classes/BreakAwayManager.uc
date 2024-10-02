@@ -13,22 +13,45 @@ function FindPlayer()
 	}
 }
 
-function Tick( float DeltaTime)
+simulated function Tick( float DeltaTime)
 {
 	local BreakAwayEffect B;
-	
-	if (Player == none)
-		FindPlayer();
+	local PlayerPawn P;
 
-	if (Player != none)
+	if (Level.NetMode == NM_Standalone)
 	{
-		ForEach RadiusActors  ( class 'BreakAwayEffect', B, 384, Player.Location )
+		if (Player == none)
+			FindPlayer();
+
+		if (Player != none)
 		{
-			if ( VSize(Player.Location - B.Location) < 256 )
+			ForEach RadiusActors  ( class 'BreakAwayEffect', B, 384, Player.Location )
 			{
-				B.Trigger(Player, none);
-			} else {
-				B.UnTrigger(Player, none);
+				if ( VSize(Player.Location - B.Location) < 256 )
+				{
+					B.Trigger(Player, none);
+				}
+				else
+				{
+					B.UnTrigger(Player, none);
+				}
+			}
+		}
+	}
+	else if (Level.NetMode != NM_DedicatedServer)
+	{
+		ForEach AllActors(class 'PlayerPawn', P)
+		{
+			ForEach RadiusActors  ( class 'BreakAwayEffect', B, 384, P.Location )
+			{
+				if ( VSize(P.Location - B.Location) < B.BreakAwayDistance )
+				{
+					B.Trigger(P, none);
+				}
+				else
+				{
+					B.UnTrigger(P, none);
+				}
 			}
 		}
 	}
@@ -36,4 +59,7 @@ function Tick( float DeltaTime)
 
 defaultproperties
 {
+	 bNetTemporary=True
+	 bAlwaysRelevant=True
+	 RemoteRole=ROLE_SimulatedProxy
 }

@@ -30,6 +30,13 @@ function PreBeginPlay()
 	SetTimer(DamageTimer, true);
 }
 
+function SetDamagePerSec(int damage)
+{
+	DamagePerSec = damage;
+	DamageTimer = 1.0 / DamagePerSec;
+	SetTimer(DamageTimer, true);
+}
+
 // Check the touch list against
 function Timer()
 {

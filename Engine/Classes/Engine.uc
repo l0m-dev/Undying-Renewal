@@ -26,6 +26,6 @@ var float	TimeSinceInput;
 
 defaultproperties
 {
-     CacheSizeMegs=2
+     CacheSizeMegs=64
      UseSound=True
 }

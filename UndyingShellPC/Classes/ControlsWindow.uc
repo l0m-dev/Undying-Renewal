@@ -130,6 +130,9 @@ function Created()
 	SmokingWindows[2] = -1;
 	SmokingWindows[3] = -1;
 
+	SelectedCol = -1;
+	SelectedRow = -1;
+
 //create components
 	for( i=0; i<7; i++ )
 	{
@@ -1310,7 +1313,9 @@ defaultproperties
      AliasNames(55)="FireDefSpell"
      AliasNames(56)="SelectDefSpell"
      AliasNames(57)="Button bSelectItem | SelectItem"
-     AliasCount=58
+     AliasNames(58)="Talk"
+     AliasNames(59)="ShowScores"
+     AliasCount=60
      LabelList(0)="Weapon/Spells Actions,Weapon Fire"
      LabelList(1)="Weapon Select"
      LabelList(2)="Spell Fire"
@@ -1369,6 +1374,8 @@ defaultproperties
      LabelList(55)="Defensive Spell Fire"
      LabelList(56)="Defensive Spell Select"
      LabelList(57)="Item Quick Select"
+     LabelList(58)="Multiplayer, Chat"
+     LabelList(59)="Show Scoreboard"
      BackNames(0)="UndyingShellPC.Controls_0"
      BackNames(1)="UndyingShellPC.Controls_1"
      BackNames(2)="UndyingShellPC.Controls_2"

@@ -117,6 +117,16 @@ simulated function AttachToSurface(optional vector DecalDir)
 	local vector Start, End, HitLocation, HitNormal;
 	local Texture HitTexture;
 
+	if (Level.NetMode == NM_DedicatedServer)
+		return;
+
+	if (Level.NetMode == NM_Client && Role < ROLE_Authority && Rotation == rot(0,0,0))
+	{
+		// since rotation isn't replicated, try downwards direction
+		DecalDir = vect(0,0,1);
+		SetRotation(Rotator(DecalDir));
+	}
+
 	start = Location + (Vector(Rotation) * 128);
 	end = Location - (Vector(Rotation) * 128);
 	HitTexture = TraceTexture(End, Start, Flags);
@@ -139,9 +149,12 @@ simulated function AttachToSurface(optional vector DecalDir)
 }
 
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
+
+	bCarriedItem = true; // prevent replicating Location
+	
 	if (NumDecals > 0)
 	{
 		Texture = DecalTextures[Rand(NumDecals)];

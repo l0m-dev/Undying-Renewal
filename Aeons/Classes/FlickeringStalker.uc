@@ -499,4 +499,6 @@ defaultproperties
      CollisionRadius=16
      CollisionHeight=12
      bGroundMesh=False
+     MenuName="Flickering Stalker"
+     CreatureDeathVerb="pursued"
 }

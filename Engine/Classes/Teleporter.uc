@@ -259,7 +259,7 @@ simulated function Touch( actor Other )
 
 	if ( !bEnabled )
 	{
-		log ("Touch() called, but bEnabled is false", 'Misc');
+		//log ("Touch() called, but bEnabled is false", 'Misc');
 		return;
 	}
 
@@ -277,6 +277,7 @@ simulated function Touch( actor Other )
 
 				if( Player.Player.Console != none )
 				{
+					// needs replication
 					Player.Player.Console.bUseTransitionScreen = bUseTransitionScreen;
 					for(i = 0; i < 6; ++i )
 					{

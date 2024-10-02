@@ -77,7 +77,7 @@ var LightningNavigationPoint NavPoints[16];
 var MasterLightningNavigationPoint MasterNavPoint;
 
 // ===================================================================================
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	local vector start, end;
 
@@ -105,14 +105,15 @@ function Trigger(Actor Other, Pawn Instigator)
 }
 
 // Strike between two locations
-function Strike(vector start, vector end)
+simulated function Strike(vector start, vector end)
 {
 	local PlayerPawn Player;
 	local float StartDist;
 
 	ForEach AllActors(class 'PlayerPawn', Player)
 	{
-		break;
+		if (Viewport(Player.Player) != None)
+			break;
 	}
 
 	StartDist = VSize(Player.Location - Start);
@@ -149,7 +150,7 @@ function Strike(vector start, vector end)
 }
 
 // Strike along a set of path points
-function PathedStrike()
+simulated function PathedStrike()
 {
 	local int numNavPoints;
 	local name NextPoint;
@@ -229,14 +230,14 @@ function PathedStrike()
 // sets the new desired scale - the larger the pct value, the more deviation
 // the scale will be from its last desired scale.  the pct is a percentage of
 // the previous scale.  
-function newScale(float pct)
+simulated function newScale(float pct)
 {
 	desiredScale = shaftScale * pct;
 }
 
 // sets the new direction - the larger the weight, the more randomized
 // the direction will be from its last direction
-function newDir(float weight)
+simulated function newDir(float weight)
 {
 	local vector seekDir;
 
@@ -262,7 +263,7 @@ function newDir(float weight)
 }
 
 // Adds one knot to the knot array, sets a new direction
-function addKnot()
+simulated function addKnot()
 {
 	if ( lastKnot < (numKnots-1) )
 	{
@@ -280,7 +281,7 @@ function addKnot()
 }
 
 // updates the particle system for rendering
-function updateParticleSystem()
+simulated function updateParticleSystem()
 {
 	local int i;
 
@@ -293,7 +294,7 @@ function updateParticleSystem()
 	}
 }
 
-function moveKnot()
+simulated function moveKnot()
 {
 	knots[lastKnot] += (cDir * growRate);
 	InitialKnots[lastKnot] = knots[lastKnot];
@@ -301,7 +302,7 @@ function moveKnot()
 	InitialScales[lastKnot] = scales[lastKnot];
 }
 
-function ShiftPoints(float amount)
+simulated function ShiftPoints(float amount)
 {
 	local int i;
 	
@@ -313,7 +314,7 @@ function ShiftPoints(float amount)
 	}
 }
 
-function Timer()
+simulated function Timer()
 {
 	local int i;
 
@@ -329,10 +330,10 @@ function Timer()
 // ==================================================================================
 // Idle2 State
 // ==================================================================================
-state Idle2
+simulated state Idle2
 {
-	function Tick(float DeltaTime);
-	function Timer();
+	simulated function Tick(float DeltaTime);
+	simulated function Timer();
 
 	function Trigger(Actor Other, Pawn Instigator)
 	{
@@ -351,10 +352,10 @@ state Idle2
 // ==================================================================================
 // Idle State
 // ==================================================================================
-state Idle
+simulated state Idle
 {
-	function Timer();
-	function Tick(float DeltaTime);
+	simulated function Timer();
+	simulated function Tick(float DeltaTime);
 
 
 	function Trigger(Actor Other, Pawn Instigator)
@@ -382,11 +383,11 @@ state Idle
 // ==================================================================================
 // Holding State
 // ==================================================================================
-state Holding
+simulated state Holding
 {
 	// ====================================
 	// setup
-	function BeginState()
+	simulated function BeginState()
 	{
 		HoldstateTimer = 0;
 	
@@ -394,7 +395,7 @@ state Holding
 
 	// ====================================
 	// creates a pulse and sends it off
-	function GeneratePulse()
+	simulated function GeneratePulse()
 	{
 		local int i;
 		local pulse p;
@@ -433,13 +434,13 @@ state Holding
 
 	// ====================================
 	// Timer
-	function Timer()
+	simulated function Timer()
 	{
 		GeneratePulse();
 	}
 
 	// remove the indexed pulse from the array up pulses and update necessary stuff
-	function removePulse(int Index)
+	simulated function removePulse(int Index)
 	{
 		local pulse p;
 		
@@ -448,7 +449,7 @@ state Holding
 	}
 
 	// moves the pulses down the array of knots
-	function movePulses(float dt)
+	simulated function movePulses(float dt)
 	{
 		// dt is deltaTime, passed from Tick() - this is the length of time in the frame I am working with
 		local int i;
@@ -473,7 +474,7 @@ state Holding
 		}
 	}
 
-	function UpdateKnotMods()
+	simulated function UpdateKnotMods()
 	{
 		local int i, j;
 		local pulse p;
@@ -531,7 +532,7 @@ state Holding
 		}
 	}
 
-	function float getStrength(float c, float w, float x)
+	simulated function float getStrength(float c, float w, float x)
 	{
 		local float	pi;
 		local float h, d;
@@ -541,7 +542,7 @@ state Holding
 		return ( square(cos (((x-c) * pi) / w )) );
 	}
 
-	function updateKnotArray()
+	simulated function updateKnotArray()
 	{
 		local int i;
 
@@ -560,7 +561,7 @@ state Holding
 
 	// ====================================
 	// updater of everything
-	function Tick(float deltaTime)
+	simulated function Tick(float deltaTime)
 	{
 		if (HoldStateTimer > HoldLen)
 		{ 

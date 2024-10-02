@@ -689,4 +689,6 @@ defaultproperties
      LightSaturation=64
      LightRadius=24
      LightRadiusInner=16
+     MenuName="Aaron"
+     CreatureDeathVerb="possesed"
 }

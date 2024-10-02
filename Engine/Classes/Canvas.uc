@@ -42,8 +42,8 @@ var const viewport Viewport; // Viewport that owns the canvas.
 var const int FramePtr;      // Scene frame pointer.
 var const int RenderPtr;	 // Render device pointer, only valid during UGameEngine::Draw
 
-var float padding; // for some reason you can't have FontScale here, so add padding
-var float FontScale;
+//var float padding; // for some reason you can't have FontScale here, so add padding
+//var float FontScale;
 
 // native functions.
 native(463) final function Draw3DLine( Color Color, Vector Start, Vector End);
@@ -101,7 +101,7 @@ event Reset()
 	bCenter     = false;
 	bNoSmooth   = false;
 	Z           = 1.0;
-	FontScale	= 1.0;
+	//FontScale	= 1.0;
 }
 final function SetPos( float X, float Y )
 {
@@ -147,5 +147,5 @@ defaultproperties
      BigFont=Font'Engine.BigFont'
      LargeFont=Font'Engine.LargeFont'
      DebugFont=Font'Engine.SmallFont'
-	 FontScale=1
+	 //FontScale=1
 }

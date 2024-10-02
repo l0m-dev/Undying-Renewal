@@ -11,20 +11,17 @@ function Trigger( actor Other, pawn EventInstigator )
 
 	log("ObjectivesTrigger: Trigger");
 
-	forEach AllActors( class 'AeonsPlayer', AP )
+	if (( Objectives != "" ))
 	{
-		break;
-	}
-
-	if (( AP != None )&&( Objectives != "" ))
-	{
-		AP.ProcessObjectives( Objectives );		
+		forEach AllActors( class 'AeonsPlayer', AP )
+		{
+			AP.ProcessObjectives( Objectives );		
+		}
 	}
 	else
 	{
 		Log("ObjectivesTrigger: couldn't process objectives.  AP=" $ AP $ " Objectives='" $ Objectives $ "'"); 
 	}
-
 }
 
 defaultproperties

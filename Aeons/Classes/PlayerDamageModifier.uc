@@ -9,14 +9,14 @@ var float RotStrength;
 var Vector TotalVec;
 var int y, p, r;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	Damping = 0.800;
 	RotStrength = 4096;
 }
 
-function TakeHit(float Strength)
+simulated function TakeHit(float Strength)
 {
 	Strength *= GetRenewalConfig().DamageScreenShakeScale;
 	str = 100;
@@ -36,7 +36,7 @@ function TakeHit(float Strength)
 		r = RotStrength * Strength * -1;
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local rotator rot;
 

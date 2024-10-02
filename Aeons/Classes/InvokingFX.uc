@@ -6,7 +6,18 @@ class InvokingFX expands ScriptedFX;
 var name JointNames[64];
 var int NumJoints;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
+{
+	if (Level.NetMode != NM_Client)
+		SetupInvokeFX();
+}
+
+simulated function PostNetBeginPlay()
+{
+	SetupInvokeFX();
+}
+
+simulated function SetupInvokeFX()
 {
 	local int i;
 	local name JointName;
@@ -16,14 +27,17 @@ function PreBeginPlay()
 	A = Owner;
 
 	p = A.CollisionHeight / 48.0;
-	ColorStart.Base = PlayerPawn(A.Owner).InvokeColor;
+	if (PlayerPawn(A.Owner) != None)
+		ColorStart.Base = PlayerPawn(A.Owner).InvokeColor;
+	else
+		ColorStart.Base = class'PlayerPawn'.default.InvokeColor;
 	SizeWidth.Base = FClamp((48 * p), 8, 96);
 	SizeLength.Base = FClamp((48 * p), 8, 96);
 
 	Disable('Tick');
 	if (Owner == none)
 	{
-		bShuttingDown = true;
+		Shutdown();
 		log ("Invoking Effect shutting down - Owner is none", 'Misc');
 		return;
 	}
@@ -48,13 +62,13 @@ function PreBeginPlay()
 	bUpdate = true;
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local int i;
 	
 	if ( Owner == none)
 	{
-		bShuttingDown = true;
+		Shutdown();
 		return;
 	} else {
 	

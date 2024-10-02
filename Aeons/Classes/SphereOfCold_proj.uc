@@ -20,7 +20,7 @@ function PreBeginPlay()
 function Destroyed()
 {
 	if (IceTrail != none)
-		IceTrail.bShuttingDown = true;
+		IceTrail.Shutdown();
 }
 
 simulated function ProcessTouch (Actor Other, Vector HitLocation)

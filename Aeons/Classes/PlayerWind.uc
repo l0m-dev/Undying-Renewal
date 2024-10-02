@@ -5,12 +5,20 @@ class PlayerWind expands Wind;
 
 // Travels with an actor, matching its current velocity.
 
-function PreBeginPlay()
+// set bHidden to False to allow replication
+// set DrawType to DT_None to hide sprite
+
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
-	if (Owner == none)
-		Destroy();
+	if ( Level.NetMode == NM_Client )
+		Disable('Tick');
+}
+
+simulated function PostNetBeginPlay()
+{
+	Enable('Tick');
 }
 
 simulated function Tick(float deltaTime)
@@ -32,4 +40,9 @@ defaultproperties
      WindRadiusInner=128
      bTimedTick=True
      MinTickTime=0.2
+     bNoDelete=False
+     RemoteRole=ROLE_SimulatedProxy
+     bHidden=False
+     DrawType=DT_None
+     NetUpdateFrequency=4
 }

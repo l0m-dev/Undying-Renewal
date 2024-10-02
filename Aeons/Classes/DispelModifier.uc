@@ -10,7 +10,7 @@ simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	dispelLen = 2.0;
-	debug = true;
+	//debug = true;
 }
 
 auto state Idle

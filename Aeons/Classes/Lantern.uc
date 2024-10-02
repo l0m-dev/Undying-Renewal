@@ -55,20 +55,23 @@ state Activated
 		if (Owner.Region.Zone.bWaterZone)
 			GotoState('Deactivated');
 
-		eyeheight.z = Pawn(Owner).Eyeheight;
-		MainLight.setRotation(Pawn(Owner).ViewRotation);
-		MainLight.setLocation((Pawn(Owner).Location + eyeHeight) + Vector(Pawn(Owner).ViewRotation) * 48);
-		PlayerLight.setLocation( Pawn(Owner).Location );
-		
-		if ( AeonsPlayer(Owner).viewTarget != none )
+		if (MainLight != none)
 		{
-			MainLight.LightBrightness = 0;
-			PlayerLight.LightBrightness = 0;
-		} else {
-			MainLight.LightBrightness = 255;
-			PlayerLight.LightBrightness = 255;
-			//MainLight.LightBrightness = class'Aeons.LanternSpotlight'.default.LightBrightness;
-			//PlayerLight.LightBrightness = class'Aeons.LanternLight'.default.LightBrightness;
+			eyeheight.z = Pawn(Owner).Eyeheight;
+			MainLight.setRotation(Pawn(Owner).ViewRotation);
+			MainLight.setLocation((Pawn(Owner).Location + eyeHeight) + Vector(Pawn(Owner).ViewRotation) * 48);
+			PlayerLight.setLocation( Pawn(Owner).Location );
+			
+			if ( AeonsPlayer(Owner).viewTarget != none )
+			{
+				MainLight.LightBrightness = 0;
+				PlayerLight.LightBrightness = 0;
+			} else {
+				MainLight.LightBrightness = 255;
+				PlayerLight.LightBrightness = 255;
+				//MainLight.LightBrightness = class'Aeons.LanternSpotlight'.default.LightBrightness;
+				//PlayerLight.LightBrightness = class'Aeons.LanternLight'.default.LightBrightness;
+			}
 		}
 	}
 
@@ -153,8 +156,10 @@ state Deactivated
 		setTimer(0,false);
 		bActive = false;
 		AeonsPlayer(Owner).bLanternOn = false;
-		mainLight.Destroy();
-		PlayerLight.Destroy();
+		if (mainLight != None)
+			mainLight.Destroy();
+		if (PlayerLight != None)
+			PlayerLight.Destroy();
 		mainLight = none;
 		PlayerLight = none;
 }

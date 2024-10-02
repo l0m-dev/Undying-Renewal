@@ -26,7 +26,7 @@ class DifficultyWindow expands ShellWindow;
 //#exec Texture Import File=dfclt_nightm_ov.bmp	Mips=Off
 //#exec Texture Import File=dfclt_nightm_dn.bmp	Mips=Off
 
-var localized string StartMap;
+var string StartMap;
 
 var() ShellButton Buttons[4];
 var int		SmokingWindows[4];
@@ -51,6 +51,10 @@ var int CurrentRow; // current row in scrollable resolution list
 var ShellButton Down;
 var ShellButton Up;
 var int NumberOfMutators;
+
+var bool bDedicated;
+
+var localized string SelectMutatorsText;
 
 function Created()
 {
@@ -151,8 +155,8 @@ function Created()
 	Up.Style = 5;
 	Down.Style = 5;
 
-	Up.Template =	NewRegion(558,130,64,128);
-	Down.Template = NewRegion(558,388,64,128);
+	Up.Template =	NewRegion(538,130,64,128);
+	Down.Template = NewRegion(538,388,64,128);
 
 	Up.TexCoords = NewRegion(0,0,64,128);
 	Down.TexCoords = NewRegion(0,0,64,128);
@@ -180,7 +184,7 @@ function Created()
 
 	MutatorsLabel.Template=NewRegion(584, 100, 204, 54);
 	MutatorsLabel.Manager = Self;
-	MutatorsLabel.Text = "SELECT MUTATORS";
+	MutatorsLabel.Text = SelectMutatorsText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -368,7 +372,6 @@ function StartGame( int Difficulty )
 	PlayNewScreenSound();
 	
 	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ mutatorClassString;
-	//ParentWindow.Close();
 
 	Close();
 	MainMenuWindow(AeonsRootWindow(Root).MainMenu).Single.Close();
@@ -378,9 +381,19 @@ function StartGame( int Difficulty )
 	Root.Console.bLocked = False;
 
 	Root.Console.CloseUWindow();
+
+	if (OwnerWindow != Root)
+		OwnerWindow.NotifyBeforeLevelChange();
 	
-	GetPlayerOwner().ConsoleCommand("deletesavelevels");
-	GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
+	if (bDedicated)
+	{
+		GetPlayerOwner().ConsoleCommand("RELAUNCH" @ URL @ "-server -nointro");
+	}
+	else
+	{
+		GetPlayerOwner().ConsoleCommand("deletesavelevels");
+		GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
+	}
 	
 	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;
 }
@@ -567,5 +580,6 @@ defaultproperties
      BackNames(3)="UndyingShellPC.Difficulty_3"
      BackNames(4)="UndyingShellPC.Difficulty_4"
      BackNames(5)="UndyingShellPC.Difficulty_5"
-	 MutatorBaseClass="Engine.Mutator"
+     MutatorBaseClass="Engine.Mutator"
+     SelectMutatorsText="SELECT MUTATORS"
 }

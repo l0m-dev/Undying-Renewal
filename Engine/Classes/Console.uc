@@ -369,7 +369,13 @@ function DrawTransitionScreen(Canvas C)
 {
 	local int XOffset, YOffset, W, H;
 	local float TileWidth, TileHeight;
-	local int i;
+	local int NumTilesX, NumTilesY, i;
+	local Texture Tex;
+
+	local float	InnerLeft, InnerTop, InnerWidth, InnerHeight;
+
+	NumTilesX = 3;
+	NumTilesY = 2;
 
 	for ( i=0; i<6; i++ )
 	{
@@ -380,9 +386,21 @@ function DrawTransitionScreen(Canvas C)
 		if (Back[i] == None )
 			return;
 	}
+
+	if (C.SizeY / C.SizeX < 0.75 ) {
+		InnerWidth = C.SizeY / 0.75;
+		InnerLeft = (C.SizeX - InnerWidth) / 2;
+		InnerHeight = C.SizeY;
+		InnerTop = 0;
+	} else {
+		InnerWidth = C.SizeX;
+		InnerLeft = 0;
+		InnerHeight = C.SizeX * 0.75;
+		InnerTop = (C.SizeY - InnerHeight) / 2;
+	}
 	
-	TileWidth = C.SizeX / 3;
-	TileHeight = C.SizeY / 2;
+	TileWidth = InnerWidth / NumTilesX;
+	TileHeight = InnerHeight / NumTilesY;
 
 	C.DrawColor.R = 255;
 	C.DrawColor.G = 255;
@@ -391,13 +409,16 @@ function DrawTransitionScreen(Canvas C)
 	
 	C.bNoSmooth = false;
 
-	DrawStretchedTextureSegment( C, 0, 0, TileWidth, TileHeight, 1, 1, 254, 254, Back[0] );
-	DrawStretchedTextureSegment( C, TileWidth, 0, TileWidth, TileHeight, 1, 1, 254, 254, Back[1] );
-	DrawStretchedTextureSegment( C, TileWidth*2, 0,	TileWidth, TileHeight, 1, 1, 254, 254, Back[2] );
-
-	DrawStretchedTextureSegment( C, 0, TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[3] );
-	DrawStretchedTextureSegment( C, TileWidth, TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[4] );
-	DrawStretchedTextureSegment( C, TileWidth*2, TileHeight, TileWidth, TileHeight, 1, 1, 254, 254, Back[5] );
+	DrawStretchedTextureSegment( C, C.OrgX, C.OrgY, C.SizeX, C.SizeY, 0, 0, 1, 1, texture'Engine.noisy1pfx' ); // black background
+	
+	for (w = 0; w < NumTilesX; w++)
+	{
+		for (h = 0; h < NumTilesY; h++)
+		{
+			Tex = Back[w+h*NumTilesX];
+			DrawStretchedTextureSegment( C, InnerLeft + TileWidth*w, InnerTop + TileHeight*h, TileWidth, TileHeight, 0, 0, Tex.USize, Tex.VSize, Tex );
+		}
+	}
 
 	C.DrawColor = C.Default.DrawColor;
 
@@ -425,7 +446,10 @@ function DrawLevelAction( canvas C )
 	if ( (Viewport.Actor.Level.Pauser != "") && (Viewport.Actor.Level.LevelAction == LEVACT_None) )
 	{
 		C.Font = C.LargeFont;//rb MedFont;
-		BigMessage = PausedMessage; // Add pauser name?
+		if (Viewport.Actor.Level.NetMode == NM_Standalone)
+			BigMessage = PausedMessage; // Add pauser name?
+		else
+			BigMessage = Viewport.Actor.Level.Pauser @ PausedMessage;
 		PrintActionMessage(C, BigMessage);
 		return;
 	}
@@ -464,7 +488,8 @@ function DrawLevelAction( canvas C )
 				C.DrawColor.B = 0;
 				C.DrawColor.A = 255;
 	
-				C.DrawPattern( Texture'Border', C.ClipX, C.ClipY, 1.0 );
+				//C.DrawPattern( Texture'Border', C.ClipX, C.ClipY, 1.0 );
+				DrawStretchedTextureSegment( C, C.OrgX, C.OrgY, C.SizeX, C.SizeY, 0, 0, 1, 1, texture'Engine.noisy1pfx' ); // black background
 
 				C.DrawColor = C.Default.DrawColor;
 			}
@@ -509,11 +534,22 @@ function PrintActionMessage( Canvas C, string BigMessage )
 event PostRender( canvas C )
 {
 	local int YStart, YEnd, Y, I, J, Line, iLine;
+	local bool bDrawProgressMessage;
+
+	bDrawProgressMessage = Viewport.Actor.ProgressTimeOut > Viewport.Actor.Level.TimeSeconds;
 	
 	if(bNoDrawWorld)
 	{
 		C.SetPos(0,0);
 		C.DrawPattern( Texture'Border', C.ClipX, C.ClipY, 1.0 );
+	}
+
+	if (bDrawProgressMessage)
+	{
+		if (Viewport.Actor.Level == Viewport.Actor.GetEntryLevel())
+			DrawStretchedTextureSegment( C, C.OrgX, C.OrgY, C.SizeX, C.SizeY, 0, 0, 1, 1, texture'Engine.noisy1pfx' ); // black background
+
+		DrawProgressMessage(C, 0.25 * C.ClipY);
 	}
 
 	if( bTimeDemo )
@@ -666,6 +702,33 @@ simulated function DrawSingleView( Canvas C )
 			}
 		}		
 	}
+}
+
+simulated function DrawProgressMessage(Canvas C, float Y)
+{
+	local int i;
+	local float YOffset, XL, YL;
+
+	C.DrawColor.R = 255;
+	C.DrawColor.G = 255;
+	C.DrawColor.B = 255;
+	C.bCenter = true;
+	C.Font = C.MedFont;
+	C.Style = 1;
+	YOffset = 0;
+	C.StrLen("TEST", XL, YL);
+	for (i=0; i<8; i++)
+	{
+		C.SetPos(0, Y + YOffset);
+		C.DrawColor = Viewport.Actor.ProgressColor[i];
+		C.DrawText(Viewport.Actor.ProgressMessage[i], false);
+		YOffset += YL + 1;
+	}
+	C.bCenter = false;
+	C.DrawColor.R = 255;
+	C.DrawColor.G = 255;
+	C.DrawColor.B = 255;
+	C.DrawColor.A = 255;
 }
 
 //-----------------------------------------------------------------------------

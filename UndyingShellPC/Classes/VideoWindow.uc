@@ -401,10 +401,10 @@ function GetStartingRow()
 	{
 		if ( ResLabel.Text ~= ResolutionList[i] )
 		{
+			CurrentRow = clamp(i - (ArrayCount(Resolutions) / 2), 0, ArrayCount(ResolutionList) - ArrayCount(Resolutions));
 			break;
 		}
 	}
-	CurrentRow = clamp(i - (ArrayCount(Resolutions) / 2), 0, ArrayCount(ResolutionList) - ArrayCount(Resolutions));
 
 	if ( CurrentRow > 0 ) 
 	{
@@ -538,7 +538,7 @@ function SetColorDepth( int NewColorDepth )
 		OriginalRes = GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth");
 
 
-		if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" && DriverLabel.Text != "3DFX")
+		if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" )
 		{
 			ColorDepth = 16;
 			BitDepth_16.UpTexture = texture'Video_resol_dn';
@@ -693,7 +693,7 @@ function GetCurrentSettings()
 	// link up shell components with variables
 	BrightnessSlider.SetValue(OrigBrightness);
 
-	if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" && GetPlayerOwner().ConsoleCommand("GetCurrentDriver") != "3DFX")
+	if ( GetPlayerOWner().ConsoleCommand("GetCurrentColorDepth") == "16" )
 	{
 		ColorDepth = 16;
 		BitDepth_16.UpTexture = texture'Video_resol_dn';
@@ -731,9 +731,6 @@ function GetCurrentSettings()
 
 	DriverLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentDriver");
 	ResLabel.Text = GetPlayerOwner().ConsoleCommand("GetCurrentRes"); 
-	
-	if (VideoDriverClassName ~= "d3d11drv.d3d11renderdevice")
-		DriverLabel.Text = DriverLabel.Text$" 11";
 	
 	// Will save changes by default
 	bSaveChanges = True;

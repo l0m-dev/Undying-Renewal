@@ -56,7 +56,7 @@ function Resized()
 	}
 
 	if(!bSizingColumn)
-		HorizSB.SetRange(0, TotalWidth, WinWidth - LookAndFeel.Size_ScrollbarWidth, 10);
+		HorizSB.SetRange(0, TotalWidth, WinWidth - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY, 10);
 
 	if(!HorizSB.bDisabled)
 	{
@@ -74,26 +74,26 @@ function Resized()
 
 	ClientArea.WinTop = 0;
 	ClientArea.WinLeft = 0;
-	ClientArea.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth;
+	ClientArea.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	if(bShowHorizSB)
-		ClientArea.WinHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth;
+		ClientArea.WinHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	else
 		ClientArea.WinHeight = WinHeight;
 
 
 	if(bShowHorizSB)
 	{
-		HorizSB.WinTop = WinHeight-LookAndFeel.Size_ScrollbarWidth;
+		HorizSB.WinTop = WinHeight-LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 		HorizSB.WinLeft = 0;
-		HorizSB.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth;
-		HorizSB.WinHeight = LookAndFeel.Size_ScrollbarWidth;
+		HorizSB.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
+		HorizSB.WinHeight = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	}
 
 	VertSB.WinTop = 0;
-	VertSB.WinLeft = WinWidth-LookAndFeel.Size_ScrollbarWidth;
-	VertSB.WinWidth = LookAndFeel.Size_ScrollbarWidth;
+	VertSB.WinLeft = WinWidth-LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
+	VertSB.WinWidth = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	if(bShowHorizSB)
-		VertSB.WinHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth;
+		VertSB.WinHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	else
 		VertSB.WinHeight = WinHeight;
 
@@ -152,15 +152,15 @@ function Paint(Canvas C, float MouseX, float MouseY)
 	X = LastColumn.WinWidth + LastColumn.WinLeft;
 
 	T = GetLookAndFeelTexture();
-	DrawUpBevel( C, X, 0, WinWidth-X, LookAndFeel.ColumnHeadingHeight, T);
+	DrawUpBevel( C, X, 0, WinWidth-X, LookAndFeel.ColumnHeadingHeight*Root.ScaleY, T);
 
 	if(bShowHorizSB)
 	{
 		// R = LookAndFeel.SBBackground;
-		DrawStretchedTextureSegment( C, WinWidth-LookAndFeel.Size_ScrollbarWidth,
-										WinHeight-LookAndFeel.Size_ScrollbarWidth,
-										LookAndFeel.Size_ScrollbarWidth,
-										LookAndFeel.Size_ScrollbarWidth,
+		DrawStretchedTextureSegment( C, WinWidth-LookAndFeel.Size_ScrollbarWidth*Root.ScaleY,
+										WinHeight-LookAndFeel.Size_ScrollbarWidth*Root.ScaleY,
+										LookAndFeel.Size_ScrollbarWidth*Root.ScaleY,
+										LookAndFeel.Size_ScrollbarWidth*Root.ScaleY,
 										R.X, R.Y, R.W, R.H, T);
 	}
 }

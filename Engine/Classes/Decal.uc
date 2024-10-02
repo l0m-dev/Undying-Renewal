@@ -32,7 +32,7 @@ simulated function Init()
 	}
 }
 
-function StartLevel()
+simulated function StartLevel()
 {
 	AttachToSurface();
 }
@@ -42,14 +42,14 @@ simulated event PostBeginPlay()
 	// AttachToSurface();
 }
 
-function Tick( float DeltaTime )
+simulated function Tick( float DeltaTime )
 {
 	Age += DeltaTime;
 	if ( DecalLifetime > 0 )
 		AgePct = Age / DecalLifetime;
 }
 
-function SetNewLocation(Vector Loc, vector HitNormal)
+simulated function SetNewLocation(Vector Loc, vector HitNormal)
 {
 	DetachDecal();
 	SetLocation(Loc);
@@ -57,14 +57,14 @@ function SetNewLocation(Vector Loc, vector HitNormal)
 	AttachDecal(32, Vector(Rotation));
 }
 
-function SetDrawScale(float Value)
+simulated function SetDrawScale(float Value)
 {
 	DetachDecal();
 	DrawScale = Value;
 	AttachDecal(32, Vector(Rotation));
 }
 
-function ReattachDecal(optional Vector newRot)
+simulated function ReattachDecal(optional Vector newRot)
 {
    DetachDecal();
    if (newRot != vect(0,0,0))
@@ -75,8 +75,13 @@ function ReattachDecal(optional Vector newRot)
 
 simulated function AttachToSurface(optional vector DecalDir)
 {
+	if (Level.NetMode == NM_DedicatedServer) // decals can't be attached on a dedicated server because of GetLevel()->Engine->Client check
+		return;
+	
 	if( AttachDecal(100, DecalDir) == None )	// trace 100 units ahead in direction of current rotation
+	{
 		Destroy();
+	}
 }
 
 simulated event Destroyed()
@@ -86,12 +91,12 @@ simulated event Destroyed()
 	Super.Destroyed();
 }
 
-function Timer()
+simulated function Timer()
 {
 	gotoState('FadeOut');
 }
 
-auto state Startup
+auto simulated state Startup
 {
 
 	Begin:
@@ -100,9 +105,9 @@ auto state Startup
 		GotoState('');
 }
 
-state FadeOut
+simulated state FadeOut
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		if (FadeTime > 0)
 		{
@@ -111,7 +116,7 @@ state FadeOut
 		}
 	}
 
-	function Timer()
+	simulated function Timer()
 	{
 		Destroy();
 	}
@@ -120,7 +125,7 @@ state FadeOut
 		setTimer(FadeTime,false);
 }
 
-function SoftLimitReached()
+simulated function SoftLimitReached()
 {
 	if ( (GetStateName() != 'FadeOut') && !bScryeOnly && !bAlwaysVisible )
 	{
@@ -129,7 +134,7 @@ function SoftLimitReached()
 	}
 }
 
-function HardLimitReached()
+simulated function HardLimitReached()
 {
 	if ( (GetStateName() != 'FadeOut') && !bScryeOnly && !bAlwaysVisible )
 	{

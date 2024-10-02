@@ -23,7 +23,7 @@ function ResolutionChanged(float W, float H)
 
 function SetSizePos()
 {
-	SetSize(FMin(Root.WinWidth-20, 400), 160);
+	SetSize(FMin(Root.WinWidth-20*Root.ScaleY, 400*Root.ScaleY), 160*Root.ScaleY);
 
 	WinLeft = Int((Root.WinWidth - WinWidth) / 2);
 	WinTop = Int((Root.WinHeight - WinHeight) / 2);
@@ -32,17 +32,21 @@ function SetSizePos()
 function Resized()
 {
 	Super.Resized();
-	ClientArea.SetSize(ClientArea.WinWidth, ClientArea.WinHeight-24);
+	ClientArea.SetSize(ClientArea.WinWidth, ClientArea.WinHeight-24*Root.ScaleY);
 }
 
 function BeforePaint(Canvas C, float X, float Y)
 {
 	Super.BeforePaint(C, X, Y);
 
-	OKButton.WinLeft = ClientArea.WinLeft+ClientArea.WinWidth-104;
-	OKButton.WinTop = ClientArea.WinTop+ClientArea.WinHeight+4;
-	CloseButton.WinLeft = ClientArea.WinLeft+ClientArea.WinWidth-52;
-	CloseButton.WinTop = ClientArea.WinTop+ClientArea.WinHeight+4;
+	SetSizePos();
+
+	OKButton.WinLeft = ClientArea.WinLeft+ClientArea.WinWidth-104*Root.ScaleY;
+	OKButton.WinTop = ClientArea.WinTop+ClientArea.WinHeight+4*Root.ScaleY;
+	OKButton.WinWidth = 48*Root.ScaleY;
+	CloseButton.WinLeft = ClientArea.WinLeft+ClientArea.WinWidth-52*Root.ScaleY;
+	CloseButton.WinTop = ClientArea.WinTop+ClientArea.WinHeight+4*Root.ScaleY;
+	CloseButton.WinWidth = 48*Root.ScaleY;
 }
 
 function Paint(Canvas C, float X, float Y)
@@ -50,7 +54,7 @@ function Paint(Canvas C, float X, float Y)
 	local Texture T;
 
 	T = GetLookAndFeelTexture();
-	DrawUpBevel( C, ClientArea.WinLeft, ClientArea.WinTop + ClientArea.WinHeight, ClientArea.WinWidth, 24, T);
+	DrawUpBevel( C, ClientArea.WinLeft, ClientArea.WinTop + ClientArea.WinHeight, ClientArea.WinWidth, 24*Root.ScaleY, T);
 
 	Super.Paint(C, X, Y);
 }

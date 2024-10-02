@@ -11,8 +11,8 @@ function Created()
 	Super.Created();
 
 	MainWindow = UBrowserMainWindow(CreateWindow(class'UBrowserMainWindow', 50, 30, 500, 300));
-	MainWindow.bStandaloneBrowser = True;
-	MainWindow.WindowTitle = "Unreal Browser";
+	//MainWindow.bStandaloneBrowser = True;
+	MainWindow.WindowTitle = "Undying Browser";
 	Resized();
 }
 

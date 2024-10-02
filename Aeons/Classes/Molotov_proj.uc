@@ -95,6 +95,11 @@ simulated function PostBeginPlay()
 		Damage = 40;
 	}
 	numSkips = 0;
+
+	if (Level.NetMode != NM_Standalone)
+	{
+		maxSkips = 0;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -106,7 +111,7 @@ simulated function ZoneChange( ZoneInfo NewZone )
 
 	if ( NewZone.bWaterZone )
 	{
-		fPart.bShuttingDown = true;
+		fPart.Shutdown();
 		LightType = LT_None;
 	}
 }
@@ -119,7 +124,7 @@ function generateSmallDrip(vector offset)
 	if ( bInWater ) 
 		return;
 
-	clone = spawn(class 'MolotovFire_proj',,,(Location + offset), Rotator(Vect(0,0,1)));
+	clone = spawn(class 'MolotovFire_proj',Owner,,(Location + offset), Rotator(Vect(0,0,1)));
 
 	if ( clone != None ) 
 	{
@@ -344,7 +349,20 @@ auto state Flying
 // Destroyed - creathe my explosion and clean up
 simulated function Destroyed()
 {
-	if ( Level.NetMode != NM_DedicatedServer )
+	local FireTrigger FireTrigger;
+	if ( Level.NetMode == NM_DedicatedServer )
+	{
+		// hack: spawn a fire trigger if NM_DedicatedServer instead of client side particles spawning a trigger
+		FireTrigger = Spawn(class 'FireTrigger', Pawn(Owner),,Location, Rotator(vect(0,0,1)));
+		if (FireTrigger != None)
+		{
+			//FireTrigger.SetBase(self);
+			FireTrigger.SetCollisionSize(200, 40);
+			FireTrigger.SetDamagePerSec(10);
+			FireTrigger.LifeSpan = class'MolotovFire_proj'.default.LifeSpan;
+		}
+	}
+	else
 	{
 		if ( Region.Zone.bWaterZone )
 		{
@@ -362,7 +380,7 @@ simulated function Destroyed()
 		}
 		
 		if ( fPart != None ) 
-			fPart.bShuttingDown = true;
+			fPart.Shutdown();
 		
 		if ( Wind != None ) 
 			wind.Destroy();
@@ -401,4 +419,5 @@ defaultproperties
      LightSaturation=21
      LightRadius=19
      bBounce=True
+     bClientAnim=True
 }

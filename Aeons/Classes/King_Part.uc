@@ -193,6 +193,12 @@ function RecoverMultiMouthShot()
 
 function Tick( float deltaTime )
 {
+	// in multiplayer a player doesn't exist on StartLevel so we need to set an enemy later
+	if ( Enemy == None )
+	{
+		SetEnemy( FindPlayer() );
+	}
+
 	super.Tick( deltaTime );
 
 	if( TouchingActor != none )
@@ -448,4 +454,6 @@ defaultproperties
      bCollideWorld=False
      bBlockActors=False
      Mass=1e+009
+     MenuName="Undying King"
+     CreatureDeathVerb="doomsdayed"
 }

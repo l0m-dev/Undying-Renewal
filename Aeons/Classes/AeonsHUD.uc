@@ -149,9 +149,13 @@ class AeonsHUD expands HUD;
 #exec Texture Import File=Revolver_Icon_Silver.bmp		Mips=Off
 #exec Texture Import File=FlightBar_Icon_Fixed.bmp		Mips=Off FLAGS=2
 #exec Texture Import File=HUD_Numbers_HD.bmp
-
+#exec Texture Import Name=DisconnectWarn File=Disconnect.bmp Group="Icons" Mips=Off FLAGS=2
 
 //=============================================================================
+
+// should match the ones from UWindowRootWindow
+const OriginalWidth = 800;
+const OriginalHeight = 600;
 
 // these are only needed for backwards compatibility (loading renewal saves in original undying)
 var(Fonts) font MySmallFont, MyMediumFont, MyLargeFont;
@@ -303,6 +307,12 @@ var float HalfClipY;
 var float HudScale;
 var float ClampedHudScale;
 var bool bAltHud;
+var bool bOriginalWheels; // move somewhere more persistent?
+
+var PlayerPawn PlayerOwner;
+var AeonsPlayer PlayerTarget;
+
+var localized string ConnectionProblemMessage;
 
 const OSMClientMessage = true;
 
@@ -321,10 +331,46 @@ Struct MessageStruct
 	var PlayerReplicationInfo PRI;
 };
 
+var transient int ChatLogIndex;
+var transient struct ChatMessageStruct
+{
+	var string Text;
+	var color Color;
+} ChatLog[16];
+var transient int VisibleChatLogIndices[4];
+var transient float ChatVisibleTime;
+var transient bool ChatInitialized;
+
+const CHAT_FADE_TIME = 2.0;
+const CHAT_VISIBLE_TIME = 5.0;
+
+// scoring 
+var float ScoreTime;
+
 simulated function PostBeginPlay()
 {
+	local AeonsPlayer AP;
 
-	MOTDFadeOutTime = 255;
+	PlayerOwner = PlayerPawn(Owner);
+	PlayerTarget = AeonsPlayer(PlayerOwner);
+
+	AP = AeonsPlayer(PlayerOwner);
+
+	if (AP != None)
+	{
+		if (AP.bNetShowMOTD)
+		{
+			ShowMOTD();
+			AP.bNetShowMOTD = False;
+		}
+
+		bLetterbox = AP.bLetterboxPlayer;
+		if (bLetterbox)
+		{
+			LetterboxFadeRate = 0; // AP.LetterboxFadeRatePlayer
+			LetterboxFadeTime = LetterboxFadeRate - LetterboxFadeTime;
+		}
+	}
 	Super.PostBeginPlay();
 
 	DigitInfo.Offset[0] = 6;
@@ -348,8 +394,8 @@ simulated function PostBeginPlay()
 	DigitInfo.Offset[6] = 147;
 	DigitInfo.Width[6] = 23;
 
-	DigitInfo.Offset[7] = 170;
-	DigitInfo.Width[7] = 25;
+	DigitInfo.Offset[7] = 171;
+	DigitInfo.Width[7] = 24;
 
 	DigitInfo.Offset[8] = 197;
 	DigitInfo.Width[8] = 23;
@@ -360,44 +406,13 @@ simulated function PostBeginPlay()
 	MyLargeFont =	Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
 	MyMediumFont =	Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
 	MySmallFont =	Font(DynamicLoadObject("Comic.Comic10", class'Font'));
-
-	// original weapon order
-	/*
-	Con_InvGroup[0] = 1;
-	Con_InvGroup[1] = 2;
-	Con_InvGroup[2] = 5;
-	Con_InvGroup[3] = 4;
-	Con_InvGroup[4] = 3;
-	Con_InvGroup[5] = 6;
-	Con_InvGroup[6] = 28;
-	Con_InvGroup[7] = 8;
-
-	Off_InvGroup[0] = 7;
-	Off_InvGroup[1] = 11;
-	Off_InvGroup[2] = 14;
-	Off_InvGroup[3] = 21;
-	Off_InvGroup[4] = 12;
-	Off_InvGroup[5] = 24;
-	Off_InvGroup[6] = 25;
-	Off_InvGroup[7] = 18;
-
-	Def_InvGroup[0] = 16;
-	Def_InvGroup[1] = 22;
-	Def_InvGroup[2] = 13;
-	Def_InvGroup[3] = 23;
-	Def_InvGroup[4] = 17;
-	Def_InvGroup[5] = 27;
-	Def_InvGroup[6] = 26;
-	Def_InvGroup[7] = 15;
-	*/
 }
 
-simulated function PreBeginPlay()
+simulated function ShowMOTD()
 {
-	Arrow = spawn(class 'DebugArrow');
-	Arrow.bHidden = true;
+	MOTDFadeOutTime = 255;
 }
-	
+
 simulated function AddSubtitle( string NewSubtitle, optional string SoundName )
 {
 	local int i, timelen;
@@ -474,13 +489,14 @@ simulated function DrawSubtitles(Canvas canvas)
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
+		Canvas.DrawColor.A = 255;
 		
 		Canvas.Font = Canvas.MedFont;
 		
 		Canvas.TextSize(Subtitle.Text[Subtitle.Number], W, H);
 		//StartHeight = (HalfClipY-LetterboxHeight/2);
 		StartHeight = LetterboxHeight;
-		LineCount = ceil(W / Canvas.ClipX);
+		LineCount = Ceil(W / Canvas.ClipX);
 		SubtitleHeight = (H * LineCount);
 		
 		if (IsLetterBoxed())
@@ -501,7 +517,7 @@ simulated function DrawSubtitles(Canvas canvas)
 
 		if (!IsLetterBoxed())
 		{
-			Canvas.Style = 4;
+			Canvas.Style = ERenderStyle.STY_Modulated;
 			Canvas.DrawColor = Canvas.Default.DrawColor;
 			Canvas.SetPos(HalfClipX - W/2 - 4*ScaleY, Y);
 			Canvas.DrawTileClipped( texture'HUD_Inv_Shad_Test', W + 8*ScaleY, SubtitleHeight, 0, 0, 60, 64);
@@ -510,21 +526,58 @@ simulated function DrawSubtitles(Canvas canvas)
 
 		Canvas.SetPos (Canvas.OrgX, Y);
 		Canvas.bCenter = true;
-		Canvas.Style = ERenderStyle.STY_AlphaBlend;
+		Canvas.Style = ERenderStyle.STY_Normal;
 		Canvas.DrawText (Subtitle.Text[Subtitle.Number], true);
 		Canvas.bCenter = false;
 		Canvas.SetPos (Canvas.OrgX, Canvas.OrgY);
 	}
 }
 
-function int ceil(float num) {
-    local int inum;
-	inum = int(num);
+// original wheel order
+exec function OriginalWheels()
+{
+	local int i;
 	
-    if (num == float(inum)) {
-        return inum;
-    }
-    return inum + 1;
+	bOriginalWheels = !bOriginalWheels;
+	
+	if (bOriginalWheels)
+	{
+		Con_InvGroup[0] = 1;
+		Con_InvGroup[1] = 2;
+		Con_InvGroup[2] = 5;
+		Con_InvGroup[3] = 4;
+		Con_InvGroup[4] = 3;
+		Con_InvGroup[5] = 6;
+		Con_InvGroup[6] = 116;
+		Con_InvGroup[7] = 8;
+
+		Off_InvGroup[0] = 11;
+		Off_InvGroup[1] = 24;
+		Off_InvGroup[2] = 14;
+		Off_InvGroup[3] = 7;
+		Off_InvGroup[4] = 12;
+		Off_InvGroup[5] = 21;
+		Off_InvGroup[6] = 25;
+		Off_InvGroup[7] = 18;
+
+		Def_InvGroup[0] = 16;
+		Def_InvGroup[1] = 22;
+		Def_InvGroup[2] = 13;
+		Def_InvGroup[3] = 23;
+		Def_InvGroup[4] = 17;
+		Def_InvGroup[5] = 27;
+		Def_InvGroup[6] = 26;
+		Def_InvGroup[7] = 15;
+	}
+	else
+	{
+		for ( i = 0; i < 8; i++ )
+		{
+			Con_InvGroup[i] = default.Con_InvGroup[i];
+			Off_InvGroup[i] = default.Off_InvGroup[i];
+			Def_InvGroup[i] = default.Def_InvGroup[i];
+		}
+	}
 }
 
 exec function ShowArrow()
@@ -539,12 +592,15 @@ exec function ShowArrow()
 exec function ShowRico()
 {
 	local int i;
+	local AeonsPlayer AP;
+
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if (Owner == None)
+	if (AP == None)
 		return;
 	
-	AeonsPlayer(Owner).bDrawRico = !AeonsPlayer(Owner).bDrawRico;
-	if (!AeonsPlayer(Owner).bDrawRico)
+	AP.bDrawRico = !AP.bDrawRico;
+	if (!AP.bDrawRico)
 	{
 		for (i = 0; i < ArrayCount(RicochetArrows); i++)
 		{
@@ -556,27 +612,27 @@ exec function ShowRico()
 
 exec function SaveView1()
 {
-	SavedView1 = AeonsPlayer(Owner).ViewRotation;
+	SavedView1 = PlayerOwner.ViewRotation;
 }
 
 exec function LoadView1()
 {
-	AeonsPlayer(Owner).ViewRotation = SavedView1;
+	PlayerOwner.ViewRotation = SavedView1;
 }
 
 exec function rico1()
 {
-	AeonsPlayer(Owner).ViewTarget = RicochetArrows[0];
+	PlayerOwner.ViewTarget = RicochetArrows[0];
 }
 
 exec function rico2()
 {
-	AeonsPlayer(Owner).ViewTarget = RicochetArrows[1];
+	PlayerOwner.ViewTarget = RicochetArrows[1];
 }
 
 exec function rico3()
 {
-	AeonsPlayer(Owner).ViewTarget = RicochetArrows[2];
+	PlayerOwner.ViewTarget = RicochetArrows[2];
 }
 
 exec function EnemyCrosshair()
@@ -660,12 +716,15 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	local Actor A;
 	local vector HitLocation;
 	local float CrosshairScale;
+	local AeonsPlayer AP;
 
- 	A = PlayerPawn(Owner).EyeTraceActor; //EyeTrace(HitLocation,,4096, true);
+	AP = AeonsPlayer(PlayerOwner);
+
+ 	A = PlayerOwner.EyeTraceActor; //EyeTrace(HitLocation,,4096, true);
 	
-	Canvas.DrawColor = PlayerPawn(Owner).CrossHairColor;
+	Canvas.DrawColor = PlayerOwner.CrossHairColor;
 	
-	PlayerPawn(Owner).bHaveTarget = false;
+	PlayerOwner.bHaveTarget = false;
 	
 	CrosshairScale = ScaleY;
 	CurrentCrossHair = CrossHairs[ CrossHair ];	
@@ -673,7 +732,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	if ( A != none )
 	{
 		// Player is NOT scrying and the crosshair is tracing a bScryeOnly Actor
-		if ( ((AeonsPlayer(Owner).ScryeTimer == 0) && A.bScryeOnly) || (AeonsPlayer(Owner).MindShatterMod != None && AeonsPlayer(Owner).MindShatterMod.bActive) )
+		if ( ((PlayerOwner.ScryeTimer == 0) && A.bScryeOnly) || (AP != None && AP.MindShatterMod != None && AP.MindShatterMod.bActive) )
 		{
 			// do nothing .. the crosshair color is already defined.
 		}
@@ -685,18 +744,18 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 				{
 					if ( (GetPlatform() == PLATFORM_PSX2) || bShowCrosshairEnemyColor )
 					{
-						Canvas.DrawColor = PlayerPawn(Owner).LitCrossHairColor;
-						PlayerPawn(Owner).bHaveTarget = true;
+						Canvas.DrawColor = PlayerOwner.LitCrossHairColor;
+						PlayerOwner.bHaveTarget = true;
 					}
 				}
 
-				if (AeonsPlayer(Owner).AttSpell != none)
+				if (PlayerOwner.AttSpell != none)
 				{
-					if (AeonsPlayer(Owner).AttSpell.IsA('Invoke') && (VSize(Pawn(Owner).Location - A.Location) <= 256.0))
+					if (PlayerOwner.AttSpell.IsA('Invoke') && (VSize(Pawn(Owner).Location - A.Location) <= 256.0))
 					{
-						if ( (ScriptedPawn(A).Health <= 0) || A.IsA('DecayedSaint') )
+						if (ScriptedPawn(A).CanBeInvoked()) //if ( (ScriptedPawn(A).Health <= 0) || A.IsA('DecayedSaint') )
 						{
-							Canvas.DrawColor = PlayerPawn(Owner).CrossHairInvokeColor;
+							Canvas.DrawColor = PlayerOwner.CrossHairInvokeColor;
 						}
 					}
 				}
@@ -760,19 +819,16 @@ simulated function DisplayProgressMessage( canvas Canvas )
 	Canvas.DrawColor.B = 255;
 }
 
-simulated function PreRender( canvas Canvas )
+simulated function SetupHUD( canvas Canvas )
 {
-	HudScale = Owner.GetRenewalConfig().HudScale;
+	HudScale = GetRenewalConfig().HudScale;
 	ClampedHudScale = FMax(HudScale, 1.0);
-	bAltHud = Owner.GetRenewalConfig().bAltHud;
-	
-	if (WindowConsole(PlayerPawn(Owner).Player.Console).Root == None)
-		return;
+	bAltHud = GetRenewalConfig().bAltHud;
 	
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
 	//
-	ScaleX = Canvas.ClipX / WindowConsole(PlayerPawn(Owner).Player.Console).Root.OriginalWidth * HudScale;
-	ScaleY = Canvas.ClipY / WindowConsole(PlayerPawn(Owner).Player.Console).Root.OriginalHeight * HudScale;
+	ScaleX = Canvas.ClipX / OriginalWidth * HudScale;
+	ScaleY = Canvas.ClipY / OriginalHeight * HudScale;
 	Scale = ScaleY;
 
 	HalfClipX = Canvas.ClipX / 2;
@@ -803,13 +859,20 @@ simulated function PreRender( canvas Canvas )
 	ScaleY = WindowConsole(PlayerPawn(Owner).Player.Console).Root.ScaleY;
 	Scale = ScaleY;
 	*/
-	
 
-	if (PlayerPawn(Owner).Weapon != None)
-		PlayerPawn(Owner).Weapon.PreRender(Canvas);
-	
 	CanvasWidth  = Canvas.ClipX;
 	CanvasHeight = Canvas.ClipY;
+
+	PlayerOwner = PlayerPawn(Owner);
+	PlayerTarget = AeonsPlayer(PlayerOwner);
+	if (PlayerOwner != None && AeonsPlayer(PlayerOwner.ViewTarget) != None)
+		PlayerTarget = AeonsPlayer(PlayerOwner.ViewTarget);
+}
+
+simulated function PreRender( canvas Canvas )
+{
+	if (PlayerOwner != None && PlayerOwner.Weapon != None)
+		PlayerOwner.Weapon.PreRender(Canvas);
 
 	//Log("AeonsHud: PreRender");
 }
@@ -844,7 +907,7 @@ exec function ShowTex()
 	bShowTex = !bShowTex;
 }
 
-function DrawDecalInfo(Canvas Canvas)
+simulated function DrawDecalInfo(Canvas Canvas)
 {
 	Canvas.Font = Canvas.SmallFont;
 
@@ -869,7 +932,7 @@ function DrawDecalInfo(Canvas Canvas)
 	Canvas.DrawColor.B = 255;
 }
 
-function DrawTexData(Canvas Canvas)
+simulated function DrawTexData(Canvas Canvas)
 {
 	local Texture T;
 	local string TypeStr;
@@ -1012,9 +1075,9 @@ function DrawTexData(Canvas Canvas)
 exec function testSaveShot(string SavePath)
 {
 	if ( AeonsPlayer(Owner) != None )
-	{
-		AeonsPlayer(Owner).SavePath = SavePath;
+	{			
 		AeonsPlayer(Owner).bRequestedShot = true;
+		AeonsPlayer(Owner).SavePath = SavePath;
 	}
 }
 */
@@ -1034,10 +1097,8 @@ exec function showFPS()
 
 exec function Flight()
 {
-	if ( Level.bAllowFlight )
-		Level.bAllowFlight = false;
-	else
-		Level.bAllowFlight = true;
+	if( AeonsPlayer(PlayerOwner) != None )
+		AeonsPlayer(PlayerOwner).ToggleFlight();
 }
 
 /*
@@ -1046,21 +1107,21 @@ simulated function SetFlight(bool bFlight)
 
 	if ( bFlight )
 	{
-		if ( AeonsPlayer(Owner) != None )
+		if ( PlayerOwner != None )
 		{
-			if ( AeonsPlayer(Owner).Flight == None )
-				AeonsPlayer(Owner).Flight = Spawn(class'Aeons.FlightModifier', Owner);
+			if ( PlayerOwner.Flight == None )
+				PlayerOwner.Flight = Spawn(class'Aeons.FlightModifier', Owner);
 		}
 	}
 	else
 	{
-		if ((AeonsPlayer(Owner) != None)&&(AeonsPlayer(Owner).Flight != None))
-				AeonsPlayer(Owner).Flight.Destroy();
+		if ((PlayerOwner != None)&&(PlayerOwner.Flight != None))
+				PlayerOwner.Flight.Destroy();
 	}
 	
 }*/
 
-function FindMasterCameraPoint()
+simulated function FindMasterCameraPoint()
 {
 	ForEach AllActors(class 'MasterCameraPoint', MP)
 	{
@@ -1068,7 +1129,7 @@ function FindMasterCameraPoint()
 	}
 }
 
-function DrawCutsceneDebug(Canvas Canvas)
+simulated function DrawCutsceneDebug(Canvas Canvas)
 {
 	Canvas.Font = Canvas.SmallFont;
 
@@ -1116,10 +1177,13 @@ simulated function DrawRicochet(canvas Canvas)
 	
 	for (i = 0; i < ArrayCount(RicochetArrows); i++)
 	{
+		if (RicochetArrows[i] == None)
+			RicochetArrows[i] = spawn(class 'DebugArrow');
+		
 		RicochetArrows[i].bHidden = true;
 	}
 	
-	for ( i=0; i < 3; i++ ) // maxWallHits + 1
+	for ( i=0; i < ArrayCount(RicochetArrows); i++ ) // maxWallHits + 1
 	{
 		EndTrace = StartTrace + ShotNormal * 4096.0;
 
@@ -1145,9 +1209,6 @@ simulated function DrawRicochet(canvas Canvas)
 		if (HitTexture.ImpactID != TID_Stone && HitTexture.ImpactID != TID_Metal)
 			break;
 		
-		if (RicochetArrows[i] == None)
-			RicochetArrows[i] = spawn(class 'DebugArrow');
-		
 		RicochetArrows[i].bHidden = false;
 		RicochetArrows[i].SetLocation(HitLocation);
 		RicochetArrows[i].SetRotation(Rotator(ShotNormal));
@@ -1161,21 +1222,36 @@ simulated function DrawRicochet(canvas Canvas)
 simulated function PostRender( canvas Canvas )
 {
 	local int FPS;
-	local PlayerPawn PlayerOwner;
 	local int YDelta;
-	local bool bDrawHUD;
+	local bool bDrawHUD, bGameEnded;
 	local float WeaponX;
-	
-	bDrawHUD = true;
+	local AeonsPlayer AP;
+
+	SetupHUD(Canvas); // moved here from PreRender because PostRender is called before PreRender after a cutscene
+
+	if (PlayerOwner == none) // todo: added PlayerOwner check here and now remove redundant PlayerOwner checks below
+		return;
+
+	AP = AeonsPlayer(PlayerOwner);
+
+	if (PlayerTarget != None)
+	{
+		bDrawHUD = true;
+	}
 	
 	HUDSetup(canvas);
 
 	if ( IsLetterBoxed() )
 		bDrawHud = false;
 
-	if ( PlayerPawn(Owner) != None && PlayerPawn(Owner).Level.bLoadBootShellPSX2 && GetPlatform() == PLATFORM_PSX2 )
-		bDrawHud = false;		
+	if ( PlayerOwner != None && PlayerOwner.Level.bLoadBootShellPSX2 && GetPlatform() == PLATFORM_PSX2 )
+		bDrawHud = false;
 
+	if ( PlayerOwner != None && PlayerOwner.GetStateName() == 'GameEnded' )
+	{
+		bGameEnded = true;
+		bDrawHud = false;
+	}
 
 	if ( IsLetterBoxed() )
 	{
@@ -1196,14 +1272,17 @@ simulated function PostRender( canvas Canvas )
 		
 		// BURT: FIX 1
 		// force draw on screen messages during cutscenes
-		if (AeonsPlayer(Owner).OSMMod != none)
+		if (AP != none)
 		{
-			AeonsPlayer(Owner).OSMMod.RenderOverlays(Canvas);
-		}
-		else if (AeonsPlayer(Owner).OverlayActor != none &&
-				 AeonsPlayer(Owner).OverlayActor.IsA('OnScreenMessage'))
-		{
-			AeonsPlayer(Owner).OverlayActor.RenderOverlays(Canvas);		
+			if (AP.OSMMod != none)
+			{
+				AP.OSMMod.RenderOverlays(Canvas);
+			}
+			else if (AP.OverlayActor != none &&
+					AP.OverlayActor.IsA('OnScreenMessage'))
+			{
+				AP.OverlayActor.RenderOverlays(Canvas);		
+			}
 		}
 		// --BURT
 
@@ -1223,12 +1302,12 @@ simulated function PostRender( canvas Canvas )
 		bDrawHUD = false;
 	} 
 
-	//if ( AeonsPlayer(Owner).OverlayActor != none )
+	//if ( PlayerOwner.OverlayActor != none )
 	//{
-		//AeonsPlayer(Owner).OverlayActor.RenderOverlays(Canvas);		
+		//PlayerOwner.OverlayActor.RenderOverlays(Canvas);		
 		/*
-		if ( AeonsPlayer(Owner).OverlayActor.IsA('OnScreenMessage') )
-			if ( OnScreenMessage(AeonsPlayer(Owner).OverlayActor).bHideHUD )
+		if ( PlayerOwner.OverlayActor.IsA('OnScreenMessage') )
+			if ( OnScreenMessage(PlayerOwner.OverlayActor).bHideHUD )
 				bDrawHUD = false;
 		*/
 	//}
@@ -1236,25 +1315,25 @@ simulated function PostRender( canvas Canvas )
 	
 	if ( bDrawHUD )
 	{
-		if ( !AeonsPlayer(Owner).bPhoenix )
+		if ( !PlayerTarget.bPhoenix )
 		{
-			if (!AeonsPlayer(Owner).bWizardEye)
+			if (!PlayerTarget.bWizardEye)
 			{
 				// we're not viewing through the wizardeye
-				if (AeonsPlayer(Owner).Health > 0)
+				if (PlayerTarget.Health > 0)
 				{
 					DrawScryeOverlay(Canvas);
 
-					if (AeonsPlayer(Owner).ScryeTimer == 0 )
+					if (PlayerTarget.ScryeTimer == 0 )
 						DrawShieldOverlay(Canvas);
 				
-					if (AeonsPlayer(Owner).ShalasMod != none)
-						if ( AeonsPlayer(Owner).ShalasMod.bActive )
+					if (PlayerTarget.ShalasMod != none)
+						if ( PlayerTarget.ShalasMod.bActive )
 							DrawShalasOverlay(Canvas);
 
-					if (AeonsPlayer(Owner).SlimeMod != none)
-						if ( AeonsPlayer(Owner).SlimeMod.bActive )
-							DrawSlimeOverlay(Canvas, SlimeModifier(AeonsPlayer(Owner).SlimeMod).EffectIntensity );
+					if (PlayerTarget.SlimeMod != none)
+						if ( PlayerTarget.SlimeMod.bActive )
+							DrawSlimeOverlay(Canvas, SlimeModifier(PlayerTarget.SlimeMod).EffectIntensity );
 				}
 			} else {
 				// we're viewing through the wizardeye, don't draw any other overlays
@@ -1264,38 +1343,33 @@ simulated function PostRender( canvas Canvas )
 			DrawPhoenixOverlay(Canvas);
 		}
 	
-		PlayerOwner = PlayerPawn(Owner);
-	
 	
 		if ( PlayerOwner != None )
 		{
-			if ( PlayerOwner.PlayerReplicationInfo == None )
-				return;
-	
 			if ( PlayerOwner.bShowMenu )
 			{
 				DisplayMenu(Canvas);
 				return;
 			}
-	
-			if ( PlayerOwner.bShowScores )
-			{
-	//			if ( (AeonsPlayer(Owner).bDrawCrosshair) && ( PlayerOwner.Weapon != None ) && ( !PlayerOwner.Weapon.bOwnsCrossHair ) )
-	//				 DrawCrossHair(Canvas, HalfClipX + AeonsPlayer(Owner).crossHairOffsetX, HalfClipY + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
-				if ( (PlayerOwner.Scoring == None) && (PlayerOwner.ScoringType != None) )
-					PlayerOwner.Scoring = Spawn(PlayerOwner.ScoringType, PlayerOwner);
-				if ( PlayerOwner.Scoring != None )
-				{ 
-					PlayerOwner.Scoring.ShowScores(Canvas);
-					return;
-				}
-			}
+
+	//			if ( (PlayerOwner.bDrawCrosshair) && ( PlayerOwner.Weapon != None ) && ( !PlayerOwner.Weapon.bOwnsCrossHair ) )
+	//				 DrawCrossHair(Canvas, HalfClipX + PlayerOwner.crossHairOffsetX, HalfClipY + PlayerOwner.crossHairOffsetY, PlayerOwner.crossHairScale);
 			
-			if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) )
+			if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) && PlayerTarget.Health > 0 )
 			{
 				PlayerOwner.Weapon.PostRender(Canvas);
-				if ( !PlayerOwner.Weapon.bOwnsCrossHair && !AeonsPlayer(PlayerOwner).bSelectObject )
-					DrawCrossHair(Canvas, HalfClipX + AeonsPlayer(Owner).crossHairOffsetX, HalfClipY + AeonsPlayer(Owner).crossHairOffsetY, AeonsPlayer(Owner).crossHairScale);
+				if ( !PlayerOwner.Weapon.bOwnsCrossHair )
+				{
+					if ( AP != None )
+					{
+						if ( !AP.bSelectObject )
+							DrawCrossHair(Canvas, HalfClipX + AP.crossHairOffsetX, HalfClipY + AP.crossHairOffsetY, AP.crossHairScale);
+					}
+					else
+					{
+						DrawCrossHair(Canvas, HalfClipX, HalfClipY, 1.0);
+					}
+				}
 			}
 	
 			if ( !PlayerOwner.bBehindView && (PlayerOwner.AttSpell != None) && (Level.LevelAction == LEVACT_None) )
@@ -1306,8 +1380,8 @@ simulated function PostRender( canvas Canvas )
 				PlayerOwner.DefSpell.PostRender(Canvas);
 	
 			
-			if ( PlayerPawn(Owner).ProgressTimeOut > Level.TimeSeconds )
-				DisplayProgressMessage(Canvas);
+			//if ( PlayerPawn(Owner).ProgressTimeOut > Level.TimeSeconds )
+			//	DisplayProgressMessage(Canvas);
 		}
 	
 		DrawDebugInfo(Canvas);
@@ -1319,64 +1393,69 @@ simulated function PostRender( canvas Canvas )
 		// DrawDecalInfo(Canvas);
 		
 		//This is a crosshair test
-		// if ( AeonsPlayer(Owner).bDrawCrossHair )
-			// DrawCrossHair(Canvas, (HalfClipX - 8) + AeonsPlayer(Owner).crossHairOffsetX, (HalfClipY - 8) + AeonsPlayer(Owner).crossHairOffsetY,AeonsPlayer(Owner).crossHairScale);
+		// if ( PlayerOwner.bDrawCrossHair )
+			// DrawCrossHair(Canvas, (HalfClipX - 8) + PlayerOwner.crossHairOffsetX, (HalfClipY - 8) + PlayerOwner.crossHairOffsetY,PlayerOwner.crossHairScale);
 		// this next line always draws a stationary cross hair - for debugging mindshatter
 		// DrawCrossHair(Canvas, (HalfClipX - 8), (HalfClipY - 8),1);
 	
-		//if (AeonsPlayer(Owner).bDrawStealth || AeonsPlayer(Owner).bDrawDebugHUD )
+		//if (PlayerOwner.bDrawStealth || PlayerOwner.bDrawDebugHUD )
 		//	DrawStealth(Canvas);
 		
-		if (AeonsPlayer(Owner).bDrawRico)
+		if ( AP != None && AP.bDrawRico )
 		{
 			DrawRicochet(Canvas);
 		}
 	
-		if ( AeonsPlayer(Owner).bDrawDebugHUD )
+		if ( AP != None && AP.bDrawDebugHUD )
 		{
 			DrawCoords(Canvas);
 			DrawTouchList(Canvas);
 		}
+
+		Canvas.DrawColor.a = 255; // set to 0 when connecting to a server
 	
-		if (bAltHud)
-		{
-			DrawHealth(Canvas, (64+WSI_Padding+WSI_Left)*ScaleY, Canvas.ClipY - 64*Scale);
-			DrawMana(Canvas, (128+60+WSI_Left+WSI_Padding*3)*ScaleY, Canvas.ClipY - 64*Scale);
-		}
-		else
-		{
-			DrawHealth(Canvas, HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY, true); // was 68 in renewal
-			DrawMana(Canvas, HalfClipX + (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
-		}
-	
-		if (Level.bDebugMessaging)
-			DrawManaInfo(Canvas);		// mana maintenence values
-	
-		// Stealth Icons have been cut from the game 11/19/2000
-		if (AeonsPlayer(Owner).bDrawStealth)
-			DrawStealthIcons(Canvas);
-	
-		DrawFlightMana(Canvas);
-		DrawCenterPiece(Canvas);
-		
-		if (Owner.GetRenewalConfig().bShowUsedMana)
+		if ( PlayerTarget.Health > 0 || !PlayerOwner.bShowScores ) // don't show health if dead and scoreboard is visible
 		{
 			if (bAltHud)
 			{
-				DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
+				DrawHealth(Canvas, (64+WSI_Padding+WSI_Left)*ScaleY, Canvas.ClipY - 64*Scale);
+				DrawMana(Canvas, (128+60+WSI_Left+WSI_Padding*3)*ScaleY, Canvas.ClipY - 64*Scale);
 			}
 			else
 			{
-				DrawUsedMana(Canvas, HalfClipX + 26*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
+				DrawHealth(Canvas, HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY, true); // was 68 in renewal
+				DrawMana(Canvas, HalfClipX + (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
+			}
+		
+			if (Level.bDebugMessaging)
+				DrawManaInfo(Canvas);		// mana maintenence values
+		
+			// Stealth Icons have been cut from the game 11/19/2000
+			if (AP != None && AP.bDrawStealth)
+				DrawStealthIcons(Canvas);
+		
+			DrawFlightMana(Canvas);
+			DrawCenterPiece(Canvas);
+			
+			if (GetRenewalConfig().bShowUsedMana)
+			{
+				if (bAltHud)
+				{
+					DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
+				}
+				else
+				{
+					DrawUsedMana(Canvas, HalfClipX + 26*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
+				}
 			}
 		}
 		
 		if ( bShowArrow )
 			MoveDebugArrow();
 		
-		if ( PlayerPawn(Owner).Health > 0 )
+		if ( PlayerTarget.Health > 0 )
 		{
-			if ( AeonsPlayer(Owner).bDrawDebugHUD )
+			if ( AP != None && AP.bDrawDebugHUD )
 			{
 				DrawGhelzUse(Canvas, Canvas.sizeX - 50, 30);
 				DrawInvCount(Canvas, 104*ScaleY, Canvas.ClipY-88*ScaleY);
@@ -1384,7 +1463,7 @@ simulated function PostRender( canvas Canvas )
 
 			if (bAltHud)
 			{
-				if (AeonsPlayer(Owner).DefSpell != none)
+				if (PlayerTarget.DefSpell != none)
 					DrawInventoryItem(Canvas, Canvas.ClipX - (WSI_Left + 256 + WSI_Padding*3)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
 				else
 					DrawInventoryItem(Canvas, Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
@@ -1397,7 +1476,7 @@ simulated function PostRender( canvas Canvas )
 			WeaponX = WSI_Left*ScaleY;
 			if (bAltHud)
 			{
-				if (AeonsPlayer(Owner).DefSpell != none)
+				if (PlayerTarget.DefSpell != none)
 					WeaponX = Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY;
 				else
 					WeaponX = Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY;
@@ -1405,30 +1484,31 @@ simulated function PostRender( canvas Canvas )
 			
 			DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-WSI_Bottom*ScaleY - 8*ScaleY/HudScale); // TextSize would be the proper way
 			DrawConventionalWeapon(Canvas, WeaponX, Canvas.ClipY - WSI_Bottom*ScaleY);
-		}
 
-		DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Right-2)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);
-		DrawOffensiveSpell(Canvas, Canvas.ClipX - WSI_Right*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);	
+			DrawOffensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Right-2)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);
+			DrawOffensiveSpell(Canvas, Canvas.ClipX - WSI_Right*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);	
 
-		DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);	
-		DrawDefensiveSpell(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
+			DrawDefensiveSpellAmplitude(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - (WSI_Bottom+8)*ScaleY);	
+			DrawDefensiveSpell(Canvas, Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY);
 		
-		DrawActiveSpells(Canvas);
+			DrawActiveSpells(Canvas);
 
-		// if their are any unread entries in the book, draw the hud icon
-		DrawBookInfo(Canvas);
+			// if their are any unread entries in the book, draw the hud icon
+			DrawBookInfo(Canvas);
+		}
 		
 		// draw objectives
-		DrawObjectives(Canvas);
+		if (Level.TimeSeconds < DisplayObjectivesTime)
+			DrawObjectives(Canvas);
 		
-		if (AeonsPlayer(Owner).bDrawInvList && (!AeonsPlayer(Owner).bSelectObject || AeonsPlayer(Owner).SelectMode != SM_Item))
+		if (AP != None && AP.bDrawInvList && (!AP.bSelectObject || AP.SelectMode != SM_Item))
 			DrawHeldItems(Canvas);
-	
-		if (AeonsPlayer(Owner).bDrawDebugHUD && bShowTex)
-			DrawTexData(Canvas);
 		
-		if (AeonsPlayer(Owner).bDrawDebugHUD)
+		if (AP != None && AP.bDrawDebugHUD)
 		{
+			if (bShowTex)
+				DrawTexData(Canvas);
+
 			DrawWeaponStateInfo(Canvas);
 			DrawSpellStateInfo(Canvas);
 			// DrawWeaponStateInfo(Canvas);
@@ -1446,7 +1526,7 @@ simulated function PostRender( canvas Canvas )
 				DrawLevelInfo(Canvas);
 		}
 	
-		if ( (AeonsPlayer(Owner).bDrawDebugHUD || showFrameRate) && (HudMode > 0) )
+		if ( ((AP != None && AP.bDrawDebugHUD) || showFrameRate) && (HudMode > 0) )
 		{
 			Canvas.Font = Canvas.LargeFont;
 			// Canvas.SetPos(0, 0.01 * Canvas.ClipY);
@@ -1473,6 +1553,26 @@ simulated function PostRender( canvas Canvas )
 			Canvas.DrawColor.G = 255;
 			Canvas.DrawColor.B = 255;
 		}
+
+		if ( PlayerOwner.bBadConnectionAlert && Level.TimeSeconds > 5.0 && HudMode > 0 )
+		{
+			/*
+			Canvas.Font = Canvas.MedFont;
+			Canvas.SetPos(10*Scale, 2*Scale);
+
+			Canvas.DrawColor = RedColor;
+
+			Canvas.DrawText(ConnectionProblemMessage, false);
+
+			Canvas.DrawColor = WhiteColor;
+			*/
+
+			Canvas.Style = ERenderStyle.STY_Normal;
+			Canvas.DrawColor = WhiteColor;
+			//Canvas.SetPos(Canvas.ClipX - (64*Scale), HalfClipY);
+			Canvas.SetPos(10*Scale, 10*Scale);
+			Canvas.DrawIcon(texture'DisconnectWarn', Scale);
+		}
 	
 		// circular HUD's
 		DrawSelectHUD(Canvas);
@@ -1489,15 +1589,15 @@ simulated function PostRender( canvas Canvas )
 		*/
 	
 		// Display Identification Info
-		DrawIdentifyInfo(Canvas, 0, Canvas.ClipY - 64.0);
+		DrawIdentifyInfo(Canvas, 0, Canvas.ClipY - 64.0*ScaleY);
 	
-		//if (AeonsPlayer(Owner).AttSpell.IsA('PowerWord'))
+		//if (PlayerOwner.AttSpell.IsA('PowerWord'))
 		//	DrawPowerWordDebug(Canvas);
 	
-		if ( AeonsPlayer(Owner).bDrawPawnName )
-			DrawPawnName(Canvas, 0, Canvas.ClipY - 64.0);
+		if ( AP != None && AP.bDrawPawnName )
+			DrawPawnName(Canvas, 0, Canvas.ClipY - 64.0*ScaleY);
 		
-		if ( AeonsPlayer(Owner).bDrawActorName )
+		if ( AP != None && AP.bDrawActorName )
 			DrawActorName(Canvas);
 	
 		if (MOTDFadeOutTime != 0.0)
@@ -1518,10 +1618,10 @@ simulated function PostRender( canvas Canvas )
 		// this really should be last in the render process
 		//fix only if debug build or other criteria
 	
-		//	if ( AeonsPlayer(Owner).bDrawDebugHUD )
+		//	if ( PlayerOwner.bDrawDebugHUD )
 		//	DrawIconsofShame(Canvas);
 	}
-	
+
 	/*
 	if ( AeonsPlayer(Owner) != None ) 
 	{
@@ -1529,25 +1629,49 @@ simulated function PostRender( canvas Canvas )
 		{
 			AeonsPlayer(Owner).bRequestedShot = false;
 
-			if ( AeonsPlayer(Owner).SavePath != "" )
-			{
-				Owner.ConsoleCommand("shot " $ AeonsPlayer(Owner).SavePath);
+			if ( AeonsPlayer(Owner).SavePath != "" ) 
 				Owner.ConsoleCommand("SaveShot " $ AeonsPlayer(Owner).SavePath);
-			}
-			
+
 			AeonsPlayer(Owner).SavePath = "";
 		}
 	}
 	*/
+
+	if ( bGameEnded )
+	{
+		ChatVisibleTime = Level.TimeSeconds + CHAT_FADE_TIME;
+		DrawSepiaOverlay(Canvas);
+	}
+	
+	if ( Level.TimeSeconds < ChatVisibleTime || AeonsConsole(PlayerPawn(Owner).Player.Console).bChatting )
+		DrawChat(Canvas);
 	
 	// Draw the subtitles
-	if (Aeonsplayer(Owner).bEnableSubtitles)
+	if (PlayerOwner.bEnableSubtitles)
 		DrawSubtitles (Canvas);
-	
+
+	if ( PlayerOwner.bShowScores && PlayerOwner.PlayerReplicationInfo != None )
+	{
+		if ( (PlayerOwner.Scoring == None) && (PlayerOwner.ScoringType != None) )
+		{
+			PlayerOwner.Scoring = Spawn(PlayerOwner.ScoringType, PlayerOwner);
+			PlayerOwner.Scoring.OwnerHUD = self;
+		}
+		if ( PlayerOwner.Scoring != None )
+		{ 
+			PlayerOwner.Scoring.ShowScores(Canvas);
+		}
+	}
 }
 
-function MoveDebugArrow()
+simulated function MoveDebugArrow()
 {
+	if (Arrow == None)
+	{
+		Arrow = spawn(class 'DebugArrow');
+		Arrow.bHidden = true;
+	}
+
 	Arrow.SetLocation(PlayerPawn(Owner).EyeTraceLoc);
 	Arrow.SetRotation(Rotator(PlayerPawn(Owner).EyeTraceNormal));
 }
@@ -1726,7 +1850,10 @@ simulated function DrawLevelInfo(Canvas Canvas)
 	
 	Canvas.SetPos( 1 , (Canvas.ClipY - 24*ScaleY));
 
-	Canvas.DrawText(""$LevelName$" Skill: "$Level.Game.Difficulty, false);
+	if (Level.Game != None)
+		Canvas.DrawText(LevelName$" Skill: "$Level.Game.Difficulty, false);
+	else
+		Canvas.DrawText(LevelName, false);
 
 	Canvas.DrawColor.R = 255;
 	Canvas.DrawColor.G = 255;
@@ -1755,7 +1882,7 @@ simulated function DrawDamageInfo(Canvas Canvas)
 	{
 		Canvas.Font = Canvas.SmallFont;
 
-		Canvas.SetPos( 8, 64-24);
+		Canvas.SetPos( 8*ScaleY, (64-24)*ScaleY);
 
 		Canvas.DrawColor.R = 150;
 		Canvas.DrawColor.G = 255;
@@ -1777,17 +1904,17 @@ simulated function DrawStateInfo(Canvas Canvas)
 	{
 		Canvas.Font = Canvas.SmallFont;
 
-		bClimbing = (AeonsPlayer(Owner).bCanFly && (GetStateName() == 'PlayerWalking'));
+		bClimbing = (PlayerOwner.bCanFly && (PlayerOwner.GetStateName() == 'PlayerWalking'));
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 100;
 
-		Canvas.SetPos( 8, 64-12);
-		Canvas.DrawText("Standing On: "$ (Pawn(Owner).StandingOn())$" bPainZone = "$Pawn(Owner).FootRegion.Zone.bPainZone$" ScryeTimer = "$PlayerPawn(Owner).ScryeTimer, false);
+		Canvas.SetPos( 8*ScaleY, (64-12)*ScaleY);
+		Canvas.DrawText("Standing On: "$ (PlayerOwner.StandingOn())$" bPainZone = "$PlayerOwner.FootRegion.Zone.bPainZone$" ScryeTimer = "$PlayerOwner.ScryeTimer, false);
 
-		Canvas.SetPos( 8, 64);
-		Canvas.DrawText("State: "$(AeonsPlayer(Owner).getStateName())$" AnimSequence = "$AeonsPlayer(Owner).AnimSequence$" Crouching = "$AeonsPlayer(Owner).bIsCrouching$" bDuck = "$AeonsPlayer(Owner).bDuck$" CrouchTime = "$AeonsPlayer(Owner).CrouchTime, false);
+		Canvas.SetPos( 8*ScaleY, 64*ScaleY);
+		Canvas.DrawText("State: "$(PlayerOwner.getStateName())$" AnimSequence = "$PlayerOwner.AnimSequence$" Crouching = "$PlayerOwner.bIsCrouching$" bDuck = "$PlayerOwner.bDuck$" CrouchTime = "$PlayerOwner.CrouchTime, false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -1802,25 +1929,39 @@ simulated function DrawSpellStateInfo(Canvas Canvas)
 	{
 		Canvas.Font = Canvas.SmallFont;
 
-		Canvas.DrawColor.R = 255;
-		Canvas.DrawColor.G = 255;
-		Canvas.DrawColor.B = 100;
+		if (PlayerOwner.AttSpell != None)
+		{
+			Canvas.DrawColor.R = 255;
+			Canvas.DrawColor.G = 255;
+			Canvas.DrawColor.B = 100;
 
-		Canvas.SetPos( 8, 64 + 12);
-		Canvas.DrawText("AttSpell: "$(AeonsPlayer(Owner).AttSpell.Class.name)$" Level: "$AttSpell(AeonsPlayer(Owner).AttSpell).LocalCastingLevel$" "$AeonsPlayer(Owner).AttSpell.PlayerViewOffset$" bFiring: "$AttSpell(AeonsPlayer(Owner).AttSpell).bFiring$" PendingAttSpell = "$AeonsPlayer(Owner).PendingAttSpell, false);
+			Canvas.SetPos( 8*ScaleY, (64 + 12)*ScaleY);
+			Canvas.DrawText("AttSpell: "$(PlayerOwner.AttSpell.Class.name)$" Level: "$AttSpell(PlayerOwner.AttSpell).LocalCastingLevel$" "$PlayerOwner.AttSpell.PlayerViewOffset$" bFiring: "$AttSpell(PlayerOwner.AttSpell).bFiring$" PendingAttSpell = "$PlayerOwner.PendingAttSpell, false);
 
-		Canvas.SetPos( 8, 64 + 2*12);
-		Canvas.DrawText("Att Spell state: "$(AeonsPlayer(Owner).AttSpell.GetStateName()$" __ Anim: "$AeonsPlayer(Owner).AttSpell.AnimSequence ), false);
+			Canvas.SetPos( 8*ScaleY, (64 + 2*12)*ScaleY);
+			Canvas.DrawText("Att Spell state: "$(PlayerOwner.AttSpell.GetStateName()$" __ Anim: "$PlayerOwner.AttSpell.AnimSequence ), false);
 
-		Canvas.DrawColor.R = 255;
-		Canvas.DrawColor.G = 100;
-		Canvas.DrawColor.B = 255;
+			if (AeonsSpell(PlayerOwner.AttSpell).bCanClientFire) 
+			{
+				Canvas.SetPos( 8*ScaleY, (64 + 3*12)*ScaleY);
+				Canvas.DrawText("CanClientFire", false);
+			}
+		}
 
-		Canvas.SetPos( 8, 64 + 3*12);
-		Canvas.DrawText("DefSpell: "$(AeonsPlayer(Owner).DefSpell.Class.name)$" Level: "$DefSpell(AeonsPlayer(Owner).DefSpell).LocalCastingLevel, false);
+		if (PlayerOwner.DefSpell != None)
+		{
+			Canvas.DrawColor.R = 255;
+			Canvas.DrawColor.G = 100;
+			Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, 64 + 4*12);
-		Canvas.DrawText("Def Spell state: "$(AeonsPlayer(Owner).defSpell.GetStateName()$" __ Anim: "$AeonsPlayer(Owner).DefSpell.AnimSequence), false);
+			Canvas.SetPos( 8*ScaleY, (64 + 3*12)*ScaleY);
+			Canvas.DrawText("DefSpell: "$(PlayerOwner.DefSpell.Class.name)$" Level: "$DefSpell(PlayerOwner.DefSpell).LocalCastingLevel, false);
+
+			Canvas.SetPos( 8*ScaleY, (64 + 4*12)*ScaleY);
+			Canvas.DrawText("Def Spell state: "$(PlayerOwner.defSpell.GetStateName()$" __ Anim: "$PlayerOwner.DefSpell.AnimSequence), false);
+		}
+
+		
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -1832,9 +1973,15 @@ simulated function DrawCameraDebug(Canvas Canvas)
 {
 	local rotator r;
 	local vector v;
+	local AeonsPlayer AP;
 
-	r = AeonsPlayer(Owner).CamDebugRotDiff;
-	v = AeonsPlayer(Owner).CamDebugPosDiff;
+	AP = AeonsPlayer(PlayerOwner);
+
+	if ( AP == None )
+		return;
+
+	r = AP.CamDebugRotDiff;
+	v = AP.CamDebugPosDiff;
 
 	Canvas.Font = Canvas.SmallFont;
 
@@ -1847,15 +1994,15 @@ simulated function DrawCameraDebug(Canvas Canvas)
 	Canvas.SetPos( 256, 4+14);
 	Canvas.DrawText("Pos Difference: "$v, false);
 	Canvas.SetPos( 256, 4+ 2*14);
-	Canvas.DrawText("LookAt[1]: "$AeonsPlayer(Owner).LookAt1, false);
+	Canvas.DrawText("LookAt[1]: "$AP.LookAt1, false);
 	Canvas.SetPos( 256, 4+ 3*14);
-	Canvas.DrawText("LookAt[2]: "$AeonsPlayer(Owner).LookAt2, false);
+	Canvas.DrawText("LookAt[2]: "$AP.LookAt2, false);
 	Canvas.SetPos( 256, 4+ 4*14);
-	Canvas.DrawText("LookDir: "$AeonsPlayer(Owner).LookDir, false);
+	Canvas.DrawText("LookDir: "$AP.LookDir, false);
 	Canvas.SetPos( 256, 4+ 5*14);
-	Canvas.DrawText("Fov: Current"$AeonsPlayer(Owner).DesiredFov, false);
+	Canvas.DrawText("Fov: Current"$AP.DesiredFov, false);
 	Canvas.SetPos( 256, 4+ 6*14);
-	Canvas.DrawText("Parametric Dist: "$AeonsPlayer(Owner).pDist, false);
+	Canvas.DrawText("Parametric Dist: "$AP.pDist, false);
 
 	Canvas.DrawColor.R = 255;
 	Canvas.DrawColor.G = 255;
@@ -1866,11 +2013,13 @@ simulated function DrawWeaponStateInfo(Canvas Canvas)
 {
 	local AeonsWeapon PlayerWeapon;
 	local int VerticalOffset;
+	local name PendingWeaponName;
+	local int AmmoAmount;
 
 	if(HudMode == 1)
 	{
-		if ( (Owner != None) && (AeonsPlayer(Owner) != None))
-				PlayerWeapon = AeonsWeapon(AeonsPlayer(Owner).Weapon);
+		if ( (Owner != None) && (PlayerOwner != None))
+				PlayerWeapon = AeonsWeapon(PlayerOwner.Weapon);
 
 		if ( PlayerWeapon != None )
 		{
@@ -1880,28 +2029,34 @@ simulated function DrawWeaponStateInfo(Canvas Canvas)
 			Canvas.DrawColor.G = 45;
 			Canvas.DrawColor.B = 100;
 
-			VerticalOffset = 124; // 60 + 5*12
-			Canvas.SetPos( 8, VerticalOffset);
-			Canvas.DrawText("Weapon: "$(PlayerWeapon.Class.Name)$" Pending Weapon: "$AeonsPlayer(Owner).PendingWeapon.name$" bFiring = "$AeonsWeapon(AeonsPlayer(Owner).Weapon).bFiring, false);
+			if (PlayerOwner.PendingWeapon != None)
+				PendingWeaponName = PlayerOwner.PendingWeapon.name;
 
-			VerticalOffset += 12;
-			Canvas.SetPos( 8, VerticalOffset);
-			Canvas.DrawText("Weapon State: "$(PlayerWeapon.GetStateName())$" HeldTime: "$AeonsPlayer(Owner).FireHeldTime$"Ammo Type = "$PlayerWeapon.AmmoType$" Ammo Count = "$PlayerWeapon.AmmoType.AmmoAmount$" bAltAmmo = "$PlayerWeapon.bAltAmmo, false);
+			if (PlayerWeapon.AmmoType != None)
+				AmmoAmount = PlayerWeapon.AmmoType.AmmoAmount;
 
-			VerticalOffset += 12;
-			Canvas.SetPos( 8, VerticalOffset);
+			VerticalOffset = 124*ScaleY; // 60 + 5*12
+			Canvas.SetPos( 8*ScaleY, VerticalOffset);
+			Canvas.DrawText("Weapon: "$(PlayerWeapon.Class.Name)$" Pending Weapon: "$PendingWeaponName$" bFiring = "$PlayerWeapon.bFiring, false);
+
+			VerticalOffset += 12*ScaleY;
+			Canvas.SetPos( 8*ScaleY, VerticalOffset);
+			Canvas.DrawText("Weapon State: "$(PlayerWeapon.GetStateName())$" HeldTime: "$AeonsPlayer(PlayerOwner).FireHeldTime$"Ammo Type = "$PlayerWeapon.AmmoType$" Ammo Count = "$AmmoAmount$" bAltAmmo = "$PlayerWeapon.bAltAmmo, false);
+
+			VerticalOffset += 12*ScaleY;
+			Canvas.SetPos( 8*ScaleY, VerticalOffset);
 			Canvas.DrawText("Weapon Sequence: "$(PlayerWeapon.AnimSequence), false);
 
 			// do the offset anyway so that we can keep fixed locations below us
-			VerticalOffset += 12;
+			VerticalOffset += 12*ScaleY;
 
-/*
+
 			if (PlayerWeapon.bCanClientFire) 
 			{
-				Canvas.SetPos( 8, VerticalOffset);
+				Canvas.SetPos( 8*ScaleY, VerticalOffset);
 				Canvas.DrawText("CanClientFire", false);
 			}
-
+/*
 
 			// do the offset anyway so that we can keep fixed locations below us
 			VerticalOffset += 12;
@@ -1948,7 +2103,7 @@ simulated function DrawManaInfo(Canvas Canvas)
 {
 	local float ManaInfoX;
 	
-	if ( (AeonsPlayer(Owner).ManaMod == None) )
+	if ( PlayerTarget.ManaMod == None )
 		return;
 
 	if(HudMode == 1)
@@ -1964,10 +2119,10 @@ simulated function DrawManaInfo(Canvas Canvas)
 			ManaInfoX = (128+60+60+WSI_Left+WSI_Padding*3)*ScaleY;
 
 		Canvas.SetPos(ManaInfoX, Canvas.ClipY - 50*ScaleY);
-		Canvas.DrawText(("+"$ManaModifier(AeonsPlayer(Owner).ManaMod).ManaPerSec), false);
+		Canvas.DrawText(("+"$ManaModifier(PlayerTarget.ManaMod).ManaPerSec), false);
 
 		Canvas.SetPos(ManaInfoX, Canvas.ClipY - 30*ScaleY);
-		Canvas.DrawText(("-"$(ManaModifier(AeonsPlayer(Owner).ManaMod).ManaMaint + ManaModifier(AeonsPlayer(Owner).ManaMod).ScytheMaint)), false);
+		Canvas.DrawText(("-"$(ManaModifier(PlayerTarget.ManaMod).ManaMaint + ManaModifier(PlayerTarget.ManaMod).ScytheMaint)), false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -1976,21 +2131,27 @@ simulated function DrawManaInfo(Canvas Canvas)
 }
 
 
-function DrawStealth(Canvas Canvas)
+simulated function DrawStealth(Canvas Canvas)
 {
 	local float a,v,m,t,ca;
 	local color c;
+	local AeonsPlayer AP;
+
+	AP = AeonsPlayer(PlayerOwner);
+
+	if ( AP == None )
+		return;
 	
-	if ( (AeonsPlayer(Owner).StealthMod == None) )
+	if ( (AP.StealthMod == None) )
 		return;
 
 	if (HudMode == 1)
 	{
-		ca = StealthModifier(AeonsPlayer(Owner).StealthMod).CurrentAudible;
-		a = StealthModifier(AeonsPlayer(Owner).StealthMod).AudibleStealth;
-		v = StealthModifier(AeonsPlayer(Owner).StealthMod).VisibleStealth;
-		m = StealthModifier(AeonsPlayer(Owner).StealthMod).MovementStealth;
-		t = StealthModifier(AeonsPlayer(Owner).StealthMod).TotalStealth;
+		ca = StealthModifier(AP.StealthMod).CurrentAudible;
+		a = StealthModifier(AP.StealthMod).AudibleStealth;
+		v = StealthModifier(AP.StealthMod).VisibleStealth;
+		m = StealthModifier(AP.StealthMod).MovementStealth;
+		t = StealthModifier(AP.StealthMod).TotalStealth;
 
 		Canvas.Font = Canvas.SmallFont;
 
@@ -1998,32 +2159,32 @@ function DrawStealth(Canvas Canvas)
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 156;
 
-		Canvas.SetPos( 8, HalfClipY + 52 + 48 );
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (52 + 48)*ScaleY );
 		Canvas.DrawText( ("Player Stealth Info"), false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, HalfClipY + 64 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (64 + 48)*ScaleY);
 		Canvas.DrawText( ("Audible:  "$a$" Ca:"$ca), false);
 
-		c = PlayerPawn(Owner).Weapon.IncidentLight;
+		c = PlayerOwner.Weapon.IncidentLight;
 		Canvas.DrawColor.R = c.r;
 		Canvas.DrawColor.G = c.g;
 		Canvas.DrawColor.B = c.b;
 
-		Canvas.SetPos( 8, HalfClipY + 64 + 12 + 48 );
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (64 + 12 + 48)*ScaleY );
 		Canvas.DrawText( ("Visible:  "$v), false);
 
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, HalfClipY + 64 + 24 + 48 );
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (64 + 24 + 48)*ScaleY );
 		Canvas.DrawText( ("Movement: "$m), false);
 
-		Canvas.SetPos( 8, HalfClipY + 64 + 36 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (64 + 36 + 48)*ScaleY);
 		Canvas.DrawText( ("Total:    "$t), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2032,7 +2193,7 @@ function DrawStealth(Canvas Canvas)
 	}
 }
 
-function DrawTouchList(Canvas Canvas)
+simulated function DrawTouchList(Canvas Canvas)
 {
 	Canvas.Font = Canvas.SmallFont;
 
@@ -2042,61 +2203,61 @@ function DrawTouchList(Canvas Canvas)
 
 	if ( Owner.Touching[0] != None )
 	{
-		Canvas.SetPos( 128, 2);
+		Canvas.SetPos( 128*ScaleY, 2*ScaleY);
 		Canvas.DrawText( ("Touch[0]: "$Owner.Touching[0].name), false);
 	}
 
 	if ( Owner.Touching[1] != None )
 	{
-		Canvas.SetPos( 128, 2 + 12);
+		Canvas.SetPos( 128*ScaleY, (2 + 12)*ScaleY);
 		Canvas.DrawText( ("Touch[1]: "$Owner.Touching[1].name), false);
 	}
 
 	if ( Owner.Touching[2] != None )
 	{
-		Canvas.SetPos( 256, 2);
+		Canvas.SetPos( 256*ScaleY, 2*ScaleY);
 		Canvas.DrawText( ("Touch[2]: "$Owner.Touching[2].name), false);
 	}
 
 	if ( Owner.Touching[3] != None )
 	{
-		Canvas.SetPos( 256, 2 + 12);
+		Canvas.SetPos( 256*ScaleY, (2 + 12)*ScaleY);
 		Canvas.DrawText( ("Touch[3]: "$Owner.Touching[3].name), false);
 	}
 
 	if ( Owner.Touching[4] != None )
 	{
-		Canvas.SetPos( 128, 2 + 2*12);
+		Canvas.SetPos( 128*ScaleY, (2 + 2*12)*ScaleY);
 		Canvas.DrawText( ("Touch[4]: "$Owner.Touching[4].name), false);
 	}
 
 	if ( Owner.Touching[5] != None )
 	{
-		Canvas.SetPos( 128, 2 + 3*12);
+		Canvas.SetPos( 128*ScaleY, (2 + 3*12)*ScaleY);
 		Canvas.DrawText( ("Touch[5]: "$Owner.Touching[5].name), false);
 	}
 
 	if ( Owner.Touching[6] != None )
 	{
-		Canvas.SetPos( 256, 2 + 2*12);
+		Canvas.SetPos( 256*ScaleY, (2 + 2*12)*ScaleY);
 		Canvas.DrawText( ("Touch[6]: "$Owner.Touching[6].name), false);
 	}
 
 	if ( Owner.Touching[7] != None )
 	{
-		Canvas.SetPos( 256, 2 + 3*12);
+		Canvas.SetPos( 256*ScaleY, (2 + 3*12)*ScaleY);
 		Canvas.DrawText( ("Touch[7]: "$Owner.Touching[7].name), false);
 	}
 	
-	Canvas.SetPos( 384, 2 + 3*12);
-	Canvas.DrawText( ("Overlay Actor: "$AeonsPlayer(Owner).OverlayActor), false);
+	Canvas.SetPos( 384*ScaleY, (2 + 3*12)*ScaleY);
+	Canvas.DrawText( ("Overlay Actor: "$AeonsPlayer(PlayerOwner).OverlayActor), false);
 
 	Canvas.DrawColor.R = 255;
 	Canvas.DrawColor.G = 255;
 	Canvas.DrawColor.B = 255;
 }
 
-function DrawCoords(Canvas Canvas)
+simulated function DrawCoords(Canvas Canvas)
 {
 	local vector pos, dir;
 	local int x, y, z;
@@ -2105,8 +2266,8 @@ function DrawCoords(Canvas Canvas)
 	if(HudMode == 1)
 	{
 		
-		pos = AeonsPlayer(Owner).Location;
-		dir = Vector(AeonsPlayer(Owner).ViewRotation);
+		pos = PlayerOwner.Location;
+		dir = Vector(PlayerOwner.ViewRotation);
 
 		Canvas.Font = Canvas.SmallFont;
 
@@ -2114,7 +2275,7 @@ function DrawCoords(Canvas Canvas)
 		Canvas.DrawColor.G = 0;
 		Canvas.DrawColor.B = 255;
 
-		Canvas.SetPos( 8, HalfClipY + 128 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (128 + 48)*ScaleY);
 		Canvas.DrawText( ("Coordinate Info"), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2141,13 +2302,13 @@ function DrawCoords(Canvas Canvas)
 		else
 			zStr = (" 0."$z);
 
-		Canvas.SetPos( 8, HalfClipY + 128 + 12 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (128 + 12 + 48)*ScaleY);
 		Canvas.DrawText( ("Location: "$int(pos.x)$"  "$int(pos.y)$"  "$int(pos.z)), false);
 
-		Canvas.SetPos( 8, HalfClipY + 128 + 24 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (128 + 24 + 48)*ScaleY);
 		Canvas.DrawText( ("Dir:      "$Dir.x$"  "$Dir.y$"  "$Dir.z), false);
 
-		Canvas.SetPos( 8, HalfClipY + 128 + 36 + 48);
+		Canvas.SetPos( 8*ScaleY, HalfClipY + (128 + 36 + 48)*ScaleY);
 		Canvas.DrawText(("Speed:    "$int(VSize(Pawn(Owner).Velocity))), false);
 
 		Canvas.DrawColor.R = 255;
@@ -2164,7 +2325,7 @@ simulated function DrawActiveSpells(Canvas canvas)
 	local int OffsetX, tempX;
 	local int Slot;
 	
-	Player = AeonsPlayer(Owner);
+	Player = PlayerTarget;
 	
 	if ( Player != None )	
 	{
@@ -2192,11 +2353,12 @@ simulated function DrawActiveSpells(Canvas canvas)
 			OffsetX -= (32 + 8)*Scale;
 		}
 		
-		if ( Player.bHasteActive )//( Player.HasteMod != None )&&( Player.HasteMod.bActive ))
+		if ( (Player.HasteMod != None) && (Player.HasteMod.bActive) )
+		//if ( Player.bHasteActive )
 		{
 			Canvas.SetPos( OffsetX, 8*Scale );
 			Canvas.DrawTile( Icons[15], 32*Scale, 32*Scale, 0, 0, 64, 64 );
-			if ( Level.bDebugMessaging )
+			if ( Level.bDebugMessaging && Player.HasteMod != None )
 			{
 				Canvas.SetPos( OffsetX, 8*Scale );
 				Canvas.DrawText(class'UWindowBase'.static.TrimFloat(HasteModifier(Player.HasteMod).TimeLeft, 2), false);
@@ -2425,10 +2587,9 @@ simulated function DrawBookInfo(Canvas Canvas)
 {
 	local AeonsPlayer AP;
 
-	if ( Owner != None )
-		AP = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if (AP.Book == None || bAltHud) // don't draw this hud element with new hud
+	if (AP == None || AP.Book == None || bAltHud) // don't draw this hud element with new hud
 		return;
 
 	// Check to see if the newest unread should be refreshed or if data is corrupted.
@@ -2455,7 +2616,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 			}
 			else
 			{
-				if (AeonsPlayer(Owner).DefSpell != none)
+				if (PlayerOwner.DefSpell != none)
 					Canvas.SetPos( Canvas.ClipX - (WSI_Left + 192 + WSI_Padding*2)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY );
 				else
 					Canvas.SetPos( Canvas.ClipX - (WSI_Left + 128 + WSI_Padding)*ScaleY, Canvas.ClipY - WSI_Bottom*ScaleY );
@@ -2466,6 +2627,7 @@ simulated function DrawBookInfo(Canvas Canvas)
 			else
 				Canvas.DrawTileClipped( AP.Book.NewestUnread.Icon, 64*Scale, 64*Scale, 0, 0, 64, 64);
 
+			Canvas.Style = ERenderStyle.STY_Normal;
 		}
 	}
 }
@@ -2480,39 +2642,36 @@ simulated function DrawObjectives(Canvas Canvas)
 	local int i;
 	local int Objective;
 
-	AP = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 
-	if (Level.TimeSeconds < DisplayObjectivesTime)
+	Canvas.DrawColor = WhiteColor;
+	Canvas.Font = Canvas.SmallFont;
+	Canvas.Style = ERenderStyle.STY_Normal;
+
+	for (i=0; i<ArrayCount(AP.Objectives); i++)
 	{
-		Canvas.DrawColor = WhiteColor;
-		Canvas.Font = Canvas.SmallFont;
-		Canvas.Style = ERenderStyle.STY_Normal;
+		Canvas.SetPos( 50*ScaleY, (25+25*i)*ScaleY );
+		
+		Objective = AP.Objectives[i];
 
-		for (i=0; i<ArrayCount(AP.Objectives); i++)
+		// once we hit a 0 or a disabled objective we have reached the end of the valid objectives
+		if ( (AP.Objectives[i] == 0) || (AP.Objectives[i] >= 100) )
 		{
-			Canvas.SetPos( 50*ScaleY, (25+25*i)*ScaleY );
+			return;
+		}
+
+		TempString = AP.ObjectivesText[Objective];
+
+		if (TempString != "")
+		{
+			Token = InStr(TempString, ",");
 			
-			Objective = AP.Objectives[i];
-
-			// once we hit a 0 or a disabled objective we have reached the end of the valid objectives
-			if ( (AP.Objectives[i] == 0) || (AP.Objectives[i] >= 100) )
+			if (Token >= 0)
 			{
-				return;
+				TempString = Right(TempString, Len(TempString)-Token-1);
 			}
 
-			TempString = AP.ObjectivesText[Objective];
-
-			if (TempString != "")
-			{
-				Token = InStr(TempString, ",");
-				
-				if (Token >= 0)
-				{
-					TempString = Right(TempString, Len(TempString)-Token-1);
-				}
-
-				Canvas.DrawText(TempString, false);
-			}
+			Canvas.DrawText(TempString, false);
 		}
 	}
 }
@@ -2638,6 +2797,9 @@ simulated function DrawHeldItems(Canvas Canvas)
 			// one last time, position text differently on PSX2
 			Inv = LuckysevenItems[i];
 
+			if (Inv == None)
+				continue;
+
 			if (bAltHud)
 			{
 				CurrentY = YOffset*ScaleY + (i * Spacing) + Spacing / 2.0; // centered spacing
@@ -2717,18 +2879,30 @@ simulated function DrawAmmo(Canvas Canvas, int X, int Y)
 	local int Ammocount, ClipCount;
 	local Ammo ammo;
 
-	ammo = Pawn(Owner).Weapon.ammoType;
+	if (PlayerTarget.Weapon == None)
+		return;
+
+	ammo = PlayerTarget.Weapon.ammoType;
 
 	if (ammo != none && ammo.MaxAmmo > 0)
 	{
-		clipCount = AeonsWeapon(Pawn(Owner).Weapon).ClipCount;
-		AmmoCount = ammo.AmmoAmount - clipCount;
-		AmmoCount = Clamp(AmmoCount, 0, 99999);
-		
-		if (ammo.AmmoAmount == 0)
-			ClipCount = 0;
+		if (AeonsWeapon(PlayerTarget.Weapon).bReloadable)
+		{
 
-		tmpStr = (ClipCount$"/"$AmmoCount);
+			clipCount = AeonsWeapon(PlayerTarget.Weapon).ClipCount;
+
+			AmmoCount = ammo.AmmoAmount - clipCount;
+			AmmoCount = Clamp(AmmoCount, 0, 99999);
+			
+			if (ammo.AmmoAmount == 0)
+				ClipCount = 0;
+
+			tmpStr = (ClipCount$"/"$AmmoCount);
+		}
+		else
+		{
+			tmpStr = ""$ammo.AmmoAmount;
+		}
 		Canvas.Font = Canvas.SmallFont;
 		Canvas.SetPos( X, Y );
 	
@@ -2769,15 +2943,15 @@ simulated function DrawHealth(Canvas Canvas, int X, int Y, optional bool bRightA
 {
 	local int iTempHealth;
 
-	if ( Pawn(Owner).Health < 0 )
-		Pawn(Owner).Health = 0;
+	if ( PlayerTarget.Health < 0 )
+		PlayerTarget.Health = 0;
 
 	if (HudMode > 0)
 	{
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 
-		iTempHealth = Pawn(Owner).Health;
-		if ( ( iTempHealth == 0 ) && ( pawn(Owner).Health > 0.0 ) )
+		iTempHealth = PlayerTarget.Health;
+		if ( ( iTempHealth == 0 ) && ( PlayerTarget.Health > 0.0 ) )
 			iTempHealth = 1;
 
 		if ( iTempHealth > 75 )
@@ -2825,21 +2999,21 @@ simulated function DrawConventionalWeapon(Canvas Canvas, int X, int Y)
 	local int Slot;
 	local Weapon whatToDraw;
 	
-	if ( (Owner == None) || (Pawn(Owner) == None) )
+	if ( PlayerTarget == None )
 		return;
 
-	if ( AeonsPlayer(Owner) != None && AeonsPlayer(Owner).bScrollObject
-		&& AeonsPlayer(Owner).SelectMode == SM_Weapon )
+	if ( PlayerTarget != None && PlayerTarget.bScrollObject
+		&& PlayerTarget.SelectMode == SM_Weapon )
 	{
 		// in this case, we don't draw the weapon held--
 		// we draw the weapon to be selected
 		// also draw swirly behind it, with weapon name above
-		whatToDraw = Weapon(AeonsPlayer(Owner).SelectedInvPSX2);
+		whatToDraw = Weapon(PlayerTarget.SelectedInvPSX2);
 		DrawSelectHighlightPSX2(Canvas,X,Y);
 	}
 	else
 	{
-		whatToDraw = Pawn(Owner).Weapon;
+		whatToDraw = PlayerTarget.Weapon;
 	}
 
 	if ( whatToDraw == None )
@@ -2868,14 +3042,14 @@ simulated function DrawConventionalWeapon(Canvas Canvas, int X, int Y)
 			//fix check for valid group
 			if (WhatToDraw.IsA('Shotgun'))
 			{
-				if (AeonsPlayer(Owner).bDoubleShotgun)
+				if (PlayerTarget.bDoubleShotgun)
 					Canvas.DrawTileClipped( Icons[29], 64*Scale, 64*Scale, 0, 0, 64, 64); 
 				else	
 					Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64); 
 			} else if (WhatToDraw.IsA('Scythe')) {
 				// Draw the Berserk Glow
 				Canvas.Style = ERenderStyle.STY_Translucent;
-				if (Scythe(AeonsPlayer(Owner).Weapon).bBerserk)
+				if (Scythe(PlayerTarget.Weapon).bBerserk)
 					Canvas.DrawTileClipped( Texture'Aeons.Icons.Scythe_Icon_Glow', 64*Scale, 64*Scale, 0, 0, 64, 64); 
 				// Draw the normal icon
 				Canvas.Style = ERenderStyle.STY_AlphaBlend;
@@ -2884,14 +3058,16 @@ simulated function DrawConventionalWeapon(Canvas Canvas, int X, int Y)
 			} else if (WhatToDraw.IsA('Speargun')) {
 				// Lightning Glow
 				Canvas.Style = ERenderStyle.STY_Translucent;
-				if (Speargun(AeonsPlayer(Owner).Weapon).bCharged)
+				if (Speargun(PlayerTarget.Weapon).bCharged)
 					Canvas.DrawTileClipped( Texture'Aeons.Icons.Speargun_Glow_Icon', 64*Scale, 64*Scale, 0, 0, 64, 64); 
 				// Draw the normal icon
 				Canvas.Style = ERenderStyle.STY_AlphaBlend;
 				Canvas.SetPos( X, Y );
 				Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64); 
 			} else {
-				if ( Icons[whatToDraw.InventoryGroup] != None )
+				if ( whatToDraw.Icon != None && whatToDraw.Icon != Texture'Engine.S_Weapon' )
+					Canvas.DrawIcon( whatToDraw.Icon, Scale ); 
+				else if ( Icons[whatToDraw.InventoryGroup] != None )
 					Canvas.DrawTileClipped( Icons[whatToDraw.InventoryGroup], 64*Scale, 64*Scale, 0, 0, 64, 64); 
 			}
 
@@ -2905,6 +3081,7 @@ simulated function DrawConventionalWeapon(Canvas Canvas, int X, int Y)
 			{
 				if ( slot == class'TibetianWarCannon'.default.InventoryGroup )
 				{
+					Canvas.Font = Canvas.SmallFont;
 					Canvas.SetPos( X+8, Y );
 					Canvas.DrawText((""$TibetianWarCannon(whatToDraw).InternalMana$"  "$TibetianWarCannon(whatToDraw).ChargedMana), false);
 				}
@@ -2918,23 +3095,26 @@ simulated function DrawStealthIcons(Canvas Canvas)
 	local string str;
 	local int X, Y, ai, vi, mi;
 	local float a, v, m;
+	local AeonsPlayer AP;
 
-	if (AeonsPlayer(Owner) == none)
+	AP = AeonsPlayer(PlayerOwner);
+
+	if ( AP == None )
 		return;
 
-	if ( (AeonsPlayer(Owner).StealthMod == None) )
+	if ( (AP.StealthMod == None) )
 		return;
 	
-	if ( AeonsPlayer(Owner).AttSpell != None )
+	if ( AP.AttSpell != None )
 	{
 		if (HudMode == 1)
 		{
 
 			Canvas.Style = 3;
 
-			a = StealthModifier(AeonsPlayer(Owner).StealthMod).AudibleStealth - 0.05;
-			v = StealthModifier(AeonsPlayer(Owner).StealthMod).VisibleStealth - 0.05;
-			m = StealthModifier(AeonsPlayer(Owner).StealthMod).MovementStealth - 0.05;
+			a = StealthModifier(AP.StealthMod).AudibleStealth - 0.05;
+			v = StealthModifier(AP.StealthMod).VisibleStealth - 0.05;
+			m = StealthModifier(AP.StealthMod).MovementStealth - 0.05;
 	
 			ai = Clamp((a * 10), 0, 11);
 			vi = Clamp((v * 10), 0, 11);
@@ -2971,13 +3151,13 @@ simulated function DrawDefensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 	local int 		i, Lvl;
 	local bool		bGhelz;
 		
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	if ( AeonsPlayer(Owner).DefSpell != None )
+	if ( PlayerTarget.DefSpell != None )
 	{
-		Lvl = AeonsPlayer(Owner).DefSpell.castingLevel;
-		if ( AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
+		Lvl = PlayerTarget.DefSpell.castingLevel;
+		if ( PlayerTarget.Weapon != None && PlayerTarget.Weapon.IsA('GhelziabahrStone') )
 		{
 			bGhelz = true;
 			Lvl ++;
@@ -2989,7 +3169,7 @@ simulated function DrawDefensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.G = 200;
 			Canvas.DrawColor.B = 255;
 
-			if (PlayerPawn(Owner).bAmplifySpell && (AeonsPlayer(Owner).DefSpell.castingLevel <= 3))
+			if (PlayerTarget.bAmplifySpell && (PlayerTarget.DefSpell.castingLevel <= 3))
 			{
 				Canvas.DrawColor.R = 255;
 				Canvas.DrawColor.G = 100;
@@ -3021,13 +3201,13 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 	local int 		i, Lvl;
 	local bool		bGhelz;
 	
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	if ( AeonsPlayer(Owner).AttSpell != None )
+	if ( PlayerTarget.AttSpell != None )
 	{
-		Lvl = AeonsPlayer(Owner).AttSpell.castingLevel;
-		if ( AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
+		Lvl = PlayerTarget.AttSpell.castingLevel;
+		if ( PlayerTarget.Weapon != None && PlayerTarget.Weapon.IsA('GhelziabahrStone') )
 		{
 			bGhelz = true;
 			Lvl ++;
@@ -3039,7 +3219,7 @@ simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.G = 200;
 			Canvas.DrawColor.B = 255;
 
-			if (PlayerPawn(Owner).bAmplifySpell && (AeonsPlayer(Owner).AttSpell.castingLevel <= 3))
+			if (PlayerTarget.bAmplifySpell && (PlayerTarget.AttSpell.castingLevel <= 3))
 			{
 				Canvas.DrawColor.R = 255;
 				Canvas.DrawColor.G = 100;
@@ -3070,20 +3250,20 @@ simulated function DrawOffensiveSpell(Canvas Canvas, int X, int Y)
 	local int Slot;
 	local Spell whatToDraw;
 	
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	if ( AeonsPlayer(Owner).bScrollObject && AeonsPlayer(Owner).SelectMode == SM_AttSpell )
+	if ( PlayerTarget.bScrollObject && PlayerTarget.SelectMode == SM_AttSpell )
 	{
 		// in this case, we don't draw the spell held--
 		// we draw the spell to be selected
 		// also draw swirly behind it, with spell name above
-		whatToDraw = Spell(AeonsPlayer(Owner).SelectedInvPSX2);
+		whatToDraw = Spell(PlayerTarget.SelectedInvPSX2);
 		DrawSelectHighlightPSX2(Canvas,X,Y);
 	}
 	else
 	{
-		whatToDraw = AeonsPlayer(Owner).AttSpell;
+		whatToDraw = PlayerTarget.AttSpell;
 	}
 
 	if ( whatToDraw != None )
@@ -3140,23 +3320,23 @@ simulated function DrawDefensiveSpell(Canvas Canvas, int X, int Y)
 	local int Slot;
 	local Spell whatToDraw;
 	
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	if ( AeonsPlayer(Owner).DefSpell == none ) 
+	if ( PlayerTarget.DefSpell == none ) 
 		return;
 
-	if ( AeonsPlayer(Owner).bScrollObject && AeonsPlayer(Owner).SelectMode == SM_DefSpell )
+	if ( PlayerTarget.bScrollObject && PlayerTarget.SelectMode == SM_DefSpell )
 	{
 		// in this case, we don't draw the spell held--
 		// we draw the spell to be selected
 		// also draw swirly behind it, with spell name above
-		whatToDraw = Spell(AeonsPlayer(Owner).SelectedInvPSX2);
+		whatToDraw = Spell(PlayerTarget.SelectedInvPSX2);
 		DrawSelectHighlightPSX2(Canvas,X,Y);
 	}
 	else
 	{
-		whatToDraw = AeonsPlayer(Owner).DefSpell;
+		whatToDraw = PlayerTarget.DefSpell;
 	}
 
 	if ( whatToDraw == None )
@@ -3213,8 +3393,11 @@ simulated function DrawSelectHighlightPSX2(Canvas Canvas, int X, int Y)
 	local string SelectedName;
 	local float TextWidth, TextHeight;
 	local texture BackLayer;
+	local AeonsPlayer AP;
 
-	if ( AeonsPlayer(Owner) == None )
+	AP = AeonsPlayer(PlayerOwner);
+
+	if ( AP == None )
 		return;
 
 	// Draw swirly at coordinates provided
@@ -3232,16 +3415,16 @@ simulated function DrawSelectHighlightPSX2(Canvas Canvas, int X, int Y)
 
 	// Now draw text above icon
 	Canvas.Style = 1;
-	if ( AeonsPlayer(Owner).SelectedInvPSX2 != None )
+	if ( AP.SelectedInvPSX2 != None )
 	{
-		SelectedName = AeonsPlayer(Owner).SelectedInvPSX2.ItemName;
+		SelectedName = AP.SelectedInvPSX2.ItemName;
 
-		if ( AeonsPlayer(Owner).SelectedInvPSX2.ItemName != "" )
+		if ( AP.SelectedInvPSX2.ItemName != "" )
 		{
 			Canvas.TextSize( SelectedName, TextWidth, TextHeight );
-			if ( AeonsPlayer(Owner).SelectMode == SM_Weapon )
+			if ( AP.SelectMode == SM_Weapon )
 				Canvas.SetPos( X, Y - 128*Scale/3 - TextHeight*2 );
-			else if ( AeonsPlayer(Owner).SelectMode == SM_AttSpell )
+			else if ( AP.SelectMode == SM_AttSpell )
 				Canvas.SetPos( X - TextWidth/2, Y - 128*Scale/3 - TextHeight*2 );
 			else
 				Canvas.SetPos( X - TextWidth/2, Y - 128*Scale/3 - TextHeight*2 );
@@ -3343,12 +3526,12 @@ simulated function DrawGhelzUse( canvas Canvas, int X, int Y )
 {
 	local int useAmount;
 	
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerOwner == none)
 		return;
 
-	if ( AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
+	if ( PlayerOwner.Weapon != None && PlayerOwner.Weapon.IsA('GhelziabahrStone') )
 	{
-		useAmount = GhelziabahrStone(AeonsPlayer(Owner).Weapon).useMeter;
+		useAmount = GhelziabahrStone(PlayerOwner.Weapon).useMeter;
 
 		Canvas.Font = Canvas.SmallFont;
 		Canvas.SetPos( X, Y );
@@ -3388,7 +3571,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 		ManaX = (128 + WSI_Left + WSI_Padding*2)*ScaleY;
 	
 	// glow on mana icon - shows when you don't have enough mana
-	if (Level.TimeSeconds < AeonsPlayer(Owner).NoManaFlashTime)
+	if (AeonsPlayer(PlayerOwner) != None && Level.TimeSeconds < AeonsPlayer(PlayerOwner).NoManaFlashTime)
 	{
 		Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY);
 		Canvas.Style = ERenderStyle.STY_Translucent;
@@ -3398,6 +3581,7 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY); // was 66 in old renewal, 62 in undying
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
+	Canvas.Style = ERenderStyle.STY_Normal;
 }
 
 
@@ -3407,17 +3591,17 @@ simulated function DrawFlightMana( canvas Canvas )
 	local int Height;
 	local float FuelRatio;
 	
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
 	if ( HudMode == 0 ) 
 		return;
 
-	if ( AeonsPlayer(Owner).Flight == None || !Level.bAllowFlight )
+	if ( PlayerTarget.Flight == None || !Level.bAllowFlight )
 		return;
 
 
-	Fuel = AeonsPlayer(Owner).Flight.Fuel;
+	Fuel = PlayerTarget.Flight.Fuel;
 	FuelRatio = Fuel / 60.0;
 	
 //	Canvas.Font = Canvas.LargeFont;
@@ -3463,11 +3647,11 @@ simulated function DrawMana(Canvas Canvas, int X, int Y, optional bool bRightAli
 {
 	local int iTempMana;
 
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	if ( AeonsPlayer(Owner).Mana < 0 )
-		AeonsPlayer(Owner).Mana = 0;
+	if ( PlayerTarget.Mana < 0 )
+		PlayerTarget.Mana = 0;
 
 	if (HudMode > 0)
 	{
@@ -3491,7 +3675,7 @@ simulated function DrawMana(Canvas Canvas, int X, int Y, optional bool bRightAli
 		iWidth = 23 + 35 * iFound;
 		Canvas.DrawTileClipped( Texture'SlidingPieces', iWidth, 43, 205 - iWidth, 0, iWidth, 43);
 */
-		iTempMana = AeonsPlayer(Owner).Mana;
+		iTempMana = PlayerTarget.Mana;
 	
 		if ( iTempMana > 75 )
 		{
@@ -3557,10 +3741,10 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y, optional bool bRigh
 {
 	local float fTempMana;
 
-	if (AeonsPlayer(Owner) == none)
+	if (PlayerTarget == none)
 		return;
 
-	fTempMana = AeonsPlayer(Owner).Mana;
+	fTempMana = PlayerTarget.Mana;
 	
 	if (LastMana - fTempMana >= 5)
 	{
@@ -3577,6 +3761,8 @@ simulated function DrawUsedMana(Canvas Canvas, int X, int Y, optional bool bRigh
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
 	Canvas.bCenter = false;
 	
+	Canvas.DrawColor.a = 255;
+
 	// - sign outline
 	Canvas.CurX = X - 1;	
 	Canvas.CurY = Y + 15 * ScaleY;
@@ -3609,18 +3795,21 @@ simulated function DrawTypingPrompt( canvas Canvas, console Console )
 	local string TypingPrompt;
 	local float XL, YL;
 
-	if ( Console.bTyping )
+	if ( Console.bTyping && !AeonsConsole(Console).bChatting )
 	{
 		Canvas.DrawColor.r = 255;
 		Canvas.DrawColor.g = 255;
 		Canvas.DrawColor.b = 255;	
-		//TypingPrompt = "> "$Console.TypedStr$"_";
-		TypingPrompt = "> "$Left(Console.TypedStr,AeonsConsole(Console).CursorPos) $ "_" $ Right(Console.TypedStr,Len(Console.TypedStr)-AeonsConsole(Console).CursorPos);
+		Canvas.DrawColor.a = 255;
+		if (AeonsConsole(Console).CursorPos >= Len(Console.TypedStr))
+			TypingPrompt = "> "$Console.TypedStr$"_";
+		else
+			TypingPrompt = "> "$Left(Console.TypedStr,AeonsConsole(Console).CursorPos) $ "&*" $ Right(Console.TypedStr,Len(Console.TypedStr)-AeonsConsole(Console).CursorPos);
 		Canvas.Font = Canvas.MedFont;
-		Canvas.Style = ERenderStyle.STY_AlphaBlend;
+		Canvas.Style = ERenderStyle.STY_Normal;
 		Canvas.StrLen( TypingPrompt, XL, YL );
 		Canvas.SetPos( 50*Scale, Canvas.ClipY - 150*Scale);// Console.FrameY - Console.ConsoleLines - YL - 1 );
-		Canvas.DrawText( TypingPrompt, false );
+		Canvas.DrawTextClipped( TypingPrompt, true );
 	}
 
 }
@@ -3628,8 +3817,147 @@ simulated function DrawTypingPrompt( canvas Canvas, console Console )
 simulated function Message( PlayerReplicationInfo PRI, coerce string Msg, name Type )
 {
 	Super.Message(PRI, Msg, Type);
-	if (OSMClientMessage && Type == 'Pickup')
-		AeonsPlayer(Owner).ScreenMessage(Msg, 4.0);
+	if (OSMClientMessage && Type == 'Pickup' && Msg != "")
+		AeonsPlayer(PlayerOwner).ScreenMessage(Msg, 4.0);
+}
+
+simulated function LocalizedMessage( class<LocalMessage> Message, optional int Switch, optional PlayerReplicationInfo RelatedPRI_1, optional PlayerReplicationInfo RelatedPRI_2, optional Object OptionalObject, optional string CriticalString )
+{
+	ChatMessage( None, Message.Static.GetString(Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject), Message.name, Message.Static.GetColor() );
+}
+
+simulated function ChatMessage( PlayerReplicationInfo PRI, coerce string Msg, name Type, optional color Color )
+{
+	local int i;
+	local string FormattedMessage;
+
+	Super.Message(PRI, Msg, Type);
+
+	//PlayerOwner.ScreenMessage(Msg, 4.0);
+	PlayerOwner.PlayBeepSound();
+
+	// message format
+	if (PRI == None)
+		FormattedMessage = Msg; // FormattedMessage = "("$Type$") "$Msg;
+	else
+		FormattedMessage = PRI.PlayerName$": "$Msg;
+
+	ChatLog[ChatLogIndex].Text = FormattedMessage;
+
+	// color
+	if (Color.R != 0 || Color.G != 0 || Color.B != 0)
+	{
+		ChatLog[ChatLogIndex].Color = Color;
+	}
+	else
+	{
+		ChatLog[ChatLogIndex].Color.R = 255;
+		ChatLog[ChatLogIndex].Color.G = 255;
+		ChatLog[ChatLogIndex].Color.B = 255;
+
+		if (Type == 'Event')
+		{
+			// green
+			ChatLog[ChatLogIndex].Color.R = 10;
+			ChatLog[ChatLogIndex].Color.G = 255;
+			ChatLog[ChatLogIndex].Color.B = 25;
+		}
+		else if (Type == 'Logout' || Type == 'DeathMessage')
+		{
+			// red
+			ChatLog[ChatLogIndex].Color.R = 255;
+			ChatLog[ChatLogIndex].Color.G = 25;
+			ChatLog[ChatLogIndex].Color.B = 10;
+		}
+	}
+
+	// scroll and initialize chat if needed
+	for (i = 0; i < ArrayCount(VisibleChatLogIndices)-1; i++)
+	{
+		if (!ChatInitialized)
+			VisibleChatLogIndices[i] = -1; // first time showing chat
+		else
+			VisibleChatLogIndices[i] = VisibleChatLogIndices[i+1];
+	}
+	ChatInitialized = true;
+
+	// add chat message
+	ChatVisibleTime = Level.TimeSeconds + CHAT_VISIBLE_TIME;
+	VisibleChatLogIndices[ArrayCount(VisibleChatLogIndices)-1] = ChatLogIndex;
+
+	ChatLogIndex = (ChatLogIndex + 1) % ArrayCount(ChatLog);
+}
+
+simulated function DrawChat( Canvas Canvas )
+{
+	local int i;
+	local float OrgX, OrgY, ClipX, ClipY;
+	local float Y;
+	local string TypingPrompt;
+	local console Console;
+	local float Opacity, TimeLeft;
+
+	Console = PlayerPawn(Owner).Player.Console;
+
+	Canvas.Font = Canvas.SmallFont;
+	Canvas.Style = ERenderStyle.STY_AlphaBlendZ;
+
+	Y = Canvas.ClipY * 0.4;
+
+	OrgX = Canvas.OrgX;
+	OrgY = Canvas.OrgY;
+	ClipX = Canvas.ClipX;
+	ClipY = Canvas.ClipY;
+
+	TimeLeft = ChatVisibleTime - Level.TimeSeconds;
+	if (TimeLeft > CHAT_FADE_TIME)
+		Opacity = 255;
+	else
+		Opacity = (TimeLeft / CHAT_FADE_TIME) * 255;
+	
+	for (i = 0; i < ArrayCount(VisibleChatLogIndices); i++)
+	{
+		if (VisibleChatLogIndices[i] == -1)
+			continue;
+		
+		Canvas.CurYL = 0;
+		
+		Canvas.SetOrigin(32*ScaleX, Y);
+		Canvas.SetPos(0, 0);
+		Canvas.SetClip(200*ScaleX, ClipY);
+
+		Canvas.DrawColor = ChatLog[VisibleChatLogIndices[i]].Color;
+		Canvas.DrawColor.A = Opacity;
+
+		Canvas.DrawText(ChatLog[VisibleChatLogIndices[i]].Text, false);
+
+		Y += Canvas.CurYL;
+	}
+
+	Canvas.ClipX = ClipX;
+	Canvas.ClipY = ClipY;
+	Canvas.OrgX = OrgX;
+	Canvas.OrgY = OrgY;
+
+	Canvas.Style = ERenderStyle.STY_Normal;
+
+	Canvas.DrawColor.R = 255;
+	Canvas.DrawColor.G = 255;
+	Canvas.DrawColor.B = 255;
+	Canvas.DrawColor.A = 255;
+
+	if ( AeonsConsole(Console).bChatting )
+	{
+		if (AeonsConsole(Console).CursorPos >= Len(Console.TypedStr))
+			TypingPrompt = "> "$Console.TypedStr$"_";
+		else
+			TypingPrompt = "> "$Left(Console.TypedStr,AeonsConsole(Console).CursorPos) $ "&*" $ Right(Console.TypedStr,Len(Console.TypedStr)-AeonsConsole(Console).CursorPos);
+		Canvas.Font = Canvas.MedFont;
+		Canvas.SetPos( 32*ScaleY, Y );
+		Canvas.DrawText( TypingPrompt, false );
+
+		ChatVisibleTime = Level.TimeSeconds + CHAT_FADE_TIME; // add fade
+	}
 }
 
 simulated function bool DisplayMessages( canvas Canvas )
@@ -3922,8 +4250,10 @@ simulated function name TraceIdentifyJoint()
 
 simulated function DrawPawnName(canvas Canvas, float PosX, float PosY)
 {
-
 	local float XL, YL, XOffset;
+
+	if ( PlayerOwner.PlayerReplicationInfo != None && !PlayerOwner.PlayerReplicationInfo.bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	if (!TraceIdentifyPawn(Canvas))
 		return;
@@ -3935,26 +4265,26 @@ simulated function DrawPawnName(canvas Canvas, float PosX, float PosY)
 	Canvas.DrawColor.G = 100;
 	Canvas.DrawColor.B = 255;
 
-	Canvas.SetPos(4, HalfClipY - 16);
+	Canvas.SetPos(4*ScaleY, HalfClipY - 16*ScaleY);
 	Canvas.DrawText("Name: "$IdentifyTarget.name);
 
 	Canvas.DrawColor.R = 50;
 	Canvas.DrawColor.G = 50;
 	Canvas.DrawColor.B = 255;
 
-	Canvas.SetPos(4, HalfClipY);
+	Canvas.SetPos(4*ScaleY, HalfClipY);
 	Canvas.DrawText("Health: "$IdentifyTarget.Health);
 
-	Canvas.SetPos(4, HalfClipY + 16);
+	Canvas.SetPos(4*ScaleY, HalfClipY + 16*ScaleY);
 	Canvas.DrawText("State: "$IdentifyTarget.GetStateName());
 
-	Canvas.SetPos(4, HalfClipY + 2*16);
+	Canvas.SetPos(4*ScaleY, HalfClipY + 2*16*ScaleY);
 	Canvas.DrawText("Enemy: "$IdentifyTarget.Enemy);
 
-	Canvas.SetPos(4, HalfClipY + 3*16);
+	Canvas.SetPos(4*ScaleY, HalfClipY + 3*16*ScaleY);
 	Canvas.DrawText("Trace Joint: "$TraceIdentifyJoint());
 
-	Canvas.SetPos(4, HalfClipY + 4*16);
+	Canvas.SetPos(4*ScaleY, HalfClipY + 4*16*ScaleY);
 	Canvas.DrawText("GroundFriction: "$IdentifyTarget.GroundFriction);
 
 	Canvas.Style = 1;
@@ -3993,6 +4323,8 @@ simulated function bool TraceIdentifyActor(canvas Canvas)
 
 simulated function DrawActorName(canvas Canvas)
 {
+	if ( PlayerOwner.PlayerReplicationInfo != None && !PlayerOwner.PlayerReplicationInfo.bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	if (!TraceIdentifyActor(Canvas))
 		return;
@@ -4004,22 +4336,22 @@ simulated function DrawActorName(canvas Canvas)
 	Canvas.DrawColor.G = 200;
 	Canvas.DrawColor.B = 200;
 
-	Canvas.SetPos(8, 64);
+	Canvas.SetPos(8*ScaleY, 64*ScaleY);
 	Canvas.DrawText("Name = "$IdentifyActor.name);
 
-	Canvas.SetPos(8, 64 + 14);
+	Canvas.SetPos(8*ScaleY, (64 + 14)*ScaleY);
 	Canvas.DrawText("State = "$IdentifyActor.GetStateName());
 
 	if ( IdentifyActor.IsA('UndMover') )
 	{
-		Canvas.SetPos(8, 64 + 2*14);
+		Canvas.SetPos(8*ScaleY, (64 + 2*14)*ScaleY);
 		Canvas.DrawText("PendingSeq = "$UndMover(IdentifyActor).PendingSeq);
 
-		Canvas.SetPos(8, 64 + 3*14);
+		Canvas.SetPos(8*ScaleY, (64 + 3*14)*ScaleY);
 		Canvas.DrawText("KeyNum = "$UndMover(IdentifyActor).KeyNum);
 	
 	} else {
-		Canvas.SetPos(8, 64 + 2*14);
+		Canvas.SetPos(8*ScaleY, (64 + 2*14)*ScaleY);
 		Canvas.DrawText("Opacity = "$IdentifyActor.Opacity);
 	}
 		
@@ -4046,7 +4378,7 @@ simulated function DrawIdentifyInfo(canvas Canvas, float PosX, float PosY)
 	XOffset = 0.0;
 	Canvas.StrLen(IdentifyName$": "$IdentifyTarget.PlayerReplicationInfo.PlayerName, XL, YL);
 	XOffset = HalfClipX - XL/2;
-	Canvas.SetPos(XOffset, Canvas.ClipY - 54);
+	Canvas.SetPos(XOffset, Canvas.ClipY - 54*ScaleY);
 	
 	if(IdentifyTarget.IsA('PlayerPawn'))
 		if(PlayerPawn(IdentifyTarget).PlayerReplicationInfo.bFeigningDeath)
@@ -4061,7 +4393,7 @@ simulated function DrawIdentifyInfo(canvas Canvas, float PosX, float PosY)
 		Canvas.StrLen(IdentifyName$": ", XL, YL);
 		XOffset += XL;
 		Canvas.DrawText(IdentifyName$": ");
-		Canvas.SetPos(XOffset, Canvas.ClipY - 54);
+		Canvas.SetPos(XOffset, Canvas.ClipY - 54*ScaleY);
 
 		Canvas.DrawColor.R = 0;
 		Canvas.DrawColor.G = 255 * (IdentifyFadeTime / 3.0);
@@ -4082,7 +4414,7 @@ simulated function DrawPowerWordDebug(canvas Canvas)
 {
 	local PowerWord pw;
 	
-	pw = PowerWord(AeonsPlayer(Owner).AttSpell);
+	pw = PowerWord(PlayerOwner.AttSpell);
 
 	Canvas.Font = Canvas.SmallFont;
 	Canvas.Style = 3;
@@ -4091,19 +4423,19 @@ simulated function DrawPowerWordDebug(canvas Canvas)
 	Canvas.DrawColor.G = 100;
 	Canvas.DrawColor.B = 255;
 
-	Canvas.SetPos(4, (Canvas.ClipY * 0.25) - 16);
+	Canvas.SetPos(4, (Canvas.ClipY * 0.25) - 16*ScaleY);
 	Canvas.DrawText("State: "$pw.getStateName());
 
 	Canvas.SetPos(4, (Canvas.ClipY * 0.25));
 	Canvas.DrawText("Target 0: "$pw.Targets[0]$" pFX: "$pw.Shafts[0]);
 
-	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 16);
+	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 16*ScaleY);
 	Canvas.DrawText("Target 1: "$pw.Targets[1]$" pFX: "$pw.Shafts[1]);
 
-	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 2*16);
+	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 2*16*ScaleY);
 	Canvas.DrawText("Target 2: "$pw.Targets[2]$" pFX: "$pw.Shafts[2]);
 
-	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 3*16);
+	Canvas.SetPos(4, (Canvas.ClipY * 0.25) + 3*16*ScaleY);
 	Canvas.DrawText("Target 3: "$pw.Targets[3]$" pFX: "$pw.Shafts[3]);
 
 	Canvas.Style = 1;
@@ -4115,7 +4447,6 @@ simulated function DrawPowerWordDebug(canvas Canvas)
 
 simulated function DrawMOTD(Canvas Canvas)
 {
-    local GameReplicationInfo GRI;
 	local float XL, YL;
 
 	if(Owner == None) return;
@@ -4129,49 +4460,46 @@ simulated function DrawMOTD(Canvas Canvas)
 
 	Canvas.bCenter = true;
 
-	foreach AllActors(class'GameReplicationInfo', GRI)
+	if (Level.GRI.GameName != "Game")
 	{
-		if (GRI.GameName != "Game")
-		{
-			Canvas.DrawColor.R = 0;
-			Canvas.DrawColor.G = MOTDFadeOutTime / 2;
-			Canvas.DrawColor.B = MOTDFadeOutTime;
-			Canvas.SetPos(0.0, 32);
-			Canvas.StrLen("TEST", XL, YL);
-			if (Level.NetMode != NM_Standalone)
-				Canvas.DrawText(GRI.ServerName);
-			Canvas.DrawColor.R = MOTDFadeOutTime;
-			Canvas.DrawColor.G = MOTDFadeOutTime;
-			Canvas.DrawColor.B = MOTDFadeOutTime;
+		Canvas.DrawColor.R = 0;
+		Canvas.DrawColor.G = MOTDFadeOutTime / 2;
+		Canvas.DrawColor.B = MOTDFadeOutTime;
+		Canvas.SetPos(0.0, 32);
+		Canvas.StrLen("TEST", XL, YL);
+		if (Level.NetMode != NM_Standalone)
+			Canvas.DrawText(Level.GRI.ServerName);
+		Canvas.DrawColor.R = MOTDFadeOutTime;
+		Canvas.DrawColor.G = MOTDFadeOutTime;
+		Canvas.DrawColor.B = MOTDFadeOutTime;
 
-			Canvas.SetPos(0.0, 32 + YL);
-			Canvas.DrawText("Game Type: "$GRI.GameName, true);
-			Canvas.SetPos(0.0, 32 + 2*YL);
-			if (Level.Title != "Untitled")
-				Canvas.DrawText("Map Title: "$Level.Title, true);
-			Canvas.SetPos(0.0, 32 + 3*YL);
-			if (Level.Author != "")
-				Canvas.DrawText("Author: "$Level.Author, true);
-			Canvas.SetPos(0.0, 32 + 4*YL);
-			if (Level.IdealPlayerCount != "")
-				Canvas.DrawText("Ideal Player Load:"$Level.IdealPlayerCount, true);
+		Canvas.SetPos(0.0, 32*ScaleY + YL);
+		Canvas.DrawText("Game Type: "$Level.GRI.GameName, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 2*YL);
+		if (Level.Title != "Untitled")
+			Canvas.DrawText("Map Title: "$Level.Title, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 3*YL);
+		if (Level.Author != "")
+			Canvas.DrawText("Author: "$Level.Author, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 4*YL);
+		if (Level.IdealPlayerCount != "")
+			Canvas.DrawText("Ideal Player Load:"$Level.IdealPlayerCount, true);
 
-			Canvas.DrawColor.R = 0;
-			Canvas.DrawColor.G = MOTDFadeOutTime / 2;
-			Canvas.DrawColor.B = MOTDFadeOutTime;
+		Canvas.DrawColor.R = 0;
+		Canvas.DrawColor.G = MOTDFadeOutTime / 2;
+		Canvas.DrawColor.B = MOTDFadeOutTime;
 
-			Canvas.SetPos(0, 32 + 6*YL);
-			Canvas.DrawText(Level.LevelEnterText, true);
+		Canvas.SetPos(0, 32*ScaleY + 6*YL);
+		Canvas.DrawText(Level.LevelEnterText, true);
 
-			Canvas.SetPos(0.0, 32 + 8*YL);
-			Canvas.DrawText(GRI.MOTDLine1, true);
-			Canvas.SetPos(0.0, 32 + 9*YL);
-			Canvas.DrawText(GRI.MOTDLine2, true);
-			Canvas.SetPos(0.0, 32 + 10*YL);
-			Canvas.DrawText(GRI.MOTDLine3, true);
-			Canvas.SetPos(0.0, 32 + 11*YL);
-			Canvas.DrawText(GRI.MOTDLine4, true);
-		}
+		Canvas.SetPos(0.0, 32*ScaleY + 8*YL);
+		Canvas.DrawText(Level.GRI.MOTDLine1, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 9*YL);
+		Canvas.DrawText(Level.GRI.MOTDLine2, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 10*YL);
+		Canvas.DrawText(Level.GRI.MOTDLine3, true);
+		Canvas.SetPos(0.0, 32*ScaleY + 11*YL);
+		Canvas.DrawText(Level.GRI.MOTDLine4, true);
 	}
 	Canvas.bCenter = false;
 
@@ -4247,7 +4575,6 @@ simulated function AddSplat(byte count, vector HitLocation)
 simulated function DrawDebugInfo(canvas Canvas)
 {
 	local Actor a;
-	local PlayerPawn player;
 	local vector vecPawnView;
 	local float fX;
 	local float fY;
@@ -4257,11 +4584,12 @@ simulated function DrawDebugInfo(canvas Canvas)
 	local vector X, Y, Z;
 	local float width, height;
 
-	player = PlayerPawn(Owner);
+	if ( PlayerOwner.PlayerReplicationInfo != None && !PlayerOwner.PlayerReplicationInfo.bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
-	if ( player.ViewTarget != none )
+	if ( PlayerOwner.ViewTarget != none )
 	{
-		a = player.ViewTarget;
+		a = PlayerOwner.ViewTarget;
 		if ( a.bHidden || !a.bShowDebugInfo )
 			return;
 
@@ -4283,22 +4611,22 @@ simulated function DrawDebugInfo(canvas Canvas)
 		Canvas.DrawColor.B = 255;
 
 		Canvas.StrLen(a.GetDebugInfo(), width, height);
-		Canvas.SetPos(fX, fY + height + 1);
+		Canvas.SetPos(fX, fY + height + 1*ScaleY);
 		Canvas.DrawText(a.GetDebugInfo(), false);
 
 		Canvas.StrLen(a.GetDebugInfo2(), width, height);
-		Canvas.SetPos(fX, fY + height * 2 + 2);
+		Canvas.SetPos(fX, fY + height * 2 + 2*ScaleY);
 		Canvas.DrawText(a.GetDebugInfo2(), false);
 
 		Canvas.StrLen(a.GetDebugInfo3(), width, height);
-		Canvas.SetPos(fX, fY + height * 3 + 3);
+		Canvas.SetPos(fX, fY + height * 3 + 3*ScaleY);
 		Canvas.DrawText(a.GetDebugInfo3(), false);
 		return;
 	}
 
-	GetAxes(player.ViewRotation, X, Y, Z);
+	GetAxes(PlayerOwner.ViewRotation, X, Y, Z);
 
-	foreach VisibleActors(class'Actor', a, , player.Location)
+	foreach VisibleActors(class'Actor', a, , PlayerOwner.Location)
 	{
 		if ( a.bHidden )
 			continue;
@@ -4307,18 +4635,18 @@ simulated function DrawDebugInfo(canvas Canvas)
 			continue;
 			
 		// Get a vector from the player to the pawn
-		vecPawnView = a.Location - player.Location - (CollisionHeight/2)*vect(0,0,1);// + (p.EyeHeight*vect(0,0,1));// - (player.EyeHeight * vect(0,0,1));// - 75*vect(0,0,1));
+		vecPawnView = a.Location - PlayerOwner.Location - (CollisionHeight/2)*vect(0,0,1);// + (p.EyeHeight*vect(0,0,1));// - (PlayerOwner.EyeHeight * vect(0,0,1));// - 75*vect(0,0,1));
 	
 		if ( (vecPawnView Dot X) > 0 )
 		//if(IsValidTarget(vecPawnView, X, p))  // note that vecPawnView Dot X > 0 ensures that the target is in front of you.
 		{
 			// range to the pawn
-			RangeToTarget = VSize(a.Location - player.Location);
+			RangeToTarget = VSize(a.Location - PlayerOwner.Location);
 			
-			DistanceScale = (640 / RangeToTarget) * 90 / player.FOVAngle;
+			DistanceScale = (640 / RangeToTarget) * 90 / PlayerOwner.FOVAngle;
 			
-			fX = (HalfClipX) + ((vecPawnView Dot Y)) * ((HalfClipX) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
-			fY = (HalfClipY) + (-(vecPawnView Dot Z)) * ((HalfClipX) / tan(player.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
+			fX = (HalfClipX) + ((vecPawnView Dot Y)) * ((HalfClipX) / tan(PlayerOwner.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
+			fY = (HalfClipY) + (-(vecPawnView Dot Z)) * ((HalfClipX) / tan(PlayerOwner.FOVAngle * Pi / 360)) / (vecPawnView Dot X);
 
 			Canvas.Style = ERenderStyle.STY_Translucent;
 			Canvas.Font = Canvas.SmallFont;
@@ -4327,7 +4655,7 @@ simulated function DrawDebugInfo(canvas Canvas)
 			Canvas.DrawColor.B = 0;
 
 			Canvas.StrLen(a.name $ " - " $ a.GetStateName(), width, height);
-			Canvas.SetPos(fX - width/2 , fY - height * 3 - 3);
+			Canvas.SetPos(fX - width/2 , fY - height * 3 - 3*ScaleY);
 			Canvas.DrawText(a.name $ " - " $ a.GetStateName(), false);
 
 			Canvas.DrawColor.R = 255;
@@ -4335,11 +4663,11 @@ simulated function DrawDebugInfo(canvas Canvas)
 			Canvas.DrawColor.B = 255;
 
 			Canvas.StrLen(a.GetDebugInfo(), width, height);
-			Canvas.SetPos(fX - width/2 , fY - height * 2 - 2);
+			Canvas.SetPos(fX - width/2 , fY - height * 2 - 2*ScaleY);
 			Canvas.DrawText(a.GetDebugInfo(), false);
 
 			Canvas.StrLen(a.GetDebugInfo2(), width, height);
-			Canvas.SetPos(fX - width/2 , fY - height - 1);
+			Canvas.SetPos(fX - width/2 , fY - height - 1*ScaleY);
 			Canvas.DrawText(a.GetDebugInfo2(), false);
 
 			Canvas.StrLen(a.GetDebugInfo3(), width, height);
@@ -4479,23 +4807,23 @@ simulated function DrawScryeOverlay(Canvas Canvas)
 
 simulated function DrawShieldOverlay(Canvas Canvas)
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 	local float ShieldPercent; 
 	local int i;
 	local int X, Y;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if  ( P == None )
+	if ( AP == None )
 		return;
 	
-	if (P.ShieldMod == none)
+	if (AP.ShieldMod == none)
 		return;
 
-	if ( !P.ShieldMod.bActive )
+	if ( !AP.ShieldMod.bActive )
 		return;
 
-	ShieldPercent = 1.0-(ShieldModifier(P.ShieldMod).overlayStr); // * 0.5;
+	ShieldPercent = 1.0-(ShieldModifier(AP.ShieldMod).overlayStr); // * 0.5;
 	
 	Canvas.Style = ERenderStyle.STY_Translucent;
 
@@ -4514,16 +4842,16 @@ simulated function DrawShieldOverlay(Canvas Canvas)
 	
 	for (i=0; i<8; i++)
 	{
-		if ( ShieldModifier(P.ShieldMod).CrackStr[i] > 0 )
+		if ( ShieldModifier(AP.ShieldMod).CrackStr[i] > 0 )
 		{
-			X = Canvas.ClipX * ShieldModifier(P.ShieldMod).CrackLocations[i].x;
-			Y = Canvas.ClipY * ShieldModifier(P.ShieldMod).CrackLocations[i].y;
+			X = Canvas.ClipX * ShieldModifier(AP.ShieldMod).CrackLocations[i].x;
+			Y = Canvas.ClipY * ShieldModifier(AP.ShieldMod).CrackLocations[i].y;
 			Canvas.SetPos(X, Y);
 
-			Canvas.DrawColor.R = 100 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
-			Canvas.DrawColor.G = 100 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
-			Canvas.DrawColor.B = 128 * (ShieldModifier(P.ShieldMod).CrackStr[i] / ShieldModifier(P.ShieldMod).InitialCrackStr[i]);
-			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(P.ShieldMod).CrackID[i]], 128 * 1.2, 128 * 1.2, 0, 0, 128, 128);
+			Canvas.DrawColor.R = 100 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
+			Canvas.DrawColor.G = 100 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
+			Canvas.DrawColor.B = 128 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
+			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(AP.ShieldMod).CrackID[i]], 128 * 1.2, 128 * 1.2, 0, 0, 128, 128);
 		}
 	}
 
@@ -4537,11 +4865,11 @@ simulated function DrawShieldOverlay(Canvas Canvas)
 
 simulated function DrawSepiaOverlay( Canvas Canvas )
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 
-	if  ( P == none )
+	if ( AP == none )
 		return;
 
 	Canvas.DrawColor.R = 255;
@@ -4560,11 +4888,11 @@ simulated function DrawSepiaOverlay( Canvas Canvas )
 
 simulated function DrawSlimeOverlay( Canvas Canvas, float Intensity )
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 
-	if  ( ( P == none ) || ( P.SlimeMod == none ) || !P.SlimeMod.bActive )
+	if  ( ( AP == none ) || ( AP.SlimeMod == none ) || !AP.SlimeMod.bActive )
 		return;
 
 	Canvas.DrawColor.R = 255;
@@ -4587,17 +4915,17 @@ simulated function DrawSlimeOverlay( Canvas Canvas, float Intensity )
 
 simulated function DrawWizardEyeOverlay(Canvas Canvas)
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 	local float ShieldPercent; 
 	local int i;
 	local int X, Y;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if  ( P == None )
+	if  ( AP == None )
 		return;
 	
-	if (!P.bWizardEye)
+	if (!AP.bWizardEye)
 		return;
 
 	Canvas.Style = ERenderStyle.STY_Translucent;
@@ -4618,17 +4946,17 @@ simulated function DrawWizardEyeOverlay(Canvas Canvas)
 
 simulated function DrawPhoenixOverlay(Canvas Canvas)
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 	local float ShieldPercent; 
 	local int i;
 	local int X, Y;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if  ( P == None )
+	if  ( AP == None )
 		return;
 	
-	if (!P.bPhoenix)
+	if (!AP.bPhoenix)
 		return;
 
 	Canvas.Style = ERenderStyle.STY_Translucent;
@@ -4649,13 +4977,13 @@ simulated function DrawPhoenixOverlay(Canvas Canvas)
 
 simulated function DrawShalasOverlay(Canvas Canvas)
 {
-	local AeonsPlayer P;
+	local AeonsPlayer AP;
 	local int i;
 	local int X, Y;
 
-	P = AeonsPlayer(Owner);
+	AP = AeonsPlayer(PlayerOwner);
 	
-	if  ( P == None )
+	if  ( AP == None )
 		return;
 
 	if (ShalasOverlay == none)
@@ -4728,7 +5056,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
     local AeonsPlayer PPawn;
     local float Delta;
 
-	PPawn = AeonsPlayer(Owner);
+	PPawn = AeonsPlayer(PlayerOwner);
 
     if (PPawn == None)
         return;
@@ -4800,7 +5128,7 @@ simulated function DrawSelectHUD(Canvas Canvas)
 
 }
 
-function DrawAllItems(Canvas Canvas)
+simulated function DrawAllItems(Canvas Canvas)
 {
 	local Inventory Inv;
 	local string InvName;
@@ -4854,7 +5182,6 @@ function DrawAllItems(Canvas Canvas)
 		CurrentY = YOffset*ScaleY + (i * Spacing) + Spacing / 2.0; // centered spacing
 		Canvas.Style = ERenderStyle.STY_AlphaBlend;
 		Canvas.DrawColor = WhiteColor;
-		Canvas.DrawColor.a = 255;
 		Canvas.bNoSmooth = false;
 		Canvas.SetPos( XOffset*ScaleX, CurrentY - IconSize / 2.0 );
 		Canvas.DrawIcon(Inv.Icon, IconSize / 64.0);
@@ -4888,7 +5215,7 @@ function DrawAllItems(Canvas Canvas)
 	LastDrawnItemsCount = i;
 }
 
-function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int Y, int W, int H )
+simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int Y, int W, int H )
 {
 	local int u, v, ul, vl;
 	local texture sprite;
@@ -4899,6 +5226,12 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	local float TextWidth, TextHeight;
 	local string InvName;
 	local int InvCount;
+	local AeonsPlayer AP;
+
+	AP = AeonsPlayer(PlayerOwner);
+
+	if ( AP == None )
+		return;
 	
 	iState = 0;
 
@@ -4910,28 +5243,28 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	{
 		if ( InventoryGroup < 10 ) 
 		{
-			if ((AeonsPlayer(Owner).FavWeapon1 == InventoryGroup ) || (AeonsPlayer(Owner).FavWeapon2 == InventoryGroup))
+			if ((AP.FavWeapon1 == InventoryGroup ) || (AP.FavWeapon2 == InventoryGroup))
 			{
 				iState = 2;
 			}
 		}
 		else if ( InventoryGroup < 20 ) 
 		{
-			if ((AeonsPlayer(Owner).FavAttSpell1 == InventoryGroup ) || (AeonsPlayer(Owner).FavAttSpell2 == InventoryGroup))
+			if ((AP.FavAttSpell1 == InventoryGroup ) || (AP.FavAttSpell2 == InventoryGroup))
 			{
 				iState = 2;
 			}
 		}
 		else if ( InventoryGroup >= 100 ) 
 		{
-			if ((AeonsPlayer(Owner).FavItem1 == InventoryGroup ) || (AeonsPlayer(Owner).FavItem2 == InventoryGroup))
+			if ((AP.FavItem1 == InventoryGroup ) || (AP.FavItem2 == InventoryGroup))
 			{
 				iState = 2;
 			}
 		}
 		else
 		{
-			if ((AeonsPlayer(Owner).FavDefSpell1 == InventoryGroup ) || (AeonsPlayer(Owner).FavDefSpell2 == InventoryGroup))
+			if ((AP.FavDefSpell1 == InventoryGroup ) || (AP.FavDefSpell2 == InventoryGroup))
 			{
 				iState = 2;
 			}
@@ -4939,7 +5272,7 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	
 	}
 
-	if (InventoryGroup>0)
+	if (InventoryGroup>0 && Owner.Inventory != None)
 	{
 		WheelSelection = Owner.Inventory.FindItemInGroup(InventoryGroup);
 
@@ -5074,7 +5407,10 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 		}
 		else
 		{
-			Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
+			if (WheelSelection.Icon != None && WheelSelection.Icon != Texture'Engine.S_Weapon')
+				Canvas.DrawIconTrimmed(WheelSelection.Icon, Scale); 
+			else if (Icons[InventoryGroup] != None)
+				Canvas.DrawIconTrimmed(Icons[InventoryGroup], Scale);
 		}
 	}
 	else 
@@ -5112,23 +5448,16 @@ function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, int X, int 
 	Canvas.DrawColor.a = 255;
 }
 
-static final function string LTrim(coerce string S)
+static final function int Ceil(float num)
 {
-	while (Left(S, 1) == " ")
-		S = Right(S, Len(S) - 1);
-	return S;
-}
-
-static final function string RTrim(coerce string S)
-{
-	while (Right(S, 1) == " ")
-		S = Left(S, Len(S) - 1);
-	return S;
-}
-
-static final function string Trim(coerce string S)
-{
-	return LTrim(RTrim(S));
+    local int inum;
+	inum = int(num);
+	
+    if (num == float(inum))
+	{
+        return inum;
+    }
+    return inum + 1;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -5263,10 +5592,11 @@ defaultproperties
      magicFrameRate=20
      IdentifyName="Name"
      IdentifyHealth="Health"
-     VersionMessage="Build 06/29/2023"
-     RedColor=(R=255,G=64,B=64)
-     GreenColor=(R=64,G=255,B=64)
-     WhiteColor=(R=255,G=255,B=255)
+     VersionMessage="Build 10/01/2024"
+     ConnectionProblemMessage="CONNECTION PROBLEM"
+     RedColor=(R=255,G=64,B=64,A=255)
+     GreenColor=(R=64,G=255,B=64,A=255)
+     WhiteColor=(R=255,G=255,B=255,A=255)
      SlimeOverlay=WetTexture'fxB.HUD.ScarrowSlime'
      WizardEyeOverlay=WetTexture'fxB.DSpells.MyTex4'
      PhoenixOverlay=WetTexture'fxB2.Phoenix_Overlay'
@@ -5280,5 +5610,6 @@ defaultproperties
      DotTexture=Texture'Aeons.HUD.Dot'
      bDrawLevelInfo=True
      bDrawBuildInfo=True
-	 NoWheelSelectionText=""
+     NoWheelSelectionText=""
+     ScoreTime=-10000000.000000
 }

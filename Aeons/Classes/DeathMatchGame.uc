@@ -23,14 +23,18 @@ var   int			NumBots;
 var	  int			RemainingBots;
 var() globalconfig int	InitialBots;
 var		ChallengeBotInfo		BotConfig;
-var localized string GlobalNameChange;
-var localized string NoNameChange;
 var class<ChallengeBotInfo> BotConfigType;
+
+function PreBeginPlay()
+{
+	Super.PreBeginPlay();
+	class'LevelInfo'.default.bDontAllowSavegame = true;
+}
 
 function PostBeginPlay()
 {
-	local string NextPlayerClass;
-	local int i;
+	//local string NextPlayerClass;
+	//local int i;
 
 	BotConfig = spawn(BotConfigType);
 	RemainingTime = 60 * TimeLimit;
@@ -39,6 +43,7 @@ function PostBeginPlay()
 	Super.PostBeginPlay();
 
 	// load all player classes
+	/*
 	NextPlayerClass = GetNextInt("AeonsPlayer", 0); 
 	while ( NextPlayerClass != "" )
 	{
@@ -46,6 +51,7 @@ function PostBeginPlay()
 		i++;
 		NextPlayerClass = GetNextInt("AeonsPlayer", i); 
 	}
+	*/
 }
 
 function int GetIntOption( string Options, string ParseString, int CurrentValue)
@@ -64,13 +70,6 @@ function bool IsRelevant(actor Other)
 		Pawn(Other).WaterSpeed *= 1.5;
 		Pawn(Other).AirSpeed *= 1.5;
 		Pawn(Other).Acceleration *= 1.5;
-	}
-	else
-	{
-		Pawn(Other).GroundSpeed = Pawn(Other).default.GroundSpeed;
-		Pawn(Other).WaterSpeed = Pawn(Other).default.WaterSpeed;
-		Pawn(Other).AirSpeed = Pawn(Other).default.AirSpeed;
-		Pawn(Other).Acceleration = Pawn(Other).default.Acceleration;
 	}
 	return Super.IsRelevant(Other);
 }
@@ -117,6 +116,7 @@ function SetGameSpeed( Float T )
 		Level.TimeDilation = 2.1 * GameSpeed;
 	else
 		Level.TimeDilation = GameSpeed;
+	SetTimer(Level.TimeDilation, true);
 }
 
 event InitGame( string Options, out string Error )
@@ -190,12 +190,6 @@ function float PlaySpawnEffect(inventory Inv)
 	return 0.3;
 }
 
-exec function restart()
-{
-	ServerSay("Restarting game...");
-	RestartGame();
-}
-
 function RestartGame()
 {
 	local string NextMap;
@@ -206,6 +200,7 @@ function RestartGame()
 		return;
 
 	log("Restart Game");
+	BroadcastMessage("Restarting game...");
 
 	// these server travels should all be relative to the current URL
 	if ( bChangeLevels && !bAlreadyChanged && (MapListType != None) )
@@ -253,7 +248,8 @@ event playerpawn Login
 	return NewPlayer;
 }
 
-exec function bot_add() {
+function bool ForceAddBot()
+{
 	AddBot();
 }
 
@@ -270,7 +266,7 @@ function bool AddBot()
 	StartSpot = FindPlayerStart(None, 255);
 	if( StartSpot == None )
 	{
-		ServerSay("Could not find starting spot for Bot");
+		//BroadcastMessage("Could not find starting spot for Bot");
 		return false;
 	}
 
@@ -278,14 +274,14 @@ function bool AddBot()
 	NewBot = Spawn(class'Bot',,,StartSpot.Location,StartSpot.Rotation);
 	
 	if ( NewBot == None ) {
-		ServerSay("NewBot is none");
+		//BroadcastMessage("NewBot is none");
 		return false;
 	}
 
 	if ( (bHumansOnly || Level.bHumansOnly) && !NewBot.bIsHuman )
 	{
 		NewBot.Destroy();
-		ServerSay("Failed to spawn bot (not human)");
+		//BroadcastMessage("Failed to spawn bot (not human)");
 		return false;
 	}
 
@@ -296,7 +292,7 @@ function bool AddBot()
 	NewBot.ViewRotation = StartSpot.Rotation;
 
 	// broadcast a welcome message.
-	ServerSay( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage );
+	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
 	//AddDefaultInventory( NewBot );
 	AcceptInventory(NewBot);
@@ -527,8 +523,8 @@ function ChangeName( Pawn Other, coerce string S, bool bNameChange )
 		APlayer = APlayer.NextPawn;
 	}
 
-	//if (bNameChange)
-		ServerSay(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S);
+	if (bNameChange)
+		BroadcastMessage(Other.PlayerReplicationInfo.PlayerName$GlobalNameChange$S, false);
 			
 	Other.PlayerReplicationInfo.PlayerName = S;
 }
@@ -579,15 +575,13 @@ defaultproperties
 {
 	 BotConfigType=Class'Aeons.ChallengeBotInfo'
 	 InitialBots=4
-     bMultiWeaponStay=True
+     bMultiWeaponStay=False
      FragLimit=20
-     GlobalNameChange=" changed name to "
-     NoNameChange=" is already in use"
      bRestartLevel=True
 	 bSinglePlayer=False
      bDeathMatch=True
      ScoreBoardType=Class'Aeons.UndyingScoreboard'
      MapPrefix="DM"
      BeaconName="DM"
-     GameName="Undying Deathmatch"
+     GameName="Deathmatch"
 }

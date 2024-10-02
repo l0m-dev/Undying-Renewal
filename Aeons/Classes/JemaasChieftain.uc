@@ -48,4 +48,6 @@ defaultproperties
      WeaponAccuracy=0.75
      bCanSwitchToMelee=False
      Health=300
+     MenuName="Jemaas Chieftain"
+     CreatureDeathVerb="harpooned"
 }

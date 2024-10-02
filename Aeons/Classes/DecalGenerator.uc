@@ -19,7 +19,7 @@ var() float DecalLifeSpan;
 var int i, HitJoint;
 var vector HitLocation, HitNormal, End, SpewVector;
 
-function GetSpewVector(out vector v)
+simulated function GetSpewVector(out vector v)
 {
 	local Actor A;
 	
@@ -35,14 +35,14 @@ function GetSpewVector(out vector v)
 	}
 }
 
-auto state() StartupPlace
+auto simulated state() StartupPlace
 {
-	function PlaceDecal()
+	simulated function PlaceDecal()
 	{
 		if (DecalClass != none)
 		{
 			EnableLog('Misc');
-			log("PlacingDecal ........ ", 'Misc');
+			//log("PlacingDecal ........ ", 'Misc');
 			GetSpewVector(SpewVector);
 			Trace(HitLocation, HitNormal, HitJoint, (Location + SpewVector * SpewDist), Location, false);
 			D = spawn(DecalClass,,,HitLocation, rotator(HitNormal));
@@ -69,6 +69,7 @@ state() TriggerPlace
 			GetSpewVector(SpewVector);
 			Trace(HitLocation, HitNormal, HitJoint, (Location + SpewVector * SpewDist), Location, false);
 			D = spawn(DecalClass,,,HitLocation, rotator(HitNormal));
+			D.RemoteRole = ROLE_SimulatedProxy;
 			D.bScryeOnly = bDecalScryeOnly;
 			D.DecalLifetime = DecalLifeSpan;
 			if (SoundEffect != none)
@@ -98,6 +99,7 @@ state() TriggerSpew
 				end = Location + (VRand() * SpewDist);
 				Trace(HitLocation, HitNormal, HitJoint, End, Location, false);
 				D = spawn(DecalClass,,,HitLocation, rotator(HitNormal));
+				D.RemoteRole = ROLE_SimulatedProxy;
 				D.bScryeOnly = bDecalScryeOnly;
 				D.DecalLifetime = DecalLifeSpan;
 				
@@ -123,4 +125,6 @@ defaultproperties
      SpewDist=256
      InitialState=StartupPlace
      Texture=Texture'Aeons.System.DecalGen'
+     bNoDelete=True
+     RemoteRole=ROLE_SimulatedProxy
 }

@@ -8,6 +8,16 @@ var name JointNames[64];
 
 function PreBeginPlay()
 {
+	SetupDeathFX();
+}
+
+simulated function PostNetBeginPlay()
+{
+	SetupDeathFX();
+}
+
+simulated function SetupDeathFX()
+{
 	local int i;
 	local name JointName;
 	

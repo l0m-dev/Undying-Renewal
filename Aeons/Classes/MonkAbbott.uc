@@ -110,4 +110,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.MonkAbbott_m'
      CollisionRadius=28
      CollisionHeight=60
+     MenuName="Abbot"
+     CreatureDeathVerb="curst"
 }

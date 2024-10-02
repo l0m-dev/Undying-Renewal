@@ -77,6 +77,14 @@ var 	Skull_proj 	skull, summonedSkulls[4];
 var 	Skull2_proj Skull2;
 var() sound GenSound;
 
+replication
+{
+	reliable if (Role == ROLE_Authority)
+		ClientGenSkull;
+	reliable if (Role == ROLE_Authority && bNetOwner)
+		numSkulls;
+}
+
 function PreBeginPlay ()
 {
 	Super.PreBeginPlay();
@@ -114,7 +122,7 @@ function bool CheckGenSkull()
 	return true;
 }
 
-function Skull_proj genSkull(int nS)
+simulated function Skull_proj genSkull(int nS)
 {
 	local vector Start, End, SpawnLoc, HitNormal;
 	local int HitJoint, Flags;
@@ -147,8 +155,8 @@ function Skull_proj genSkull(int nS)
 	
 	bPointing=True;
 	
-	if ( ns == 0 )
-		PlayFiring();
+	//if ( ns == 0 )
+	//	PlayFiring();
 	
 	Skull2 = Spawn(class 'Skull2_proj',PawnOwner,, SpawnLoc, AdjustedAim);		// SkullA
 	
@@ -159,37 +167,62 @@ function Skull_proj genSkull(int nS)
 	Skull2.Tag = Owner.Name;
 	Skull2.SetOffset(ns);
 
+	if (Level.NetMode == NM_Client)
+	{
+		Skull2.RemoteRole = ROLE_None;
+		Skull2.bOnlyOwnerSee = true;
+	}
+	else if (Level.NetMode == NM_DedicatedServer)
+	{
+		Skull2.bOwnerNoSee = true;
+	}
+
 	if ( Owner.bHidden )
 		CheckVisibility();
 	
 	return skull;
 }
 
+simulated function ClientGenSkull(int nS)
+{
+	GenSkull(nS);
+}
+
 simulated function PlayFiring()
 {
-/*
+	/*
 	if ( AeonsPlayer(Owner).bMagicSound )
 	{
 		// Owner.PlaySound(FireSound, SLOT_None, 0.3); 
 		AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 	}
-	// PlayAnim('SkullStorm_Start',,,,0);
-	// LoopAnim('SkullStorm_Cycle');
+	*/
+
+	PlayAnim('SkullStorm_Start',,,,0);
+	LoopAnim('SkullStorm_Cycle');
 	// bStillFiring = true;
-*/
 }
 
-function StartFiring()
+simulated function StartFiring()
 {
-	// PlayAnim('SkullStorm_Start',,,,0);
+	PlayAnim('SkullStorm_Start',,,,0);
 }
 
-function StopFiring()
+function PlayFireSoundServer()
+{
+	Owner.PlayOwnedSound(FireSound);
+	Owner.PlayOwnedSound(class'Skull2_proj'.default.ScreamingSounds[Rand(2)]);
+}
+
+simulated function StopFiring()
 {
 	if ( numSkulls > 0 )
 	{
 		PlayAnim('SkullStorm_Throw',,,,0.15);
-		PlaySound(FireSound);
+		if (Level.NetMode == NM_Client)
+			PlaySound(FireSound);
+		else
+			PlayFireSoundServer();
 	} else {
 		Owner.StopSound(SndId);
 		PlayAnim('Down');
@@ -211,12 +244,14 @@ state Idle
 		Finish();
 }
 
-function releaseSkulls()
+simulated function releaseSkulls()
 {
 	local Skull2_proj Skull;
 
 	ForEach AllActors(class 'skull2_proj', Skull, Owner.Name)
 	{
+		if (Skull.bOnlyOwnerSee)
+			Skull.Destroy();
 		Skull.Fire();
 	}
 }
@@ -238,7 +273,7 @@ state NormalFire
 	
 	function FireAttSpell(float Value){}
 
-	function AnimEnd()
+	simulated function AnimEnd()
 	{
 		LoopAnim('SkullStorm_Cycle');
 	}
@@ -277,6 +312,7 @@ state NormalFire
 					
 					sleep(0.5);
 					SummonedSkulls[NumSkulls] = GenSkull(NumSkulls);
+					ClientGenSkull(NumSkulls);
 					GhelzUse(manaCostPerLevel[CastingLevel]);
 					AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 					
@@ -356,6 +392,24 @@ function FireAttSpell( float Value )
 	}
 }
 
+state ClientFiring
+{
+	simulated function EndState()
+	{
+		Super.EndState();
+
+		StopFiring();
+	}
+}
+
+simulated state ClientFinishing
+{
+	simulated function bool ClientFire( float Value )
+	{
+		return Global.ClientFire(Value);
+	}
+}
+
 defaultproperties
 {
      skullSpawnRate=0.5
@@ -384,4 +438,6 @@ defaultproperties
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      DrawScale=0.5
+     DeathMessage="%k bombarded %o with flaming skulls of death."
+     AltDeathMessage="%k barraged %o with flaming skulls of death."
 }

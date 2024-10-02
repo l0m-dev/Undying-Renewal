@@ -290,7 +290,7 @@ var travel bool bEnteredJeremiahsRoom;
 
 var globalConfig bool bLogGameState;
 
-var MasterCameraPoint MasterCamPoint;
+var private MasterCameraPoint MasterCamPoint; // unused, left for backwards compatibility
 
 // Modifier states
 var travel bool bWardActive;
@@ -420,6 +420,20 @@ var travel int    FavItem1;  //favorite item #1
 var travel int    FavItem2;
 var travel bool   FavItemToggle; //decides next favorite to be overwritten
 
+var transient bool bBhopEnabled;
+
+var transient bool bNetShowMOTD;
+
+var transient string ServerSavesList;
+
+var actor TypingIndicator;
+
+// Letterbox control, needed before HUD exists
+var bool bLetterboxPlayer;
+var float LetterboxFadeRatePlayer;
+
+var transient bool bRequestedSkipCutscene;
+
 replication
 {
 	// Variables the server should send to the client.
@@ -431,18 +445,40 @@ replication
 		bWardActive, bHasteActive, bColdActive, bMindActive, bSilenceActive, bDispelActive,
 		bShieldActive, bShalasActive, bFireFlyActive, bScryeActive, bPhaseActive, refireMultiplier, ShieldMod, wizEye, bWizardEye,
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
-		bDoubleShotgun, bDrawInvList;
+		bDoubleShotgun, bDrawInvList,
+		bAllowSpellSelectionHUD, bPhoenix,
+		Book, ServerSavesList;
+
+	reliable if( Role<ROLE_Authority && bNetOwner )
+		JumpHeldTime; //, FireHeldTime
+
+	unreliable if( Role==ROLE_Authority )
+		bRenderWeapon; // for first person spectating
 
 	reliable if ( Role==ROLE_Authority )
-		SendClientFire, RealWeapon;
+		SendClientFire, RealWeapon, PlayWinMessage,
+		GiveClientSideModifiers, ClientSetScryeModActive, ClientUpdateForecast,
+		modFOV, resetFOV, SetFOV;
 
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
-		ClientPlayTakeHit, bRenderWeapon, GiveBook, GiveJournal;
+		ClientPlayTakeHit, GiveJournalClient,
+		ScreenMessage, ProcessObjectives;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
-        Scrye, JumpHeldTime, FireHeldTime, useWizardEye, AddAll;
+        Scrye, AddAll, DefAll, SwitchAttSpell,
+		Sneak, AmpAttSpell, AmpDefSpell, DeAmpAttSpell, DeAmpDefSpell, Pie, InfiniteMana, ToggleFlight, MagicSounds, WeaponSounds,
+		ServerReloadWeapon, ServerDoubleShotgun, ServerScytheBerserk,
+		RequestSkipCutscene, TestJournal,
+		useHealth, useWizardEye, useAmplifier, useLantern, usePowderOfSiren, useTranslocationScroll;
+
+	// modifiers
+	reliable if( Role==ROLE_Authority && bNetOwner ) // && bNetInitial
+		Flight, SilenceMod, ShalasMod, SlimeMod;
+
+	//unreliable if( Role==ROLE_Authority && bNetOwner )
+	//	bLetterboxPlayer, LetterboxFadeRatePlayer;
 }
 
 event PreBeginPlay()
@@ -476,9 +512,44 @@ event PreBeginPlay()
 	bAllowSpellSelectionHUD = true;
 
 	bShowScryeHint = GetRenewalConfig().bShowScryeHint;
+
+	//TypingIndicator = spawn(class 'TypingIndicator',self,,Location + vect(0,0,128));
+	//TypingIndicator.setBase(self);
 }
 
-event PreClientTravel()
+//==============
+// Encroachment
+event bool EncroachingOn( actor Other )
+{
+	if ( PlayerPawn(Other) != None )
+		return false;
+
+	return Super.EncroachingOn(Other);
+}
+
+function EncroachedBy( actor Other )
+{
+	if ( PlayerPawn(Other) != None )
+		return;
+
+	Super.EncroachedBy(Other);
+}
+
+// PreClientTravel is called client side only
+simulated event PreClientTravel()
+{
+	if (BookJournal(Book) != None)
+		BookJournal(Book).ClearNotifyActor(); // prevent crash on clients during garbage collection while travelling
+	ClearModifierSounds();
+}
+
+// called server side from ProcessServerTravel
+event ClientTravelCleanupServer()
+{
+	ClearModifierSounds();
+}
+
+function ClearModifierSounds()
 {
 	// fix ambient sound playing when coming back to a level
 	// maybe even destroy the modifiers since they are recreated
@@ -519,7 +590,7 @@ event HeadZoneChange(ZoneInfo newHeadZone)
 }
 
 // Calculate for this pawn the total effect of all PhysicalEffectors.
-final function vector GetTotalPhysicalEffect( float DeltaTime )
+function vector GetTotalPhysicalEffect( float DeltaTime )
 {
 	local PhysicsEffector	PEffect;
 	local vector			PVect;
@@ -551,6 +622,70 @@ function PlayerTick( float DeltaTime )
 	}
 }
 
+function PlayWinMessage(bool bWinner, Actor NewViewTarget)
+{
+	local sound Announcement, AnnouncementMusic;
+	local int i, m;
+	local actor SoundPlayer;
+
+	i = Rand(4);
+	m = Rand(3);
+
+	if ( bWinner )
+	{
+		ClientFlash(1, vect(0,1000,0));
+
+		AnnouncementMusic = Sound(DynamicLoadObject("Music.M_Sting04", class'Sound'));
+		Announcement = Sound(DynamicLoadObject("Announcer.Winner", class'Sound'));
+	}
+	else
+	{
+		ClientFlash(1, vect(1000,0,0));
+
+		switch(i+1)
+		{
+			case 1:
+				Announcement = Sound(DynamicLoadObject("Voiceover.Patrick.Pa_045", class'Sound'));
+				break;
+			case 2:
+				Announcement = Sound(DynamicLoadObject("Voiceover.Patrick.Pa_046", class'Sound'));
+				break;
+			case 3:
+				Announcement = Sound(DynamicLoadObject("Voiceover.Patrick.Pa_057", class'Sound'));
+				break;
+			case 4:
+				Announcement = Sound(DynamicLoadObject("Voiceover.Patrick.Pa_091", class'Sound'));
+				break;
+		}
+
+		switch(m+1)
+		{
+			case 1:
+				AnnouncementMusic = Sound(DynamicLoadObject("Music.M_Sting04", class'Sound'));
+				break;
+			case 2:
+				AnnouncementMusic = Sound(DynamicLoadObject("Music.M_Sting11", class'Sound'));
+				break;
+			case 3:
+				AnnouncementMusic = Sound(DynamicLoadObject("Music.M_Sting13", class'Sound'));
+				break;
+		}
+	}
+
+	ViewTarget = NewViewTarget;
+	//ViewRotation.Pitch = 0;
+	ViewRotation.Yaw = ViewTarget.Rotation.Yaw;
+	//ViewRotation.Roll = 0;
+
+	if ( ViewTarget != None )
+		SoundPlayer = ViewTarget;
+	else
+		SoundPlayer = self;
+
+	SoundPlayer.PlayOwnedSound(AnnouncementMusic, SLOT_None, 1.0, false, 1600.0, 1.0, 482);
+	SoundPlayer.PlayOwnedSound(Announcement, SLOT_Talk, 1.0, false, 1600.0, 1.0, 497);
+}
+
 function ScreenMessage(string Message, float HoldTime, optional bool bFromServer)
 {
 	if (OSMMod != none)
@@ -559,8 +694,25 @@ function ScreenMessage(string Message, float HoldTime, optional bool bFromServer
 
 simulated event RenderOverlays( canvas Canvas )
 {
+	local float OldFov;
+
+	OldFov = FovAngle;
 	if ( Weapon != None )
+	{
+		if ( Weapon.WeaponFov != FovAngle )
+		{
+			FovAngle = Weapon.WeaponFov;
+			class'Utility'.static.ComputeRenderSize(Canvas);
+		}
+
 		Weapon.RenderOverlays(Canvas);
+
+		if ( OldFov != FovAngle )
+		{
+			FovAngle = OldFov;
+			class'Utility'.static.ComputeRenderSize(Canvas);
+		}
+	}
 
 	if ( myHUD != None )
 		myHUD.RenderOverlays(Canvas);
@@ -571,8 +723,8 @@ simulated event RenderOverlays( canvas Canvas )
     if ( OSMMod != none )
 		OSMMod.RenderOverlays(Canvas);
 	
-	// if ( DefSpell != None )
-     //   DefSpell.RenderOverlays(Canvas);	
+	if ( DefSpell != None )
+        DefSpell.RenderOverlays(Canvas);	
 
 	if (OverlayActor != none)
 	{
@@ -580,6 +732,11 @@ simulated event RenderOverlays( canvas Canvas )
 		OverlayActor.Velocity = Velocity + (Acceleration * 0.025);
 		OverlayActor.RenderOverlays(Canvas);
 	}
+}
+
+function GetSaveGameListMultiplayer()
+{
+	ServerSavesList = GetSaveGameList();
 }
 
 // takes the castingLevel of the DispelMagic Spell, and the casting level
@@ -727,15 +884,33 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 	return manaBag;
 }
 
-function DisableSaveGame()
+function SetShellPauses(bool bPauses)
 {
-	WindowConsole(Player.Console).bShellPauses = true;
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		if (Player == None)
+		{
+			return;
+		}
+		if (Level.NetMode == NM_Standalone || !bPauses)
+			WindowConsole(Player.Console).bShellPauses = bPauses;
+	}
+}
+
+simulated function DisableSaveGame()
+{
+	if (Level.NetMode != NM_Standalone)
+		return;
+	// always allow saving in multiplayer since it saves at the start of the level
+	SetShellPauses(true);
 	Level.bDontAllowSavegame = true;
 }
-function EnableSaveGame()
+
+simulated function EnableSaveGame()
 {
-	WindowConsole(Player.Console).bShellPauses = false;
-	Level.bDontAllowSavegame = false;
+	SetShellPauses(false);
+	if (Level.NetMode != NM_Client)
+		Level.bDontAllowSavegame = false;
 }
 
 function PlayDamageEffect(vector HitLocation, vector Momentum, DamageInfo DInfo)
@@ -817,7 +992,11 @@ function TakeDamage( Pawn instigatedBy, Vector hitlocation, Vector momentum, Dam
 			if ( DInfo.DamageType == 'LightningBoltOfGods' )
 			{
 				if ( ShieldModifier(ShieldMod).shieldHealth > 0 )
+				{
+					if (Level.NetMode == NM_DedicatedServer && ShieldModifier(ShieldMod).shieldHealth > DInfo.Damage)
+							ShieldModifier(ShieldMod).ClientAddCrack(1.0);
 					ShieldMod.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
+				}
 				super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
 			} else {
 			
@@ -846,7 +1025,11 @@ function TakeDamage( Pawn instigatedBy, Vector hitlocation, Vector momentum, Dam
 					// Shield Absorbs damage
 					// ClientMessage("Shield protects the player"$Rand(100));
 					if ( ShieldModifier(ShieldMod).shieldHealth > 0 )
+					{
+						if (Level.NetMode == NM_DedicatedServer &&  ShieldModifier(ShieldMod).shieldHealth > DInfo.Damage)
+							ShieldModifier(ShieldMod).ClientAddCrack(1.0);
 						ShieldMod.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
+					}
 					else
 						super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
 				}
@@ -891,13 +1074,17 @@ exec function TestJournal( string JournalEntryName )
 	{	
 		GiveJournal( JournalEntryClass, false );
 	}
-
 }
 
 //----------------------------------------------------------------------------
 simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
 	local JournalEntry TempEntry;
+
+	if (Book == None)
+	{
+		return false;
+	}
 	
 	if ( JournalClass != None )
 	{	
@@ -911,6 +1098,11 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 				return false;
 			}
 		}
+
+		if (Level.NetMode == NM_DedicatedServer)
+		{
+			GiveJournalClient(JournalClass, bShowImmediate);
+		}
 	}
 
 	if ( bShowImmediate )
@@ -918,6 +1110,25 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 	
 	return true;
 }
+
+simulated function GiveJournalClient(class<JournalEntry> JournalClass, optional bool bShowImmediate )
+{
+	GiveJournal(JournalClass, bShowImmediate);
+}
+
+/*
+function GiveJournalClient(int journalId, class<JournalEntry> JournalEntryClass, bool bRead)
+{
+	local JournalEntry TempEntry;
+
+	TempEntry = Spawn(JournalEntryClass);
+				
+	if ( TempEntry != None )
+	{ 
+		BookJournal(Book).SetJournalEntry(journalId, TempEntry, bRead);
+	}
+}
+*/
 
 /*exec brady doesn't want this to be bindable*/ 
 exec function ShowBook()
@@ -1293,8 +1504,12 @@ exec function SwitchWeapon( byte F )
 		PendingWeapon = newWeapon;
 		ChangedWeapon();
 	}
-	else if ( (Weapon != newWeapon) && Weapon.PutDown() )
+	else if ( Weapon != newWeapon )
+	{
 		PendingWeapon = newWeapon;
+		if ( !Weapon.PutDown() )
+			PendingWeapon = None;
+	}
 }
 
 exec function SwitchAttSpell( byte F )
@@ -1404,6 +1619,22 @@ exec function Scrye()
 
 }
 
+function ClientSetScryeModActive(bool bActive, optional int castingLevel)
+{
+	if (Level.NetMode != NM_Client)
+		return;
+	
+	if (bActive)
+	{
+		ScryeMod.gotoState('ClientActivated');
+		ScryeMod.castingLevel = castingLevel;
+	}
+	else
+	{
+		ScryeMod.GotoState('ClientDeactivated');
+	}
+}
+
 
 /*
 function Timer()
@@ -1416,14 +1647,39 @@ function Timer()
 //cheat
 exec function Pie()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	// aka "AllMana".
     Mana = ManaCapacity;
 	//ClientMessage("Mana:"$Mana);
 }
 
+exec function ToggleFlight()
+{
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
+	if ( Level.bAllowFlight )
+		Level.bAllowFlight = false;
+	else
+		Level.bAllowFlight = true;
+}
+
 event Possess()
 {
 	Super.Possess();
+}
+
+exec function PlayMusic(string m)
+{
+	PlaySound(Sound(DynamicLoadObject("Music."$m, class'Sound')), SLOT_None, 0.5, true, 1600.0, 1.0, 491);
 }
 
 exec function PlayerMesh(string MeshName)
@@ -1536,6 +1792,11 @@ function PlayDyingSound()
 	else 
 		PlaySound(Die4, SLOT_Talk,volumeMultiplier);
 	MakePlayerNoise(1.0 * VolumeMultiplier, 1280 * VolumeMultiplier);
+}
+
+simulated function PlayBeepSound()
+{
+	PlaySound(Sound'Aeons.Weapons.E_Wpn_MoltBounce01',SLOT_Interface, 2.0);
 }
 
 function PlayTakeHitSound(int damage, name damageType, int Mult)
@@ -1816,12 +2077,14 @@ function PlayRising()
 {
 //	BaseEyeHeight = 0.4 * Default.BaseEyeHeight;
 //	TweenAnim('DuckWlkS', 0.7);
-	PlayAnim( 'get_up' );
+	//PlayAnim( 'get_up' );
+	if (Level.NetMode != NM_Standalone) // keep old singleplayer behavior for speedrunning
+		PlayAnim( 'idle', [TweenTime] 0.2 ); // do not loop!
 }
 
 function PlayFeignDeath()
 {
-	PlayAnim( 'death_gun_back' );
+	PlayAnim( 'death_gun_back', [TweenTime] 0.0 );
 }
 
 function PlayDying(name DamageType, vector HitLoc, DamageInfo DInfo)
@@ -2022,7 +2285,7 @@ function PlayLanded(float impactVel)
 	
 function PlayInAir()
 {
-	LoopAnim( 'jump_cycle', speedMultiplier, MOVE_None );
+	LoopAnim( 'jump_cycle',, MOVE_None ); // speedMultiplier
 }
 
 function PlayJump()
@@ -2032,7 +2295,7 @@ function PlayJump()
 
 function PlayFlight()
 {
-	PlayAnim( 'flight_start', speedMultiplier, MOVE_None );
+	PlayAnim( 'flight_start',, MOVE_None ); // speedMultiplier
 }
 
 function PlayDuck()
@@ -2074,7 +2337,7 @@ function TweenToWaiting(float tweentime)
 	}
 }
 
-simulated function PlayFiring()
+function PlayFiring()
 {
 	// switch animation sequence mid-stream if needed
 	if (AnimSequence == 'RunLG')
@@ -2145,10 +2408,14 @@ function PlayWeaponSwitch(Weapon NewWeapon)
 function PlaySwimming()
 {
 //	BaseEyeHeight = 0.7 * Default.BaseEyeHeight;
+	LoopAnim('swim');
+
+	/*
 	if ((Weapon == None) || (Weapon.Mass < 20) )
 		LoopAnim('SwimSM', -1.0);
 	else
 		LoopAnim('SwimLG', -1.0);
+	*/
 }
 
 function TweenToSwimming(float tweentime)
@@ -2157,7 +2424,7 @@ function TweenToSwimming(float tweentime)
 }
 
 
-exec function PlayerStateTrigger(optional float rSpeed, optional float aRate)
+/*exec*/ function PlayerStateTrigger(optional float rSpeed, optional float aRate)
 {
 	GroundSpeed = rSpeed;
 	AccelRate = aRate;
@@ -2166,19 +2433,31 @@ exec function PlayerStateTrigger(optional float rSpeed, optional float aRate)
 /////////////////////////////////////////////////
 // Functions for changing player movement params
 /////////////////////////////////////////////////
-exec function Run()
+/*exec*/ function Run()
 {
 	GroundSpeed = default.GroundSpeed;
 	AccelRate = default.AccelRate;
 }
 
-exec function Haste(float mult)
+/*exec*/ function Haste(float mult)
 {
 	// ClientMessage("Haste Called");
 	// AirSpeed = default.AirSpeed * mult;
 	GroundSpeed = default.GroundSpeed * mult;
 	AccelRate = default.AccelRate * mult;
 	speedMultiplier = mult;
+}
+
+exec function bhop()
+{
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
+	bBhopEnabled = !bBhopEnabled;
+	default.bBhopEnabled = bBhopEnabled;
 }
 
 function bool CheckSelect( float DeltaTime )
@@ -2560,6 +2839,7 @@ ignores SeePlayer, HearNoise, Bump;
 
 	function AnimEnd()
 	{
+		/*
 		local vector X,Y,Z;
 		GetAxes(Rotation, X,Y,Z);
 		if ( (Acceleration Dot X) <= 0 )
@@ -2582,6 +2862,7 @@ ignores SeePlayer, HearNoise, Bump;
 			else
 				PlaySwimming();
 		}
+		*/
 	}
 	
 	function ZoneChange( ZoneInfo NewZone )
@@ -2670,9 +2951,10 @@ ignores SeePlayer, HearNoise, Bump;
 
 	function PlayerMove(float DeltaTime)
 	{
-		local rotator oldRotation;
-		local vector X,Y,Z, NewAccel;
+		local rotator oldRotation, lRot;
+		local vector X,Y,Z, NewAccel, OldAccel;
 		local float Speed2D, random;
+		local float OldVSize, NewVSize;
 	
 		GetAxes(ViewRotation,X,Y,Z);
 
@@ -2683,6 +2965,29 @@ ignores SeePlayer, HearNoise, Bump;
 		aUp		 *= 0.1;
 		
 		NewAccel = aForward*X + aStrafe*Y + aUp*vect(0,0,1);
+
+		OldAccel = Acceleration;
+		OldVSize = VSize(OldAccel);
+		NewVSize = VSize(NewAccel);
+		if ( Physics == PHYS_Swimming )
+		{
+			if ( ( NewVSize > 0.05 ) )	//&& ( OldVSize < 0.05 ) )
+			{
+				// movement just started
+				lRot = Rotation;
+				lRot.Pitch = 0;
+				lRot.Roll = 0;
+
+				lRot = rotator(Acceleration) - lRot;
+				PlayLocomotion( vector(lRot) );
+			}
+			else if ( ( NewVSize < 0.05 ) && ( OldVSize > 0.05 ) )
+			{
+				// movement just stopped
+				PlayLocomotion( vect(0,0,0) );
+			}
+		}
+		Acceleration = NewAccel;
 
 		// Add swimming noises if the player is swimming.
 		if (((NewAccel.X * NewAccel.X + NewAccel.Y * NewAccel.Y + NewAccel.Z * NewAccel.Z) > 0) && (SoundDuration < 0))
@@ -2716,7 +3021,7 @@ ignores SeePlayer, HearNoise, Bump;
 
 		// Update rotation.
 		oldRotation = Rotation;
-		UpdateRotation(DeltaTime);
+		UpdateRotation(DeltaTime, 2.0);
 
 		if (bAllowMove)
 		{
@@ -2748,6 +3053,10 @@ ignores SeePlayer, HearNoise, Bump;
 		if ( !IsAnimating() )
 			TweenToWaiting(0.3);
 		SoundDuration = 0.0;
+		PlayLocomotion( vect(0,0,0) );
+		//AnimEnd();
+		//Enable('AnimEnd');
+		//LoopAnim('swim_idle'); // fixes swimming animation not starting
 		//log("player swimming");
 	}
 }
@@ -2763,10 +3072,23 @@ ignores SeePlayer, HearNoise, Bump;
 	exec function FeignDeath()
 	{
 		if ( Physics == PHYS_Walking )
-		{			ServerFeignDeath();
+		{
+			ServerFeignDeath();
 			Acceleration = vect(0,0,0);
 			GotoState('FeigningDeath');
 		}
+	}
+
+	function ServerFeignDeath()
+	{
+		local Weapon W;
+
+		W = Weapon;
+		PendingWeapon = None;
+		if ( Weapon != None )
+			Weapon.PutDown();
+		PendingWeapon = W;
+		GotoState('FeigningDeath');
 	}
 
 	function ZoneChange( ZoneInfo NewZone )
@@ -2809,12 +3131,6 @@ ignores SeePlayer, HearNoise, Bump;
 
 	function Landed(vector HitNormal)
 	{
-		local rotator NewRot;
-
-		// flying and swimming can mess up player's rotation, reset it here
-		NewRot.Yaw = Rotation.Yaw;
-		SetRotation( NewRot );
-		
 //		log( "event Landed()" );
 //		ClientMessage( "event Landed()" );
 		Global.Landed(HitNormal);
@@ -2842,7 +3158,7 @@ ignores SeePlayer, HearNoise, Bump;
 		if ( bPressedJump )
 			DoJump();
 
-		if ( Physics == PHYS_Walking )
+		if ( Physics == PHYS_Walking || bIsClimbing )
 		{
 			// check crouch
 			if ( !bIsCrouching )
@@ -2910,11 +3226,12 @@ ignores SeePlayer, HearNoise, Bump;
 			
 	event PlayerTick( float DeltaTime )
 	{
+		local DamageInfo DInfo;
 		local float DeltaOpacity;
 
 		if ( Health <= 0 )
 		{
-			GotoState('Dying');
+			Died(None, '', Location, DInfo);
 			return;
 		}
 
@@ -2947,7 +3264,8 @@ ignores SeePlayer, HearNoise, Bump;
 		local bool	bSaveJump;
 		local rotator MoveRot;
 
-		VelocityBias = GetTotalPhysicalEffect( DeltaTime );
+		if (Level.NetMode != NM_Client)
+			VelocityBias = GetTotalPhysicalEffect( DeltaTime );
 
 		MoveRot.Yaw = ViewRotation.Yaw;
 		GetAxes(MoveRot,X,Y,Z);
@@ -2983,7 +3301,7 @@ ignores SeePlayer, HearNoise, Bump;
 			//add bobbing when walking
 			if ( !bShowMenu )
 			{
-				if ( Speed2D < 10 )
+				if ( Speed2D < 10 || GroundSpeed < 10 ) // added GroundSpeed check to fix black screen when landing if GroundSpeed is 0
 					BobTime += 0.2 * DeltaTime;
 				else
 					BobTime += DeltaTime * (0.3 + 0.7 * Speed2D/GroundSpeed);
@@ -3009,7 +3327,7 @@ ignores SeePlayer, HearNoise, Bump;
 		else
 		{
 			// Update rotation.
-			UpdateRotation(DeltaTime);
+			UpdateRotation(DeltaTime, 0.0);
 		}
 														//dodge ?
 		if ( bPressedJump && ((GetAnimGroup(AnimSequence) == 'Dodge') || (GetAnimGroup(AnimSequence) == 'Landing')) )
@@ -3036,7 +3354,7 @@ ignores SeePlayer, HearNoise, Bump;
 			ReplicateMove(DeltaTime, NewAccel, OldRotation - Rotation);
 		else
 			ProcessMove(DeltaTime, NewAccel, OldRotation - Rotation);
-		if (AeonsGameInfo(Level.Game).bBhopEnabled)
+		if (bBhopEnabled)
 			bPressedJump = bJump != 0;
 		else
 			bPressedJump = bSaveJump;
@@ -3053,7 +3371,7 @@ ignores SeePlayer, HearNoise, Bump;
 		bIsTurning = false;
 		bPressedJump = false;
 		if (Physics != PHYS_Falling) SetPhysics(PHYS_Walking);
-		if ( !IsAnimating() )
+		//if ( !IsAnimating() )
 			PlayLocomotion( vect(0,0,0) );
 
 		bSelectObject = false;
@@ -3078,7 +3396,10 @@ simulated state PlayerCutScene
 		bAcceptMagicDamage = true;
 		UnFreeze();
 		ReleasePos();
-		ViewSelf();
+		//ViewSelf(); // can't call a replicated function on level end, when player is being destroyed
+		bBehindView = false;
+		Viewtarget = None;
+		LetterboxRate(0); // needed for clients that didn't start the cutscene themselves
 		Letterbox(false);
 		bRenderSelf = true;
 		DesiredFOV = DefaultFOV;
@@ -3086,7 +3407,9 @@ simulated state PlayerCutScene
 	
 	function BeginState()
 	{
-		log("PlayerCutscene BeginState() ... "$Level.TimeSeconds, 'Misc');
+		local CutsceneManager CutsceneManager;
+
+		log("PlayerCutscene BeginState() ... "$Level.TimeSeconds, 'Custom');
 		if ( (HasteMod != none) && HasteMod.bActive )
 			HasteMod.GotoState('Deactivated');
 		bFire = 0;
@@ -3097,11 +3420,21 @@ simulated state PlayerCutScene
 		bSelectAttSpell = 0;
 		bSelectDefSpell = 0;
 		bSelectItem = 0;
+
+		bRequestedSkipCutscene = false;
 	
-		if ( Player != None && Player.Console != None )
-			WindowConsole(Player.Console).bShellPauses = true;
-		Level.bDontAllowSavegame = true;
+		DisableSaveGame();
 		NoDetect(true);
+
+		if (Level.NetMode == NM_Client)
+		{
+			// If a cutscene is active and only the client state changed, the client will eventually go back to the PlayerCutScene state
+			// Make sure SetupCutsceneForPlayer is called on the client
+			ForEach AllActors(class 'CutsceneManager', CutsceneManager)
+				break;
+			if (CutsceneManager.IsCutsceneActive())
+				CutsceneManager.SetupCutsceneForPlayer(self);
+		}
 	}
 	
 	function EndState()
@@ -3109,117 +3442,80 @@ simulated state PlayerCutScene
 		log("PlayerCutscene BeginState() ... "$Level.TimeSeconds, 'Misc');
 		NoDetect(false);
 		UnLock();
-		if ( Player != None && Player.Console != None )
-			WindowConsole(Player.Console).bShellPauses = false;
-		Level.bDontAllowSavegame = false;
+		EnableSaveGame();
 		bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
-		if ( Weapon != None )
-			Weapon.GotoState('Idle');
-		if ( AttSpell != None )
-			AttSpell.GotoState('Idle');
+		if (Level.NetMode != NM_Client)
+		{
+			if ( Weapon != None )
+				Weapon.GotoState('Idle');
+			if ( AttSpell != None )
+				AttSpell.GotoState('Idle');
+		}
 	}
 
-	exec simulated function StopCutScene()
+	exec function StopCutScene()
 	{
 		UnLock();
-		Walk();
+		StartWalk();
 		if (Region.Zone.bWaterZone)
 			GotoState('PlayerSwimming');
 		else
 			GotoState('PlayerWalking');
 	}
 
-	simulated event PlayerTick( float DeltaTime ) 
+	event PlayerTick( float DeltaTime ) 
 	{
-		if (Health <= 0)
+		local DamageInfo DInfo;
+		if (Health <= 0 && Level.NetMode == NM_Standalone)
 		{
-			GotoState('Dying');
+			// don't allow watching cutscenes while dead, except in multiplayer
+			Died(None, '', Location, DInfo);
 			return;
 		}
-		if ( MasterCamPoint == none )
+
+		if (bRequestedSkipCutscene)
 		{
-			GotoState('PlayerWalking');
-			return;
-		} else {
-			DoEyeTrace();
-			if (Health <= 0)
-			{
-				UnLock();
-				GotoState('Dying');
-			}
+			bRequestedSkipCutscene = false;
+			RequestSkipCutscene();
 		}
+
+		DoEyeTrace();
+
+		if ( bUpdatePosition )
+			ClientUpdatePosition();
+
+		PlayerMove(DeltaTime);
+		
 		//ViewFade(DeltaTime, 4);
 		ViewFlash(DeltaTime);
 	}
 
+	function PlayerMove( float DeltaTime )
+	{
+		if ( Role < ROLE_Authority ) // then save this move and replicate it
+			ReplicateMove(DeltaTime, vect(0,0,0), rot(0,0,0));
+	}
+
 	exec function Fire( optional float F )
 	{
-		local CameraProjectile Cam;
-		local ScriptedPawn SP;
-		//local Dispatcher DP;
-
-		if ( MasterCamPoint != none && (MasterCamPoint.bEscapable || MasterCamPoint.URL != "") )
-		{
-			log("Player in PlayerCutscene State -- forcing Completed Cutscene", 'Misc');
-			MasterCamPoint.CompleteCutscene(self);
-			MasterCamPoint.Teleport(self);
-		}
-		else if (GetRenewalConfig().bMoreSkippableCutscenes)
-		{
-			ForEach AllActors(class 'CameraProjectile', Cam)
-			{
-				Cam.SkipIt();
-			}
-
-			/*
-			ForEach AllActors(class 'Dispatcher', DP)
-			{
-				if (DP.Instigator == None)
-					continue;
-
-				for( DP.i=0; DP.i<ArrayCount(DP.OutEvents); DP.i++ )
-				{
-					if( DP.OutEvents[DP.i] != '' )
-					{
-						foreach AllActors( class 'Actor', Target, DP.OutEvents[DP.i] )
-						{
-							if ( Target.IsA('Trigger') )
-							{
-								// handle Pass Thru message
-								if ( Trigger(Target).bPassThru )
-								{
-									Trigger(Target).PassThru(DP.Other);
-								}
-							}
-							Target.Trigger( DP, DP.Instigator );
-						}
-					}
-				}
-
-				DP.GotoState('');
-				DP.bDisabled = true;
-			}
-			*/
-
-			foreach AllActors( class'ScriptedPawn', SP )
-			{
-				SP.Script.bClickThrough = true;
-				SP.FastScript( true );
-			}
-			
-			AeonsHud(myHud).RemoveSubtitle();
-		}
+		// don't call RequestSkipCutscene immediately since it could be the first tick and travelling won't work
+		bRequestedSkipCutscene = true;
 	}
 
 	Begin:
+		// added Freeze and LockPos, ignoring bHoldPlayer
+		// what's the point of bHoldPlayer if you can't move during cutscenes anyways?
+		// possibly because something could set player's velocity combined with bHoldPlayer
+		Freeze();
+		LockPos();
 		bAcceptDamage = false;
 		bAcceptMagicDamage = false;
 		LetterboxRate(0);
 		LetterBox(true);
 		//ClientMessage("Begin Cutscene State");
-		PlayAnim('Idle');
+		LoopAnim('Idle');
 	End:
 		//ClientMessage("End Cutscene State");
 }
@@ -3238,7 +3534,8 @@ ignores SeePlayer, HearNoise, Bump;
 		
 	function AnimEnd()
 	{
-		PlaySwimming();
+		//PlaySwimming();
+		LoopAnim( 'flight_cycle' );
 	}
 
 	function ProcessMove(float DeltaTime, vector NewAccel, rotator DeltaRot)	
@@ -3293,7 +3590,7 @@ ignores SeePlayer, HearNoise, Bump;
 		//Acceleration = aForward*X + aStrafe*Y + aUp*vect(0,0,1);  
 		Acceleration = aForward*X + aStrafe*Y ;//+ aForward*Z;  
 		
-		UpdateRotation(DeltaTime);
+		UpdateRotation(DeltaTime, 2.0);
 
 		if ( Role < ROLE_Authority ) // then save this move and replicate it
 			ReplicateMove(DeltaTime, Acceleration, rot(0,0,0));
@@ -3432,9 +3729,7 @@ ignores SeePlayer, HearNoise, Bump;
 			if ( slot >= 100 && bClicked )
 			{
 				// use item directly instead of switching to it
-				Inv = Inventory.FindItemInGroup(slot);
-				if ( Inv != none )
-					Inv.Activate();
+				ActivateInventoryItemInGroup(slot);
 			}
 	        else
 			{
@@ -3622,6 +3917,12 @@ ignores SeePlayer, HearNoise, Bump;
 		bFireDefSpell = 0;
 		SetObject();
 		//bSelectObject = False;
+
+		if ( Level.NetMode == NM_Client )
+		{
+			bSelectObject = false;
+			bAllowSelectionHUD = true;
+		}
    }
 }
 
@@ -4276,8 +4577,69 @@ ignores SeePlayer, HearNoise, Bump;
    }
 }
 
+state GameEnded
+{
+	ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneChange, ZoneChange, Falling, TakeDamage, PainTimer, Died;
+
+	exec function Fire( optional float F )
+	{
+		bFire = 0;
+
+		if ( Role < ROLE_Authority )
+			return;
+
+		if ( (Level.NetMode == NM_Standalone) && !bFrozen )
+			ServerReStartGame();
+	}
+
+	exec function FireAttSpell( optional float F )
+    {
+		bFireAttSpell = 0;
+    }
+
+	exec function FireDefSpell( optional float F )
+    {
+		bFireDefSpell = 0;
+	}
+
+	function FindGoodView()
+	{
+		
+	}
+
+	function CalcBehindView( out vector CameraLocation, out rotator CameraRotation, float Dist )
+	{
+		Global.CalcBehindView(CameraLocation, CameraRotation, 30);
+	}
+
+	function PlayerCalcView( out actor ViewActor, out vector CameraLocation, out rotator CameraRotation )
+	{
+		Global.PlayerCalcView(ViewActor, CameraLocation, CameraRotation);
+		if ( Pawn(ViewActor) == None )
+			CameraLocation.Z += 64;
+	}
+
+	// call the version in PlayerPawn
+    event PlayerInput( float DeltaTime )
+    {
+		Super.PlayerInput(DeltaTime);
+	}
+
+	function BeginState()
+	{
+		HidePlayer();
+		Super.BeginState();
+	}
+}
+
 exec function mShat(int i)
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if (i == 0 )
 		self.MindShatterMod.gotoState('Deactivated');
 	else
@@ -4317,6 +4679,12 @@ exec function AddAll()
 	local Weapon newWeapon;
 	local Spell newSpell;
 	local Items newItem;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 		
 	AttSpell.LocalCastingLevel = 4;
 	AttSpell.CastingLevel = 4;
@@ -4645,6 +5013,12 @@ exec function DefAll()
 	local Weapon newWeapon;
 	local Spell newSpell;
 	local Items newItem;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	if (Inventory.FindItemInGroup(class'Aeons.Mindshatter'.default.InventoryGroup) == none)
 	{
@@ -4742,6 +5116,12 @@ exec function GiveMe(name this, optional int Amplitude)
 	local Weapon newWeapon;
 	local Spell newSpell;
 	local Items newItem;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	// Conventional Weapons
 
@@ -5161,12 +5541,14 @@ function GiveStartupWeapons()
 			newWeapon.BecomeItem();
 			AddInventory(newWeapon);
 			newWeapon.BringUp();
+			//newWeapon.PutDown(); // commented out because stone was getting unselected on new game
 			newWeapon.GiveAmmo(self);
 			newWeapon.SetSwitchPriority(self);
 			newWeapon.WeaponSet(self);
 		}
 	}
 
+	/* added as a DefaultWeapon now
 	if (!HasItem('Revolver'))
 	{
 		newWeapon = Spawn(class'Aeons.Revolver');
@@ -5176,11 +5558,13 @@ function GiveStartupWeapons()
 			newWeapon.BecomeItem();
 			AddInventory(newWeapon);
 			newWeapon.BringUp();
+			//newWeapon.PutDown(); // commented out because stone was getting unselected on new game
 			newWeapon.GiveAmmo(self);
 			newWeapon.SetSwitchPriority(self);
 			newWeapon.WeaponSet(self);
 		}
 	}
+	*/
 
 	if (!HasItem('Scrye'))
 	{
@@ -5195,12 +5579,12 @@ function GiveStartupWeapons()
 	//ConsoleCommand("SetupInv");
 }
 
-simulated function GiveBook()
+function GiveBook()
 {
 	local BookJournalBase TempBook;
 	local class<BookJournalBase> BookJournalClass;
 	local JournalEntry TempEntry;
-	
+
 	if ( Book == None )
 	{
 		if (GetPlatform() == PLATFORM_PSX2)
@@ -5226,8 +5610,6 @@ simulated function GiveBook()
 
 		TempBook.GiveTo(Self);
 		Book = TempBook;
-		
-		log("Got book", 'Misc');
 	}
 }
 
@@ -5400,7 +5782,7 @@ exec function DumpActorStats()
 	local int StaticCount, MovableCount, BothCount;
 
 	Log("===============================");
-	Log("==  Actor Stat Dump  ==");
+	Log("==  Savable Actor Stat Dump  ==");
 	Log("===============================");
 
 	foreach AllActors( class 'Actor', A )
@@ -5456,6 +5838,12 @@ exec function debugAnim(name pawnName, name AnimName, optional bool bLoop, optio
 {
 	local Actor A;
 
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if ( rate == 0 )
 		rate = 1.0;
 
@@ -5494,29 +5882,13 @@ function ClientPutDown(Weapon Current, Weapon Next)
 	}
 }
 
-function AttachWeapon()
-{
-	local AeonsWeapon AWep;
-	AWep = AeonsWeapon(Weapon);
-	
-	log("Attached", 'Misc');
-	
-	AWep.TempMesh = AWep.Mesh;
-	AWep.Mesh = AWep.ThirdPersonMesh;
-	if ( AWep.ThirdPersonJointName != 'none' )
-		AWep.SetBase( Self, 'Revolver_Attach_Hand', AWep.ThirdPersonJointName );
-	else
-		AWep.SetBase( Self, 'Revolver_Attach_Hand', 'root' );
-	AWep.Mesh = AWep.TempMesh;
-}
-
 function SendClientFire(weapon W, int N)
 {
 	RealWeapon(W,N);
 	if ( Weapon.IsA('AeonsWeapon') )
 	{
  //change 
-		Log("AeonsPlayer: SendClientFire");
+		//Log("AeonsPlayer: SendClientFire");
 		AeonsWeapon(Weapon).bCanClientFire = true;
 		AeonsWeapon(Weapon).ForceClientFire();
 
@@ -5526,17 +5898,16 @@ function SendClientFire(weapon W, int N)
 
 function SendFire(Weapon W)
 {
-	Log("AeonsPlayer: SendFire");
+	//Log("AeonsPlayer: SendFire");
 	WeaponUpdate++;
 	SendClientFire(W,WeaponUpdate);
 }
 
 function UpdateRealWeapon(Weapon W)
 {
-	Log("AeonsPlayer: UpdateRealWeapon");
+	//Log("AeonsPlayer: UpdateRealWeapon");
 	WeaponUpdate++;
 	RealWeapon(W,WeaponUpdate);
-	AttachWeapon();
 }
 	
 function RealWeapon(weapon Real, int N)
@@ -5546,7 +5917,7 @@ function RealWeapon(weapon Real, int N)
 	WeaponUpdate = N;
 	Weapon = Real;
 
-	Log("AeonsPlayer: RealWeapon");
+	//Log("AeonsPlayer: RealWeapon");
 
 	if ( (Weapon != None) && !Weapon.IsAnimating() )
 	{
@@ -5554,8 +5925,6 @@ function RealWeapon(weapon Real, int N)
 			Weapon.GotoState('ClientActive');
 		else
 			Weapon.TweenToStill();
-		
-		//AttachWeapon();
 	}
 	bNeedActivate = false;
 	ClientPending = None;	// make sure no client side weapon changes pending
@@ -5587,7 +5956,7 @@ function ReplicateMove
 		}
 		else
 		{
-			Weapon.GotoState('');
+			Weapon.GotoState('ClientIdle');
 			Weapon.TweenToStill();
 		}
 	}
@@ -5628,10 +5997,12 @@ function SpawnGibbedCarcass( vector Dir )
 		
 		Gib = DetachLimb(JointName(i), Class 'BodyPart');
 		Gib.Velocity = Vel;
-		Gib.DesiredRotation = RotRand();
+		Gib.DesiredRotation = RotRand(true);
 		Gib.bBounce = true;
 		Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
 		//SetBase(self, JointName(i));
+
+		ReplicateDetachLimb(self, JointName(i), Gib.Velocity, Gib.DesiredRotation);
 	}
 	
 	// km - this is a bit temp :)
@@ -5725,6 +6096,12 @@ exec function getGroundSpeed()
 
 exec function setGroundSpeed(int gs)
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+	
 	default.groundSpeed = gs;
 	groundSpeed = gs;
 	ClientMessage("Ground Speed = "$groundSpeed);
@@ -5767,6 +6144,12 @@ exec function ShowStealth()
 exec function MagicSounds()
 {
 	local string str;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 	
 	bMagicSound = !bMagicSound;
 	if (bMagicSound)
@@ -5780,6 +6163,12 @@ exec function MagicSounds()
 exec function WeaponSounds()
 {
 	local string str;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	bWeaponSound = !bWeaponSound;
 
@@ -5831,7 +6220,12 @@ exec function DebugHUD()
 exec function UnHide(name ClassName)
 {
 	local Actor A;
-	
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	ForEach AllActors(Class 'Actor', A)
 	{
@@ -5843,6 +6237,12 @@ exec function UnHide(name ClassName)
 exec function Hide(name ClassName)
 {
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	ForEach AllActors(Class 'Actor', A)
 	{
@@ -5856,6 +6256,12 @@ exec function ForceHide(name ClassName)
 {
 	local Actor A;
 
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	ForEach AllActors(Class 'Actor', A)
 	{
 		if (A.IsA(ClassName))
@@ -5866,6 +6272,12 @@ exec function ForceHide(name ClassName)
 exec function ToggleHide(name ClassName)
 {
 	local Actor A;
+
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
 
 	ForEach AllActors(Class 'Actor', A)
 	{
@@ -5878,6 +6290,16 @@ function DoubleShotgun()
 {
 	bDoubleShotgun = !bDoubleShotgun;
 	// ClientMessage("Double Shotgun: "$bDoubleShotgun);
+}
+
+function ServerDoubleShotgun()
+{
+	DoubleShotgun();
+}
+
+function ServerScytheBerserk()
+{
+	Scythe(Weapon).Berserk();
 }
 
 exec function RenderWeapon()
@@ -6229,7 +6651,7 @@ exec function PDP()
 	}
 }
 
-exec function bool UseMana(int i)
+/*exec*/ function bool UseMana(int i)
 {
 	// log("AeonsPlayer:UseMana()....using "$i,'Misc');
 	if ( bUseMana )
@@ -6240,12 +6662,24 @@ exec function bool UseMana(int i)
 
 exec function InfiniteMana()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+	
 	bUseMana = !bUseMana;
 	ClientMessage("Infinite Mana use is "$!bUseMana);
 }
 
 exec function AmpAttSpell()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if (AttSpell != none)
 	{
 		if (AttSpell.CastingLevel < 4)
@@ -6258,6 +6692,12 @@ exec function AmpAttSpell()
 
 exec function AmpDefSpell()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if (DefSpell != none)
 	{
 		if (DefSpell.CastingLevel < 4)
@@ -6270,6 +6710,12 @@ exec function AmpDefSpell()
 
 exec function DeAmpAttSpell()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if (AttSpell != none)
 	{
 		if (AttSpell.CastingLevel > 0)
@@ -6282,6 +6728,12 @@ exec function DeAmpAttSpell()
 
 exec function DeAmpDefSpell()
 {
+	if( !bCheatsEnabled )
+		return;
+
+	if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+		return;
+
 	if (DefSpell != none)
 	{
 		if (DefSpell.CastingLevel > 0)
@@ -6301,6 +6753,7 @@ function bool Decapitate(optional vector Dir)
 	Wound.setup();
 
 	DestroyLimb('Head');
+	ReplicateDestroyLimb(self, 'Head');
 
 	return true;
 }
@@ -6322,7 +6775,7 @@ exec function LogGameState()
 	}
 }
 
-exec function bool SpawnHound()
+/*exec*/ function bool SpawnHound()
 {
 	/*
 	local vector X, Y, Z, HitLocation, HitNormal, EyeLoc, TempVec;
@@ -6352,8 +6805,7 @@ exec function bool SpawnHound()
 	}
 	return false;
 	*/
-	
-	
+
 	local SpawnPoint	SP;
 	local SpawnPoint	Chosen;
 	local float			PCount;
@@ -6363,14 +6815,10 @@ exec function bool SpawnHound()
 	local vector		DVect;
 	local class<pawn>	HClass;
 	local Hound			H;
-	
-	bring('Hound');
-
-	return true;
 
 	// Don't bring a Hound until Ambrose is dead.
-	//if( !CheckGameEvent( 'AmbroseDead' ) )
-	//	return false;
+	if( !CheckGameEvent( 'AmbroseDead' ) )
+		return false;
 
 	Chosen = none;
 	R = FRand();
@@ -7621,25 +8069,55 @@ exec function SetFOV(float newFOV)
 	FOVAngle = newFOV;
 }
 
+function ServerReloadWeapon()
+{
+	Weapon.Reload();
+}
+
 exec function WeaponAction()
 {
+	local CoopTranslocator CoopTranslocator;
+
 	if (Weapon != none)
 	switch(Weapon.class.name)
 	{
 		case 'GhelziabahrStone':
+			CoopTranslocator = CoopTranslocator(FindInventoryType(class'CoopTranslocator'));
+			if (CoopTranslocator != None)
+			{
+				GhelziabahrStone(Weapon).CoopTranslocator = CoopTranslocator;
+				CoopTranslocator.TrySelectTarget(GhelziabahrStone(Weapon));
+			}
 			break;
 
 		case 'Revolver':
-			Revolver(Weapon).Reload();
+			ServerReloadWeapon();
+			
+			if (Role < ROLE_Authority)
+			{
+				Weapon.ClientReloadWeapon(-1);
+			}
 			break;
 	
 		case 'Shotgun':
 			if (Shotgun(Weapon).ClipCount == 1)
-				Shotgun(Weapon).Reload();
+			{
+				ServerReloadWeapon();
+
+				if (Role < ROLE_Authority)
+				{
+					Weapon.ClientReloadWeapon(-1);
+				}
+			}
 			else
 			{
 				Shotgun(Weapon).DoubleBarrelToggle();
 				DoubleShotgun();
+
+				if (Role < ROLE_Authority)
+				{
+					ServerDoubleShotgun();
+				}
 			}
 			break;
 
@@ -7651,7 +8129,12 @@ exec function WeaponAction()
 		//	break;
 
 		case 'Scythe':
-			Scythe(Weapon).Berserk();
+			ServerScytheBerserk();
+
+			if (Role < ROLE_Authority)
+			{
+				Scythe(Weapon).Berserk();
+			}
 			break;
 	
 		case 'TibetianWarCannon':
@@ -7995,19 +8478,131 @@ exec function QuickSave()
 
 state CheatFlying
 {
+	exec function Walk()
+	{	
+		if ( !bAdmin && (Level.Netmode != NM_Standalone) )
+			return;
+
+		StartWalk();
+		if ( Level.NetMode == NM_DedicatedServer )
+			GotoState(PlayerReStartState); // needed since state is only changed on the client
+	}
+	function AnimEnd()
+	{
+		LoopAnim( 'flight_cycle' );
+	}
 	function ProcessMove(float DeltaTime, vector NewAccel, rotator DeltaRot)	
 	{
-		local float OldAirSpeed;
+		local float OldAirSpeed, FlySpeedMultiplier;
+
+		FlySpeedMultiplier = 1.0;
+		if (HasteModifier(HasteMod) != None)
+			FlySpeedMultiplier = HasteModifier(HasteMod).speedMultiplier;
 
 		Acceleration = Normal(NewAccel);
-		Velocity = Normal(NewAccel) * GroundSpeed * HasteModifier(HasteMod).speedMultiplier;
-		
+		Velocity = Normal(NewAccel) * GroundSpeed * FlySpeedMultiplier;
 		OldAirSpeed = AirSpeed;
 		
 		AutonomousPhysics(DeltaTime);
 		AirSpeed = OldAirSpeed;
 		//MoveSmooth(Acceleration * DeltaTime);
 	}
+	function BeginState()
+	{
+		EyeHeight = BaseEyeHeight;
+		AirSpeed = 9999.0;
+		SetPhysics(PHYS_Flying);
+		PlayFlight();
+		bCanFly = true;
+		// log("cheat flying");
+	}
+}
+
+function RequestSkipCutscene()
+{
+	local CutsceneManager CutsceneManager;
+	ForEach AllActors(class 'CutsceneManager', CutsceneManager)
+		break;
+	CutsceneManager.SkipCutscene();
+}
+
+// Letterbox control
+exec function Letterbox( bool B )
+{
+	bLetterboxPlayer = B;
+	Super.Letterbox(B);
+}
+
+// Letterbox fade rate control
+exec function LetterboxRate( float rate )
+{
+	LetterboxFadeRatePlayer = rate;
+	Super.LetterboxRate(rate);
+}
+
+exec function ShowMOTD()
+{
+	if ( myHUD != none )
+	{
+		AeonsHUD(myHUD).ShowMOTD();
+	}
+	else
+	{
+		bNetShowMOTD = True;
+	}
+}
+
+simulated function name GetWeaponAttachJoint()
+{
+	if (Mesh.name == 'Patrick_m')
+		return 'Revolver_Attach_Hand';
+	if (Mesh.name == 'Gerald_m')
+		return 'Revolver_Attach_Hand'; // Stone_Attach_Hand
+	
+	//if (Mesh.name == 'TrsantiBase_m')
+	//	return 'L_Palm'; // L_Hand, L_Palm
+	//if (Mesh.name == 'Shaman_m')
+	//	return 'R_Hand1'; // L_Hand
+	if (Mesh.name == 'Bethany_m')
+		return 'L_tentacle9';
+	
+	return 'L_Hand';
+	// also L_Hand
+	// TrsantiBase_m, Shaman_m, Lizbeth_m, Kiesinger_m, Evelyn_m, AaronGhost_m(Lt_Handle$Anim,Book_Att), Ambrose_m(axe_01b)
+	// Jeremiah_m(Hand_Pipe,Hand_Glasses), Jemaas_m(handle_left$anim,L_Fist,Left_Fist2), MonkSoldier_m, Drinen_m(L_Finger)
+	// MonkAbbott_m
+}
+
+simulated function GiveClientSideModifiers()
+{
+	// give the player a On Screen Message Modifier
+	if ( OSMMod == None )
+		OSMMod = Spawn(class'Aeons.OnScreenMessageModifier', self);
+
+	// Rain Modifier
+	if ( RainMod == None )
+		RainMod = Spawn(class'Aeons.RainModifier', self);
+
+	// Player Damage Physics Modifier
+	if ( PlayerDamageMod == None )
+		PlayerDamageMod = Spawn(class'Aeons.PlayerDamageModifier', self);
+
+	// Flight Modifier
+	//if ( Flight == None )
+	//	Flight = Spawn(class'Aeons.FlightModifier');
+
+	// give the player a Mindshatter Modifier
+	//if ( MindshatterMod == None )
+	//	MindshatterMod = Spawn(class'Aeons.MindshatterModifier', self);
+
+	// give the player a SoundModifier
+	//if ( SoundMod == None )
+	//	SoundMod = Spawn(class'Aeons.SoundModifier');
+}
+
+simulated function ClientUpdateForecast()
+{
+	RainModifier(RainMod).UpdateForecast();
 }
 
 function DisableScryeHint()
@@ -8073,7 +8668,7 @@ function bool ShowSelectItemHint(string Line1)
 
 	if (bFoundKey)
 	{
-		KeyName = class'ScrollingMessageTexture'.static.Replace(Localize("Misc", "SelectItemHint", "Renewal"), "%key", KeyName);
+		KeyName = FormatString(Localize("Misc", "SelectItemHint", "Renewal"), "%key", KeyName);
 		ShowInventoryMessage(Line1, KeyName, 6.0);
 	}
 

@@ -44,7 +44,7 @@ replication
 
 //----------------------------------------------------------------------------
 
-function PreBeginPlay ()
+simulated function PreBeginPlay ()
 {
 	if (RGC())
 	{
@@ -111,16 +111,16 @@ simulated function PlayFiring()
 	//logTime("Ectoplasm: PlayFiring");
 // / * we need to put this back in the appropriate places. 
 	// Some of it only happens clientside
-	if ( effectLight == none )
+	if ( effectLight == none && Level.NetMode != NM_Client )
 	{
-		log("Creating Ecto Effect Light", 'Spell');
+		//log("Creating Ecto Effect Light", 'Spell');
 		effectLight = spawn(class 'EctoEffectLight',self,, Owner.Location);
 		effectLight.setBase(self);
 	}
 
-	if ( DripParticles == none )
+	if ( DripParticles == none && Level.NetMode != NM_DedicatedServer )
 	{
-		log("Creating Ecto Drip Particles", 'Spell');
+		//log("Creating Ecto Drip Particles", 'Spell');
 		fingerPlace = jointPlace('Hand');
 		dripParticles = spawn(class 'EctoplasmDrip_particles',self,,fingerPlace.pos); // + vect(0,0,32));
 		dripParticles.setBase(self, 'Wrist', 'none'); //, 'Root');
@@ -132,7 +132,11 @@ simulated function PlayFiring()
 		Owner.MakeNOise(3.0, 1280);
 	}
 // * /
-	//LoopAnim('EctoCycle',2);
+	if (Level.NetMode == NM_Client)
+	{
+		PlayAnim('EctoStart',1,,,0);
+		LoopAnim('EctoCycle',2);
+	}
 	bStillFiring = true;
 }
 
@@ -165,14 +169,14 @@ state NormalFire
 			AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 		}
 
-		if ( effectLight == none )
+		if ( effectLight == none && Level.NetMode == NM_Client )
 		{
 			// log("Creating Ecto Effect Light", 'Spell');
 			effectLight = spawn(class 'EctoEffectLight',Owner,, Owner.Location);
 			effectLight.setBase(Owner);
 		}
 
-		if ( DripParticles == none )
+		if ( DripParticles == none && Level.NetMode != NM_DedicatedServer )
 		{
 			// log("Creating Ecto Drip Particles", 'Spell');
 			fingerPlace = jointPlace('Hand');
@@ -211,7 +215,7 @@ state NormalFire
 	
 		if ( DripParticles != none )
 		{
-			DripParticles.bShuttingDown = true;
+			DripParticles.Shutdown();
 			DripParticles = none;
 		}
 		
@@ -420,6 +424,25 @@ function FireAttSpell( float Value )
 	}
 }
 
+simulated state ClientFinishing
+{
+	simulated function BeginState()
+	{
+		if ( DripParticles != none )
+		{
+			DripParticles.Shutdown();
+			DripParticles = none;
+		}
+		
+		if (EffectLight != none)
+		{
+			EffectLight.Destroy();
+			EffectLight = none;
+		}
+		PlayAnim('EctoEnd',1,,,0);
+	}
+}
+
 defaultproperties
 {
      ParticleAlpha(0)=0.35
@@ -463,4 +486,6 @@ defaultproperties
      DesiredRotation=(Yaw=0)
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     DeathMessage="%k geisted %o with ectoplasm."
+     AltDeathMessage="%k phantasmed %o with ectoplasm."
 }

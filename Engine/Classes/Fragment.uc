@@ -7,7 +7,7 @@ var() MESH Fragments[11];
 var int numFragmentTypes;
 var bool bFirstHit;
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	if ( Region.Zone.bDestructive )
 		Destroy();
@@ -166,7 +166,6 @@ state Dying
 defaultproperties
 {
      bFirstHit=True
-     bNetTemporary=False
      bNetOptional=True
      Physics=PHYS_Falling
      LifeSpan=20

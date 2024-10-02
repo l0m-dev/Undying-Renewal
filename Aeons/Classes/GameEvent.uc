@@ -12,13 +12,11 @@ var AeonsPlayer AP;
 function Trigger(Actor Other, Pawn Instigator)
 {
 	log("GameEvent triggered ... Game Event = "$EventName, 'GameEvents');
-	if (EventName != 'none')
-	{
-		ForEach AllActors(class 'AeonsPlayer', AP)
-		{
-			break;
-		}
+	if (EventName == 'none')
+		return;
 	
+	ForEach AllActors(class 'AeonsPlayer', AP)
+	{
 		switch ( EventName )
 		{
 

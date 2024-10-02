@@ -288,4 +288,6 @@ defaultproperties
      DrawScale=0.1
      CollisionRadius=16
      CollisionHeight=16
+     MenuName="Bat"
+     CreatureDeathVerb="rabied"
 }

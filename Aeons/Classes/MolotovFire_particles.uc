@@ -8,7 +8,7 @@ var float timeOffset;
 var float spreadMax;
 var int Damage;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	// Texture = Texture'fX.Fire.fire_1';
@@ -19,17 +19,17 @@ function PreBeginPlay()
 	Damage = 3;
 }
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	super.PostBeginPlay();
 	if (Region.Zone.bWaterZone)
 		gotoState('Extinguish');
 }
 
-function ZoneChange(ZoneInfo NewZone)
+simulated function ZoneChange(ZoneInfo NewZone)
 {
 	if (NewZone.bWaterZone)
-		bShuttingDown = true;
+		Shutdown();
 }
 
 auto state Idle
@@ -189,7 +189,7 @@ state Extinguish
 	}
 
 	Begin:
-		bShuttingDown = true;
+		Shutdown();
 		setTimer(0.1,true);
 }
 

@@ -15,7 +15,7 @@ state Release
 
 	function BeginState()
 	{
-		bShuttingDown = true;
+		Shutdown();
 		Attraction = vect(0,0,0);
 
 	}

@@ -84,7 +84,7 @@ var float DmgTime, DmgRem;		//
 var Pawn LitPawn;				// Pawn that is lit by the firefly spell
 
 // ===========================================================================
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	numKnots = 32;
 	PawnOwner = Pawn(Owner);
@@ -115,6 +115,11 @@ function PreBeginPlay()
 function ChargeSpear()
 {
 	Speargun(PlayerPawn(Owner).Weapon).Charge();
+	if (Level.NetMode == NM_DedicatedServer)
+	{
+		// move to client side fire spell?
+		Speargun(PlayerPawn(Owner).Weapon).ClientCharge();
+	}
 }
 
 simulated function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
@@ -216,7 +221,7 @@ function FireSpell()
 	if ( PlayerPawn(Owner).Weapon.IsA('Speargun') && !Speargun(PlayerPawn(Owner).Weapon).bCharged )
 	{
 		if ( PawnOwner.useMana(SpeargunChargeManaCost) )
-			Speargun(PlayerPawn(Owner).Weapon).Charge();
+			ChargeSpear();
 	} else
 		// normal lightning behavior
 		StartStrike();
@@ -244,7 +249,7 @@ function ChangePFX(class<ParticleFX> pClass, vector Loc, vector N, optional Text
 		if (pFX.class.name != pClass.name)
 		{
 			spawnLocation = pFX.Location;
-			pFX.bShuttingDown = true;
+			pFX.Shutdown();
 			pFX = spawn(pClass,,,SpawnLocation, Rotator(N));
 			if (HitTexture != none)
 				pFX.ColorStart.Base = HitTexture.MipZero;
@@ -268,7 +273,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				ChangePFX(FXSurfType.FX_Glass, Loc, N, HitTexture);
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -278,7 +283,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				ChangePFX(FXSurfType.FX_Water, Loc, N, HitTexture);
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -336,7 +341,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sfx != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -349,7 +354,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				break;
@@ -369,7 +374,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -381,7 +386,7 @@ function UpdateStrikeFX(Texture HitTexture, vector Loc, vector N)
 				D.AttachToSurface(Normal(loc - LastStrike));
 				if (sFX != none)
 				{
-					sFX.bShuttingDown = true;
+					sFX.Shutdown();
 					sFX = none;
 				}
 				if (MetalDecal != none) MetalDecal.Destroy();
@@ -463,7 +468,7 @@ function Strike(vector Start, vector End)
 	{
 		if ( lts[i] != none )
 			lts[i].Destroy();
-		lts[i] = spawn( class 'LightningLight',,,(start + (end-start) * 0.25 * i) );
+		lts[i] = spawn( class 'LightningLight',,,(start + (end-start) / ArrayCount(lts) * i) );
 	}
 }
 
@@ -490,8 +495,8 @@ state NormalFire
 
 		if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) )
 		{
-			PlaySound(FireSound);
-			if ( PlayerPawn(Owner).bFireAttSpell == 0 || !RGC() )
+			PawnOwner.PlaySound(FireSound);
+			if ( PlayerPawn(Owner).bFireAttSpell == 0 || !RGC() || Level.NetMode != NM_Standalone ) // disable online for now
 			{
 				ProjectileFire(ProjectileClass, 8000, false, true);
 				FinishAnim();
@@ -602,7 +607,7 @@ state Holding
 
 				// update Lights
 				for (i=0; i<ArrayCount(lts); i++)
-					lts[i].SetLocation(start + (end-start) * 0.25 * i);
+					lts[i].SetLocation(start + (end-start) / ArrayCount(lts) * i);
 	
 				if ( len < MinPtDist )
 				{
@@ -678,7 +683,7 @@ state Holding
 						ChangePFX(FXSurfType.FX_Water, End, vect(0,0,1));
 						if (sFX != none)
 						{
-							sFX.bShuttingDown = true;
+							sFX.Shutdown();
 							sFX = none;
 						}
 						if (pFX != none)
@@ -693,7 +698,7 @@ state Holding
 						}
 						// spawn(class 'DebugLocationMarker',,,End);
 					} else if (pFX != none) {
-						pFX.bShuttingDown = true;
+						pFX.Shutdown();
 						pFX = none;
 					}
 				}
@@ -712,7 +717,7 @@ state Holding
 	
 				// update Lights
 				for (i=0; i<ArrayCount(lts); i++)
-					lts[i].SetLocation(start + (end-start) * 0.25 * i);
+					lts[i].SetLocation(start + (end-start) / ArrayCount(lts) * i);
 	
 				LastPoint = start;
 				Shaft.GetParticleParams(0,Shaft.Params);
@@ -822,13 +827,13 @@ state Release
 		}
 		if (sFX != none)
 		{
-			sFX.bShuttingDown = true;
+			sFX.Shutdown();
 			sFX = none;
 		}
 
 		if (pFX != none)
 		{
-			pFX.bShuttingDown = true;
+			pFX.Shutdown();
 			pFX = none;
 		}
 
@@ -916,5 +921,7 @@ defaultproperties
      HoldSounds(1)=Sound'Aeons.Spells.E_Spl_LightningSustain01'
      HoldSounds(2)=Sound'Aeons.Spells.E_Spl_LightningSustain01'
      SpeargunChargeManaCost=100
-     TimeToReachDamage=0.5
+     TimeToReachDamage=0.25
+     DeathMessage="%k wracked %o with a crackle of electricity."
+     AltDeathMessage="%k electocuted %o with a crackle of electricity."
 }

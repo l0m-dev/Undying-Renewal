@@ -7,7 +7,7 @@ class Shield expands AttSpell;
 
 //----------------------------------------------------------------------------
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	if (RGC())
 	{
@@ -24,13 +24,13 @@ state NormalFire
 {
 	ignores FireAttSpell;
 
-	Begin: 
+	Begin:
 		AeonsPlayer(owner).ShieldMod.gotoState('Activated');
 		AeonsPlayer(owner).ShieldMod.castingLevel = localCastingLevel;
 		FinishAnim();
 		sleep(RefireRate);
 		bFiring = false;
-		AeonsPlayer(Owner).bFireAttSpell = 0;
+		//AeonsPlayer(Owner).bFireAttSpell = 0; // caused shield to activate again if the client was still holding the key down 
 		Finish();
 }
 
@@ -62,4 +62,5 @@ defaultproperties
      PlayerViewMesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     bContinuousFire=False
 }

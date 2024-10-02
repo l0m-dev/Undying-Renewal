@@ -9,7 +9,7 @@ var() float rate;
 var() Texture Textures[8];
 var int iTex;
 
-function ChangeTexture()
+simulated function ChangeTexture()
 {
 	Texture = Textures[iTex];
 	iTex ++;
@@ -20,7 +20,7 @@ function ChangeTexture()
 
 auto State GenEffect
 {
-	function Tick(float DeltaTime)
+	simulated function Tick(float DeltaTime)
 	{
 		DrawScale += 8 * DeltaTime;
 	
@@ -36,4 +36,5 @@ defaultproperties
 	 Style=STY_AlphaBlend
      Texture=WetTexture'fxB.FX.HoundPortalWet'
      DrawScale=1
+     RemoteRole=ROLE_SimulatedProxy
 }

@@ -16,4 +16,5 @@ function Timer()
 
 defaultproperties
 {
+     RemoteRole=ROLE_None
 }

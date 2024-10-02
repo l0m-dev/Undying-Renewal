@@ -31,7 +31,7 @@ function Fire(float F)
 	}
 }
 
-function PlayFiring()
+simulated function PlayFiring()
 {
 	Firing = 1.0;
 	if (fuseFX != none) 
@@ -40,9 +40,7 @@ function PlayFiring()
 
 	if ( !AeonsPlayer(Owner).AttSpell.IsA('SkullStorm') )
 	{
-		AeonsPlayer(Owner).AttSpell.BringUp();
-		AeonsPlayer(Owner).AttSpell.PlayAnim('FireCantrip',RefireMult,,,0);
-		AeonsPlayer(Owner).AttSpell.Finish();
+		AttSpell(AeonsPlayer(Owner).AttSpell).PlayOneshotAnim('FireCantrip', RefireMult);
 	}
 
 	PlaySound(FuseLiteSound);
@@ -103,7 +101,7 @@ state NormalFire
 
 	Begin:
 		MolotovFire(class 'Molotov_proj', ProjectileSpeed, bWarnTarget);
-		log ("RefireRate of Molotov = " $ refireRate);
+		//log ("RefireRate of Molotov = " $ refireRate);
 		sleep(refireRate);
 		gotoState('NewClip');
 	    if (AmmoType.AmmoAmount > 0)
@@ -156,6 +154,7 @@ state NewClip
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
+		ClientReloadWeapon(ClipCount);
 	}
 
 	function EndState()
@@ -193,15 +192,29 @@ state Idle
 
 	function BeginState()
 	{
-		log ("Idle");		
 		Firing = 0.1;
 
 		if ( fuseFX != None ) 
 			fuseFX.Destroy();
 	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		if (Firing <= 0 && Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				LoopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+			else
+				LoopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+		}
+
+		Global.Tick(DeltaTime);
+	}
 	
 	Begin:
-		ClearAnims();
+		ClientIdleWeapon();
+		PlayIdleAnim();
+		//ClearAnims();
 		FinishAnim();
 		SetTimer((1 + FRand() * 3), true);
 		bPointing=False;
@@ -216,10 +229,9 @@ state Idle
 		}
 		if ( Pawn(Owner).bFire!=0 ) Global.Fire(0.0);
 		Disable('AnimEnd');
-		LoopAnim('StillIdle');
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	if ( (AmmoType != None) && (AmmoType.AmmoAmount > 0) ) 
 		bSpecialIcon = false;
@@ -228,6 +240,11 @@ function Tick(float DeltaTime)
 		Firing -= DeltaTime;		
 	if ( bChangeWeapon )
 		GotoState('DownWeapon');
+}
+
+simulated function PlayIdleAnim()
+{
+	LoopAnim('StillIdle', [TweenTime] 0.0);
 }
 
 defaultproperties

@@ -5,10 +5,10 @@ class SkullStorm_particles expands SpellParticleFX;
 
 //     BaseParams=(ParticlesPerSec=50.000000,AngularSpreadWidth=10.000000,AngularSpreadHeight=10.000000,Speed=0.000000,Lifetime=3.000000,ColorStart=(R=50,G=50,B=50),ColorEnd=(R=0),AlphaStart=0.300000,SizeWidth=16.000000,SizeLength=16.000000,SizeEndScale=16.000000)
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	if ( Owner == none )
-		bShuttingDown = true;
+		Shutdown();
 }
 
 state Kill
@@ -44,4 +44,5 @@ defaultproperties
      Textures(0)=Texture'Aeons.Particles.Smoke32_01'
      LODBias=101
      Style=STY_AlphaBlend
+     RemoteRole=ROLE_SimulatedProxy
 }

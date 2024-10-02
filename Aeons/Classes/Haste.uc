@@ -14,56 +14,12 @@ function FireAttSpell( float Value )
 
 	// LogTime("AttSpell: FireAttSpell");
 
-	if ( !bFiring && !AeonsPlayer(Owner).bHasteActive )
+	if ( AeonsPlayer(owner).HasteMod.bActive )
 	{
-		bPCL = ProcessCastingLevel();
-
-		PawnOwner = Pawn(Owner);
-
-		if ( PawnOwner.HeadRegion.Zone.bWaterZone && !bWaterFire) 
-		{
-			PlayFireEmpty();
-  		} 
-		else if ( !bSpellUp && bPCL ) 
-		{
-			BringUp();
-		} else 
-		{
-			if (bPCL)
-			{
-				cost = manaCostPerLevel[castingLevel];
-
-				if ( Self.IsA('Scrye') && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone'))
-					cost = 0;
-
-				if ( cost <= PawnOwner.Mana )
-				{
-					SayMagicWords();
-					if ( PawnOwner.useMana(cost) && !AeonsPlayer(Owner).bDispelActive )
-					{
-						bFiring = true;
-						GhelzUse(manaCostPerLevel[castingLevel]);
-						PlayFiring();
-						Disable('FireAttSpell');
-						
-						if ( Owner.bHidden )
-							CheckVisibility();
-			
-						// gotoState('NormalFire');
-					} else {
-						bFiring = false;
-						FailedSpellCast();
-						StopFiring();
-					}
-				} else {
-					FailedSpellCast();
-				}
-			} else {
-				bFiring = false;
-				GotoState('PostAmplify');
-			}
-		}
+		return;
 	}
+
+	Super.FireAttSpell(Value);
 }
 state NormalFire
 {

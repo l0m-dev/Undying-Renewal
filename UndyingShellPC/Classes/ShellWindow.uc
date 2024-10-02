@@ -6,6 +6,7 @@ class ShellWindow expands ManagerWindow;
 //#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
 
 var() texture Back[6];
+var() BinkTexture AnimatedBack;
 
 var sound NewScreenSound;
 
@@ -20,30 +21,60 @@ var Texture SmokeTexture;
 
 function Created()
 {
+	local int i;
+	local string TexName;
+
 	Super.Created();
 
 	bLeaveOnScreen = false;
-	bAlwaysOnTop = True;
+	//bAlwaysOnTop = True;
+	bAlwaysBehind = True;
+
+	Cursor = Root.NormalCursor;
+	
+	if ( AnimatedBack == None )
+	{
+		AnimatedBack = class'BinkTexture'.static.LoadBinkFromFile(GetPlayerOwner().GetItemName(string(class))$".bik", true);
+		if ( AnimatedBack != None )
+			AnimatedBack.bLoop = true;
+	}
 }
 
 function Paint(Canvas C, float X, float Y)
 {
 	local int XOffset, YOffset, W, H;
 	local float TileWidth, TileHeight;
-	local int i;
+	local int NumTilesX, NumTilesY, i;
+	local Texture Tex;
+	local bool Is4x3, bAnimatedMenu;
 
-	for ( i=0; i<6; i++ )
+	//if (Back[6] != None)
+	//	Is4x3 = True;
+	
+	if (Is4x3)
 	{
-		if (Back[i] == None ) 
-			Back[i]=texture(DynamicLoadObject(BackNames[i], class'texture'));
+		// not supported right now
+		NumTilesX = 4;
+		NumTilesY = 3;
+	}
+	else
+	{
+		NumTilesX = 3;
+		NumTilesY = 2;
 
-		// probably unnecessary, but if any texture is missing, just return ( this frame )
-		if (Back[i] == None )
-			return;
+		for ( i=0; i<6; i++ )
+		{
+			if (Back[i] == None ) 
+				Back[i]=texture(DynamicLoadObject(BackNames[i], class'texture'));
+
+			// probably unnecessary, but if any texture is missing, just return ( this frame )
+			if (Back[i] == None )
+				return;
+		}
 	}
 	
-	TileWidth = InnerWidth / 3;
-	TileHeight = InnerHeight / 2;
+	TileWidth = InnerWidth / NumTilesX;
+	TileHeight = InnerHeight / NumTilesY;
 
 	C.DrawColor = BackColor;
 	
@@ -54,13 +85,31 @@ function Paint(Canvas C, float X, float Y)
 
 	DrawStretchedTextureSegment( C, WinLeft, WinTop, WinWidth, WinHeight, 0, 0, 256, 256, texture'Engine.BlackTexture' );
 
-	DrawStretchedTextureSegment( C, InnerLeft, InnerTop, TileWidth, TileHeight, 0, 0, 256, 256, Back[0] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop, TileWidth, TileHeight, 0, 0, 256, 256, Back[1] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop,	TileWidth, TileHeight, 0, 0, 256, 256, Back[2] );
+	bAnimatedMenu = GetPlayerOwner().GetRenewalConfig().bAnimatedMenu && AnimatedBack != None;
 
-	DrawStretchedTextureSegment( C, InnerLeft, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[3] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[4] );
-	DrawStretchedTextureSegment( C, InnerLeft + TileWidth*2, InnerTop + TileHeight, TileWidth, TileHeight, 0, 0, 256, 256, Back[5] );
+	// brighten it?
+	//C.DrawColor.R = 255;
+	//C.DrawColor.G = 255;
+	//C.DrawColor.B = 255;
+	//C.DrawColor.A = 255;
+	
+	if (bAnimatedMenu)
+	{
+		//AnimatedBack.bCentered = true;
+		//AnimatedBack.DrawGrid(C, 0, 0, Root.WinWidth, Root.WinHeight);
+		AnimatedBack.DrawGrid(C, InnerLeft, InnerTop, InnerWidth, InnerHeight);
+	}
+	else
+	{
+		for (w = 0; w < NumTilesX; w++)
+		{
+			for (h = 0; h < NumTilesY; h++)
+			{
+				Tex = Back[w+h*NumTilesX];
+				DrawStretchedTextureSegment( C, InnerLeft + TileWidth*w, InnerTop + TileHeight*h, TileWidth, TileHeight, 0, 0, Tex.USize, Tex.VSize, Tex );
+			}
+		}
+	}
 
 	C.DrawColor = C.Default.DrawColor;
 	
@@ -111,7 +160,6 @@ function Close(optional bool bByParent)
 
 function HideWindow()
 {
-	
 	local int i;
 
 	Root.Console.bBlackOut = False;
@@ -129,7 +177,6 @@ function HideWindow()
 	
 	//fix be smarter about this, use some sort of cache scheme
 	Log("Unloaded Textures for " $ self );
-
 }
 
 

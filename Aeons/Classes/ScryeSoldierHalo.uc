@@ -5,7 +5,7 @@ class ScryeSoldierHalo expands GlowScriptedFX;
 
 var() color GlowColor;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
@@ -19,7 +19,7 @@ function PreBeginPlay()
 	SetBase( Owner );
 }
 
-function Tick( float DeltaTime )
+simulated function Tick( float DeltaTime )
 {
 	local int	i;
 

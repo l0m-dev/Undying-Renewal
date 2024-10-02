@@ -14,30 +14,35 @@ var() sound ApplyAmplification;
 var() sound DenyAmplification;
 var ParticleFX pfx;
 var float inc;
-var vector InitialLocation;
 var PlayerPawn PlayerPawnOwner;
 var string str;
 var() localized string AmpString;
 //=============================================================================
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	
-	InitialLocation = Location;
-	if ( Owner == none )
+	if ( Owner == none && Level.NetMode != NM_Client )
 	{
 		pfx = spawn(class 'AmplifierParticleFX',self,,Location);
 		pfx.SetBase(self);
 	}
 	SetPhysics(PHYS_None);
 	bCollideWorld = true;
+
+	if (Level.NetMode == NM_DedicatedServer)
+		Disable('Tick');
 }
 
 //=============================================================================
 function Destroyed()
 {
-	LogStack('Misc');
+	if ( pfx != none )
+	{
+		pfx.Shutdown();
+		pfx = none;
+	}
 }
 
 //=============================================================================
@@ -50,36 +55,30 @@ function Landed(vector HitNormal)
 function PickupFunction(Pawn Other)
 {
 	if ( pfx != none )
-		pfx.bShuttingDown = true;
+	{
+		pfx.Shutdown();
+		pfx = none;
+	}
+	AmbientSound = none;
 	super.PickupFunction(Other);
 }
 
 //=============================================================================
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
-	local vector Loc;
 	local rotator r;
-	
-	if (Owner != none)
-		AmbientSound = none;
 
-	if ( GetStateName() == 'Pickup' )
+	// left for compatibility with broken PHYS_Rotating
+	if ( GetStateName() == 'Pickup' && Physics == PHYS_None )
 	{
-		if (Physics == PHYS_None)
-		{
-			r = rotation;
-			r.yaw += (2048 * deltaTime);
-			
-			SetRotation(r);
+		r = rotation;
+		r.yaw += (2048 * deltaTime);
+		
+		SetRotation(r);
 
-			inc += DeltaTime;
-			
-			Loc.z = cos(inc) * 4;
-
-			SetLocation(InitialLocation + Loc);
-		} else {
-			InitialLocation = Location;
-		}
+		inc += DeltaTime;
+		
+		PrePivot.z = cos(inc) * 4;
 	}
 }
 

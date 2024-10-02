@@ -3,6 +3,8 @@
 //=============================================================================
 class Phoenix expands AeonsWeapon;
 
+// set bRotatingPickup to False to not interfere with old rotation code
+
 //#exec MESH IMPORT MESH=PhoenixHand_m SKELFILE=PhoenixHand.ngf
 //#exec MESH ORIGIN MESH=PhoenixHand_m YAW=64
 
@@ -26,13 +28,20 @@ replication
 {
 	// Things the server should send to the client.
 	reliable if( bNetOwner && (Role==ROLE_Authority) )
-		bGuiding, bShowStatic;
+		bGuiding, bShowStatic, bFiring;
 }
 
 function BecomePickup()
 {
 	super.BecomePickup();
+	bClientAnim = false;
 	PlayAnim( 'pickup_pose' );
+}
+
+function BecomeItem()
+{
+	super.BecomeItem();
+	bClientAnim = true;
 }
 
 simulated function PostRender( canvas Canvas )
@@ -41,6 +50,8 @@ simulated function PostRender( canvas Canvas )
 	local float XScale;
 
 	bOwnsCrossHair = ( bGuiding || bShowStatic );
+
+	bClientAnim = true;
 
 	if ( !bGuiding )
 	{
@@ -53,7 +64,8 @@ simulated function PostRender( canvas Canvas )
 		//	PlayerPawn(Owner).ViewTarget = None;
 		return;
 	}
-	GuidedShell.PostRender(Canvas);
+	if (GuidedShell != None)
+		GuidedShell.PostRender(Canvas);
 	OldClipX = Canvas.ClipX;
 	OldClipY = Canvas.ClipY;
 	XScale = FMax(0.5, int(Canvas.ClipX/640.0));
@@ -86,11 +98,11 @@ simulated function PlayFiring()
 simulated function PlayIdleAnim()
 {
 	if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-		loopAnim('IdleMove',RefireMult);
+		loopAnim('IdleMove',RefireMult, [TweenTime] 0.0);
 	else
-		loopAnim('IdleStill',RefireMult);
+		loopAnim('IdleStill',RefireMult, [TweenTime] 0.0);
 }
-function SmallExplosion()
+simulated function SmallExplosion()
 {
 	local vector Loc;
 
@@ -98,7 +110,7 @@ function SmallExplosion()
 	spawn (class 'PhoenixEggFX',Pawn(Owner),,Loc);
 }
 
-function ReleaseEgg()
+simulated function ReleaseEgg()
 {
 	local vector Loc, x,y,z;
 	
@@ -111,8 +123,17 @@ function ReleaseEgg()
 }
 
 // ================================================================================
-function FireWeapon()
+simulated function FireWeapon()
 {
+	PlayOwnedSound(FireSound, SLOT_None,4.0);
+
+	if (Level.NetMode == NM_Client)
+	{
+		if ( Egg != none )
+			Egg.Destroy();
+		return;
+	}
+
 	PawnOwner = Pawn(Owner);
 	// GhelzUse(manaCostPerLevel[castingLevel]);
 	PlayFiring();
@@ -129,9 +150,10 @@ function FireWeapon()
 	GuidedShell.CastingLevel = 3;
 	PlayerPawn(Owner).ViewTarget = GuidedShell;
 	GuidedShell.Guider = PlayerPawn(Owner);
-	ClientAltFire(0);
+	ClientFire(0);
 	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fPhoenix = 1.0;
-	Egg.Destroy();
+	if ( Egg != none )
+		Egg.Destroy();
 	GotoState('Guiding');
 }
 
@@ -164,7 +186,7 @@ function Fire( float Value )
 			GuidedShell.CastingLevel = 3;
 			PlayerPawn(Owner).ViewTarget = GuidedShell;
 			GuidedShell.Guider = PlayerPawn(Owner);
-			ClientAltFire(0);
+			ClientFire(0);
 			GameStateModifier(AeonsPlayer(Owner).GameStateMod).fPhoenix = 1.0;
 			*/
 			// GotoState('Guiding');
@@ -173,7 +195,8 @@ function Fire( float Value )
 }
 
 // ================================================================================
-simulated function bool ClientAltFire( float Value )
+/* removes PlayFiring from ClientFire and adds sound
+simulated function bool ClientFire( float Value )
 {
 //	if ( bCanClientFire && ((Role == ROLE_Authority) || (AmmoType == None) || (AmmoType.AmmoAmount > 0)) )
 	if ( bCanClientFire && (Role == ROLE_Authority) )
@@ -181,6 +204,18 @@ simulated function bool ClientAltFire( float Value )
 //		if ( Affector != None )
 	//		Affector.FireEffect();
 		PlayOwnedSound(FireSound, SLOT_None,4.0);
+		return true;
+	}
+	return false;
+}
+*/
+
+// needs a delay on client only
+simulated function bool ClientFire( float Value )
+{
+	if (!bFiring && Super.ClientFire(Value))
+	{
+		//PlayOwnedSound(FireSound, SLOT_None,4.0);
 		return true;
 	}
 	return false;
@@ -200,9 +235,9 @@ state NormalFire
 state Finishing
 {
 	Begin:
-		
 		if (AmmoType.AmmoAmount > 0)
 		{
+			loopAnim('IdleStill',RefireMult); // todo: check speed for IdleMove
 			sleep(0.5);
 			GotoState('Idle');
 		}
@@ -229,9 +264,9 @@ state Guiding
 			if (GuidedShell.GetStateName() != 'Release')
 			{
 				GuidedShell.GotoState('Release');
+				GuidedShell.RemoteRole = ROLE_SimulatedProxy;
 				PCam = Spawn(class 'PhoenixCameraProjectile',GuidedShell,,GuidedShell.Location, GuidedShell.Rotation);
 				PlayerPawn(Owner).ViewTarget = PCam;
-				// GuidedShell.Explode(GuidedShell.Location,Vect(0,0,1));
 			}
 		}
 		else
@@ -251,7 +286,6 @@ state Guiding
 
 	function BeginState()
 	{
-		// log("Phoenix Guiding BeginState", 'Misc');
 		AeonsPlayer(Owner).bPhoenix = true;
 		Scroll = 0;
 		bGuiding = true;
@@ -263,7 +297,7 @@ state Guiding
 			GuidingPawn.DesiredFOV = 130;
 			StartRotation = PlayerPawn(Owner).ViewRotation;
 			PlayerPawn(Owner).ClientAdjustGlow(-0.2,vect(200,0,0));
-			PlayerPawn(Owner).Freeze();
+			//PlayerPawn(Owner).Freeze();
 			// Test PlayActuator here!!
 			PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_NormalShake, 100000.0f);
 		}
@@ -281,7 +315,10 @@ state Guiding
 			GuidingPawn.ClientAdjustGlow(0.2,vect(-200,0,0));
 			GuidingPawn.ClientSetRotation(StartRotation);
 			GuidingPawn.DesiredFOV = GuidingPawn.default.DesiredFOV;
-			GuidingPawn.GotoState('PlayerWalking');
+			if (GuidingPawn.Health > 0)
+			{
+				GuidingPawn.GotoState('PlayerWalking');//ClientGotoState
+			}
 			GuidingPawn.ViewTarget = None;
 			GuidingPawn = None;
 			// Test PlayActuator here!!
@@ -296,12 +333,15 @@ state Guiding
 		bCanFire = true;
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local rotator r;
 
-	if ( (GetStateName() == 'Pickup') && (Owner == none) )
+	// left for compatibility with broken PHYS_Rotating
+	if ( (GetStateName() == 'Pickup') && Physics == PHYS_None && (Owner == none) )
 	{
+		RemoteRole = ROLE_SimulatedProxy; // needed because MoveThingy changes RemoteRole
+
 		r = rotation;
 		r.yaw += 8192 * DeltaTime;
 		SetRotation(r);
@@ -335,12 +375,18 @@ state Idle
         if ( bChangeWeapon )
             GotoState('DownWeapon');
 
-		PlayIdleAnim();
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+				loopAnim('IdleMove',RefireMult, [TweenTime] TweenFrom('IdleStill', 0.5));
+			else
+				loopAnim('IdleStill',RefireMult, [TweenTime] TweenFrom('IdleMove', 0.5));
+		}
 	}
 
 	Begin:
-		PlayAnim('');
-		FinishAnim();
+		ClientIdleWeapon();
+		PlayIdleAnim();
 		if ( bChangeWeapon )
 			GotoState('DownWeapon');
 		bWeaponUp = True;
@@ -348,6 +394,15 @@ state Idle
 		enable('Tick');
 		setTimer(8 + FRand()*5,true);
 
+}
+
+State ClientIdle
+{
+	simulated function BeginState()
+	{
+		Super.BeginState();
+		PlayAnim('');
+	}
 }
 
 // ================================================================================
@@ -368,6 +423,12 @@ defaultproperties
      PlayerViewMesh=SkelMesh'Aeons.Meshes.PhoenixHand_m'
      PlayerViewScale=0.1
      PickupViewMesh=SkelMesh'Aeons.Meshes.Phoenix_m'
+     ThirdPersonMesh=SkelMesh'Aeons.Meshes.PhoenixAmmo_m'
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.Phoenix_m'
+     ThirdPersonScale=0.333
+     bClientAnim=False
+     bRotatingPickup=False
+     DeathMessage="%o was incinerated by the phoenix."
+     AltDeathMessage="%o was firebombed by the phoenix."
 }

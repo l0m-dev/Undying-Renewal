@@ -16,6 +16,8 @@ var() enum ELogic
 
 var() bool bDestroy;
 
+var float CumulativeDamage;
+
 state() DamageTrig
 {
 	function Touch( actor Other );
@@ -26,6 +28,13 @@ state() DamageTrig
 	{
 		local int i;
 		local bool bLogic;
+
+		// electrical damage accumulates
+		if ( DInfo.DamageType == 'electrical' )
+		{
+			CumulativeDamage += DInfo.Damage;
+			DInfo.Damage = CumulativeDamage;
+		}
 		
 		// OR logic - any one satisfication of the test will return true
 		if (LogicType == LOGIC_or)

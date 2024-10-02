@@ -43,7 +43,7 @@ auto State Idle
 	*/	
 		if ( (Owner != None) && (PlayerPawn(Owner) != None) ) 
 		{
-			if ( PlayerPawn(Owner).Weapon == None )
+			if ( PlayerPawn(Owner).Weapon == None || Level.NetMode == NM_DedicatedServer )
 			{
 				c.r = 255;
 				c.g = 255;

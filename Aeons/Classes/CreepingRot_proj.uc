@@ -21,7 +21,7 @@ simulated function PreBeginPlay()
 simulated function Destroyed()
 {
 	if ( Trail != None )
-		Trail.bShuttingDown = true;
+		Trail.Shutdown();
 }
 
 auto state flying
@@ -29,7 +29,7 @@ auto state flying
 	simulated function Destroyed()
 	{
 		if ( Trail != None )
-			Trail.bShuttingDown = true;
+			Trail.Shutdown();
 	}
 
 	simulated function ProcessTouch (Actor Other, Vector HitLocation)

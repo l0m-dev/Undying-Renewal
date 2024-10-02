@@ -18,7 +18,7 @@ function attachSmoke(actor Other)
 
 function detachSmoke()
 {
-	cp.ShutDown();
+	cp.ShutDownFX();
 }
 
 // ===================================================================================

@@ -3,6 +3,8 @@
 //=============================================================================
 class GenTextureHitFX expands ParticleFX;
 
+/* Force-Recompile */
+
 //#exec Texture Import Name=noisy1pfx File=Textures\noisy1pfx.pcx Group=Particles Mips=OFF
 
 defaultproperties
@@ -23,4 +25,5 @@ defaultproperties
      WindModifier=1
      ParticlesMax=16
      Textures(0)=Texture'Engine.Particles.noisy1pfx'
+     bNetTemporary=True
 }

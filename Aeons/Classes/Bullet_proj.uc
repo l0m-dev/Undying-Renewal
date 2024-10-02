@@ -138,11 +138,11 @@ auto state Flying
 				HitTexture = TraceTexture(Location + (HitNormal * -32), location + (HitNormal * 32) , Flags );
 			}
 			
-			log("Bullet - Strike surface Flags = "$Flags, 'Misc');
+			//log("Bullet - Strike surface Flags = "$Flags, 'Misc');
 			if ( (134217728 & Flags) != 0)
 			{
 				bGlassStrike = true;
-				log("Bullet - GlassStrike = TRUE", 'Misc');
+				//log("Bullet - GlassStrike = TRUE", 'Misc');
 			}
 
 			if ( bGlassStrike )

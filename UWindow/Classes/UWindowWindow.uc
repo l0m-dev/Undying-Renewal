@@ -1267,52 +1267,46 @@ final function DrawUpBevel( Canvas C, float X, float Y, float W, float H, Textur
 	local Region R;
 
 	R = LookAndFeel.BevelUpTL;
-	DrawStretchedTextureSegment( C, X, Y, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X, Y, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpT;
-	DrawStretchedTextureSegment( C, X+LookAndFeel.BevelUpTL.W, Y, 
-									W - LookAndFeel.BevelUpTL.W
-									- LookAndFeel.BevelUpTR.W,
-									R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X+LookAndFeel.BevelUpTL.W*Root.ScaleY, Y, 
+									W - (LookAndFeel.BevelUpTL.W + LookAndFeel.BevelUpTR.W)*Root.ScaleY,
+									R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpTR;
-	DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 	
 	R = LookAndFeel.BevelUpL;
-	DrawStretchedTextureSegment( C, X, Y + LookAndFeel.BevelUpTL.H,
-									R.W,  
-									H - LookAndFeel.BevelUpTL.H
-									- LookAndFeel.BevelUpBL.H,
+	DrawStretchedTextureSegment( C, X, Y + LookAndFeel.BevelUpTL.H*Root.ScaleY,
+									R.W*Root.ScaleY,  
+									H - (LookAndFeel.BevelUpTL.H + LookAndFeel.BevelUpBL.H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpR;
-	DrawStretchedTextureSegment( C, X + W - R.W, Y + LookAndFeel.BevelUpTL.H,
-									R.W,  
-									H - LookAndFeel.BevelUpTL.H
-									- LookAndFeel.BevelUpBL.H,
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y + LookAndFeel.BevelUpTL.H*Root.ScaleY,
+									R.W*Root.ScaleY,  
+									H - (LookAndFeel.BevelUpTL.H + LookAndFeel.BevelUpBL.H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	
 	R = LookAndFeel.BevelUpBL;
-	DrawStretchedTextureSegment( C, X, Y + H - R.H, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X, Y + H - R.H*Root.ScaleY, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpB;
-	DrawStretchedTextureSegment( C, X + LookAndFeel.BevelUpBL.W, Y + H - R.H, 
-									W - LookAndFeel.BevelUpBL.W
-									- LookAndFeel.BevelUpBR.W,
-									R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X + LookAndFeel.BevelUpBL.W*Root.ScaleY, Y + H - R.H*Root.ScaleY, 
+									W - (LookAndFeel.BevelUpBL.W + LookAndFeel.BevelUpBR.W)*Root.ScaleY,
+									R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpBR;
-	DrawStretchedTextureSegment( C, X + W - R.W, Y + H - R.H, R.W, R.H, R.X, R.Y, 
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y + H - R.H*Root.ScaleY, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, 
 									R.W, R.H, T );
 
 	R = LookAndFeel.BevelUpArea;
-	DrawStretchedTextureSegment( C, X + LookAndFeel.BevelUpTL.W,
-	                                Y + LookAndFeel.BevelUpTL.H,
-									W - LookAndFeel.BevelUpBL.W
-									- LookAndFeel.BevelUpBR.W,
-									H - LookAndFeel.BevelUpTL.H
-									- LookAndFeel.BevelUpBL.H,
+	DrawStretchedTextureSegment( C, X + LookAndFeel.BevelUpTL.W*Root.ScaleY,
+	                                Y + LookAndFeel.BevelUpTL.H*Root.ScaleY,
+									W - (LookAndFeel.BevelUpBL.W + LookAndFeel.BevelUpBR.W)*Root.ScaleY,
+									H - (LookAndFeel.BevelUpTL.H + LookAndFeel.BevelUpBL.H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 	
 }
@@ -1322,52 +1316,46 @@ final function DrawMiscBevel( Canvas C, float X, float Y, float W, float H, Text
 	local Region R;
 
 	R = LookAndFeel.MiscBevelTL[BevelType];
-	DrawStretchedTextureSegment( C, X, Y, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X, Y, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelT[BevelType];
-	DrawStretchedTextureSegment( C, X+LookAndFeel.MiscBevelTL[BevelType].W, Y, 
-									W - LookAndFeel.MiscBevelTL[BevelType].W
-									- LookAndFeel.MiscBevelTR[BevelType].W,
-									R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X+LookAndFeel.MiscBevelTL[BevelType].W*Root.ScaleY, Y, 
+									W - (LookAndFeel.MiscBevelTL[BevelType].W + LookAndFeel.MiscBevelTR[BevelType].W)*Root.ScaleY,
+									R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelTR[BevelType];
-	DrawStretchedTextureSegment( C, X + W - R.W, Y, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 	
 	R = LookAndFeel.MiscBevelL[BevelType];
-	DrawStretchedTextureSegment( C, X, Y + LookAndFeel.MiscBevelTL[BevelType].H,
-									R.W,  
-									H - LookAndFeel.MiscBevelTL[BevelType].H
-									- LookAndFeel.MiscBevelBL[BevelType].H,
+	DrawStretchedTextureSegment( C, X, Y + LookAndFeel.MiscBevelTL[BevelType].H*Root.ScaleY,
+									R.W*Root.ScaleY,  
+									H - (LookAndFeel.MiscBevelTL[BevelType].H + LookAndFeel.MiscBevelBL[BevelType].H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelR[BevelType];
-	DrawStretchedTextureSegment( C, X + W - R.W, Y + LookAndFeel.MiscBevelTL[BevelType].H,
-									R.W,  
-									H - LookAndFeel.MiscBevelTL[BevelType].H
-									- LookAndFeel.MiscBevelBL[BevelType].H,
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y + LookAndFeel.MiscBevelTL[BevelType].H*Root.ScaleY,
+									R.W*Root.ScaleY,  
+									H - (LookAndFeel.MiscBevelTL[BevelType].H + LookAndFeel.MiscBevelBL[BevelType].H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 
 	
 	R = LookAndFeel.MiscBevelBL[BevelType];
-	DrawStretchedTextureSegment( C, X, Y + H - R.H, R.W, R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X, Y + H - R.H*Root.ScaleY, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelB[BevelType];
-	DrawStretchedTextureSegment( C, X + LookAndFeel.MiscBevelBL[BevelType].W, Y + H - R.H, 
-									W - LookAndFeel.MiscBevelBL[BevelType].W
-									- LookAndFeel.MiscBevelBR[BevelType].W,
-									R.H, R.X, R.Y, R.W, R.H, T );
+	DrawStretchedTextureSegment( C, X + LookAndFeel.MiscBevelBL[BevelType].W*Root.ScaleY, Y + H - R.H*Root.ScaleY, 
+									W - (LookAndFeel.MiscBevelBL[BevelType].W + LookAndFeel.MiscBevelBR[BevelType].W)*Root.ScaleY,
+									R.H*Root.ScaleY, R.X, R.Y, R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelBR[BevelType];
-	DrawStretchedTextureSegment( C, X + W - R.W, Y + H - R.H, R.W, R.H, R.X, R.Y, 
+	DrawStretchedTextureSegment( C, X + W - R.W*Root.ScaleY, Y + H - R.H*Root.ScaleY, R.W*Root.ScaleY, R.H*Root.ScaleY, R.X, R.Y, 
 									R.W, R.H, T );
 
 	R = LookAndFeel.MiscBevelArea[BevelType];
-	DrawStretchedTextureSegment( C, X + LookAndFeel.MiscBevelTL[BevelType].W,
-	                                Y + LookAndFeel.MiscBevelTL[BevelType].H,
-									W - LookAndFeel.MiscBevelBL[BevelType].W
-									- LookAndFeel.MiscBevelBR[BevelType].W,
-									H - LookAndFeel.MiscBevelTL[BevelType].H
-									- LookAndFeel.MiscBevelBL[BevelType].H,
+	DrawStretchedTextureSegment( C, X + LookAndFeel.MiscBevelTL[BevelType].W*Root.ScaleY,
+	                                Y + LookAndFeel.MiscBevelTL[BevelType].H*Root.ScaleY,
+									W - (LookAndFeel.MiscBevelBL[BevelType].W + LookAndFeel.MiscBevelBR[BevelType].W)*Root.ScaleY,
+									H - (LookAndFeel.MiscBevelTL[BevelType].H + LookAndFeel.MiscBevelBL[BevelType].H)*Root.ScaleY,
 									R.X, R.Y, R.W, R.H, T );
 }
 

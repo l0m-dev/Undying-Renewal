@@ -130,6 +130,7 @@ simulated function ClientPutDown(weapon NextWeapon)
 
 //----------------------------------------------------------------------------
 
+/*
 simulated function BringUp()
 {
 	Super.BringUp();
@@ -139,6 +140,7 @@ simulated function BringUp()
 		PlayIdleAnim();
 	Owner.PlaySound(SelectSound, SLOT_Misc, 1.0);	
 }
+*/
 
 //----------------------------------------------------------------------------
 
@@ -174,6 +176,9 @@ simulated function bool ClientFire( float Value )
 	//log("AeonsWeapon: ClientFire: ... bCanClientFire = "$bCanClientFire);
 	if ( bCanClientFire && ((Role == ROLE_Authority) || (AmmoType == None) || (AmmoType.AmmoAmount > 0)) )
 	{
+		if ( (Owner.GetStateName() == 'DialogScene') || (Owner.GetStateName() == 'PlayerCutscene') || (Owner.GetStateName() == 'SpecialKill') || (Owner.GetStateName() == 'Dying') )
+			return false;
+		
 		if ( (PlayerPawn(Owner) != None) 
 			&& ((Level.NetMode == NM_Standalone) || PlayerPawn(Owner).Player.IsA('ViewPort')) )
 		{
@@ -197,7 +202,49 @@ simulated function bool ClientFire( float Value )
 
 //----------------------------------------------------------------------------
 
-simulated function PlaySelect()
+simulated function ClientReloadWeapon(int CurrentClipCount)
+{
+	// we need to take in CurrentClipCount since ClipCount isn't replicated yet
+	if (Level.NetMode != NM_Client || AmmoType == None || GetStateName() == 'ClientReload')
+		return;
+
+	if (CurrentClipCount != -1)
+		ClipCount = CurrentClipCount;
+	
+	if ( bReloadable && (AmmoType.AmmoAmount>0) && (AmmoType.AmmoAmount != ClipCount) )
+    {
+        if ( PlayerPawn(Owner) != None )
+            PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
+		
+		if (ClipCount == ReloadCount)
+		{
+			PlayAnim('ReloadEnd',RefireMult/AeonsPlayer(Owner).refireMultiplier,,,0);
+		}
+		else
+		{
+			PlayAnim('ReloadStart',RefireMult / AeonsPlayer(Owner).refireMultiplier,,,0);
+		}
+		if ( Role < ROLE_Authority )
+		{
+			GotoState('ClientReload');
+		}
+	}
+}	
+
+//----------------------------------------------------------------------------
+
+simulated function ClientIdleWeapon()
+{
+    if (Level.NetMode != NM_Client)
+		return;
+	
+	if (GetStateName() != 'ClientIdle')
+		GotoState('ClientIdle');
+}
+
+//----------------------------------------------------------------------------
+
+function PlaySelect()
 {
 	//LogActorState("AeonsWeapon: PlaySelect");
 	bForceFire = false;
@@ -218,7 +265,7 @@ simulated function PlayPostSelect()
 		if ( (bForceFire || (PlayerPawn(Owner).bFire != 0)) && Global.ClientFire(0) )
 			return;
 		//Log("AeonsWeapon: PlayPostSelect calling GotoState('')");
-		GotoState('');
+		GotoState('ClientIdle');
 		AnimEnd();
 	}
 //	else
@@ -239,7 +286,7 @@ simulated function TweenDown()
 
 simulated function PlayIdleAnim()
 {
-	LogActorState("PlayIdleAnim: This is Empty!!!");
+	//LogActorState("PlayIdleAnim: This is Empty!!!");
 }
 
 //----------------------------------------------------------------------------
@@ -329,16 +376,16 @@ state ClientFiring
 		if ((Pawn(Owner) == None)||((AmmoType != None)&&(AmmoType.AmmoAmount <= 0)))
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 		else if ( !bCanClientFire )
-			GotoState('');
+			GotoState('ClientIdle');
 		else if ( Pawn(Owner).bFire != 0 )
 			Global.ClientFire(0);
 		else
 		{
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 	}
 
@@ -390,6 +437,17 @@ Begin:
 
 //----------------------------------------------------------------------------
 
+simulated function AttachWeapon(name PawnJointName)
+{
+	TempMesh = Mesh;
+	Mesh = ThirdPersonMesh;
+	if ( ThirdPersonJointName != 'none' )
+		SetBase( Owner, PawnJointName, ThirdPersonJointName );
+	else
+		SetBase( Owner, PawnJointName, 'root' );
+	Mesh = TempMesh;
+}
+
 state Active
 {
 	ignores animend;
@@ -411,24 +469,17 @@ Begin:
 	//LogActor("AeonsWeapon: state Active: Begin:");
 	
 	// our attachment stuff
-
-	TempMesh = Mesh;
-	Mesh = ThirdPersonMesh;
-	if ( ThirdPersonJointName != 'none' )
-		SetBase( Owner, 'Revolver_Attach_Hand', ThirdPersonJointName );
-	else
-		SetBase( Owner, 'Revolver_Attach_Hand', 'root' );
-	Mesh = TempMesh;
+	AttachWeapon(AeonsPlayer(Owner).GetWeaponAttachJoint());
 	
 	// eh! mek mi sum pi!
 	//PlaySelect();
-	//FinishAnim();
+	FinishAnim();
 
 	if ( bChangeWeapon )
 		GotoState('DownWeapon');
 	bWeaponUp = True;
 	PlayPostSelect();
-	//FinishAnim();
+	FinishAnim();
 	bCanClientFire = true;
 	
 	if ( (Level.Netmode != NM_Standalone) && Owner.IsA('AeonsPlayer')
@@ -445,6 +496,7 @@ Begin:
 
 //----------------------------------------------------------------------------
 
+/*
 State ClientActive
 {
 	simulated function ForceClientFire()
@@ -477,7 +529,7 @@ State ClientActive
 				return;
 
 			PlayIdleAnim();
-			GotoState('');
+			GotoState('ClientIdle');
 		}
 		else
 		{
@@ -492,13 +544,31 @@ State ClientActive
 		//LogActor("AeonsWeapon: state ClientActive: BeginState");
 		bForceFire = false;
 		bWeaponUp = false;
-		PlaySelect();
+		//PlaySelect();
+		PlayAnim('Select',[TweenTime]0.1); // needs some tweentime or it can get stuck and AnimEnd won't trigger
 	}
 
 	simulated function EndState()
 	{
 		//LogActor("AeonsWeapon: state ClientActive: EndState");
 		bForceFire = false;
+	}
+}
+*/
+
+state ClientActive
+{
+	simulated function BeginState()
+	{
+		//LogActor("AeonsWeapon: state ClientActive: BeginState");
+		bForceFire = false;
+		bWeaponUp = false;
+
+		// fix PlayerViewOffset being incorrect until replication
+		PlayerViewOffset = Default.PlayerViewOffset * 100; //scale since network passes vector components as ints
+
+		//Owner.PlaySound(SelectSound, SLOT_Misc, 1.0);
+		GotoState('ClientIdle');
 	}
 }
 
@@ -522,7 +592,7 @@ State ClientDown
 
 		A = AeonsPlayer(Owner);
 		if ( !A.bNeedActivate || ((A.Weapon != self) && (A.Weapon != None)) )
-			GotoState('');
+			GotoState('ClientIdle');
 	}
 		
 	simulated function AnimEnd()
@@ -538,7 +608,7 @@ State ClientDown
 				A.Weapon = A.ClientPending;
 				A.Weapon.GotoState('ClientActive');
 				A.ClientPending = None;
-				GotoState('');
+				GotoState('ClientIdle');
 			}
 			else
 			{
@@ -579,24 +649,83 @@ State DownWeapon
 
 //----------------------------------------------------------------------------
 
+// handles idle animation and weapon getting stuck in an animation
+State ClientIdle
+{
+	simulated function AnimEnd()
+	{
+		Global.AnimEnd();
+	}
+
+	simulated function BeginState()
+	{
+		PlayIdleAnim();
+		// force it to true for now
+		if ( Pawn(Owner) != None && Pawn(Owner).Weapon == Self )
+			bCanClientFire = True;
+		if ( bCanClientFire && (PlayerPawn(Owner) != None) )
+		{
+			if ( bForceFire || (Pawn(Owner).bFire != 0) )
+			{
+				Global.ClientFire(0);
+				return;
+			}
+		}
+		enable('Tick');
+	}
+
+	simulated function Tick(float DeltaTime)
+	{
+		Global.Tick(DeltaTime);
+
+		if (Owner != None)
+		{
+			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
+			{
+				if (IsA('Revolver') || IsA('Phoenix'))
+					LoopAnim('IdleMove', [TweenTime] TweenFrom('IdleStill', 0.5));
+				else
+					LoopAnim('MoveIdle', [TweenTime] TweenFrom('StillIdle', 0.5));
+			} else {
+				if (IsA('Revolver') || IsA('Phoenix'))
+					LoopAnim('IdleStill', [TweenTime] TweenFrom('IdleMove', 0.5));
+				else
+					LoopAnim('StillIdle', [TweenTime] TweenFrom('MoveIdle', 0.5));
+			}
+		}
+	}
+}
+
+
+//----------------------------------------------------------------------------
+
 function BeginPlay()
 {
 	Super.BeginPlay();
 	RefireMult = 1.0;
 }
 
+simulated function StartLevel()
+{
+	Super.StartLevel();
+	PlayIdleAnim();
+}
+
 //----------------------------------------------------------------------------
 
 simulated event RenderOverlays( canvas Canvas )
 {
-	if ( AeonsPlayer(Owner).Opacity == 1.0 )
+	if ( AeonsPlayer(Owner) != None )
 	{
-		if (AeonsPlayer(Owner).bRenderWeapon)
-			Opacity = FClamp(Opacity + 0.05, 0, 1);
-		else
-			Opacity = FClamp(Opacity - 0.05, 0, 1);
-	} else {
-		Opacity = FClamp(AeonsPlayer(Owner).Opacity, 0.15, 1);
+		if ( AeonsPlayer(Owner).Opacity == 1.0 )
+		{
+			if (AeonsPlayer(Owner).bRenderWeapon)
+				Opacity = FClamp(Opacity + 0.05, 0, 1);
+			else
+				Opacity = FClamp(Opacity - 0.05, 0, 1);
+		} else {
+			Opacity = FClamp(AeonsPlayer(Owner).Opacity, 0.15, 1);
+		}
 	}
 
 	super.RenderOverlays(Canvas);
@@ -617,7 +746,20 @@ function PostBeginPlay()
 {
     ClipCount = ReloadCount;
     Super.PostBeginPlay();
+
+	// weapon animations for first person spectating, increased bandwith, this would also need increased NetUpdateFrequency
+	//if (Level.NetMode != NM_Client)
+	//	bClientAnim = false;
 }
+
+// weapon animations for first person spectating
+/* 
+simulated function PostNetBeginPlay()
+{
+	if (Owner != None && ViewPort(PlayerPawn(Owner).Player) == None)
+		bClientAnim = false;
+}
+*/
 
 //----------------------------------------------------------------------------
 
@@ -670,7 +812,7 @@ simulated function PlayFiring()
 {
 	//LogActor("AeonsWeapon: PlayFiring");
 	// just play the anim - the animation drives the rest of the weapon functionality
-	playAnim('Fire');//,1.0,,,0);
+	playAnim('Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier);//,1.0,,,0);
 }
 
 //----------------------------------------------------------------------------
@@ -725,18 +867,27 @@ function Fire( float Value )
 */
 
 //----------------------------------------------------------------------------
- 
-function FireWeapon()
+
+function PlayFireSoundServer()
+{
+	if (bAltAmmo)
+		Owner.PlayOwnedSound(AltFireSound);
+	else
+		Owner.PlayOwnedSound(FireSound);
+}
+
+simulated function FireWeapon()
 {
 	local float Value;
-
-	//LogActor("AeonsWeapon: FireWeapon");
 	
-	if ( PlayerPawn(Owner) != None )
-		PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		if ( PlayerPawn(Owner) != None )
+			PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
 
-	if ( !bRapidFire && (FiringSpeed > 0) )
-		Pawn(Owner).PlayRecoil(FiringSpeed);
+		if ( !bRapidFire && (FiringSpeed > 0) )
+			Pawn(Owner).PlayRecoil(FiringSpeed);
+	}
 
 	if ( bInstantHit )
 		TraceFire(Value);
@@ -750,20 +901,37 @@ function FireWeapon()
 	if ( AeonsPlayer(Owner).bWeaponSound )
 	{
 	    AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280 * 3);
-		if (bAltAmmo)
-		    Owner.PlaySound(AltFireSound);
+		if (Level.NetMode == NM_Client)
+		{
+			if (bAltAmmo)
+				Owner.PlaySound(AltFireSound);
+			else
+				Owner.PlaySound(FireSound);
+		}
 		else
-		    Owner.PlaySound(FireSound);
+		{
+			// playing sounds here won't replicate since it's a simulated function
+			// we need to call a non simulated function
+			PlayFireSoundServer();
+		}
+	}
+
+	if (bMuzzleFlashParticles && Role < ROLE_Authority)
+	{
+		bMuzzleFlash++;
 	}
 
 	bPointing=True;
-	
+	//bCanClientFire = true;
 	//ClientFire(Value);
 
-	if ( Owner.bHidden )
-		CheckVisibility();
+	if (Level.NetMode != NM_Client)
+	{
+		if ( Owner.bHidden )
+			CheckVisibility();
 
-	gotoState('NormalFire');
+		gotoState('NormalFire');
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -889,6 +1057,11 @@ state NewClip
 {
 	ignores Reload;
 
+	function BeginState()
+	{
+		ClientReloadWeapon(ClipCount);
+	}
+
     function Finish()
     {
 		//LogActor("AeonsWeapon: state NewClip: Finish");
@@ -909,6 +1082,40 @@ Begin:
     Finish();
 }
 
+state ClientReload
+{
+	simulated function bool ClientFire(float Value)
+	{
+		//bForceFire = bForceFire || ( bCanClientFire && (Pawn(Owner) != None) && (AmmoType.AmmoAmount > 0) );
+		//return bForceFire;
+		return false;
+	}
+
+	simulated function AnimEnd()
+	{
+		if ( bCanClientFire && (PlayerPawn(Owner) != None) && (AmmoType.AmmoAmount > 0) )
+		{
+			if ( bForceFire || (Pawn(Owner).bFire != 0) )
+			{
+				Global.ClientFire(0);
+				return;
+			}
+		}			
+		GotoState('ClientIdle');
+		Global.AnimEnd();
+	}
+
+	simulated function EndState()
+	{
+		bForceFire = false;
+	}
+
+	simulated function BeginState()
+	{
+		bForceFire = false;
+	}
+}
+
 //----------------------------------------------------------------------------
 
 simulated function WallDecal(Vector HitLocation, Vector HitNormal)
@@ -919,6 +1126,15 @@ simulated function WallDecal(Vector HitLocation, Vector HitNormal)
 		// log("Projectile:WallDecal:Spawning Decal");
 		Spawn(ExplosionDecal,self,,HitLocation, rotator(HitNormal));
 	}
+}
+
+//----------------------------------------------------------------------------
+
+simulated function float TweenFrom(name NewIdleAnim, float TweenTime)
+{
+	if (AnimSequence == NewIdleAnim)
+		return TweenTime;
+	return -1.0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

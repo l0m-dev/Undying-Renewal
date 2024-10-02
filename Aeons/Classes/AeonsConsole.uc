@@ -7,10 +7,27 @@ var bool bRequestedBook;
 var bool bRequestWindow;
 var int CursorPos;
 var bool bControlDown;
+var bool bChatting;
 
 function RequestBook(Pawn P)
 {
 	Aeonsplayer(P).ShowBook();
+}
+
+state UWindow
+{
+	event PostRender( canvas Canvas )
+	{
+		local int i;
+		local float YOffset, XL, YL;
+
+		Super.PostRender(Canvas);
+
+		if (Viewport.Actor.ProgressTimeOut > Viewport.Actor.Level.TimeSeconds)
+		{
+			DrawProgressMessage(Canvas, 0.9 * Canvas.ClipY);
+		}
+	}
 }
 
 event Tick( float Delta )
@@ -24,10 +41,39 @@ event Tick( float Delta )
 	}
 }
 
+exec function Type()
+{
+	bChatting = false;
+	TypedStr="";
+	GotoState( 'Typing' );
+}
+
+exec function Chat()
+{
+	Talk();
+}
+ 
+exec function Talk()
+{
+	bChatting = true;
+	TypedStr="";
+	bNoStuff = true;
+	GotoState( 'Typing' );
+}
+
+exec function TeamTalk()
+{
+	bChatting = true;
+	TypedStr="";
+	bNoStuff = true;
+	GotoState( 'Typing' );
+}
+
 state Typing
 {
 	exec function Type()
 	{
+		bControlDown = false;
 		TypedStr="";
 		CursorPos=0;
 		gotoState( '' );
@@ -39,7 +85,7 @@ state Typing
 			bNoStuff = false;
 			return true;
 		}
-		if( Key>=0x20 && Key<0x100 && Key!=Asc("~") && Key!=Asc("`") )
+		if( Key>=0x20 && Key<0x100 && Key!=Asc("~") && Key!=Asc("`") && Key!=Asc("") )
 		{
 			//TypedStr = TypedStr $ Chr(Key);
 			TypedStr = Left(TypedStr,CursorPos) $ Chr(Key) $ Right(TypedStr,Len(TypedStr)-CursorPos);
@@ -51,6 +97,7 @@ state Typing
 	function bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 	{
 		local string Temp;
+		local int TempCursorPos;
 
 		bNoStuff = false;
 		if( Key==IK_Escape )
@@ -70,6 +117,13 @@ state Typing
 				GotoState( '' );
 			}
 			Scrollback=0;
+		}
+		else if ( Key==IK_CTRL )
+		{
+			if ( Action == EInputAction.IST_Press )
+				bControlDown = True;
+			else
+				bControlDown = False;
 		}
 		else if( global.KeyEvent( Key, Action, Delta ) )
 		{
@@ -94,21 +148,28 @@ state Typing
 						Message( None, "(>" @ TypedStr, 'Console' );
 
 					// Update history buffer.
-					History[HistoryCur++ % MaxHistory] = TypedStr;
-					if( HistoryCur > HistoryBot )
-						HistoryBot++;
-					else
+					if (!bChatting)
+					{
+						History[HistoryBot++ % MaxHistory] = TypedStr;
 						HistoryCur = HistoryBot;
-					if( HistoryCur - HistoryTop >= MaxHistory )
-						HistoryTop = HistoryCur - MaxHistory + 1;
+						if( HistoryCur - HistoryTop >= MaxHistory )
+							HistoryTop = HistoryCur - MaxHistory + 1;
+					}
 
 					// Make a local copy of the string.
 					Temp=TypedStr;
 					TypedStr="";
 					CursorPos=0;
-					if( !ConsoleCommand( Temp ) )
-						Message( None, Localize("Errors","Exec","Core"), 'Console' );
-					Message( None, "", 'Console' );
+					if (bChatting)
+					{
+						ConsoleCommand( "Say"@Temp ); 
+					}
+					else
+					{
+						if( !ConsoleCommand( Temp ) )
+							Message( None, Localize("Errors","Exec","Core"), 'Console' );
+						Message( None, "", 'Console' );
+					}
 				}
 				if( ConsoleDest==0.0 )
 					GotoState('');
@@ -117,23 +178,27 @@ state Typing
 		}
 		else if( Key==IK_Up )
 		{
-			if( HistoryCur > HistoryTop )
+			if (!bChatting)
 			{
-				History[HistoryCur % MaxHistory] = TypedStr;
-				TypedStr = History[--HistoryCur % MaxHistory];
-				CursorPos=Len(TypedStr);
+				if( HistoryCur > HistoryTop )
+				{
+					TypedStr = History[--HistoryCur % MaxHistory];
+					CursorPos=Len(TypedStr);
+				}
+				Scrollback=0;
 			}
-			Scrollback=0;
 		}
 		else if( Key==IK_Down )
 		{
-			History[HistoryCur % MaxHistory] = TypedStr;
-			if( HistoryCur < HistoryBot )
-				TypedStr = History[++HistoryCur % MaxHistory];
-			else
-				TypedStr="";
-			CursorPos=Len(TypedStr);
-			Scrollback=0;
+			if (!bChatting)
+			{
+				if( HistoryCur < HistoryBot )
+					TypedStr = History[++HistoryCur % MaxHistory];
+				else
+					TypedStr="";
+				CursorPos=Len(TypedStr);
+				Scrollback=0;
+			}
 		}
 		else if( Key==IK_PageUp )
 		{
@@ -147,28 +212,53 @@ state Typing
 		}
 		else if( Key==IK_Backspace )
 		{
-			if( Len(TypedStr)>0 )
+			if( CursorPos>0 )
 			{
-				//TypedStr = Left(TypedStr,Len(TypedStr)-1);
-				TypedStr = Left(TypedStr,CursorPos-1) $ Right(TypedStr,Len(TypedStr)-CursorPos);
-				CursorPos--;
+				if (bControlDown)
+				{
+					TempCursorPos = CursorPos;
+					while(TempCursorPos > 0 && Mid(TypedStr, TempCursorPos - 1, 1) == " ")
+						TempCursorPos--;
+					while(TempCursorPos > 0 && Mid(TypedStr, TempCursorPos - 1, 1) != " ")
+						TempCursorPos--;
+					TypedStr = Left(TypedStr,TempCursorPos) $ Right(TypedStr,Len(TypedStr)-CursorPos);
+					CursorPos = TempCursorPos;
+				}
+				else
+				{
+					TypedStr = Left(TypedStr,CursorPos-1) $ Right(TypedStr,Len(TypedStr)-CursorPos);
+					CursorPos--;
+				}
 			}
 			Scrollback = 0;
 		}
 		else if ( Key==IK_Left )
 		{
-			CursorPos = Max(0, CursorPos-1);
+			if (bControlDown)
+			{
+				while(CursorPos > 0 && Mid(TypedStr, CursorPos - 1, 1) == " ")
+					CursorPos--;
+				while(CursorPos > 0 && Mid(TypedStr, CursorPos - 1, 1) != " ")
+					CursorPos--;
+			}
+			else
+			{
+				CursorPos = Max(0, CursorPos-1);
+			}
 		}
 		else if ( Key==IK_Right )
 		{
-			CursorPos = Min(Len(TypedStr), CursorPos+1);
-		}
-		else if ( Key==IK_CTRL )
-		{
-			if ( Action == EInputAction.IST_Press )
-				bControlDown = True;
-			else if ( Action == EInputAction.IST_Release )
-				bControlDown = False;
+			if (bControlDown)
+			{
+				while(CursorPos < Len(TypedStr) && Mid(TypedStr, CursorPos, 1) != " ")
+					CursorPos++;
+				while(CursorPos < Len(TypedStr) && Mid(TypedStr, CursorPos, 1) == " ")
+					CursorPos++;
+			}
+			else
+			{
+				CursorPos = Min(Len(TypedStr), CursorPos+1);
+			}
 		}
 		else if ( Key==IK_C )
 		{
@@ -181,7 +271,14 @@ state Typing
 		{
 			if (bControlDown)
 			{
-				TypedStr=Left(TypedStr,CursorPos) $ Viewport.Actor.PasteFromClipboard() $ Right(TypedStr,Len(TypedStr)-CursorPos);
+				Temp = Viewport.Actor.PasteFromClipboard();
+
+				// strip crlf
+				Viewport.Actor.ReplaceText(Temp, Chr(13)$Chr(10), "");
+				Viewport.Actor.ReplaceText(Temp, Chr(13), "");
+				Viewport.Actor.ReplaceText(Temp, Chr(10), "");
+
+				TypedStr=Left(TypedStr,CursorPos) $ Temp $ Right(TypedStr,Len(TypedStr)-CursorPos);
 				CursorPos=Len(TypedStr);
 			}
 		}
@@ -192,10 +289,13 @@ state Typing
 	{
 		bTyping = true;
 		Viewport.Actor.Typing(bTyping);
+		CursorPos=Len(TypedStr);
+		HistoryCur = HistoryBot;
 	}
 	function EndState()
 	{
 		bTyping = false;
+		bChatting = false;
 		Viewport.Actor.Typing(bTyping);
 		//log("Console leaving Typing");
 		ConsoleDest=0.0;

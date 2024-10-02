@@ -159,4 +159,6 @@ defaultproperties
      TransientSoundRadius=1500
      CollisionRadius=24
      CollisionHeight=18
+     MenuName="Phoenix Guardian"
+     CreatureDeathVerb="obliterated"
 }

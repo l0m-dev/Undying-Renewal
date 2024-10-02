@@ -101,6 +101,14 @@ function Close(optional bool bByParent)
 	Super.Close(bByParent);
 }
 
+function WindowHidden()
+{
+	if(bListVisible)
+		CloseUp();
+
+	Super.WindowHidden();
+}
+
 function SetNumericOnly(bool bNumericOnly)
 {
 	EditBox.bNumericOnly = bNumericOnly;

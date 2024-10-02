@@ -3,8 +3,9 @@
 //=============================================================================
 class Weapon extends Inventory
 	abstract
-	native
-	nativereplication;
+	native;
+
+// removed nativereplication to replicate bAltAmmo
 
 //#exec Texture Import File=Textures\Weapon.pcx Name=S_Weapon Mips=On Flags=2
 
@@ -88,13 +89,20 @@ var(MuzzleFlash) ERenderStyle FlashStyle0,FlashStyle1;
 // var(MuzzleFlash) texture MuzzleFlare;
 // var(MuzzleFlash) float FlareOffset; 
 
+var() float WeaponFov;
+var() Localized string AltDeathMessage;
+
 // Network replication
 //
 replication
 {
 	// Things the server should send to the client.
 	reliable if( bNetOwner && (Role==ROLE_Authority) )
-		AmmoType, bLockedOn, bHideWeapon;
+		AmmoType, bLockedOn, bHideWeapon,
+		bAltAmmo;
+	
+	reliable if( Role==ROLE_Authority )
+		ClientIdleWeapon, ClientReloadWeapon; // things like activating items are server sided so this is needed for now
 }
 
 //=============================================================================
@@ -146,6 +154,7 @@ simulated event RenderOverlays( canvas Canvas )
 	local bool bPlayerOwner;
 	local int Hand;
 	local PlayerPawn PlayerOwner;
+	local float	InnerLeft, InnerWidth;
 
 	if ( bHideWeapon || (Owner == None) )
 		return;
@@ -171,7 +180,18 @@ simulated event RenderOverlays( canvas Canvas )
 
 	if ( (bMuzzleFlash > 0) && bDrawMuzzleFlash && Level.bHighDetailMode && (MFTexture0 != None) )
 	{
-		MuzzleScale = Default.MuzzleScale * Canvas.ClipX/640.0;
+		if (Canvas.SizeY / Canvas.SizeX < 0.75 )
+		{
+			InnerWidth = Canvas.SizeY / 0.75;
+			InnerLeft = (Canvas.SizeX - InnerWidth) / 2;
+		}
+		else
+		{
+			InnerWidth = Canvas.SizeX;
+			InnerLeft = 0;
+		}
+
+		MuzzleScale = Default.MuzzleScale * Canvas.ClipY/480.0; // Canvas.ClipX/640.0
 		if ( !bSetFlashTime )
 		{
 			bSetFlashTime = true;
@@ -188,7 +208,7 @@ simulated event RenderOverlays( canvas Canvas )
 				Canvas.SetPos(Canvas.ClipX/2 - 0.5 * MuzzleScale * FlashS + Canvas.ClipX * (Hand * Default.FireOffset.Y * FlashO), Canvas.ClipY/2 - 0.5 * MuzzleScale * FlashS + Canvas.ClipY * FlashY);
 			*/
 			
-			Canvas.SetPos((Canvas.ClipX * FlashX) - (0.5 * MFTexture0.USize * MuzzleScale), (Canvas.ClipY * FlashY) - (0.5 * MFTexture0.USize * MuzzleScale));
+			Canvas.SetPos((InnerLeft + InnerWidth * FlashX) - (0.5 * MFTexture0.USize * MuzzleScale), (Canvas.ClipY * FlashY) - (0.5 * MFTexture0.USize * MuzzleScale));
 			// Canvas.SetPos((Canvas.ClipX * FlashX) - (0.5 * FlashS * MuzzleScale), (Canvas.ClipY * FlashY) - (0.5 * FlashS * MuzzleScale));
 			Canvas.Style = FlashStyle0;
 			Canvas.DrawIcon(MFTexture0, MuzzleScale);
@@ -196,7 +216,7 @@ simulated event RenderOverlays( canvas Canvas )
 			if (MFTexture1 != none)
 			{
 				Canvas.Style = FlashStyle1;
-				Canvas.SetPos((Canvas.ClipX * FlashX) - (0.5 * MFTexture1.USize * MuzzleScale), (Canvas.ClipY * FlashY) - (0.5 * MFTexture1.USize * MuzzleScale));
+				Canvas.SetPos((InnerLeft + InnerWidth * FlashX) - (0.5 * MFTexture1.USize * MuzzleScale), (Canvas.ClipY * FlashY) - (0.5 * MFTexture1.USize * MuzzleScale));
 				Canvas.DrawIcon(MFTexture1, MuzzleScale);
 			}
 
@@ -205,6 +225,8 @@ simulated event RenderOverlays( canvas Canvas )
 	}
 	else
 		bSetFlashTime = false;
+
+
 
 	SetLocation( Owner.Location + CalcDrawOffset() );
 	NewRot = Pawn(Owner).ViewRotation;
@@ -422,29 +444,31 @@ function checkAltAmmo()
 
 //
 // Change weapon to that specificed by F matching inventory weapon's Inventory Group.
+/*
 simulated function Inventory FindItemInGroup( byte F )
 {
-	local Inventory newWeapon;
+	local Inventory Inv;
+	local Weapon newWeapon;
+	local int Count;
 
-	if ( InventoryGroup == F )
+	for( Inv=self; Inv!=None && Count < 1000; Inv=Inv.Inventory )
 	{
-		checkAltAmmo();
-		if ( (AmmoType != None) && (AmmoType.AmmoAmount <= 0) )
+		if ( Inv.InventoryGroup == F )
 		{
-			self.bHaveTokens = false;
-			return self;
-		}		
-		else
-		{
-			self.bHaveTokens = true;
-			return self;
+			newWeapon = Weapon(Inv);
+			if ( newWeapon != None )
+			{
+				newWeapon.checkAltAmmo();
+				newWeapon.bHaveTokens = ((newWeapon.AmmoType == None) || (newWeapon.AmmoType.AmmoAmount > 0));
+			}
+			return newWeapon;
 		}
+		Count++;
 	}
-	else if ( Inventory == None )
-		return None;
-	else
-		return Inventory.FindItemInGroup(F);
+
+	return None;
 }
+*/
 
 // Either give this inventory to player Other, or spawn a copy
 // and give it to the player Other, setting up original to be respawned.
@@ -452,14 +476,16 @@ simulated function Inventory FindItemInGroup( byte F )
 //
 function inventory SpawnCopy( pawn Other )
 {
-	local inventory Copy;
-	local Weapon newWeapon;
+	local Weapon Copy;
 
 	if( Level.Game.ShouldRespawn(self) )
 	{
 		Copy = spawn(Class,Other,,,rot(0,0,0));
 		Copy.Tag           = Tag;
 		Copy.Event         = Event;
+		Copy.PickupAmmoCount = PickupAmmoCount;
+		if ( AmmoName != None )
+			Copy.AmmoName = AmmoName;
 		if ( !bWeaponStay )
 			GotoState('Sleeping');
 	}
@@ -470,14 +496,13 @@ function inventory SpawnCopy( pawn Other )
 	Copy.bHeldItem = true;
 	Copy.bTossedOut = false;
 	Copy.GiveTo( Other );
-	newWeapon = Weapon(Copy);
-	newWeapon.Instigator = Other;
-	newWeapon.GiveAmmo(Other);
-	newWeapon.SetSwitchPriority(Other);
+	Copy.Instigator = Other;
+	Copy.GiveAmmo(Other);
+	Copy.SetSwitchPriority(Other);
 	if ( !Other.bNeverSwitchOnPickup )
-		newWeapon.WeaponSet(Other);
-	newWeapon.AmbientGlow = 0;
-	return newWeapon;
+		Copy.WeaponSet(Other);
+	Copy.AmbientGlow = 0;
+	return Copy;
 }
 
 function SetSwitchPriority(pawn Other)
@@ -762,6 +787,17 @@ function Fire( float Value )
 	}
 }
 */
+
+simulated function ClientIdleWeapon()
+{
+	//log("Weapon: ClientIdleWeapon");
+}
+
+simulated function ClientReloadWeapon(int CurrentClipCount)
+{
+	//log("Weapon: ClientReloadWeapon");
+}
+
 function Reload();
 
 simulated function PlayFiring()
@@ -797,6 +833,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 function TraceFire( float Accuracy )
 {
 	local vector HitLocation, HitNormal, StartTrace, EndTrace, X,Y,Z;
+	local int HitJoint;
 	local actor Other;
 	local Pawn PawnOwner;
 
@@ -813,7 +850,7 @@ function TraceFire( float Accuracy )
 		+ Accuracy * (FRand() - 0.5 ) * Z * 1000;
 	X = vector(AdjustedAim);
 	EndTrace += (10000 * X); 
-	Other = PawnOwner.TraceShot(HitLocation,HitNormal,EndTrace,StartTrace);
+	Other = PawnOwner.TraceShot(HitLocation,HitNormal,HitJoint,EndTrace,StartTrace);
 	ProcessTraceHit(Other, HitLocation, HitNormal, X,Y,Z);
 }
 
@@ -897,6 +934,7 @@ Begin:
 	if ( Pawn(Owner).bFire!=0 ) Fire(0.0);
 	Disable('AnimEnd');
 	PlayIdleAnim();
+	ClientIdleWeapon();
 }
 
 //
@@ -981,7 +1019,7 @@ function BringUp()
 		//PlayerPawn(Owner).EndZoom();
 	}	
 	bWeaponUp = false;
-	//PlaySelect();
+	PlaySelect();
 	GotoState('Active');
 }
 
@@ -1023,7 +1061,6 @@ function PlayPostSelect()
 
 function PlayIdleAnim()
 {
-	LoopAnim('StillIdle');
 }
 
 defaultproperties
@@ -1039,6 +1076,7 @@ defaultproperties
      RefireRate=0.5
      MessageNoAmmo=" has no ammo."
      DeathMessage="%o was killed by %k's %w."
+     AltDeathMessage="%o was killed by %k's %w."
      NameColor=(R=255,G=255,B=255)
      MuzzleScale=4
      FlashLength=0.1
@@ -1049,6 +1087,7 @@ defaultproperties
      RespawnTime=30
      PlayerViewOffset=(X=30,Z=-5)
      MaxDesireability=0.5
+     WeaponFov=110
      Icon=Texture'Engine.S_Weapon'
      Texture=Texture'Engine.S_Weapon'
      bNoSmooth=True

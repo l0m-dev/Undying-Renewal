@@ -3,7 +3,7 @@
 //=============================================================================
 class HealthVial expands Health;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	

@@ -14,7 +14,7 @@ var name InState;
 function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	SetTimer(0, false)	;
+	SetTimer(0, false);
 }
 
 function PassThru(Actor Other)
@@ -59,6 +59,7 @@ simulated function Touch( actor Other )
 			if ( Other.IsA('AeonsPlayer') )
 			{
 				AeonsPlayer(Other).ScryeMod.GotoState( 'Deactivated' );
+				AeonsPlayer(Other).ClientSetScryeModActive(false);
 				if ( HideWeapons )
 					AeonsPlayer(Other).bRenderWeapon = false;
 			}
@@ -111,6 +112,10 @@ function ReleasePlayer()
 	// return the player to the state they were in when triggered.
 	AeonsPlayer(P).bRenderWeapon = true;
 	P.GotoState(InState);
+	if (P.RemoteRole == ROLE_AutonomousProxy)
+	{
+		P.GotoState(InState);//ClientGotoState
+	}
 	if ( bLetterBox )
 	{
 		P.LetterBox(false);

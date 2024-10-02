@@ -31,10 +31,11 @@ var HeldProp				BookProp;
 //****************************************************************************
 // Inherited functions.
 //****************************************************************************
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	Spawn( class'AaronGhostHalo', self,, Location );
+	if (Level.NetMode != NM_DedicatedServer)
+		Spawn( class'AaronGhostHalo', self,, Location );
 }
 
 function vector GetTotalPhysicalEffect( float DeltaTime )

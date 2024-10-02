@@ -137,7 +137,7 @@ function StopFireLeftEye()
 	if (LEyeFire != none)
 	{
 		// shut it down
-		LEyeFire.bShuttingDown = true;
+		LEyeFire.Shutdown();
 	}
 }
 
@@ -161,7 +161,7 @@ function StopFireRightEye()
 	if (REyeFire != none)	
 	{
 		// shut it down
-		REyeFire.bShuttingDown = true;
+		REyeFire.Shutdown();
 	}
 }
 
@@ -187,7 +187,7 @@ function StopFireMouth()
 	if (MouthFire != none)
 	{
 		// shut it down
-		MouthFire.bShuttingDown = true;
+		MouthFire.Shutdown();
 	}
 }
 
@@ -241,7 +241,7 @@ function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, 
 simulated function Explode(vector HitLocation, vector HitNormal)
 {
 	if (ps != none)
-		ps.bShuttingDown = true;	// Destroy the particle system
+		ps.Shutdown();	// Destroy the particle system
 	Destroy();		// Destroy self
 }
 
@@ -903,7 +903,7 @@ simulated function BlowUp(vector HitLocation, vector HitNormal)
 simulated function Destroyed()
 {
 	if (ps != none)
-		ps.bShuttingDown = true;
+		ps.Shutdown();
 	wind.Destroy();
  	StopFireLeftEye();
  	StopFireRightEye();
@@ -963,5 +963,6 @@ defaultproperties
      DrawScale=0.25
      CollisionRadius=8
      CollisionHeight=8
+     bFixedRotationDir=True
      bRotateToDesired=True
 }

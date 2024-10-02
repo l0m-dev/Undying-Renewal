@@ -26,6 +26,8 @@ replication
 	// Variables the server should send to the client.
 	reliable if( Role==ROLE_Authority && bNetOwner)
 		OverlayStr;
+	unreliable if( Role==ROLE_Authority )
+		ClientAddCrack;
 }
 
 //----------------------------------------------------------------------------
@@ -52,7 +54,7 @@ function PreBeginPlay()
 
 //----------------------------------------------------------------------------
 
-function AddCrack(float Str)
+simulated function AddCrack(float Str)
 {
 	local int i;
 	local vector Loc;
@@ -70,6 +72,11 @@ function AddCrack(float Str)
 			break;
 		}
 	}
+}
+
+simulated function ClientAddCrack(float Str)
+{
+	AddCrack(Str);
 }
 
 //----------------------------------------------------------------------------
@@ -187,6 +194,9 @@ state Activated
 		Stop;
 
 	AlreadyActive:
+		if( shieldMesh == none )
+			shieldMesh = spawn(class 'Shield3rdPerson',Pawn(Owner),,Owner.Location + (Vector(PlayerPawn(Owner).ViewRotation) * 16), PlayerPawn(Owner).ViewRotation );
+
 		adjLoc = Pawn(Owner).location;
 		adjLoc.z -= 48;
 		OverlayStr = shieldHealth * 0.01;
@@ -258,4 +268,5 @@ defaultproperties
      OverlayStrPerLevel(3)=0.6
      OverlayStrPerLevel(4)=1.0
      OverlayStrPerLevel(5)=1.0
+     RemoteRole=ROLE_SimulatedProxy
 }

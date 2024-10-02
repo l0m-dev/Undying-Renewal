@@ -5,22 +5,28 @@ class Phosphorus_proj expands WeaponProjectile;
 
 var ParticleFX ps, ps_Smoke;
 
-function Destroyed()
+simulated function Destroyed()
 {
-	ps.bShuttingDown = true;
-	ps_Smoke.bShuttingDown = true;
+	if (Level.NetMode != NM_DedicatedServer)
+	{
+		ps.Shutdown();
+		ps_Smoke.Shutdown();
+	}
 }
 
 auto state Flying
 {
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		Velocity = Vector(Rotation) * speed;
-		ps = spawn(class 'Phosphorus_particles',,,Location, Rotation);
-		ps.SetBase(self);
-		ps_Smoke = spawn(class 'PhosphorusSmoke_particles',,,Location, Rotation);
-		ps_Smoke.SetBase(self);
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			ps = spawn(class 'Phosphorus_particles',,,Location, Rotation);
+			ps.SetBase(self);
+			ps_Smoke = spawn(class 'PhosphorusSmoke_particles',,,Location, Rotation);
+			ps_Smoke.SetBase(self);
+		}
 	}
 
 	simulated function ZoneChange( Zoneinfo NewZone )

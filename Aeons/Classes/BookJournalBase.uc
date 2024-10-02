@@ -13,29 +13,37 @@ var travel int FirstJournalId;
 var travel int		JournalRead[150];
 var travel string JournalNames[150];
 var travel JournalEntry Journals[150]; //fix travel  ?
+var travel class<JournalEntry> JournalsClassesRep[150];
 
+replication
+{
+	reliable if (Role == ROLE_Authority && bNetOwner && bNetInitial)
+		NumJournals, JournalsClassesRep;
+}
 
 // someone wants us to display a specific JournalEntry class in the book.
 var Class<JournalEntry> RequestedEntryClass;
 
-function bool HasEntry(JournalEntry NewEntry)
+simulated function bool HasEntry(JournalEntry NewEntry)
 {
 	local int i;
 	for ( i=0; i<ArrayCount(Journals); i++ )
 	{
 		if ( (Journals[i] != None) && (Journals[i].Class == NewEntry.Class) ) 
 		{
-			log("AddEntry: duplicate found: " $ NewEntry);
+			//log("AddEntry: duplicate found: " $ NewEntry);
 			return true;
 		}
 	}
 	return false;
 }
 
-function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
+simulated function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 {
 	local JournalEntry temp;
 	local int i;
+	local name tempname;
+
 	
 	if ( NewEntry == None )
 	{
@@ -61,7 +69,7 @@ function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 	NumUnreadJournals = 0;
 	for (i = 0; i < NumJournals; i++)
 	{
-		if (!Journals[i].bRead)
+		if (Journals[i] != None && !Journals[i].bRead) // check for none since NumJournals is replicated and not number of spawned journals for the client
 			NumUnreadJournals++;
 	}
 
@@ -72,6 +80,7 @@ function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 	
 	JournalNames[CurrentJournalIndex] = String(NewEntry.Class);
 	Journals[CurrentJournalIndex] = NewEntry;
+	JournalsClassesRep[CurrentJournalIndex] = NewEntry.Class;
 	
 	NewestUnread=NewEntry;
 
@@ -82,7 +91,7 @@ function bool AddEntry( JournalEntry NewEntry, bool bMakeCurrent )
 	return true;
 }
 
-function FindRequestedEntryClass()
+simulated function FindRequestedEntryClass()
 {
 	local int i;
 	local JournalEntry NewEntry;
@@ -110,14 +119,14 @@ function FindRequestedEntryClass()
 }
 
 
-function RefreshUnread()
+simulated function RefreshUnread()
 {
 	local int i;
 
+	NumUnreadJournals = 0;
 	for (i = 0; i < NumJournals; i++)
 	{
-		NumUnreadJournals = 0;
-		if (!Journals[i].bRead)
+		if (Journals[i] != None && !Journals[i].bRead)
 		{
 			NumUnreadJournals++;
 			NewestUnread = Journals[i];
@@ -126,7 +135,7 @@ function RefreshUnread()
 }
 
 
-function JournalEntry GetJournalEntry( int Index ) 
+simulated function JournalEntry GetJournalEntry( int Index ) 
 {
 	if ( Journals[Index] != None ) 
 		return Journals[Index];
@@ -136,4 +145,5 @@ function JournalEntry GetJournalEntry( int Index )
 
 defaultproperties
 {
+	 RemoteRole=Role_SimulatedProxy
 }

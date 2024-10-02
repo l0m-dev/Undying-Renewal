@@ -6,17 +6,16 @@ class WeatherFXManager expands Info;
 var PlayerPawn Player;
 var bool bPlayerInMyZone;
 
-function FindPlayer()
+simulated function FindPlayer()
 {
-	if (Player != none)
-		return;
-	ForEach AllActors (class 'PlayerPawn', Player)
-	{
-		break;
-	}
+	local PlayerPawn P;
+
+	foreach AllActors(class'PlayerPawn', P)
+		if(Viewport(P.Player) != None)
+			Player = P;
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local ParticleFX P;
 
@@ -54,4 +53,6 @@ function Tick(float DeltaTime)
 
 defaultproperties
 {
+     bNoDelete=True
+     RemoteRole=ROLE_SimulatedProxy
 }

@@ -10,7 +10,7 @@ function Created()
 {
 	Super.Created();
 
-	RowHeight = 12;
+	RowHeight = 12*Root.ScaleY;
 
 	AddColumn(RuleText, 150);
 	AddColumn(ValueText, 150);
@@ -26,13 +26,15 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 	local int Y;
 	local int TopMargin;
 	local int BottomMargin;
+
+	RowHeight = 12*Root.ScaleY;
 	
 	if(bShowHorizSB)
-		BottomMargin = LookAndFeel.Size_ScrollbarWidth;
+		BottomMargin = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	else
 		BottomMargin = 0;
 
-	TopMargin = LookAndFeel.ColumnHeadingHeight;
+	TopMargin = LookAndFeel.ColumnHeadingHeight*Root.ScaleY;
 	
 	Server = UBrowserInfoClientWindow(GetParent(class'UBrowserInfoClientWindow')).Server;
 	if(Server == None)

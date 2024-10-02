@@ -79,6 +79,7 @@ state AIWaitForTrigger
 			if ( !bInitialShadow )
 				ShadowImportance = -1.0;
 			PlayAnim( InitialAnim, 20.0, MOVE_None,, 0.0 );
+			NetUpdateFrequency = 8; // hack: since all anims loop in multiplayer, reduce NetUpdateFrequency to stop flickering
 		}
 	}
 
@@ -91,6 +92,7 @@ state AIWaitForTrigger
 		SetCollision( InitCollideActors, InitBlockActors, InitBlockPlayers );
 		PushState( GetStateName(), 'AWAKENED' );
 		GotoState( 'AIAwaken' );
+		NetUpdateFrequency = default.NetUpdateFrequency;
 	}
 
 	// *** new (state only) functions ***

@@ -672,4 +672,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.TrsantiGrunt_m'
      CollisionRadius=18
      CollisionHeight=59
+     MenuName="Trsanti"
+     CreatureDeathVerb="killed"
 }

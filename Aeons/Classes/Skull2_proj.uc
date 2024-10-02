@@ -58,12 +58,22 @@ var(Sound)	sound	ScreamingSounds[2];				// Screaming sounds
 var(Sound)	sound	OnFireSound;
 
 var vector frenzyBob;
+
+var byte SkullID;
+
+replication
+{
+	reliable if (Role == ROLE_Authority && bNetInitial)
+		Player, SpawnLocation, SkullID;
+}
+
 // ================================================
 // This function is called after the skull is spawned from SkullStorm.uc
 // the Spell knows how many skulls it has created, and calls this function
 // on each after spawning them to give then their location offset from the player.
-function SetOffset(int i)
+simulated function SetOffset(int i)
 {
+	SkullID = i;
 	switch(i)
 	{
 		case 0:
@@ -110,6 +120,15 @@ function PreBeginPlay()
 
 		Frenzy = 0.0;
 		DrawScale = 0.075;
+	}
+}
+
+simulated function PostNetBeginPlay()
+{
+	if (Level.NetMode == NM_Client)
+	{
+		//SetOffset(SkullID); // not needed with new fake clientside skulls
+		bOwnerNoSee = true;
 	}
 }
 
@@ -568,6 +587,9 @@ function Destroyed()
 {
 	if ( SndID > 0 )
 		StopSound(SndID);
+
+	if ( bOnlyOwnerSee )
+		return;
 	
 	if ( bInWater )
 	{
@@ -578,12 +600,15 @@ function Destroyed()
 	}
 
 	// kill the smoke trail
-	SmokeTrail.bShuttingDown = true;
+	SmokeTrail.Shutdown();
 }
 
-function Fire()
+simulated function Fire()
 {
-	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSkulls += 1.0;
+	if (Level.NetMode != NM_Client)
+	{
+		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSkulls += 1.0;
+	}
 	
 	bFlying = true;					// I am flying - Tick() checks this to see if positions, etc need to be updated.
 
@@ -608,8 +633,11 @@ function Fire()
 	// SetCollisionSize(16, 16);
 
 	// Smoke Trail
-	SmokeTrail = spawn(class'SkullStorm_particles', self,,Location);
-	SmokeTrail.setBase(self);
+	if (Level.NetMode != NM_Client)
+	{
+		SmokeTrail = spawn(class'SkullStorm_particles', self,,Location);
+		SmokeTrail.setBase(self);
+	}
 
 	// Sound
 	PlaySound(ScreamingSounds[Rand(2)]);
@@ -654,6 +682,9 @@ defaultproperties
      bMRM=False
      CollisionRadius=3
      CollisionHeight=4
+     bFixedRotationDir=True
      bRotateToDesired=True
-	 bCollideWorld=False
+     bCollideWorld=False
+     bNetTemporary=False
+     RemoteRole=ROLE_DumbProxy
 }

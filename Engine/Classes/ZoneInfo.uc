@@ -6,8 +6,9 @@
 // This is a built-in Unreal class and it shouldn't be modified.
 //=============================================================================
 class ZoneInfo extends Info
-	native
-	nativereplication;
+	native;
+
+// removed nativereplication to replicate weather and bWaterZone
 
 //#exec Texture Import File=Textures\ZoneInfo.pcx Name=S_ZoneInfo Mips=On Flags=2
 
@@ -114,7 +115,9 @@ replication
 		TexUPanSpeed, TexVPanSpeed,
 		// ViewFlash, ViewFog, // Not replicated because vectors replicated with elements rounded to integers
 		bReverbZone,
-		FogColor;
+		FogColor,
+		Weather, WeatherStrength,
+		bWaterZone; // for DynamicZoneInfo
 }
 
 //=============================================================================

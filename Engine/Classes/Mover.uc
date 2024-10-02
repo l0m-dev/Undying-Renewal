@@ -6,6 +6,8 @@ class Mover extends Brush
 	native
 	nativereplication;
 
+// changed NetUpdateFrequency to 1.0 when not opening or closing
+
 // How the mover should react when it encroaches an actor.
 var() enum EMoverEncroachType
 {
@@ -102,6 +104,7 @@ var bool		bDelaying;
 var			bool		bClientPause;
 
 var		  bool			bPlayerOnly;
+var		  bool			bClosed; // mover is in closed position, and no longer moving
 var		  Trigger		RecommendedTrigger;
 
 // for client side replication
@@ -134,10 +137,13 @@ simulated function Timer()
 		{
 			if ( bClientPause )
 			{
+				/*
 				if ( VSize(RealPosition - Location) > 3 )
 					SetLocation(RealPosition);
 				else
 					RealPosition = Location;
+				*/
+				SetLocation(RealPosition); // always set location, keep it more accurate
 				SetRotation(RealRotation);
 				bClientPause = false;
 			}
@@ -324,7 +330,7 @@ function Actor SpecialHandling(Pawn Other)
 // Movement functions.
 
 // Interpolate to keyframe KeyNum in Seconds time.
-final function InterpolateTo( byte NewKeyNum, float Seconds )
+simulated final function InterpolateTo( byte NewKeyNum, float Seconds )
 {
 	//log ("Mover "$self.name$" InterpolateTo ...."$NewKeyNum, 'Misc' );
 	//LogStack('Misc');
@@ -370,7 +376,7 @@ final function SetKeyframe( byte NewKeyNum, vector NewLocation, rotator NewRotat
 }
 
 // Interpolation ended.
-function InterpolateEnd( actor Other )
+simulated function InterpolateEnd( actor Other )
 {
 	local byte OldKeyNum;
 
@@ -401,14 +407,19 @@ function InterpolateEnd( actor Other )
 			SetRotation(BaseRot + KeyRot[KeyNum]);
 			InterpolateTo(KeyNum+1,MoveTime);
 		} else {
-			// Finished interpolating.
-			AmbientSound = None;
-			if ( (ClientUpdate == 0) && (Level.NetMode != NM_Client) )
-			{
-				RealPosition = Location;
-				RealRotation = Rotation;
-			}
+			FinishedInterpolating();
 		}
+	}
+}
+
+simulated function FinishedInterpolating()
+{
+	// Finished interpolating.
+	AmbientSound = None;
+	if ( (ClientUpdate == 0) && (Level.NetMode != NM_Client) )
+	{
+		RealPosition = Location;
+		RealRotation = Rotation;
 	}
 }
 
@@ -451,7 +462,9 @@ function FinishedClosing()
 		SavedTrigger.EndEvent();
 	SavedTrigger = None;
 	Instigator = None;
+	bClosed	= true;
 	FinishNotify(); 
+	NetUpdateFrequency = 1.0;
 }
 
 // Handle when the mover finishes opening.
@@ -479,6 +492,7 @@ function FinishedOpening()
 		}
 
 	FinishNotify();
+	NetUpdateFrequency = 1.0;
 }
 
 // Open the mover.
@@ -489,6 +503,7 @@ function DoOpen()
 	InterpolateTo( 1, MoveTime );
 	PlaySound( OpeningSound, SLOT_None,OpeningProps.Volume,,OpeningProps.Radius, OpeningProps.Pitch);
 	AmbientSound = MoveAmbientSound;
+	NetUpdateFrequency = default.NetUpdateFrequency;
 }
 
 // Close the mover.
@@ -504,6 +519,7 @@ function DoClose()
 		foreach AllActors( class 'Actor', A, Event )
 			A.UnTrigger( Self, Instigator );
 	AmbientSound = MoveAmbientSound;
+	NetUpdateFrequency = default.NetUpdateFrequency;
 }
 
 //-----------------------------------------------------------------------------
@@ -544,19 +560,16 @@ simulated function BeginPlay()
 	// timer updates real position every second in network play
 	if ( Level.NetMode != NM_Standalone )
 	{
-		if ( Level.NetMode == NM_Client )
-			settimer(4.0, true);
-		else
+		//if ( Level.NetMode == NM_Client )
+		//	settimer(4.0, true);
+		//else
 			settimer(1.0, true);
 		if ( Role < ROLE_Authority )
 			return;
 	}
 
-	if ( Level.NetMode != NM_Client )
-	{
-		RealPosition = Location;
-		RealRotation = Rotation;
-	}
+	RealPosition = Location;
+	RealRotation = Rotation;
 
 	// Init key info.
 	Super.BeginPlay();
@@ -572,12 +585,17 @@ simulated function BeginPlay()
 	// find movers in same group
 	if ( ReturnGroup == '' )
 		ReturnGroup = tag;
+
+	NetUpdateFrequency = 1.0; // heavily reduce update frequency if not opening or closing
 }
 
 // Immediately after mover enters gameplay.
 function PostBeginPlay()
 {
 	local mover M;
+
+	RealRotation = Rotation;
+	RealPosition = Location;
 
 	//log("Mover PostBeginPlay() "$self.name, 'Misc');
 	//brushes can't be deleted, so if not relevant, make it invisible and non-colliding
@@ -586,33 +604,32 @@ function PostBeginPlay()
 		SetCollision(false, false, false);
 		SetLocation(Location + vect(0,0,20000)); // temp since still in bsp
 		bHidden = true;
+		return;
 	}
-	else
+	
+	FindTriggerActor();
+	// Initialize all slaves.
+	if( !bSlave )
 	{
-		FindTriggerActor();
-		// Initialize all slaves.
-		if( !bSlave )
+		foreach AllActors( class 'Mover', M, Tag )
 		{
-			foreach AllActors( class 'Mover', M, Tag )
+			if( M.bSlave )
 			{
-				if( M.bSlave )
-				{
-					M.GotoState('');
-					M.SetBase( Self );
-				}
+				M.GotoState('');
+				M.SetBase( Self );
 			}
 		}
-		if ( Leader == None )
-		{	
-			Leader = self;
-			ForEach AllActors( class'Mover', M )
-				if ( (M != self) && (M.ReturnGroup == ReturnGroup) )
-				{
-					M.Leader = self;
-					M.Follower = Follower;
-					Follower = M;
-				}
-		}
+	}
+	if ( Leader == None )
+	{	
+		Leader = self;
+		ForEach AllActors( class'Mover', M )
+			if ( (M != self) && (M.ReturnGroup == ReturnGroup) )
+			{
+				M.Leader = self;
+				M.Follower = Follower;
+				Follower = M;
+			}
 	}
 }
 
@@ -791,7 +808,9 @@ state() TriggerOpenTimed
 	}
 
 Open:
-	Disable( 'Trigger' );
+	if ( bTriggerOnceOnly )
+		Disable('Trigger');
+	bClosed = false;
 	if ( DelayTime > 0 )
 	{
 		bDelaying = true;
@@ -832,6 +851,7 @@ state() TriggerToggle
 	}
 Open:
 	//log("Mover in TriggerToggle state OPEN TAG ", 'Misc');
+	bClosed = false;
 	if ( DelayTime > 0 )
 	{
 		bDelaying = true;
@@ -865,7 +885,8 @@ state() TriggerControl
 		Instigator = EventInstigator;
 		if ( SavedTrigger != None )
 			SavedTrigger.BeginEvent();
-		GotoState( 'TriggerControl', 'Open' );
+		//if ( !bOpening ) // removed since undying calls Trigger twice instead of using UnTrigger
+			GotoState( 'TriggerControl', 'Open' );
 	}
 	function UnTrigger( actor Other, pawn EventInstigator )
 	{
@@ -875,7 +896,8 @@ state() TriggerControl
 			numTriggerEvents = 0;
 			SavedTrigger = Other;
 			Instigator = EventInstigator;
-			SavedTrigger.BeginEvent();
+			if ( SavedTrigger != None )
+				SavedTrigger.BeginEvent();
 			GotoState( 'TriggerControl', 'Close' );
 		}
 	}
@@ -886,20 +908,24 @@ state() TriggerControl
 	}
 
 Open:
+	bClosed = false;
 	if ( DelayTime > 0 )
 	{
 		bDelaying = true;
 		Sleep(DelayTime);
 	}
-	DoOpen();
+	//if ( !bOpening ) // removed since undying calls Trigger twice instead of using UnTrigger
+		DoOpen();
 	FinishInterpolation();
 	FinishedOpening();
-	SavedTrigger.EndEvent();
+	if ( SavedTrigger != None )
+		SavedTrigger.EndEvent();
 	if( bTriggerOnceOnly )
 		GotoState('');
 	Stop;
-Close:		
-	DoClose();
+Close:
+	if ( bOpening )
+		DoClose();
 	FinishInterpolation();
 	FinishedClosing();
 }
@@ -936,6 +962,9 @@ state() TriggerPound
 	}
 
 Open:
+	if ( bTriggerOnceOnly )
+		Disable('Trigger');
+	bClosed = false;
 	if ( DelayTime > 0 )
 	{
 		bDelaying = true;
@@ -979,7 +1008,8 @@ state() BumpControl
 			numTriggerEvents = 0;
 			SavedTrigger = Other;
 			Instigator = EventInstigator;
-			SavedTrigger.BeginEvent();
+			if ( SavedTrigger != None )
+				SavedTrigger.BeginEvent();
 			GotoState( 'BumpControl', 'Close' );
 		}
 	}
@@ -998,6 +1028,7 @@ state() BumpControl
 		GotoState( 'BumpControl', 'Open' );
 	}
 Open:
+	bClosed = false;
 	Disable( 'Bump' );
 	if ( DelayTime > 0 )
 	{
@@ -1044,6 +1075,7 @@ state() BumpOpenTimed
 		GotoState( 'BumpOpenTimed', 'Open' );
 	}
 Open:
+	bClosed = false;
 	Disable( 'Bump' );
 	if ( DelayTime > 0 )
 	{
@@ -1099,6 +1131,9 @@ state() BumpButton
 		GotoState( 'BumpButton', 'Close' );
 	}
 Open:
+	if ( bTriggerOnceOnly )
+		Disable('Trigger');
+	bClosed = false;
 	Disable( 'Bump' );
 	if ( DelayTime > 0 )
 	{
@@ -1152,6 +1187,7 @@ state() BumpToggle
 	}
 
 Open:
+	bClosed = false;
 	Disable( 'Bump' );
 	if ( DelayTime > 0 )
 	{
@@ -1204,6 +1240,7 @@ state() StandOpenTimed
 		GotoState( 'StandOpenTimed', 'Open' );
 	}
 Open:
+	bClosed = false;
 	Disable( 'Attach' );
 	if ( DelayTime > 0 )
 	{
@@ -1249,4 +1286,5 @@ defaultproperties
      bBlockActors=True
      bBlockPlayers=True
      NetPriority=2.7
+     bClosed=True
 }

@@ -1,4 +1,4 @@
-class RenewalSettingsDebugPage extends RenewalSettingsBasePage;
+class RenewalSettingsDebugPage extends UMenuRenewalBasePage;
 
 var UWindowCheckbox DebugCheck;
 var UWindowCheckbox Debug2Check;

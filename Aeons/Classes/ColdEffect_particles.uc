@@ -12,7 +12,7 @@ function PreBeginPlay()
 function Timer()
 {
 	if (Owner == none)
-		bShuttingDown = true;
+		Shutdown();
 }
 
 defaultproperties

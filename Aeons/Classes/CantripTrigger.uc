@@ -90,9 +90,8 @@ state Firing
 	Begin:
 		if (P != none)
 		{
-			P.AttSpell.BringUp();
-			P.AttSpell.PlayAnim('FireCantrip',1,,,0);
-			P.AttSpell.Finish();
+			AttSpell(P.AttSpell).PlayOneshotAnim('FireCantrip', 1.0);
+
 			sleep(0.5);
 			// Trigger the effect
 			if( Event != '' )

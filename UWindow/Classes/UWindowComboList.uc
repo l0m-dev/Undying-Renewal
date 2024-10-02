@@ -239,7 +239,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	Count = Items.Count();
 	if(Count > MaxVisible)
 	{
-		ExtraWidth += LookAndFeel.Size_ScrollbarWidth;
+		ExtraWidth += LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 		WinHeight = (ItemHeight * MaxVisible) + (VBorder * 2);
 	}
 	else
@@ -264,9 +264,9 @@ function BeforePaint(Canvas C, float X, float Y)
 	{
 		VertSB.ShowWindow();
 		VertSB.SetRange(0, Count, MaxVisible);
-		VertSB.WinLeft = WinWidth - LookAndFeel.Size_ScrollbarWidth - HBorder;
+		VertSB.WinLeft = WinWidth - LookAndFeel.Size_ScrollbarWidth*Root.ScaleY - HBorder;
 		VertSB.WinTop = HBorder;
-		VertSB.WinWidth = LookAndFeel.Size_ScrollbarWidth;
+		VertSB.WinWidth = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 		VertSB.WinHeight = WinHeight - 2*VBorder;
 	}
 	else

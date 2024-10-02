@@ -3,7 +3,7 @@
 //=============================================================================
 class HotExplosionFX expands ExplosionFX;
 
-function Tick(float deltaTime)
+simulated function Tick(float deltaTime)
 {
 	LightBrightness = FClamp( (LightBrightness - (deltaTime * 255)), 0, 255);
 

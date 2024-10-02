@@ -4,10 +4,13 @@
 class GrandFatherClock expands Furniture;
 //#exec MESH IMPORT MESH=GrandFatherClock_m SKELFILE=GrandFatherClock.ngf 
 
-
-function PostBeginPlay()
+simulated function StartLevel()
 {
-	PlayAnim('Idle');
+     if (LoopAnim('Idle',, MOVE_None))
+     {
+          // Idle anim lowers the mesh, raise it back up
+          PrePivot.Z = 60.0;
+     }
 }
 
 defaultproperties
@@ -17,4 +20,10 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.GrandFatherClock_m'
      CollisionRadius=24
      CollisionHeight=75
+     bStatic=False
+     bNoDelete=True
+     bGroundMesh=True
+     Physics=PHYS_None
+     bClientAnim=True
+     PrePivot=(Z=-25)
 }

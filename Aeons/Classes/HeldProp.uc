@@ -23,6 +23,7 @@ function Setup(name PawnAttachJointName, name AttachJointName)
 function Dropped()
 {
 	setPhysics(PHYS_Falling);
+	RemoteRole = ROLE_DumbProxy;
 	bCollideWorld = true;
 	Lifespan = DroppedLifespan;
 }
@@ -39,6 +40,7 @@ function Thrown(vector Dir, float Speed, optional bool bRandSpin)
 // Called by a Pawn when this prop is picked up
 function PickedUp()
 {
+	RemoteRole = ROLE_SimulatedProxy;
 }
 
 function SwitchLocation()
@@ -47,4 +49,6 @@ function SwitchLocation()
 
 defaultproperties
 {
+	RemoteRole=ROLE_SimulatedProxy
+	bSimFall=True
 }

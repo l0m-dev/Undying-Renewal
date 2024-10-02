@@ -120,6 +120,18 @@ struct BoundingVolume extends boundingbox
 	var plane Sphere;
 };
 
+struct URL
+{
+	// URL components.
+	var string Protocol;	// Protocol, i.e. "unreal" or "http".
+	var string Host;		// Optional hostname, i.e. "204.157.115.40" or "unreal.epicgames.com", blank if local.
+	var int Port;       	// Optional host port.
+	var string Map;			// Map name, i.e. "SkyCity", default is "Index".
+	var array<string> Op;	// Options.
+	var string Portal;		// Portal to enter through, default is "".
+	var int Valid;			// Whether parsed successfully.
+};
+
 //=============================================================================
 // Constants.
 
@@ -289,6 +301,27 @@ native(235) static final function string Caps   ( coerce string S );
 native(236) static final function string Chr    ( int i );
 native(237) static final function int    Asc    ( string S );
 
+static simulated final function string Trim(coerce string S)
+{
+	while (Left(S, 1) == " ")
+		S = Right(S, Len(S) - 1);
+	while (Right(S, 1) == " ")
+		S = Left(S, Len(S) - 1);
+	return S;
+}
+
+static simulated function string FormatString(string Text, string Match, string Replacement)
+{
+	local int i;
+	
+	i = InStr(Text, Match);	
+
+	if(i != -1)
+		return Left(Text, i) $ Replacement $ FormatString(Mid(Text, i+Len(Match)), Match, Replacement);
+	else
+		return Text;
+}
+
 // Object operators.
 native(114) static final operator(24) bool == ( Object A, Object B );
 native(119) static final operator(26) bool != ( Object A, Object B );
@@ -308,7 +341,7 @@ native(239) final static function EnableLog( name Filename );
 native(240) final static function DisableLog( name Filename );
 
 
-native static function string Localize( string SectionName, string KeyName, string PackageName, optional bool Options );
+native static function string Localize( string SectionName, string KeyName, string PackageName, optional bool Optional );
 
 // Goto state and label.
 native(113) final function GotoState( optional name NewState, optional name Label );
@@ -348,13 +381,13 @@ native(2007) final function EnableStates();
 native(2013) final function GetPSX2TimeStamp( out string TimeStamp );
 
 // Return a random number within the given range.
-final function float RandRange( float Min, float Max )
+static final function float RandRange( float Min, float Max )
 {
     return Min + (Max - Min) * FRand();
 }
 
 //
-function float FVariant( float BaseVal, float Variant )
+static final function float FVariant( float BaseVal, float Variant )
 {
 	return BaseVal - Variant + ( FRand() * Variant * 2 );
 }

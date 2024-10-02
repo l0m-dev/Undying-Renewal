@@ -38,7 +38,7 @@ class GlassShard expands Decoration;
 
 var float Len;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local int i;
 	Super.PreBeginPlay();
@@ -146,7 +146,7 @@ function PreBeginPlay()
 	SetTimer(Len, false);
 }
 
-function Timer()
+simulated function Timer()
 {
 	GotoState('FadeAway');
 
@@ -155,17 +155,17 @@ function Timer()
 state FadeAway
 {
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		SetTimer(2, false);
 	}
 	
-	function Tick( float DeltaTime )
+	simulated function Tick( float DeltaTime )
 	{
 		Opacity -= DeltaTime * 0.5;
 	}
 	
-	function Timer()
+	simulated function Timer()
 	{
 		Destroy();
 	}
@@ -192,4 +192,5 @@ defaultproperties
      bFixedRotationDir=True
      bRotateToDesired=True
      NetPriority=1.4
+     bNetTemporary=True
 }

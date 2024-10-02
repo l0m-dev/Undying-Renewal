@@ -84,8 +84,8 @@ function UWindowPageControlPage AddPage(string Caption, class<UWindowPageWindow>
 	local UWindowPageControlPage P;
 	P = UWindowPageControlPage(AddTab(Caption));
 	P.Page = UWindowPageWindow(CreateWindow(PageClass, 0, 
-				TabArea.WinHeight-(LookAndFeel.TabSelectedM.H-LookAndFeel.TabUnselectedM.H), 
-				WinWidth, WinHeight-(TabArea.WinHeight-(LookAndFeel.TabSelectedM.H-LookAndFeel.TabUnselectedM.H)),,,ObjectName));
+				TabArea.WinHeight-(LookAndFeel.TabSelectedM.H*Root.ScaleY-LookAndFeel.TabUnselectedM.H*Root.ScaleY), 
+				WinWidth, WinHeight-(TabArea.WinHeight-(LookAndFeel.TabSelectedM.H*Root.ScaleY-LookAndFeel.TabUnselectedM.H*Root.ScaleY)),,,ObjectName));
 	P.Page.OwnerTab = P;
 
 	if(P != SelectedTab) 
@@ -109,8 +109,8 @@ function UWindowPageControlPage InsertPage(UWindowPageControlPage BeforePage, st
 
 	P = UWindowPageControlPage(InsertTab(BeforePage, Caption));
 	P.Page = UWindowPageWindow(CreateWindow(PageClass, 0, 
-				TabArea.WinHeight-(LookAndFeel.TabSelectedM.H-LookAndFeel.TabUnselectedM.H), 
-				WinWidth, WinHeight-(TabArea.WinHeight-(LookAndFeel.TabSelectedM.H-LookAndFeel.TabUnselectedM.H)),,,ObjectName));
+				TabArea.WinHeight-(LookAndFeel.TabSelectedM.H*Root.ScaleY-LookAndFeel.TabUnselectedM.H*Root.ScaleY), 
+				WinWidth, WinHeight-(TabArea.WinHeight-(LookAndFeel.TabSelectedM.H*Root.ScaleY-LookAndFeel.TabUnselectedM.H*Root.ScaleY)),,,ObjectName));
 	P.Page.OwnerTab = P;
 
 	if(P != SelectedTab) 

@@ -13,4 +13,5 @@ defaultproperties
      Chaos=20
      Gravity=(Z=400)
      Textures(0)=Texture'Aeons.Particles.PotFire09'
+     bNoDelete=True
 }

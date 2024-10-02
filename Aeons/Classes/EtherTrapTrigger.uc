@@ -17,11 +17,12 @@ var() sound AmbientLoop;
 var() float InitialStateTime;
 var() float HoldStateTime;
 
-function BeginPlay()
+simulated function BeginPlay()
 {
 	super.BeginPlay();
 	AmbientSound = AmbientLoop;
-	fx = spawn(class 'EtherTrapParticleFX',self,,Location + (vect(0,0,-1) * (CollisionHeight - 8)), Rotator(vect(1,0,0)));
+	if (Level.NetMode != NM_DedicatedServer)
+		fx = spawn(class 'EtherTrapParticleFX',self,,Location + (vect(0,0,-1) * (CollisionHeight - 8)), Rotator(vect(1,0,0)));
 }
 
 state() EtherTrapState
@@ -160,11 +161,11 @@ state Holding
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	PlaySound(CloseSound);
 	if (fx != none)
-		fx.bShuttingDown = true;
+		fx.Shutdown();
 }
 
 defaultproperties

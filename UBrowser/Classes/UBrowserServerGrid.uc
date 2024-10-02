@@ -21,7 +21,7 @@ function Created()
 {
 	Super.Created();
 
-	RowHeight = 12;
+	RowHeight = 12*Root.ScaleY;
 
 	CreateColumns();
 
@@ -31,27 +31,16 @@ function Created()
 
 function Close(optional bool bByParent)
 {
-	/*
 	Super.Close(bByParent);
 	if(Menu != None && Menu.bWindowVisible)
 		Menu.CloseUp();
-	*/
-	//GetParent(class'UWindowFramedWindow').Close();
-	//Root.Console.CloseUWindow();
-	GetParent(class'UWindowFramedWindow').OwnerWindow.NextSiblingWindow = none;
-	GetParent(class'UWindowFramedWindow').OwnerWindow.PrevSiblingWindow = none;
-
-	GetParent(class'UWindowFramedWindow').OwnerWindow.BringToFront();
-	//MainMenuWindow(AeonsRootWindow(Root).MainMenu).Multiplayer
-	GetParent(class'UWindowFramedWindow').OwnerWindow;
-	//GetParent(class'UWindowFramedWindow').OwnerWindow.ShowWindow();
 }
 
 function CreateColumns()
 {
 	Server	= AddColumn(ServerName, 300);
-	Ping	= AddColumn(PingName, 30);
-	MapName	= AddColumn(MapNameName, 100);
+	Ping	= AddColumn(PingName, 50);
+	MapName	= AddColumn(MapNameName, 200);
 	Players	= AddColumn(PlayersName, 50);
 
 	SortByColumn = Ping;
@@ -86,7 +75,8 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 	local int BottomMargin;
 
 	C.Font = Root.Fonts[F_Normal];
-
+	
+	RowHeight = 12*Root.ScaleY;
 
 	List = UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).PingedList;
 
@@ -96,11 +86,11 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 		Count = List.Count();
 
 	if(bShowHorizSB)
-		BottomMargin = LookAndFeel.Size_ScrollbarWidth;
+		BottomMargin = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
 	else
 		BottomMargin = 0;
 
-	TopMargin = LookAndFeel.ColumnHeadingHeight;
+	TopMargin = LookAndFeel.ColumnHeadingHeight*Root.ScaleY;
 
 	Visible = int((WinHeight - (TopMargin + BottomMargin))/RowHeight);
 	
@@ -258,9 +248,9 @@ function JoinServer(UBrowserServerList Server)
 {
 	if(Server != None && Server.GamePort != 0) 
 	{
-		GetPlayerOwner().ClientTravel("unreal://"$Server.IP$":"$Server.GamePort$UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).URLAppend, TRAVEL_Absolute, false);
-		GetParent(class'UWindowFramedWindow').Close();
+		GetPlayerOwner().ClientTravel("unreal://"$Server.IP$":"$Server.GamePort$UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).URLAppend$"?nosave", TRAVEL_Absolute, false);
 		Root.Console.CloseUWindow();
+		GetParent(class'UWindowFramedWindow').Close();
 	}
 }
 

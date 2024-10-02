@@ -10,7 +10,7 @@ var() float					FullDrawScale;		//
 var() float					GrowTime;			//
 var() float					ShrinkTime;			//
 var() float					Strength;			//
-var() vector				Offset;				//
+//var() vector				Offset;				//
 
 
 //****************************************************************************
@@ -47,19 +47,10 @@ auto state Growing
 {
 	simulated function Tick( float DeltaTime )
 	{
-		local vector	X, Y, Z;
-
 		if ( pawn(Owner).Health <= 0 )
 		{
 			Destroy();
 			return;
-		}
-
-		if ( Owner != none )
-		{
-			GetAxes( Owner.Rotation, X, Y, Z );
-			SetLocation( Owner.Location + ( X * Offset.X ) + ( Y * Offset.Y ) + ( Z * Offset.Z ) );
-			SetRotation( Owner.Rotation );
 		}
 
 		if ( DrawScale < FullDrawScale )
@@ -83,8 +74,6 @@ state Holding
 {
 	simulated function Tick( float DeltaTime )
 	{
-		local vector	X, Y, Z;
-
 		super.Tick( DeltaTime );
 
 		if ( pawn(Owner).Health <= 0 )
@@ -92,14 +81,6 @@ state Holding
 			Destroy();
 			return;
 		}
-
-		if ( Owner != none )
-		{
-			GetAxes( Owner.Rotation, X, Y, Z );
-			SetLocation( Owner.Location + ( X * Offset.X ) + ( Y * Offset.Y ) + ( Z * Offset.Z ) );
-			SetRotation( Owner.Rotation );
-		}
-
 	}
 
 } // state Holding
@@ -109,19 +90,10 @@ state Shrinking
 {
 	simulated function Tick( float DeltaTime )
 	{
-		local vector	X, Y, Z;
-
 		if ( pawn(Owner).Health <= 0 )
 		{
 			Destroy();
 			return;
-		}
-
-		if ( Owner != none )
-		{
-			GetAxes( Owner.Rotation, X, Y, Z );
-			SetLocation( Owner.Location + ( X * Offset.X ) + ( Y * Offset.Y ) + ( Z * Offset.Z ) );
-			SetRotation( Owner.Rotation );
 		}
 
 		if ( DrawScale > 0.05 )
@@ -155,4 +127,7 @@ defaultproperties
      DrawType=DT_Mesh
      Style=STY_Translucent
      Mesh=SkelMesh'Aeons.Meshes.Shield3rd_m'
+     bTrailerSameRotation=True
+     bTrailerPrePivot=True
+     Physics=PHYS_Trailer
 }

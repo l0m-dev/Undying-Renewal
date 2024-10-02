@@ -77,17 +77,20 @@ state Dropping
 		Destroy();
 	}
 	
-	/* simulated */ function BeginState()
+	simulated function BeginState()
 	{
 		setPhysics(PHYS_Falling);
 		Velocity = vect(0,0,-1);
-		Fire = spawn(class 'FireDripFX',,,Location, Rotation);
-		Fire.MakeDynamic();
-		Fire.setBase(self);
-		//Fire.Lifespan=10;
-		Smoke = spawn(class 'FireSmokeFXDrip',Fire,,Location, Rotation);
-		Smoke.setBase(self);
-		//Smoke.Lifespan=10;
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			Fire = spawn(class 'FireDripFX',,,Location, Rotation);
+			Fire.MakeDynamic();
+			Fire.setBase(self);
+			//Fire.Lifespan=10;
+			Smoke = spawn(class 'FireSmokeFXDrip',Fire,,Location, Rotation);
+			Smoke.setBase(self);
+			//Smoke.Lifespan=10;
+		}
 	}
 
 //	Begin:
@@ -102,9 +105,12 @@ state Flying
 {
 	simulated function splash()
 	{
-		Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
-		Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
-		Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
+			Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
+			Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		}
 		Destroy();
 	}
 
@@ -131,18 +137,21 @@ state Flying
 		Velocity = Vector(Rotation) * speed;
 
 		// create and attach the particle system
-		Fire = spawn(class 'FireFX',,,Location, Rotation);
-		Fire.setBase(self);
-		Fire.MakeDynamic();
-		if (!bMakesSound)
-			Fire.AmbientSound = none;
-		
-		Smoke = spawn(class 'FireSmokeFXMedium',Fire,,Location, Rotation);
-		Smoke.setBase(self);
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			Fire = spawn(class 'FireFX',,,Location, Rotation);
+			Fire.setBase(self);
+			Fire.MakeDynamic();
+			if (!bMakesSound)
+				Fire.AmbientSound = none;
+			
+			Smoke = spawn(class 'FireSmokeFXMedium',Fire,,Location, Rotation);
+			Smoke.setBase(self);
 
-		Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
-		Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
-		Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+			Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
+			Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
+			Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		}
 	}
 
 //	Begin:
@@ -158,7 +167,8 @@ state Extinguish
 	simulated function BeginState()
 	{
 		SetPhysics(PHYS_None);
-		Fire.bShuttingDown = true;
+		if (Level.NetMode != NM_DedicatedServer)
+			Fire.Shutdown();
 		Destroy();
 	}
 
@@ -183,24 +193,30 @@ state Idle
 	{
 		// setRotation(Rotator(HitNormal));
 		WallDecal(Location, HitNormal);
-		Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
-		Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
-		Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
+			Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
+			Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		}
 		Destroy();
 	}
 
 	simulated function BeginState()
 	{
-		Fire = spawn(class 'FireFX',Pawn(Owner),,Location, Rotation);
-		Fire.setBase(self);
+		if (Level.NetMode != NM_DedicatedServer)
+		{
+			Fire = spawn(class 'FireFX',Pawn(Owner),,Location, Rotation);
+			Fire.setBase(self);
 
-		Fire.MakeDynamic();
-		Smoke = spawn(class 'FireSmokeFXMedium',Fire,,Location, Rotation);
-		Smoke.setBase(self);
+			Fire.MakeDynamic();
+			Smoke = spawn(class 'FireSmokeFXMedium',Fire,,Location, Rotation);
+			Smoke.setBase(self);
 
-		Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
-		Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
-		Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+			Fire.SourceDepth.Base = Fire.default.SourceDepth.Base * 4;
+			Fire.SourceWidth.Base = Fire.default.SourceWidth.Base * 4;
+			Fire.SourceHeight.Base = Fire.default.SourceHeight.Base * 4;
+		}
 	
 		setTimer(3 + (FRand() * 2), false);
 	}

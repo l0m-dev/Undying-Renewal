@@ -10,11 +10,38 @@ var() 	Texture 	NewTexture;
 var 	Texture 	Saved;
 var 	bool		bBase;
 
-function PreBeginPlay()
+var Texture AnimCurrent;
+var Texture OldAnimCurrent;
+
+replication
+{
+	unreliable if( Role==ROLE_Authority )
+		AnimCurrent;
+}
+
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	bBase = true;
 	Saved = BaseTexture;
+
+	AnimCurrent = BaseTexture.AnimCurrent;
+	OldAnimCurrent = AnimCurrent;
+
+	if (Level.NetMode != NM_Client)
+		Disable('Tick');
+}
+
+simulated function Tick(float DeltaTime)
+{
+	if (AnimCurrent != OldAnimCurrent)
+	{
+		BaseTexture.AnimCurrent = AnimCurrent;
+		if ( BaseTexture.AnimCurrent.AnimNext == None )
+			BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
+
+		OldAnimCurrent = AnimCurrent;
+	}
 }
 
 function Trigger(Actor Other, Pawn Instigator)
@@ -34,6 +61,8 @@ function Trigger(Actor Other, Pawn Instigator)
 			BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
 		bBase = true;
 	}
+	AnimCurrent = BaseTexture.AnimCurrent;
+	OldAnimCurrent = AnimCurrent;
 }
 
 function StartLevel()
@@ -42,6 +71,9 @@ function StartLevel()
 		BaseTexture.AnimCurrent = Saved;
 	else
 		BaseTexture.AnimCurrent = NewTexture;
+
+	AnimCurrent = BaseTexture.AnimCurrent;
+	OldAnimCurrent = AnimCurrent;
 
 	if( BaseTexture.AnimCurrent.AnimNext == None )
 		BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
@@ -52,4 +84,8 @@ function StartLevel()
 defaultproperties
 {
      Texture=Texture'Aeons.System.ToggleTexture'
+     RemoteRole=ROLE_SimulatedProxy
+     bAlwaysRelevant=True
+     NetUpdateFrequency=2
+     bNoDelete=True
 }

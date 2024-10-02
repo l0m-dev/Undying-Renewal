@@ -27,6 +27,11 @@ function ReceiveLocalizedMessage( class<LocalMessage> Message, optional int Swit
 	RepReceiveLocalizedMessage( Message, Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject );
 }
 
+function ChatMessage( PlayerReplicationInfo PRI, coerce string S, name Type, optional color Color )
+{
+	RepChatMessage( PRI, S, Type, Color );
+}
+
 //==== Called during demo playback ============================================
 
 simulated function Tick(float Delta)
@@ -99,10 +104,16 @@ simulated function RepReceiveLocalizedMessage( class<LocalMessage> Message, opti
 		PlaybackActor.ReceiveLocalizedMessage( Message, Switch, RelatedPRI_1, RelatedPRI_2, OptionalObject );
 }
 
+simulated function RepChatMessage( PlayerReplicationInfo PRI, coerce string S, name Type, optional color Color )
+{
+	if(PlaybackActor != None && PlaybackActor.Role == ROLE_Authority)
+		PlaybackActor.ChatMessage( PRI, S, Type, Color );
+}
+
 replication
 {
 	reliable if ( bDemoRecording )
-		RepClientMessage, RepTeamMessage, RepClientVoiceMessage, RepReceiveLocalizedMessage;
+		RepClientMessage, RepTeamMessage, RepClientVoiceMessage, RepReceiveLocalizedMessage, RepChatMessage;
 }
 
 defaultproperties

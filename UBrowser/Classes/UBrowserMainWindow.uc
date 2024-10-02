@@ -25,26 +25,20 @@ function BeginPlay()
 function WindowShown()
 {
 	Super.WindowShown();
-	//if(WinLeft < 0 || WinTop < 16 || WinLeft + WinWidth > Root.WinWidth || WinTop + WinHeight > Root.WinHeight)
-	//	SetSizePos();
+	if(WinLeft < 0 || WinTop < 16 || WinLeft + WinWidth > Root.WinWidth || WinTop + WinHeight > Root.WinHeight)
+		SetSizePos();
 }
 
 function Created()
 {
-	bSizable = False;
+	bSizable = True;
 	bStatusBar = True;
-	bMovable = False;
-	bAlwaysOnTop = True;
-	
+
 	Super.Created();
 
-	//MinWinWidth = WinWidth;
+	MinWinWidth = 300;
 
-	//SetSizePos();
-	
-	//Super.Resized();
-	
-	//SetSize(WinWidth, WinHeight);
+	SetSizePos();
 }
 
 function BeforePaint(Canvas C, float X, float Y)
@@ -63,13 +57,6 @@ function Close(optional bool bByParent)
 		Super.Close(bByParent);
 }
 
-function Resized()
-{
-	Super.Resized();
-	
-	SetSizePos();
-}
-
 function ResolutionChanged(float W, float H)
 {
 	SetSizePos();
@@ -78,7 +65,6 @@ function ResolutionChanged(float W, float H)
 
 function SetSizePos()
 {
-	/*
 	if(Root.WinHeight < 400)
 		SetSize(Min(620, Root.WinWidth - 10), Root.WinHeight-32);
 	else
@@ -88,11 +74,6 @@ function SetSizePos()
 	WinTop = Int((Root.WinHeight - WinHeight) / 2);
 
 	MinWinHeight = Min(300, WinHeight - 20);
-	*/
-
-	WinLeft = 0;
-	WinTop = 0;
-	SetSize(Root.WinWidth, Root.WinHeight);
 }
 
 // External entry points
@@ -130,5 +111,5 @@ function SelectLAN()
 
 defaultproperties
 {
-     WindowTitleString="Undying Server Browser"
+     WindowTitleString="Unreal Server Browser"
 }

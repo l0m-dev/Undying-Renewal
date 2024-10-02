@@ -136,6 +136,8 @@ exec function PrevItem()
 
 exec function Fire( optional float F )
 {
+	if (Role < ROLE_Authority)
+		return;
 	ViewPlayerNum(-1);
 	bBehindView = bChaseCam;
 	if ( ViewTarget == None )

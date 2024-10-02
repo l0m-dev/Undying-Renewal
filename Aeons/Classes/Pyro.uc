@@ -32,7 +32,7 @@ state NormalFire
 		CastPyro();
 		FinishAnim();
 		sleep(RefireRate);
-		PawnOwner.bFireAttSpell = 0;
+		//PawnOwner.bFireAttSpell = 0;
 		Finish();
 }
 
@@ -52,4 +52,5 @@ defaultproperties
      PlayerViewMesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
+     bContinuousFire=False
 }

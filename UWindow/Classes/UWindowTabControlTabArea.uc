@@ -23,7 +23,7 @@ function SizeTabsSingleLine(Canvas C)
 	local float ItemX, W, H;
 	local bool bHaveMore;
 
-	ItemX = LookAndFeel.Size_TabXOffset;
+	ItemX = LookAndFeel.Size_TabXOffset*Root.ScaleY;
 	TabCount=0;
 	for( 
 			I = UWindowTabControlItem(UWindowTabControl(ParentWindow).Items.Next);
@@ -43,7 +43,7 @@ function SizeTabsSingleLine(Canvas C)
 	
 	while(True)
 	{
-		ItemX = LookAndFeel.Size_TabXOffset;
+		ItemX = LookAndFeel.Size_TabXOffset*Root.ScaleY;
 		Count = 0;
 		LastHidden = None;
 		FirstShown = None;
@@ -306,7 +306,7 @@ function DrawItem(Canvas C, UWindowList Item, float X, float Y, float W, float H
 
 function bool CheckMousePassThrough(float X, float Y)
 {
-	return Y >= LookAndFeel.Size_TabAreaHeight*TabRows;
+	return Y >= LookAndFeel.Size_TabAreaHeight*Root.ScaleY*TabRows;
 }
 
 defaultproperties

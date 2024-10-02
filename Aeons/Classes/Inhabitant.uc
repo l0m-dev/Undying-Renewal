@@ -95,7 +95,10 @@ var float					IdleDelay;			//
 //****************************************************************************
 function PlayNearAttack()
 {
-	PlayAnim( 'attack2' );
+	if (RGC())
+		PlayAnim( 'attack2', 2.0 );
+	else
+		PlayAnim( 'attack2' );
 }
 
 function PlayFarAttack()
@@ -151,9 +154,10 @@ function PreBeginPlay()
 	{
 		FollowDistance = 310;
 		GreetDistance = 80;
-		MeleeInfo[0].Damage = 35;
-		DamageRadius = 70;
+		MeleeInfo[0].Damage = 25;
+		DamageRadius = 95;
 		MeleeRange = 70;
+		WeaponAccuracy = 1.0;
 	}
 	super.PreBeginPlay();
 	if ( SPMindshatter(RangedWeapon) != none )
@@ -391,6 +395,38 @@ INHABSTART:
 
 
 //****************************************************************************
+// AINearAttack
+// attack near enemy (melee)
+//****************************************************************************
+state AINearAttack
+{
+	// *** overridden functions ***
+	function bool MoveInAttack()
+	{
+		if (RGC())
+			return true;
+		return Super.MoveInAttack();
+	}
+
+	function PostAttack()
+	{
+		if (RGC() && bDidMeleeDamage)
+		{
+			PushState( 'AIAttack', 'BEGIN' );
+			GotoState( 'AIQuickTaunt' );
+		}
+		else
+		{
+			super.PostAttack();
+		}
+	}
+
+	// *** new (state only) functions ***
+
+} // state AINearAttack
+
+
+//****************************************************************************
 // Def props.
 //****************************************************************************
 
@@ -426,4 +462,6 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Inhabitant_m'
      CollisionRadius=20
      CollisionHeight=38
+     MenuName="Inhabitant"
+     CreatureDeathVerb="warped"
 }

@@ -27,7 +27,7 @@ simulated function Timer()
 simulated function Destroyed()
 {
 	if ( pFX != None )
-		pFX.bShuttingDown = true;
+		pFX.Shutdown();
 }
 
 simulated function Tick(float deltaTime)

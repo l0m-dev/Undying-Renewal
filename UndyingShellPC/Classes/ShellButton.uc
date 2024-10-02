@@ -26,9 +26,41 @@ var float key_interval;
 var bool bSentClick;
 var bool bIgnoreNextClick;
 
+var bool bScrollingText;
+var float ScrollingOffsetX, MaxScrollX, ScrollDir, ScrollDelay;
+
+var bool bDrawShadow;
+var float ShadowOffset;
+
+const SCROLL_SPEED = 40.0f;
+const SCROLL_DELAY = 2.0f;
+
 function Created()
 {
 	Super.Created();
+
+	ResetScroll();
+}
+
+function ResetScroll()
+{
+	ScrollingOffsetX = 0;
+	ScrollDir = 1.0;
+	ScrollDelay = SCROLL_DELAY;
+}
+
+function SetText(string NewText)
+{
+	Super.SetText(NewText);
+
+	ResetScroll();
+}
+
+function ManagerResized(float ScaleX, float ScaleY)
+{
+	Super.ManagerResized(ScaleX, ScaleY);
+	
+	ResetScroll();
 }
 
 function Paint(Canvas C, float X, float Y)
@@ -37,15 +69,41 @@ function Paint(Canvas C, float X, float Y)
 	local int SaveStyle;
 	local float OrgX, OrgY, ClipX, ClipY;
 	local float W,H;
+	local float ScaledShadowOffset;
 
 	C.Font = Root.Fonts[Font];
+
+	SaveStyle = C.Style;
+
+	// shadow
+	if ( false && bDrawShadow && Style == 5 && UpTexture != None )
+	{
+		ScaledShadowOffset = ShadowOffset*Root.ScaleY;
+
+		C.Style = 5;
+		C.DrawColor.r = 0;
+		C.DrawColor.g = 0;
+		C.DrawColor.b = 0;
+		C.DrawColor.a = 100;
+		//C.bNoSmooth = false;
+
+		C.OrgX += ScaledShadowOffset;
+		C.OrgY += ScaledShadowOffset;
+		DrawStretchedTextureSegment( C, 0, 0, WinWidth, WinHeight, TexCoords.X, TexCoords.Y, TexCoords.W, TexCoords.H, UpTexture );
+		C.OrgX -= ScaledShadowOffset;
+		C.OrgY -= ScaledShadowOffset;
+
+		C.Style = SaveStyle;
+		C.DrawColor.r = 255;
+		C.DrawColor.g = 255;
+		C.DrawColor.b = 255;
+	}
 
 	if ( Style == 5 ) 
 	{
 		C.Style = 5;
 		C.DrawColor.a = 255;
 	}
-
 
 	if(bDisabled)
 	{
@@ -87,6 +145,8 @@ function Paint(Canvas C, float X, float Y)
 
 	TextSize(C, Text, W, H);
 
+	bScrollingText = (W >= WinWidth);
+
 	TextY = (WinHeight - H) / 2;
 	switch (Align)
 	{
@@ -101,7 +161,12 @@ function Paint(Canvas C, float X, float Y)
 			break;
 	}	
 
-
+	if (bScrollingText)
+	{
+		MaxScrollX = W - WinWidth;
+		TextX = -ScrollingOffsetX;
+	}
+	
 	if(Text != "")
 	{
 		//Log("ShellButton: Paint: Text=" $ Text $ " TextX=" $ TextX $ " TextY=" $ TextY $ " Align=" $ Align);
@@ -129,6 +194,29 @@ function Tick(float Delta)
 			time_count -= key_interval;
 			Click(0,0);
 			bSentClick = True;
+		}
+	}
+	if ( bScrollingText )
+	{
+		if ( ScrollDelay > 0 )
+		{
+			ScrollDelay -= Delta;
+		}
+		else
+		{
+			ScrollingOffsetX = ScrollingOffsetX + SCROLL_SPEED*Root.ScaleY*Delta*ScrollDir;
+			if ( ScrollingOffsetX > MaxScrollX )
+			{
+				ScrollingOffsetX = MaxScrollX;
+				ScrollDir = -1;
+				ScrollDelay = SCROLL_DELAY;
+			}
+			else if ( ScrollingOffsetX < 0 )
+			{
+				ScrollingOffsetX = 0;
+				ScrollDir = 1;
+				ScrollDelay = SCROLL_DELAY;
+			}
 		}
 	}
 }
@@ -223,4 +311,5 @@ defaultproperties
      bIgnoreLDoubleClick=True
      bIgnoreMDoubleClick=True
      bIgnoreRDoubleClick=True
+     ShadowOffset=5
 }

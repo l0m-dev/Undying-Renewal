@@ -51,7 +51,7 @@ var transient bool		  bIsRenderable;	// Flag is true if the actor can be rendere
 var transient bool        bLightChanged; // Recalculate this light's lighting now.
 var bool                  bDynamicLight; // Temporarily treat this as a dynamic light.
 var bool			bTimerLoop;		// Timer loops (else is one-shot).
-var bool				  bSpawned;		 // Whether this actor was spawned in this level or not
+var bool				  bSpawned;		 // Whether this actor was spawned in this level or not, valid after StartLevel
 
 // Other flags.
 var(Advanced) bool        bCanTeleport;  // This actor can be teleported.
@@ -566,7 +566,7 @@ var(Lighting) enum ELightSource
 
 // Options.
 var(Movement) bool        bBounce;           // Bounces when hits ground fast.
-var(Movement) bool		  bFixedRotationDir; // Fixed direction of rotation.
+var(Movement) bool		  bFixedRotationDir; // Fixed direction of rotation. Always true (ignored) in original.
 var(Movement) bool		  bRotateToDesired;  // Rotate to DesiredRotation.
 var           bool        bInterpolating;    // Performing interpolating.
 var			  const bool  bJustTeleported;   // Used by engine physics - not valid for scripts.
@@ -574,7 +574,7 @@ var			  const bool  bJustTeleported;   // Used by engine physics - not valid for
 // Physics properties.
 var(Movement) float       Mass;            // Mass of this actor.
 var   float       PhysAlpha;       // Interpolating position, 0.0-1.0.
-var   float       PhysRate;        // Interpolation rate per second. Used in renewal to scale turn animation speed.
+var   float       PhysRate;        // Interpolation rate per second.
 
 //-----------------------------------------------------------------------------
 // Networking.
@@ -599,7 +599,8 @@ var const bool bClientDemoNetFunc;// True if we're client-side demo recording an
 var bool bShowDebugInfo;
 
 // Hit location information
-var int LastJointHit;			// last joint hit by Trace
+//var int LastJointHit;			// last joint hit by Trace
+var int FREE_VARIABLE; // not used by unrealscript anymore, maybe used in c++
 
 //-----------------------------------------------------------------------------
 // Enums.
@@ -756,7 +757,7 @@ replication
 	unreliable if( RemoteRole==ROLE_SimulatedProxy && Physics==PHYS_Rotating && bNetInitial )
 		bFixedRotationDir, bRotateToDesired;
 	unreliable if( RemoteRole==ROLE_SimulatedProxy && Physics==PHYS_Rotating && bNetInitial )
-		RotationRate, DesiredRotation;
+		RotationRate, DesiredRotation; // these are replicated only for AVisible, they are mistakenly in AVisible::GetOptimizedRepList
 
 	// Rendering.
 	unreliable if( Role==ROLE_Authority )
@@ -783,6 +784,10 @@ replication
 	// Messages
 	reliable if( Role<ROLE_Authority )
 		BroadcastMessage, BroadcastLocalizedMessage;
+
+	// Limbs
+	unreliable if( Role==ROLE_Authority )
+		ClientDetachLimb, ClientDestroyLimb;
 }
 
 //=============================================================================
@@ -839,11 +844,11 @@ native(415) final function vector StaticJointDir( name BodyLoc, vector Dir );
 native(416) final function int JointParent( int iJoint );
 
 // Animation functions.
-native(259) exec final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
-native(274) exec final function int PlayAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags );
-native(260) exec final function bool LoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
-native(294) exec final function bool TweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys );
-final function ClearAnims()
+native(259) final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move /* MOVE_Anim */, optional ECombine combine /* COMBINE_Replace */, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
+native(274) final function int PlayAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags );
+native(260) final function bool LoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
+native(294) final function bool TweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys );
+simulated final function ClearAnims()
 {
 	PlayAnim('');
 }
@@ -882,16 +887,82 @@ native(426) final function AddDynamic ( name JointName, optional vector Loc, opt
 // Other skeletal functions.
 
 // Destroy the limb of a skeletal actor.
-native(409) exec final function DestroyLimb( name BodyLoc );
+native(409) final function DestroyLimbNative( name BodyLoc );
 
 // Remove the limb of a skeletal actor, creating new object from it.
-native(410) exec final function actor DetachLimb( name BodyLoc, class<actor> SpawnClass );
+native(410) final function actor DetachLimbNative( name BodyLoc, class<actor> SpawnClass );
 
 // Applies some sort of modification to an actor.
-native(421) exec final function ApplyMod( name JointName, class<modifier> Mod );
+native(421) final function ApplyMod( name JointName, class<modifier> Mod );
 
 // Disable collision on a limb or limb tree.
-native(417) exec final function SetLimbTangible( name Joint, bool tangible, optional bool all );
+native(417) final function SetLimbTangible( name Joint, bool tangible, optional bool all );
+
+// there is no way to reset the limbs when the player respawns so just disable gibbing players
+simulated final function DestroyLimb( name BodyLoc )
+{
+	if (Level.NetMode == NM_Standalone || !IsA('PlayerPawn'))
+	{
+		DestroyLimbNative(BodyLoc);
+	}
+}
+
+simulated final function actor DetachLimb( name BodyLoc, class<actor> SpawnClass )
+{
+	if (Level.NetMode == NM_Standalone || !IsA('PlayerPawn'))
+	{
+		return DetachLimbNative(BodyLoc, SpawnClass);
+	}
+
+	return None;
+}
+
+function ReplicateDetachLimb(Actor A, Name JointName, Vector Velocity, Rotator DesiredRotation)
+{
+	local Pawn P;
+
+	if ( Role < ROLE_Authority )
+		return;
+
+	for( P=Level.PawnList; P!=None; P=P.nextPawn )
+		if( P.bIsPlayer && P.RemoteRole == ROLE_AutonomousProxy )
+		{
+			P.ClientDetachLimb(A, JointName, Velocity, DesiredRotation);
+		}
+}
+
+simulated function ClientDetachLimb(Actor DetachActor, Name JointName, Vector Velocity, Rotator DesiredRotation)
+{
+	local Actor B;
+	if (DetachActor == None)
+		return;
+	B = DetachActor.DetachLimb(JointName, Class 'BodyPart');
+	B.Velocity = Velocity;
+	B.DesiredRotation = DesiredRotation;
+	B.bBounce = true;
+	B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+}
+
+function ReplicateDestroyLimb(Actor A, Name BodyLoc)
+{
+	local Pawn P;
+
+	if ( Role < ROLE_Authority )
+		return;
+
+	for( P=Level.PawnList; P!=None; P=P.nextPawn )
+		if( P.bIsPlayer && P.RemoteRole == ROLE_AutonomousProxy )
+		{
+			P.ClientDestroyLimb(A, BodyLoc);
+		}
+}
+
+simulated function ClientDestroyLimb(Actor DestroyActor, Name BodyLoc)
+{
+	if (DestroyActor == None)
+		return;
+	 DestroyActor.DestroyLimb(BodyLoc);
+}
 
 
 // Skeletal animation linkup.
@@ -949,7 +1020,7 @@ event InterpolateEnd( actor Other );
 // Shadow support
 event Actor HeldPropRequest(int idx);
 
-event FellOutOfWorld()
+simulated event FellOutOfWorld()
 {
 	SetPhysics(PHYS_None);
 	Destroy();
@@ -1097,7 +1168,7 @@ native simulated event DemoPlaySound
 );
 
 // Get a sound duration.
-native final function float GetSoundDuration( sound Sound );
+native simulated final function float GetSoundDuration( sound Sound );
 
 native(402) final latent function FinishSound
 (
@@ -1116,7 +1187,7 @@ native(400) final function PlayImpactSound
 	optional float Pitch 
 );
 
-function Dust(vector HitLocation, vector HitNormal, Texture T, float StrengthMultiplier)
+simulated function Dust(vector HitLocation, vector HitNormal, Texture T, float StrengthMultiplier)
 {
 	local Actor A;
 	local class<ParticleFX> ParticleClass;
@@ -1208,6 +1279,7 @@ function int PlayActuator(PlayerPawn PPawn, int Effect, optional float Duration,
 
 	if ( PPawn.bVibrateOn )
 	{
+		// test PPawn.ShakeView(Duration, 300*Intensity, 5*Intensity);
 		switch (Effect)
 		{
 			case EActEffects.ACTFX_FadeIn:
@@ -1239,7 +1311,7 @@ function int PlayActuator(PlayerPawn PPawn, int Effect, optional float Duration,
 	}
 	else
 	{
-		Log("Vibrate called, but user disabled it!");
+		//Log("Vibrate called, but user disabled it!");
 	}
 
 	return retVal;
@@ -1335,6 +1407,12 @@ event BroadcastMessage( coerce string Msg, optional bool bBeep, optional name Ty
 {
 	local Pawn P;
 
+	Msg = Trim(Left(Msg, Min(Len(Msg), 64)));
+	if ( Msg == "" )
+	{
+		return;
+	}
+
 	if (Type == '')
 		Type = 'Event';
 
@@ -1345,9 +1423,9 @@ event BroadcastMessage( coerce string Msg, optional bool bBeep, optional name Ty
 				if ( (Level.Game != None) && (Level.Game.MessageMutator != None) )
 				{
 					if ( Level.Game.MessageMutator.MutatorBroadcastMessage(Self, P, Msg, bBeep, Type) )
-						P.ClientMessage( Msg, Type, bBeep );
+						P.ChatMessage( None, Msg, Type );
 				} else
-					P.ClientMessage( Msg, Type, bBeep );
+					P.ChatMessage( None, Msg, Type );
 			}
 }
 
@@ -1539,23 +1617,23 @@ static function SetMultiSkin( playerpawn SkinActor, string SkinName, string Face
 // Note! the first arg, dir, needs to be pointing away from the surface
 // you are reflecting off - this is particularly true with projectile velocity
 // vectors - just pass in the negative normalized velocity vector
-function vector reflect(vector dir, vector N)
+simulated final function vector reflect(vector dir, vector N)
 {
 	return Normal(( 2 * (dir dot N) * N) - dir);
 }
 
 // Debug.
-function String GetDebugInfo()
+simulated function String GetDebugInfo()
 {
 	return "";
 }
 
-function String GetDebugInfo2()
+simulated function String GetDebugInfo2()
 {
 	return "";
 }
 
-function String GetDebugInfo3()
+simulated function String GetDebugInfo3()
 {
 	return "";
 }
@@ -1634,13 +1712,43 @@ function int GetHexDigit(string D)
 	return 0;
 }
 
-function RenewalConfig GetRenewalConfig()
+simulated final function Actor GetTopOwner()
 {
-	return Level.Game.GetRenewalConfig();
+	local Actor Top;
+	for ( Top=self; Top.Owner != None; Top=Top.Owner );
+	return Top;
 }
+
+static simulated final function TearOff(actor A)
+{
+	if (A != None)
+		A.RemoteRole = ROLE_None;
+}
+
+simulated final function bool IsLocalActor()
+{
+	local PlayerPawn Top;
+	Top = PlayerPawn(GetTopOwner());
+
+	if (Top != None && ViewPort(Top.Player) != None)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+simulated function RenewalConfig GetRenewalConfig()
+{
+	return Level.GetRenewalConfig();
+} 
 
 function bool RGC()
 {
+	if (Level.NetMode != NM_Standalone)
+	{
+		return true;
+	}
 	return GetRenewalConfig().bGameplayChanges;
 }
 

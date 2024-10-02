@@ -720,4 +720,6 @@ defaultproperties
      CollisionRadius=18
      CollisionHeight=60
      bHackable=False
+     MenuName="Decayed Saint"
+     CreatureDeathVerb="bludgeoned"
 }

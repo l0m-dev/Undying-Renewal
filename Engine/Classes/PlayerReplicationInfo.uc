@@ -77,5 +77,5 @@ function Timer()
 defaultproperties
 {
      Team=255
-     NetUpdateFrequency=2
+     NetUpdateFrequency=1
 }

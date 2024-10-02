@@ -35,10 +35,10 @@ function PreBeginPlay()
 	} else {
 		AddParticle(1, Owner.Location);
 	}
-	bShuttingDown = true;
+	Shutdown();
 }
 
-function RenderOverlays(Canvas Canvas)
+simulated function RenderOverlays(Canvas Canvas)
 {
 	local int i;
 	

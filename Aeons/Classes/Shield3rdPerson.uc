@@ -7,13 +7,14 @@ class Shield3rdPerson expands PlayerEffects;
 
 simulated function PreBeginPlay()
 {
+	PrePivot.X = 10.0;
 	DrawScale = 0;
 	super.PreBeginPlay();
 }
 
 simulated function Tick(float deltaTime)
 {
-	setRotation(Pawn(Owner).Rotation);
+	//setRotation(Pawn(Owner).Rotation);
 
 	if (DrawScale < default.DrawScale)
 		drawScale += 0.1;
@@ -26,7 +27,7 @@ state Holding
 {
 	simulated function Tick(float deltaTime)
 	{
-		setRotation(Pawn(Owner).Rotation);
+		//setRotation(Pawn(Owner).Rotation);
 
 		if ( Pawn(Owner).Health <= 0 ) 
 			Destroy();
@@ -43,4 +44,8 @@ defaultproperties
      Style=STY_Translucent
      Mesh=SkelMesh'Aeons.Meshes.Shield3rd_m'
      DrawScale=1.35
+     bNetTemporary=False
+     bTrailerSameRotation=True
+     bTrailerPrePivot=True
+     Physics=PHYS_Trailer
 }

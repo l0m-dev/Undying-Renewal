@@ -20,13 +20,14 @@ var int NumMeshes;
 var int CurrentMesh;
 var vector	ViewOffset;
 var rotator ViewRotator;
-var MeshActor Model;
 
 var ShellButton Back;
 var ShellButton FaceButton;
 var ShellTextBox TextBox;
 
-var localized string FaceText, BodyText;
+var ShellLabel NameLabel;
+
+var localized string NameText, FaceText, BodyText;
 
 var int		SmokingWindows[2];
 var float	SmokingTimers[2];
@@ -34,6 +35,20 @@ var float	SmokingTimers[2];
 //var actor SoundEmitter;
 
 var bool bFace;
+
+struct PlayerMeshInfo
+{
+	var() string Mesh;
+	var() name Sequence;
+};
+
+var() PlayerMeshInfo PlayerMeshes[13];
+
+var ShellButton		CrosshairLeft;
+var ShellButton		CrosshairRight;
+
+var PlayerMeshClient MeshWindow;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -54,13 +69,10 @@ function Created()
 	PlayCount = 3 ; 
 
 // 3D Model view
-	Model = GetEntryLevel().Spawn(class'MeshActor', GetEntryLevel());
-//	Model = GetPlayerOwner().Spawn(class'MeshActor', GetEntryLevel());
-	Model.Mesh = GetPlayerOwner().Mesh;
-	Model.Skin = GetPlayerOwner().Skin;
-	Model.NotifyClient = Self;
-	SetMesh(Model.Mesh);
-
+	MeshWindow = PlayerMeshClient(CreateWindow(class'PlayerMeshClient', 420*RootScaleX, 130*RootScaleY, 256*RootScaleY, 256*RootScaleY));
+	MeshWindow.SetNotifyClient(self);
+	MeshWindow.SetMesh(GetPlayerOwner().Mesh);
+	MeshWindow.SetSkin(GetPlayerOwner().Skin);
 
 // Back Button
 	Back = ShellButton(CreateWindow(class'ShellButton', 48*RootScaleX, 500*RootScaleY, 160*RootScaleX, 64*RootScaleY));
@@ -78,6 +90,7 @@ function Created()
 	Back.DownTexture = texture'sload_cancel_dn';
 	Back.OverTexture = texture'sload_cancel_ov';
 	
+	/*
 	FaceButton = ShellButton(CreateWindow(class'ShellButton', 60*RootScaleX, 350*RootScaleY, 160*RootScaleX, 40*RootScaleY));
 	
 	FaceButton.TexCoords = NewRegion(0,0,160,40);
@@ -85,7 +98,7 @@ function Created()
 	
 	FaceButton.Manager = Self;
 	FaceButton.Style = 5;
-	FaceButton.Text = FaceText;
+	FaceButton.Text = BodyText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -98,12 +111,25 @@ function Created()
 	FaceButton.DownTexture =		texture'Video_resol_up';
 	FaceButton.OverTexture =		texture'Video_resol_ov';
 	FaceButton.DisabledTexture =	None;
+	*/
+
+	NameLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+
+	NameLabel.Template=NewRegion(50, 132, 158, 38);
+	NameLabel.Manager = Self;
+	NameLabel.Text = NameText;
+	TextColor.R = 251;
+	TextColor.G = 231;
+	TextColor.B = 118;
+	NameLabel.SetTextColor(TextColor);
+	NameLabel.Align = TA_Center;
+	NameLabel.Font = 4;
 	
 	TextBox = ShellTextBox(CreateWindow(class'ShellTextBox', 48*RootScaleX, 130*RootScaleY, 160*RootScaleX, 128*RootScaleY));
 
 	//TextBox.TexCoords = NewRegion(0,0,160,128);
 	TextBox.Template = NewRegion(48,130,160,128);
-	TextBox.Font = 2;
+	TextBox.Font = 1;
 	TextBox.Value = GetPlayerOwner().PlayerReplicationInfo.PlayerName;
 	TextBox.CaretOffset = Len(TextBox.Value);
 
@@ -117,6 +143,40 @@ function Created()
 	SoundEmitter.SoundPitch=48;
 	SoundEmitter.SOundRadius=255;
 	*/
+
+	CrosshairLeft =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+	CrosshairRight =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
+
+	CrosshairLeft.Style = 5;
+	CrosshairRight.Style = 5;
+
+	CrosshairLeft.Template =	NewRegion(400, 406, 88, 51);
+	CrosshairRight.Template = NewRegion(635, 395, 88, 51);
+
+	CrosshairLeft.TexCoords = NewRegion(0,0,88,51);
+	CrosshairRight.TexCoords = NewRegion(0,0,88,51);
+
+	CrosshairLeft.bRepeat = True;
+	CrosshairRight.bRepeat = True;
+
+	CrosshairLeft.key_interval = 0.08;
+	CrosshairRight.key_interval = 0.08;
+
+	
+
+	CrosshairLeft.Manager = Self;
+
+	CrosshairRight.Manager = Self;
+
+	CrosshairLeft.UpTexture =   texture'Book_Left_Up';
+	CrosshairLeft.DownTexture = texture'Book_Left_Dn';
+	CrosshairLeft.OverTexture = texture'Book_Left_Ov';
+	CrosshairLeft.DisabledTexture = texture'Book_Left_Ds';
+
+	CrosshairRight.UpTexture =   texture'Book_Right_Up';
+	CrosshairRight.DownTexture = texture'Book_Right_Dn';
+	CrosshairRight.OverTexture = texture'Book_Right_Ov';
+	CrosshairRight.DisabledTexture = texture'Book_Right_Ds';
 	
 	Resized();
 }
@@ -132,6 +192,10 @@ function Resized()
 
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
+
+	MeshWindow.SetSize(256*RootScaleY, 256*RootScaleY);
+	MeshWindow.WinLeft = 420*RootScaleX;
+	MeshWindow.WinTop = 130*RootScaleY;
 	
 	if ( FaceButton != None )
 		FaceButton.ManagerResized(RootScaleX, RootScaleY);
@@ -139,8 +203,17 @@ function Resized()
 	if ( TextBox != None )
 		TextBox.ManagerResized(RootScaleX, RootScaleY);
 		
+	if ( NameLabel != None )
+		NameLabel.ManagerResized(RootScaleX, RootScaleY);
+		
 	if ( Back != None )
 		Back.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( CrosshairLeft != None ) 
+		CrosshairLeft.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( CrosshairRight != None ) 
+		CrosshairRight.ManagerResized(RootScaleX, RootScaleY);
 }
 
 //----------------------------------------------------------------------------
@@ -154,10 +227,17 @@ function Message(UWindowWindow B, byte E)
 			switch (B)
 			{
 				case Back:
+					PlayNewScreenSound();
 					Close();
 					break;
 				case FaceButton:
 					FacePressed();
+					break;
+				case CrosshairLeft:
+					ChangeMesh(-1);
+					break;
+				case CrosshairRight:
+					ChangeMesh(1);
 					break;
 			}
 			break;
@@ -186,7 +266,9 @@ function Close(optional bool bByParent)
 {
 	//SoundEmitter.SoundRadius = 0;
 	
-	GetPlayerOwner().ConsoleCommand("name " $ TextBox.Value);
+	//GetPlayerOwner().ConsoleCommand("name " $ TextBox.Value);
+	GetPlayerOwner().ChangeName(TextBox.GetValue());
+	GetPlayerOwner().UpdateURL("Name", TextBox.GetValue(), True);
 
 	HideWindow();
 }
@@ -200,63 +282,19 @@ function Tick(float Delta)
 
 function Paint(Canvas C, float X, float Y) 
 {
-	C.Style = GetPlayerOwner().ERenderStyle.STY_Modulated;
-	DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
 	C.Style = GetPlayerOwner().ERenderStyle.STY_Normal;
 	Super.Paint(C, X, Y);
 	
 	Super.PaintSmoke(C, Back, SmokingWindows[0], SmokingTimers[0]);
-
-	if (Model != None)
-	{
-	    if (bFace)
-			DrawClippedActorFixedFov( C, 30, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset + vect(-40, 0, 0 ));
-		else
-			DrawClippedActorFixedFov( C, 30, WinWidth/5, WinHeight/5, Model, False, ViewRotator, Model.ViewOffset);
-	}
 }
 
 function FacePressed()
 {
 	bFace = !bFace;
 	if (bFace)
-		FaceButton.Text = BodyText;
-	else
 		FaceButton.Text = FaceText;
-}
-
-//----------------------------------------------------------------------------
-
-function SetMesh(mesh NewMesh)
-{
-	Model.bMeshEnviroMap = False;
-	Model.DrawScale = Model.Default.DrawScale;
-	Model.Mesh = NewMesh;
-	if(Model.Mesh != None)
-		Model.PlayAnim('Walk');//, 0.5);
-}
-
-//----------------------------------------------------------------------------
-
-function SetNoAnimMesh(mesh NewMesh)
-{
-	Model.bMeshEnviroMap = False;
-	Model.DrawScale = Model.Default.DrawScale;
-	Model.Mesh = NewMesh;
-}
-
-//----------------------------------------------------------------------------
-
-// function SetMeshString(string NewMesh)
-// {
-	// SetMesh(mesh(DynamicLoadObject(NewMesh, Class'Mesh')));
-// }
-
-//----------------------------------------------------------------------------
-
-function SetNoAnimMeshString(string NewMesh)
-{
-	SetNoAnimMesh(mesh(DynamicLoadObject(NewMesh, Class'Mesh')));
+	else
+		FaceButton.Text = BodyText;
 }
 
 //----------------------------------------------------------------------------
@@ -273,90 +311,29 @@ function AnimEnd(MeshActor MyMesh)
 		MyMesh.TweenAnim('All', 0.4);
 	else
 		MyMesh.PlayAnim('Breath3', 0.4);
-		
-	PlayCount--;
 
-	//switch( int(FRand()*11) )
-	if ( PlayCount >= 0 ) 
+	MyMesh.PlayAnim('Walk');	
+}
+
+function ChangeMesh(int d)
+{
+	CurrentMesh += d;
+	if (CurrentMesh >= ArrayCount(PlayerMeshes))
 	{
-		MyMesh.PlayAnim('Walk');
-		return;
+		CurrentMesh = 0;
 	}
-	else
+	else if (CurrentMesh < 0)
 	{
-		PlayCount = 3;
-		CurrentMesh++;
-
-		if (CurrentMesh >= NumMeshes)
-		{
-			CurrentMesh = 0;
-		}
+		CurrentMesh = ArrayCount(PlayerMeshes) - 1;
 	}
 
-	switch( CurrentMesh )
-	{
-		case 0: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.AaronGhost_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
+	// change mesh
+	MeshWindow.SetMesh(SkelMesh(DynamicLoadObject(PlayerMeshes[CurrentMesh].Mesh, class'SkelMesh')));
+	MeshWindow.MeshActor.PlayAnim(PlayerMeshes[CurrentMesh].Sequence);
 
-		case 1:
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Bethany_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 2: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Ambrose_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 3: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Kiesinger_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 4: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Jemaas_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 5: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Jeremiah_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 6: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.MonkSoldier_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 7: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Drinen_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 8: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Shaman_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 9: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Lizbeth_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 10: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.MonkAbbott_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-		case 11: 
-			MyMesh.Mesh = SkelMesh(DynamicLoadObject("Aeons.Meshes.Evelyn_m", class'SkelMesh'));
-			MyMesh.PlayAnim('Walk');
-			break;
-
-	}
-	//SetMeshString(MyMesh);
+	// apply changes
+	// disabled until proper weapon attachment for other meshes
+	//GetPlayerOwner().UpdateURL("Mesh", string(MeshWindow.MeshActor.Mesh), True);
 }
 
 //----------------------------------------------------------------------------
@@ -364,15 +341,35 @@ function AnimEnd(MeshActor MyMesh)
 function ShowWindow()
 {
 	Super.ShowWindow();
-	AnimEnd(Model);
+	AnimEnd(MeshWindow.MeshActor);
 }
 
 //----------------------------------------------------------------------------
+
+/*
+PlayerMeshes(0)=(Mesh="Aeons.Meshes.Patrick_m",Sequence=Walk)
+PlayerMeshes(1)=(Mesh="Aeons.Meshes.TrsantiBase_m",Sequence=Walk)
+PlayerMeshes(2)=(Mesh="Aeons.Meshes.Shaman_m",Sequence=Walk)
+
+PlayerMeshes(0)=(Mesh="Aeons.Meshes.AaronGhost_m",Sequence=Walk)
+PlayerMeshes(1)=(Mesh="Aeons.Meshes.Bethany_m",Sequence=Walk)
+PlayerMeshes(2)=(Mesh="Aeons.Meshes.Ambrose_m",Sequence=Walk)
+PlayerMeshes(3)=(Mesh="Aeons.Meshes.Kiesinger_m",Sequence=Walk)
+PlayerMeshes(4)=(Mesh="Aeons.Meshes.Jemaas_m",Sequence=Walk)
+PlayerMeshes(5)=(Mesh="Aeons.Meshes.Jeremiah_m",Sequence=Walk)
+PlayerMeshes(6)=(Mesh="Aeons.Meshes.MonkSoldier_m",Sequence=Walk)
+PlayerMeshes(7)=(Mesh="Aeons.Meshes.Drinen_m",Sequence=Walk)
+PlayerMeshes(8)=(Mesh="Aeons.Meshes.Shaman_m",Sequence=Walk)
+PlayerMeshes(9)=(Mesh="Aeons.Meshes.Lizbeth_m",Sequence=Walk)
+PlayerMeshes(10)=(Mesh="Aeons.Meshes.MonkAbbott_m",Sequence=Walk)
+PlayerMeshes(11)=(Mesh="Aeons.Meshes.Evelyn_m",Sequence=Walk)
+*/
 
 defaultproperties
 {
      NumMeshes=12
      ViewRotator=(Yaw=32768)
+     NameText="Name"
      FaceText="Face"
      BodyText="Body"
      BackNames(0)="UndyingShellPC.PSetup_0"
@@ -381,4 +378,17 @@ defaultproperties
      BackNames(3)="UndyingShellPC.PSetup_3"
      BackNames(4)="UndyingShellPC.PSetup_4"
      BackNames(5)="UndyingShellPC.PSetup_5"
+     PlayerMeshes(0)=(Mesh="Aeons.Meshes.Patrick_m",Sequence=Walk)
+     PlayerMeshes(1)=(Mesh="Aeons.Meshes.AaronGhost_m",Sequence=Walk)
+     PlayerMeshes(2)=(Mesh="Aeons.Meshes.Bethany_m",Sequence=Walk)
+     PlayerMeshes(3)=(Mesh="Aeons.Meshes.Ambrose_m",Sequence=Walk)
+     PlayerMeshes(4)=(Mesh="Aeons.Meshes.Kiesinger_m",Sequence=Walk)
+     PlayerMeshes(5)=(Mesh="Aeons.Meshes.Jemaas_m",Sequence=Walk)
+     PlayerMeshes(6)=(Mesh="Aeons.Meshes.Jeremiah_m",Sequence=Walk)
+     PlayerMeshes(7)=(Mesh="Aeons.Meshes.MonkSoldier_m",Sequence=Walk)
+     PlayerMeshes(8)=(Mesh="Aeons.Meshes.Drinen_m",Sequence=Walk)
+     PlayerMeshes(9)=(Mesh="Aeons.Meshes.Shaman_m",Sequence=Walk)
+     PlayerMeshes(10)=(Mesh="Aeons.Meshes.Lizbeth_m",Sequence=Walk)
+     PlayerMeshes(11)=(Mesh="Aeons.Meshes.MonkAbbott_m",Sequence=Walk)
+     PlayerMeshes(12)=(Mesh="Aeons.Meshes.Evelyn_m",Sequence=Walk)
 }
