@@ -540,6 +540,11 @@ simulated event PreClientTravel()
 {
 	if (BookJournal(Book) != None)
 		BookJournal(Book).ClearNotifyActor(); // prevent crash on clients during garbage collection while travelling
+	if (Level.NetMode == NM_Client && Level.DMan != None)
+	{
+		Level.DMan.Destroy();
+		Level.DMan = None;
+	}
 	ClearModifierSounds();
 }
 
