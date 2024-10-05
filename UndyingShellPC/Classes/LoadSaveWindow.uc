@@ -840,8 +840,14 @@ function UpdateScreenshot(bool bClear)
 	local texture NewTex;
 
 	// don't wait for garbage collector to destroy the loaded textures
-	if (ScreenShot.T != None && bDynamicScreenshotLoaded)
-		class'Utility'.static.DestroyTexture(ScreenShot.T);
+	// caused texture corruption after clicking on a non empty slot, loading a save, clicking on a non empty slot, then on an empty slot and clicking save game
+	//if (ScreenShot.T != None && bDynamicScreenshotLoaded)
+	//{
+	//	class'Utility'.static.DestroyTexture(ScreenShot.T);
+	//	ScreenShot.T = None; 
+	//	bDynamicScreenshotLoaded = false;
+	//	GetPlayerOwner().ConsoleCommand("FLUSH"); // causes lag in d3d renderer, but fixes texture corruption
+	//}
 
 	if (bClear)
 	{
