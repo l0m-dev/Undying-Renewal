@@ -12,6 +12,18 @@ var() Texture BaseTexture;
 var() Texture ScryeTexture;
 var Texture Saved;
 
+simulated function StartLevel()
+{
+	// fix incorrect texture showing after we load the game or restart the level
+	FindPlayer();
+
+	if ( Player != None )
+	{
+		bWasScrying = Player.ScryeTimer>(Player.ScryeFullTime/2);
+		SetScryeTextureActive(bWasScrying);
+	}
+}
+
 simulated function FindPlayer()
 {
 	local PlayerPawn P; 
@@ -28,34 +40,39 @@ simulated function Tick(float DeltaTime)
 		FindPlayer();
 	}
 	
-	if ( Player != None && BaseTexture != None )
+	if ( Player != None )
 	{
 		if ((Player.ScryeTimer>(Player.ScryeFullTime/2))&&(!bWasScrying))
 		{
-			
 			bWasScrying = true;
-
-			Saved = BaseTexture.AnimCurrent;
-			
-			BaseTexture.AnimCurrent = ScryeTexture;
-			
-			if ( BaseTexture.AnimCurrent.AnimNext == None )
-				BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
-						
+			SetScryeTextureActive(true);
 		}
 		else if ((Player.ScryeTimer<=(Player.ScryeRampTime/2))&&(bWasScrying))
-		{
-				
+		{		
 			bWasScrying = false;
-		
-			BaseTexture.AnimCurrent = Saved;
-
-			if ( BaseTexture.AnimCurrent.AnimNext == None )
-				BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
-					
+			SetScryeTextureActive(false);
 		}
 	}
+}
 
+simulated function SetScryeTextureActive(bool bActive)
+{
+	if ( bActive )
+	{
+		Saved = BaseTexture.AnimCurrent;
+
+		BaseTexture.AnimCurrent = ScryeTexture;
+
+		if ( BaseTexture.AnimCurrent.AnimNext == None )
+			BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
+	}
+	else
+	{
+		BaseTexture.AnimCurrent = Saved;
+
+		if ( BaseTexture.AnimCurrent.AnimNext == None )
+			BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
+	}
 }
 
 defaultproperties

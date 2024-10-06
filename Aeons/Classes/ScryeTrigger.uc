@@ -19,16 +19,16 @@ var() name ScryeEndEvent;
 
 simulated function bool IsClientPlayer(PlayerPawn Other)
 {
-	// always return true since it returns false server side
-	return true;
-	/*
 	local bool bIsClient;
+
+	if ( Level.NetMode != NM_Standalone )
+		return true;
 	 
 	if ( Viewport(Other.Player) != None ) 
 		return true;
 	else
 		return false;
-	*/
+	
 }
 
 simulated function Timer()

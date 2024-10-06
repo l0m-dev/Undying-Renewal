@@ -450,13 +450,13 @@ state stuck
 				if ( Owner != None && Owner.AcceptDamage(GetDamageInfo()) )
 					Pawn(Owner).TakeDamage( none, Owner.Location, vect(0,0,0), GetDamageInfo('LightningBoltOfGods'));
 				Destroy();
-			} else if ( Wound != none ) {
+			} else if ( Owner != None || Wound != none ) {
 				GotoState('Shatter');
 			} else {
 				GotoState('FadeAway');
 			}
 		} 
-		else if ( Wound != none ) {
+		else if ( Owner != None || Wound != none ) {
 			GotoState('Shatter');
 		}
 		else
