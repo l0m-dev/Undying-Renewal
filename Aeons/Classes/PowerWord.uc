@@ -95,10 +95,7 @@ state GenParticles
 		GetAxes(Pawn(Owner).ViewRotation, x, y, z);
 		
 		WorldLoc = JointPlace('Mid_Tip').pos;
-	 	//PLocs[cnt] = (WorldLoc - EyeLoc) << Pawn(Owner).ViewRotation;
-
-		for (i=0; i<ArrayCount(Plocs); i++)
-			Plocs[i] = LastLoc + (WorldLoc-LastLoc) / ArrayCount(Plocs) * i;
+	 	PLocs[cnt] = (WorldLoc - EyeLoc) << Pawn(Owner).ViewRotation;
 
 		// from skulls
 		// seekLoc = (skullPos >> Pawn(Owner).ViewRotation) + eyeLoc + tempSeekLoc;
