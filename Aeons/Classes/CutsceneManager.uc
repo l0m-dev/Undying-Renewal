@@ -176,7 +176,8 @@ simulated function SetupCutsceneForPlayer(optional PlayerPawn Player)
 
 	if (Level.NetMode != NM_Client)
 	{
-		if ( MasterCamPoint.bHidePlayer )
+		// bIsCutsceneLevel check is needed because undying developers didn't set bHidePlayer everywhere (ex. CU_06)
+		if ( MasterCamPoint.bHidePlayer || Level.bIsCutsceneLevel )
 		{
 			Player.bRenderSelf = false;
 			Player.bHidden = true;
