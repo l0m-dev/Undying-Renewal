@@ -172,10 +172,6 @@ simulated function Skull_proj genSkull(int nS)
 		Skull2.RemoteRole = ROLE_None;
 		Skull2.bOnlyOwnerSee = true;
 	}
-	else if (Level.NetMode == NM_DedicatedServer)
-	{
-		Skull2.bOwnerNoSee = true;
-	}
 
 	if ( Owner.bHidden )
 		CheckVisibility();
@@ -185,7 +181,8 @@ simulated function Skull_proj genSkull(int nS)
 
 simulated function ClientGenSkull(int nS)
 {
-	GenSkull(nS);
+	if (Role < ROLE_Authority)
+		GenSkull(nS);
 }
 
 simulated function PlayFiring()
@@ -250,9 +247,9 @@ simulated function releaseSkulls()
 
 	ForEach AllActors(class 'skull2_proj', Skull, Owner.Name)
 	{
+		Skull.Fire();
 		if (Skull.bOnlyOwnerSee)
 			Skull.Destroy();
-		Skull.Fire();
 	}
 }
 
@@ -312,7 +309,8 @@ state NormalFire
 					
 					sleep(0.5);
 					SummonedSkulls[NumSkulls] = GenSkull(NumSkulls);
-					ClientGenSkull(NumSkulls);
+					if (Level.NetMode != NM_Standalone )
+						ClientGenSkull(NumSkulls);
 					GhelzUse(manaCostPerLevel[CastingLevel]);
 					AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 					
