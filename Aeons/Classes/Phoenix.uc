@@ -237,6 +237,8 @@ state Finishing
 	Begin:
 		if (AmmoType.AmmoAmount > 0)
 		{
+			PlayAnim('');
+			sleep(0);
 			loopAnim('IdleStill',RefireMult); // todo: check speed for IdleMove
 			sleep(0.5);
 			GotoState('Idle');

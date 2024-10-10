@@ -27,7 +27,7 @@ function PlayTake(int i)
 	// if ( Take == 0 )
 		// 	Age = 0;
 	if (AnimName[Take] == 'Destroy')
-		Destroy();
+		Hide(); // Destroy();
 		
 	if ( bAnimOverrideHide )
 	{	
@@ -126,7 +126,7 @@ function SetupTake(int Cutscene, int Take)
 				UnHide();
 				break;
 			case 34:
-				Destroy();
+				Hide(); // Destroy();
 				break;
 		}
 	}

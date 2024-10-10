@@ -8,7 +8,7 @@ var KingAcidProj_particles	Trail;
 function PreBeginPlay()
 {
 	PlaySound(SpawnSound);
- 	Trail = spawn(class 'KingAcidProj_particles',,,Location);
+ 	Trail = spawn(class 'KingAcidProj_particles',self,,Location);
  	Trail.setBase(self);
 }
 

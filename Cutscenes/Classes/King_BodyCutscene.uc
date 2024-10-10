@@ -37,7 +37,7 @@ function SetupTake(int Cutscene, int Take)
 		switch( Take )
 		{
 			case 7:
-				Destroy();
+				Hide(); // Destroy();
 				break;
 		}
 	}

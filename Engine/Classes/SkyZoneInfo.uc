@@ -12,6 +12,8 @@ var int DeltaRot;
 
 simulated function PreBeginPlay()
 {
+	Super.PreBeginPlay();
+	
 	if ( bRotating )
 	{
 		Enable('Tick');

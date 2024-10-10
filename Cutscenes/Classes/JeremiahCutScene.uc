@@ -46,7 +46,9 @@ function Explode()
 	Spawn (class 'SmokyDynamiteExplosionFX'  ,,,Location);
 	if ( Glasses != none )
 		Glasses.Destroy();
-	Destroy();
+	if ( GFX != none )
+		GFX.Destroy();
+	Hide(); // Destroy();
 }
 
 function GlassesOnFace()
@@ -83,7 +85,8 @@ function Hide()
 		Pipe.bHidden = true;
 	if (Glasses != none)
 		Glasses.bHidden = true;
-	Scroll.bHidden = true;
+	if (Scroll != none)
+		Scroll.bHidden = true;
 }
  
 function UnHide()
@@ -93,7 +96,8 @@ function UnHide()
 		Pipe.bHidden = false;
 	if (Glasses != none)
 		Glasses.bHidden = false;
-	Scroll.bHidden = false;
+	if (Scroll != none)
+		Scroll.bHidden = false;
 }
 
 function ScrollInHand()

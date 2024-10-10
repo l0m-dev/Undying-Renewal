@@ -53,7 +53,7 @@ function MaskOnFace()
 function Explode()
 {
 	Spawn (class 'SmokyDynamiteExplosionFX'  ,,,Location);
-	Destroy();
+	Hide(); // Destroy();
 }
 
 function SetupTake(int Cutscene, int Take)
