@@ -118,12 +118,18 @@ simulated function PlayFiring()
 		effectLight.setBase(self);
 	}
 
-	if ( DripParticles == none && Level.NetMode != NM_DedicatedServer )
+	if ( Level.NetMode != NM_DedicatedServer )
 	{
-		//log("Creating Ecto Drip Particles", 'Spell');
-		fingerPlace = jointPlace('Hand');
-		dripParticles = spawn(class 'EctoplasmDrip_particles',self,,fingerPlace.pos); // + vect(0,0,32));
-		dripParticles.setBase(self, 'Wrist', 'none'); //, 'Root');
+		if ( DripParticles == none )
+		{
+			//log("Creating Ecto Drip Particles", 'Spell');
+			fingerPlace = jointPlace('Hand');
+			dripParticles = spawn(class 'EctoplasmDrip_particles',self,,fingerPlace.pos); // + vect(0,0,32));
+			dripParticles.setBase(self, 'Wrist', 'none'); //, 'Root');
+		}
+
+		// ensure particles don't live forever
+		dripParticles.LifeSpan = 1.0;
 	}
 
 	if ( AeonsPlayer(Owner).bMagicSound )
@@ -176,12 +182,18 @@ state NormalFire
 			effectLight.setBase(Owner);
 		}
 
-		if ( DripParticles == none && Level.NetMode != NM_DedicatedServer )
+		if ( Level.NetMode != NM_DedicatedServer )
 		{
-			// log("Creating Ecto Drip Particles", 'Spell');
-			fingerPlace = jointPlace('Hand');
-			dripParticles = spawn(class 'EctoplasmDrip_particles',self,,fingerPlace.pos); // + vect(0,0,32));
-			dripParticles.setBase(self, 'Wrist', 'none'); //, 'Root');
+			if ( DripParticles == none )
+			{
+				// log("Creating Ecto Drip Particles", 'Spell');
+				fingerPlace = jointPlace('Hand');
+				dripParticles = spawn(class 'EctoplasmDrip_particles',self,,fingerPlace.pos); // + vect(0,0,32));
+				dripParticles.setBase(self, 'Wrist', 'none'); //, 'Root');
+			}
+
+			// ensure particles don't live forever
+			dripParticles.LifeSpan = 1.0;
 		}
 	}
 

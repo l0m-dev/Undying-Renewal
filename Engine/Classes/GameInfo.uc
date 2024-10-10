@@ -1528,8 +1528,8 @@ function DiscardInventory( Pawn Other )
 	}					
 	Other.Weapon = None;
 	Other.SelectedItem = None;	
-	for( Inv=Other.Inventory; Inv!=None; Inv=Inv.Inventory )
-		Inv.Destroy();
+	while ( Other.Inventory != None && !Other.Inventory.bDeleteMe )
+		Other.Inventory.Destroy();
 }
 
 // Return the player jumpZ scaling for this gametype

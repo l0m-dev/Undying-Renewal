@@ -70,7 +70,7 @@ simulated function SetScryeTextureActive(bool bActive)
 	{
 		BaseTexture.AnimCurrent = Saved;
 
-		if ( BaseTexture.AnimCurrent.AnimNext == None )
+		if ( BaseTexture.AnimCurrent != None && BaseTexture.AnimCurrent.AnimNext == None )
 			BaseTexture.AnimCurrent.AnimNext = BaseTexture.AnimCurrent;
 	}
 }

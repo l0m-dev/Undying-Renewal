@@ -1476,6 +1476,7 @@ function bool DeleteInventory( inventory Item )
 {
 	// If this item is in our inventory chain, unlink it.
 	local actor Link;
+	local int Count;
 
 	if ( Item == Weapon )
 		Weapon = None;
@@ -1486,7 +1487,14 @@ function bool DeleteInventory( inventory Item )
 		if( Link.Inventory == Item )
 		{
 			Link.Inventory = Item.Inventory;
+			Item.Inventory = None;
 			break;
+		}
+		if ( Level.NetMode == NM_Client )
+		{
+			Count++;
+			if ( Count > 1000 )
+				break;
 		}
 	}
 	Item.SetOwner(None);
@@ -1697,7 +1705,6 @@ event LongFall();
 
 simulated event Destroyed()
 {
-	local Inventory Inv;
 	local Pawn OtherPawn;
 
 	if ( Shadow != None )
@@ -1707,8 +1714,8 @@ simulated event Destroyed()
 
 	RemovePawn();
 
-	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )   
-		Inv.Destroy();
+	while ( Inventory != None && !Inventory.bDeleteMe )
+		Inventory.Destroy();
 	Weapon = None;
 	AttSpell = None;
 	DefSpell = None;

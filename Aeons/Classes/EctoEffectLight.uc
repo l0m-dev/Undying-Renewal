@@ -9,8 +9,11 @@ class EctoEffectLight expands Light;
 
 function Tick(float DeltaTime)
 {
-	if (Owner == none)
-		Destroy();
+     if (Owner == none)
+     {
+          Destroy();
+          return;
+     }
 	
 	SetLocation(Owner.Location);
 }

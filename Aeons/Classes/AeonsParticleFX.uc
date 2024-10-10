@@ -197,6 +197,10 @@ function PostLoadGame()
 	}
 }
 
+simulated function StartLevel()
+{
+}
+
 //----------------------------------------------------------------------------
 
 // Called whenever time passes.

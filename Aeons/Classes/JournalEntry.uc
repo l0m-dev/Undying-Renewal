@@ -88,7 +88,7 @@ function PostBeginPlay()
 {
 	local int i;
 
-	Log("JournalEntry: PostBeginPlay" $ Self);
+	//Log("JournalEntry: PostBeginPlay" $ Self);
 	Super.PostBeginPlay();
 
 	Text = "";

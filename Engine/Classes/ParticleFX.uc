@@ -172,6 +172,16 @@ replication
 }
 */
 
+simulated function StartLevel()
+{
+	// not all particles are AeonsParticleFX (ex. BloodParticles)
+	// we have no access to bAlreadyStarted here, add it in the next update?
+	if (!bSpawned)
+	{
+		RemoteRole = ROLE_None;
+	}
+}
+
 //----------------------------------------------------------------------------
 //	Default Properties
 //----------------------------------------------------------------------------
@@ -203,4 +213,5 @@ defaultproperties
      CollisionRadius=100
      CollisionHeight=100
      bNetOptional=True
+     NetUpdateFrequency=4
 }

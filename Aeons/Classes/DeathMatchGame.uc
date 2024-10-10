@@ -493,8 +493,8 @@ function AcceptInventory(pawn PlayerPawn)
 {
 	//deathmatch accepts no inventory
 	local inventory Inv;
-	for( Inv=PlayerPawn.Inventory; Inv!=None; Inv=Inv.Inventory )
-		Inv.Destroy();
+	while ( PlayerPawn.Inventory != None && !PlayerPawn.Inventory.bDeleteMe )
+		PlayerPawn.Inventory.Destroy();
 	PlayerPawn.Weapon = None;
 	PlayerPawn.SelectedItem = None;
 	AddDefaultInventory( PlayerPawn );
