@@ -441,13 +441,13 @@ state stuck
 					}
 				}
 				
-				if (Owner != None)
+				if (ScriptedPawn(Owner) != None)
 				{
 					ScriptedPawn(Owner).StopMovement();
-					Pawn(Owner).LoopAnim('Death_PowerWord_Cycle',2,,,0);
+					//Pawn(Owner).LoopAnim('Death_PowerWord_Cycle',2,,,0);
 				}
 				Spawn (class 'Aeons.LBGExplosion',,,start + vect(0,0,32));
-				if ( Owner != None && Owner.AcceptDamage(GetDamageInfo()) )
+				if ( Pawn(Owner) != None && Pawn(Owner).Health > 0 && Owner.AcceptDamage(GetDamageInfo()) )
 					Pawn(Owner).TakeDamage( none, Owner.Location, vect(0,0,0), GetDamageInfo('LightningBoltOfGods'));
 				Destroy();
 			} else if ( Owner != None || Wound != none ) {

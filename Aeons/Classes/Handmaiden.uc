@@ -193,6 +193,7 @@ function PlayDying( name damage, vector HitLocation, DamageInfo DInfo )
 			PlayExplosionDeath( HitLocation );
 			break;
 		case 'powerword':
+		case 'LightningBoltOfGods':
 			bNoBloodPool = true;
 			PWDeathTimer = 2.0;
 			PlayAnim( 'death_powerword_start' );

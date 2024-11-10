@@ -94,7 +94,7 @@ simulated function PreBeginPlay()
 	{
 		MaxTargetRange = 4096;
 		RefireRate = 0.5;
-		SpeargunChargeManaCost = 50;
+		SpeargunChargeManaCost = 75;
 
 		manaCostPerLevel[0] = 40;
 		manaCostPerLevel[1] = 35;

@@ -5,7 +5,7 @@ class MinigunAmmo expands Ammo;
 
 //#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
-#exec MESH IMPORT MESH=MinigunAmmo_m SKELFILE=Minigun\MinigunAmmo.ngf
+#exec MESH IMPORT MESH=MinigunAmmo_m SKELFILE=Minigun\MinigunAmmo\MinigunAmmo.ngf
 
 #exec AUDIO IMPORT FILE="Minigun\I_MinigunAmmoPU1.WAV" NAME="I_MinigunAmmoPU1" GROUP="Inventory"
 
