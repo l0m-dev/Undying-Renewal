@@ -22,6 +22,9 @@ function Activate()
 		FireJoint( 'r_elbow' );
 		FireJoint( 'r_wrist' );
 		FireJoint( 'head' );
+		/*
+		// RGC()? disabled to fix phoenix not attacking, phoenix shouldn't take fire damage anyways
+		// alternatively, implement AcceptDamage for SPPhoenix and GuardianPhoenix to prevent fire damage
 		if ( Owner.AcceptDamage(GetDamageInfo()) )
 		{
 			Pawn(Owner).TakeDamage( pawn(Owner), Location, vect(0,0,0), getDamageInfo() );
@@ -29,6 +32,7 @@ function Activate()
 			Burnout = 0.0;
 			GotoState( 'Damaging' );
 		}
+		*/
 	}
 }
 
