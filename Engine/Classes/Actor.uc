@@ -1170,6 +1170,7 @@ native simulated event DemoPlaySound
 // Get a sound duration.
 native simulated final function float GetSoundDuration( sound Sound );
 
+//l0m don't use, can get stuck waiting forever
 native(402) final latent function FinishSound
 (
 	//rb maybe use a Sound pointer in addition / instead ?

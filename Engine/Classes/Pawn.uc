@@ -1737,7 +1737,7 @@ simulated event Destroyed()
 //
 native simulated event ClientHearSound ( 
 	actor Actor, 
-	int Id, 
+	int Flags, // old: int Id
 	sound S, 
 	vector SoundLocation, 
 	vector Parameters 

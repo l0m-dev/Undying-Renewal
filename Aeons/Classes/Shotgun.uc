@@ -449,7 +449,7 @@ state NewClip
 				sndID = PlaySound(LoadShellSound);
 
 			sleep(0.5 * (1/RefireMult * AeonsPlayer(Owner).refireMultiplier));
-			FinishSound(sndID);
+			//FinishSound(sndID);
 			ClipCount++;
 			
 			if (AeonsPlayer(Owner).refireMultiplier < 0.6 && ClipCount < ReloadCount)

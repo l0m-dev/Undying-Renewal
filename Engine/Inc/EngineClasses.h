@@ -2705,7 +2705,7 @@ struct APawn_eventHearNoise_Parms
 struct APawn_eventClientHearSound_Parms
 {
     class AActor* Actor;
-    INT Id;
+    INT flags;
     class USound* S;
     FVector SoundLocation;
     FVector Parameters;
@@ -3100,11 +3100,11 @@ public:
         Parms.NoiseMaker=NoiseMaker;
         ProcessEvent(FindFunctionChecked(ENGINE_HearNoise),&Parms);
     }
-    void eventClientHearSound(class AActor* Actor, INT Id, class USound* S, FVector SoundLocation, FVector Parameters)
+    void eventClientHearSound(class AActor* Actor, INT flags, class USound* S, FVector SoundLocation, FVector Parameters)
     {
         APawn_eventClientHearSound_Parms Parms;
         Parms.Actor=Actor;
-        Parms.Id=Id;
+        Parms.flags=flags;
         Parms.S=S;
         Parms.SoundLocation=SoundLocation;
         Parms.Parameters=Parameters;

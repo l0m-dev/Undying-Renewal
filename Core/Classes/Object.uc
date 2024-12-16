@@ -57,8 +57,8 @@ const DEGREES = 182;
 // A quaternion representation of rotation.
 struct Quat
 {
-	// Component ordering convention is different from Plane.
-	var() float W, X, Y, Z;
+	// old false comment: Component ordering convention is different from Plane.
+	var() float X, Y, Z, W;
 };
 
 // A position plus quat rotation.
