@@ -57,7 +57,6 @@ state Activated
 	{
 		if (Owner == none)
 			Destroy();
-		SetBase(Owner, 'root', 'root');
 		AmbientSound = ActiveLoopSound;		
 		log("HasteModifier "$self.name$" Owner == "$Owner.name$" IsPlayer = "$AeonsPlayer(Owner).bIsPlayer, 'Misc');
 	}
@@ -71,7 +70,6 @@ state Activated
 	
 	function EndState()
 	{
-		SetBase(None);
 		AmbientSound = None;
 		Owner.PlaySound(EffectEndSound);
 	}

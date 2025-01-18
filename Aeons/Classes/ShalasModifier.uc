@@ -61,13 +61,11 @@ state Activated
 
 	function BeginState()
 	{
-		SetBase(Owner);
 		AmbientSound = EffectSound;
 	}
 
 	function EndState()
 	{
-		SetBase(None);
 		AmbientSound = None;
 		//Owner.PlaySound(EffectEndSound);
 	}

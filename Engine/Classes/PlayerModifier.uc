@@ -35,6 +35,18 @@ replication
 
 //----------------------------------------------------------------------------
 
+simulated function PreBeginPlay()
+{
+	if ( Owner == none )
+	{
+		Destroy();
+		return;
+	}
+
+	SetLocation( Owner.Location );
+	SetBase( Owner );
+}
+
 function int Dispel(optional bool bCheck)
 {
 	if ( !bCheck )

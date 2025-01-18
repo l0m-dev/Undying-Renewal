@@ -545,23 +545,6 @@ simulated event PreClientTravel()
 		Level.DMan.Destroy();
 		Level.DMan = None;
 	}
-	ClearModifierSounds();
-}
-
-// called server side from ProcessServerTravel
-event ClientTravelCleanupServer()
-{
-	ClearModifierSounds();
-}
-
-function ClearModifierSounds()
-{
-	// fix ambient sound playing when coming back to a level
-	// maybe even destroy the modifiers since they are recreated
-	if (ScryeMod != None)
-		ScryeMod.AmbientSound = None;
-	if (Flight != None)
-		Flight.AmbientSound = None;
 }
 
 event HeadZoneChange(ZoneInfo newHeadZone)

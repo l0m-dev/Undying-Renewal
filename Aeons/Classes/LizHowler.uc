@@ -3,8 +3,6 @@
 //=============================================================================
 class LizHowler expands Howler;
 
-// BURT - All exec imports were ripped since it is just an update
-
 defaultproperties
 {
      MeleeInfo(0)=(Damage=50)
@@ -23,4 +21,6 @@ defaultproperties
 	 bHasFarAttack=True
 	 bBlockPlayers=True
 	 bBlockActors=False
+	 CollisionRadius=40
+	 CollisionHeight=57
 }

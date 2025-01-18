@@ -266,16 +266,20 @@ function WorldEventAlert( actor Alerter )
 function bool NearStrikeValid( actor Victim, int DamageNum )
 {
 	DebugInfoMessage( ".NearStrikeValid(), DamageNum is " $ DamageNum );
+
+	// only allow damage if the victim is in front of us
+	if ( RGC() && XYAngleToEnemy() < 0 )
+	{
+		return false;
+	}
+
 	switch ( DamageNum )
 	{
 		case 1:
 			return JointStrikeValid( Victim, 'head', DamageRadius );
 			break;
 		default:
-			if (RGC())
-				return Super.NearStrikeValid(Victim, DamageNum); // fixes missed standing slash attack
-			else
-				return JointStrikeValid( Victim, 'r_hand1', DamageRadius );
+			return JointStrikeValid( Victim, 'r_hand1', DamageRadius );
 			break;
 	}
 }
@@ -471,7 +475,7 @@ BEGIN:
 		StopMovement();
 		PlayWait();
 
-		if( DistanceTo( Enemy ) > DamageRadius )
+		if( !NearStrikeValid(Enemy, 0) )
 		{
 			bDidMeleeAttack = false;
 
@@ -524,7 +528,7 @@ DOATTACK:
 INATTACK:
 	if (RGC())
 	{
-		if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
+		if( !NearStrikeValid(Enemy, 0) )	// enemy lost
 		{
 			//StopTimer();
 			//GotoState( 'AIFarAttack' );

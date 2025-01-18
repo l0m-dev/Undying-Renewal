@@ -66,17 +66,16 @@ state Activated
 
 	function Tick(float DeltaTime)
 	{
-		if (Owner == None)
-			return;
+		if (PlayerPawn(Owner) != None)
+			PlayerPawn(Owner).ScryeTimer -= DeltaTime;
 		
-		PlayerPawn(Owner).ScryeTimer -= DeltaTime;
-		
-		if ((PlayerPawn(Owner).GetStatename() == 'PlayerCutscene') || (PlayerPawn(Owner).GetStatename() == 'DialogScene') || (PlayerPawn(Owner).GetStatename() == 'SpecialKill'))
+		if ((PlayerPawn(Owner) == None) || (PlayerPawn(Owner).GetStatename() == 'PlayerCutscene') || (PlayerPawn(Owner).GetStatename() == 'DialogScene') || (PlayerPawn(Owner).GetStatename() == 'SpecialKill'))
 		{
 			if (bGlowOn)
 			{
 				gotoState('Deactivated');
-				AeonsPlayer(Owner).ClientSetScryeModActive(false);
+				if (PlayerPawn(Owner) != None)
+					AeonsPlayer(Owner).ClientSetScryeModActive(false);
 			}
 		} else {
 			if ( !bGlowOn )
@@ -93,14 +92,16 @@ state Activated
 			}
 		}
 
-
-		if (PlayerPawn(Owner).Health <= 0)
-			PlayerPawn(Owner).ScryeTimer = 0;
-
-		if ( PlayerPawn(Owner).ScryeTimer < 0.2f )
+		if (PlayerPawn(Owner) != None)
 		{
-			// PlayerPawn(Owner).ScryeTimer = 0.0f;
-			gotoState('Deactivated');
+			if (PlayerPawn(Owner).Health <= 0)
+				PlayerPawn(Owner).ScryeTimer = 0;
+
+			if ( PlayerPawn(Owner).ScryeTimer < 0.2f )
+			{
+				// PlayerPawn(Owner).ScryeTimer = 0.0f;
+				gotoState('Deactivated');
+			}
 		}
 	}
 
@@ -110,7 +111,6 @@ state Activated
 
 		if ( !bActive )
 		{
-			SetBase(Owner, 'root', 'root');
 			AmbientSound = ActiveLoopSound;		
 		}
 
@@ -185,31 +185,30 @@ state Deactivated
 	}
 
 	Begin:
-		if (Owner == None)
-			stop;
-
 		col = vect(233,196,255);	// hud change color
-		AeonsPlayer(Owner).bScryeActive = false;
 
-		SetBase(None);
 		AmbientSound = None;
+		Owner.PlaySound(EndSound);
 
-		str = 0.1;					// HUD change strength
-		PlayerPawn(Owner).ClientAdjustGlow( str, col );
-		sleep(0.1);
-		PlayerPawn(Owner).ClientAdjustGlow( -str, -col );
-		str = 0.5;					// HUD change strength
-		sleep(0.1);
-		PlayerPawn(Owner).ClientAdjustGlow( str, col );
-		sleep(0.2);
-		PlayerPawn(Owner).ClientAdjustGlow( -str, -col );
-		PlayerPawn(Owner).ScryeTimer = 0.0f;
+		if (PlayerPawn(Owner) != none)
+		{
+			AeonsPlayer(Owner).bScryeActive = false;
+			str = 0.1;					// HUD change strength
+			PlayerPawn(Owner).ClientAdjustGlow( str, col );
+			sleep(0.1);
+			PlayerPawn(Owner).ClientAdjustGlow( -str, -col );
+			str = 0.5;					// HUD change strength
+			sleep(0.1);
+			PlayerPawn(Owner).ClientAdjustGlow( str, col );
+			sleep(0.2);
+			PlayerPawn(Owner).ClientAdjustGlow( -str, -col );
+			PlayerPawn(Owner).ScryeTimer = 0.0f;
+		}
 
 		if (MyScryeLight != none)
 			MyScryeLight.Destroy();
 
 		bActive = false;
-		PlayerPawn(Owner).ScryeTimer = 0.0f;
 		CallEndEvent();
 }
 

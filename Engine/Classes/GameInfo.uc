@@ -686,7 +686,6 @@ function ProcessServerTravel( string URL, bool bItems )
 	foreach AllActors( class'PlayerPawn', P )
 		if( NetConnection(P.Player)!=None )
 		{
-			P.ClientTravelCleanupServer();
 			P.ClientTravel( URL, TRAVEL_Relative, bItems );
 		}
 		else

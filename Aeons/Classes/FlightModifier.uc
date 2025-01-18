@@ -116,7 +116,6 @@ state Active
 		Timer(); // removes 0.1s delay
 		SetTimer(0.1, True);
 		AmbientSound = FlyingSound;
-		SetBase(Owner, 'root', 'root');
 		
 		SoundVolume = InitialVolume;
 	}
@@ -145,7 +144,6 @@ auto state Idle
 				SoundVolume -= ( (8*InitialVolume) * DeltaTime );
 			} else {
 				AmbientSound = none;
-				SetBase(None);
 				SoundVolume = 0;
 			}
 		} else {

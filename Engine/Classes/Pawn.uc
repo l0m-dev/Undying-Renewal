@@ -1706,6 +1706,7 @@ event LongFall();
 simulated event Destroyed()
 {
 	local Pawn OtherPawn;
+	local PlayerModifier Modifier;
 
 	if ( Shadow != None )
 		Shadow.Destroy();
@@ -1720,6 +1721,14 @@ simulated event Destroyed()
 	AttSpell = None;
 	DefSpell = None;
 	Inventory = None;
+	
+	// clean up the player modifiers
+	// ideally, we would set the variables to None as well, to prevent garbage collection issues
+	// thankfully, renewal engine handles destroyed (bDeleteMe) actors as None
+	foreach AllActors( class 'PlayerModifier', Modifier )
+		if ( Modifier.Owner == Self )
+			Modifier.Destroy();
+
 	if ( bIsPlayer && (Level.Game != None) )
 		Level.Game.logout(self);
 	if ( PlayerReplicationInfo != None )

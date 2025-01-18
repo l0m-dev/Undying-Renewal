@@ -6,6 +6,15 @@ class HealthModifier expands PlayerModifier;
 var travel int HealthSurplus, NumHealths, SuperHealthSurplus, ProjectedHealthTarget;
 var float t;
 
+simulated function PreBeginPlay()
+{
+	Super.PreBeginPlay();
+
+	// fixes picking up health before we tick (on custom maps that give us health packs on start)
+	if ( Owner != None ) 
+		ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus;
+}
+
 function int Dispel(optional bool bCheck)
 {
 	return -1;
@@ -108,7 +117,6 @@ auto state Activated
 
 defaultproperties
 {
-	 ProjectedHealthTarget=100 // fixes picking up health before we tick (custom maps that give us health packs on start)
      bTimedTick=True
      MinTickTime=0.15
      RemoteRole=ROLE_None
