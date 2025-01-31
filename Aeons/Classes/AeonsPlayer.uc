@@ -467,7 +467,7 @@ replication
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
-        Scrye, AddAll, DefAll, SwitchAttSpell,
+        Scrye, AddAll, DefAll, SwitchAttSpell, SwitchDefSpell, PrevAttSpell, PrevDefSpell, NextDefSpell,
 		Sneak, AmpAttSpell, AmpDefSpell, DeAmpAttSpell, DeAmpDefSpell, Pie, InfiniteMana, ToggleFlight, MagicSounds, WeaponSounds,
 		ServerReloadWeapon, ServerDoubleShotgun, ServerScytheBerserk,
 		RequestSkipCutscene, TestJournal,

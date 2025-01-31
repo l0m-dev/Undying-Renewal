@@ -1074,7 +1074,8 @@ native(277) final function Actor Trace
 	optional vector TraceStart,
 	optional bool   bTraceActors,
 	optional bool   bIgnorePermeable,
-	optional vector Extent
+	optional vector Extent,
+	optional bool   bTraceZoneChangesOnly
 );
 
 // returns true if did not hit world geometry

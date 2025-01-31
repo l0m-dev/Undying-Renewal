@@ -705,12 +705,6 @@ function BeginPlay()
 	RefireMult = 1.0;
 }
 
-simulated function StartLevel()
-{
-	Super.StartLevel();
-	PlayIdleAnim();
-}
-
 //----------------------------------------------------------------------------
 
 simulated event RenderOverlays( canvas Canvas )

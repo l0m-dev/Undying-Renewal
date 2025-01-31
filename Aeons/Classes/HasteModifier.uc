@@ -214,4 +214,5 @@ defaultproperties
      EffectEndSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_HasteEnd01'
      SoundRadius=255
      SoundVolume=96
+     RemoteRole=ROLE_SimulatedProxy
 }
