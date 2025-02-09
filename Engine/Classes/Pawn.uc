@@ -392,8 +392,9 @@ replication
 	unreliable if( Role<ROLE_AutonomousProxy )
 		bZoom, bRun, bLook, bDuck, bSnapLevel, bStrafe;
 
-	unreliable if( Role<ROLE_Authority )
-		Climb, ClimbDirection;
+	// not replicated natively
+	//unreliable if( Role<ROLE_Authority )
+	//	Climb, ClimbDirection;
 
 	unreliable if( Role==ROLE_Authority )
 		SplatterHUD, PlayDamageEffect;

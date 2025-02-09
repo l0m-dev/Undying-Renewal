@@ -284,7 +284,7 @@ replication
 {
 	// Things the server should send to the client.
 	reliable if( bNetOwner && Role==ROLE_Authority )
-		ViewTarget, ScoringType, HUDType, GameReplicationInfo, bFixedCamera, bCheatsEnabled, ScryeTimer, ScryeFullTime, bAmplifySpell, bAllowMove;
+		ViewTarget, ScoringType, HUDType, GameReplicationInfo, bFixedCamera, bCheatsEnabled, ScryeTimer, ScryeFullTime, bAmplifySpell, bAllowMove; // ScryeFullTime and bAmplifySpell are not replicated natively
 	unreliable if ( bNetOwner && Role==ROLE_Authority )
 		TargetViewRotation, TargetEyeHeight, TargetWeaponViewOffset;
 	reliable if( bDemoRecording && Role==ROLE_Authority )
