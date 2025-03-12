@@ -231,12 +231,6 @@ function string ParseQuery( IpAddr Addr, coerce string QueryStr, int QueryNum, o
 		ValidationString = "\\validate\\"$Validate(QueryValue, Query.GameName);
 		Result = SendQueryPacket(Addr, ValidationString, QueryNum, ++PacketNum, FinalPacket);
 	}
-	else
-	{
-		Log("UdpServerQuery: Unknown query: "$QueryType);
-	}
-	if( !Result )
-		Log("UdpServerQuery: Error responding to query.");
 	return QueryRest;
 }
 

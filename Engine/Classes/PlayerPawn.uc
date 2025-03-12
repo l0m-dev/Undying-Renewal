@@ -752,7 +752,7 @@ function ServerMove
         else
             bFiredDefSpell = false;
 
-		Log("bFiredAttSpell and bFiredDefSpell were both TRUE in ServerMove:  Att="$bFiredAttSpell$" Def="$bFiredDefSpell);
+		//Log("bFiredAttSpell and bFiredDefSpell were both TRUE in ServerMove:  Att="$bFiredAttSpell$" Def="$bFiredDefSpell);
     }
 
 //	Log("PlayerPawn: ServerMove: before check for bFiredAttSpell");
