@@ -24,13 +24,13 @@ var transient bool bInitialized;
 // here we store the set values for pitch and volume for later use.
 // then we set them to Zero so it doesn't actually play at those
 // levels while precaching.
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 
 }
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	Super.PostBeginPlay();
 	
@@ -55,7 +55,7 @@ function PostBeginPlay()
 	NewVolTarget = RandRange( (InitialVolume-VolVar), InitialVolume );
 }
 
-function Tick(float DeltaTime)
+simulated function Tick(float DeltaTime)
 {
 	local int p, v;
 
@@ -97,7 +97,7 @@ function Tick(float DeltaTime)
 	}
 }
 
-function EvalPitch()
+simulated function EvalPitch()
 {
 	local int p;
 
@@ -111,7 +111,7 @@ function EvalPitch()
 	PitchTimer = Rate;
 }
 
-function EvalVol()
+simulated function EvalVol()
 {
 	local int v;
 

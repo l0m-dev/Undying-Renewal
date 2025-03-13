@@ -4498,7 +4498,7 @@ ignores SeePlayer, HearNoise, Bump;
 		if (PendingWeapon != None)
 			PendingWeapon.SetDefaultDisplayProperties();
 		if (Level.NetMode != NM_Standalone) // keep old singleplayer behavior for speedrunning
-			Global.ChangedWeapon();
+			Global.ChangedWeapon(); // crashes the client if the map is changed while in FeigningDeath state
 	}
 
 	function BeginState()

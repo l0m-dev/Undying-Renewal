@@ -7,8 +7,6 @@ class AmbientSound extends Keypoint;
 // Import the sprite.
 //#exec Texture Import File=Textures\Ambient.pcx Name=S_Ambient Mips=On Flags=2
 
-// added bNoDelete because some AmbientSounds had bStatic set to false in the editor (ex. in Grounds_Cottage)
-
 var Sound StoredSound;
 var() bool bInitiallyOn;
 var() bool bFadeOut;
@@ -18,7 +16,7 @@ var int SavedSoundVolume;
 var PlayerPawn Player;
 var float RealVolume, FadeTimer;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	Super.PreBeginPlay();
 	StoredSound = AmbientSound;
@@ -103,17 +101,23 @@ state() TurnOnSound
 	}
 }
 
-state() PlayerZoneControl
+simulated state() PlayerZoneControl
 {
-	function FindPlayer()
+	simulated function FindPlayer()
 	{
-		ForEach AllActors(class 'PlayerPawn', Player)
+		local PlayerPawn P;
+
+		foreach AllActors(class'PlayerPawn', P)
 		{
-			break;
+			if(Viewport(P.Player) != None)
+			{
+				Player = P;
+				break;
+			}
 		}
 	}
 	
-	function Timer()
+	simulated function Timer()
 	{
 		// Get the player
 		if ( Player == none )
@@ -132,7 +136,9 @@ state() PlayerZoneControl
 	}
 
 	Begin:
-		SetTimer(0.1, true);
+		RemoteRole = ROLE_None;
+		if ( Level.NetMode != NM_DedicatedServer )
+			SetTimer(0.1, true);
 }
 
 state() NormalAmbientSound
@@ -146,6 +152,8 @@ defaultproperties
      Texture=Texture'Engine.S_Ambient'
      SoundRadius=40
      SoundVolume=190
+     bStatic=False
      bNoDelete=True
      NetUpdateFrequency=10
+     RemoteRole=ROLE_SimulatedProxy
 }

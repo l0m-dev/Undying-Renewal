@@ -337,12 +337,13 @@ var transient struct ChatMessageStruct
 	var string Text;
 	var color Color;
 } ChatLog[16];
-var transient int VisibleChatLogIndices[4];
+var transient int VisibleChatLogIndices[6];
 var transient float ChatVisibleTime;
 var transient bool ChatInitialized;
 
 const CHAT_FADE_TIME = 2.0;
 const CHAT_VISIBLE_TIME = 5.0;
+const CHAT_WIDTH = 300;
 
 // scoring 
 var float ScoreTime;
@@ -3924,7 +3925,7 @@ simulated function DrawChat( Canvas Canvas )
 		
 		Canvas.SetOrigin(32*ScaleX, Y);
 		Canvas.SetPos(0, 0);
-		Canvas.SetClip(200*ScaleX, ClipY);
+		Canvas.SetClip(CHAT_WIDTH*ScaleX, ClipY);
 
 		Canvas.DrawColor = ChatLog[VisibleChatLogIndices[i]].Color;
 		Canvas.DrawColor.A = Opacity;
