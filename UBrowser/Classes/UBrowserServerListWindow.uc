@@ -13,7 +13,7 @@ var string						ServerListClassName;
 var class<UBrowserServerList>	ServerListClass;
 
 var UBrowserServerList			PingedList;
-var UBrowserServerList			UnpingedList;
+//var UBrowserServerList			UnpingedList;
 
 var UBrowserServerListFactory	Factories[10];
 var int							QueryDone[10];
@@ -61,6 +61,8 @@ var	localized string			QueryFailedText;
 var	localized string			PingingText;
 var	localized string			CompleteText;
 
+var int							TotalPinged;
+var int							TotalServers;
 var string						ErrorString;
 var EPingState					PingState;
 
@@ -108,14 +110,11 @@ function SuspendPinging()
 
 function ResumePinging()
 {
-	if(!bHadInitialRefresh)
-		Refresh(False, True);	
-
 	bPingSuspend = False;
 	if(bPingResume)
 	{
 		bPingResume = False;
-		UnpingedList.PingNext(bPingResumeIntial, bNoSort);
+		PingedList.PingNext(bPingResumeIntial, bNoSort);
 	}
 }
 
@@ -277,14 +276,6 @@ function UBrowserServerList AddFavorite(UBrowserServerList Server)
 
 function Refresh(optional bool bBySuperset, optional bool bInitial, optional bool bSaveExistingList, optional bool bInNoSort)
 {
-	bHadInitialRefresh = True;
-
-	if(!bSaveExistingList)
-	{
-		InfoItem = None;
-		InfoClient.Server = None;
-	}
-
 	if(!bSaveExistingList && PingedList != None)
 	{
 		PingedList.DestroyList();
@@ -296,27 +287,16 @@ function Refresh(optional bool bBySuperset, optional bool bInitial, optional boo
 	{
 		PingedList=New ServerListClass;
 		PingedList.Owner = Self;
-		PingedList.SetupSentinel(True);
-		PingedList.bSuspendableSort = True;
+		PingedList.SetupSentinel();
 	}
 	else
 	{
 		TagServersAsOld();
 	}
 
-	if(UnpingedList != None)
-		UnpingedList.DestroyList();
-	
-	if(!bSaveExistingList)
-	{
-		UnpingedList = New ServerListClass;
-		UnpingedList.Owner = Self;
-		UnpingedList.SetupSentinel(False);
-	}
-
 	PingState = PS_QueryServer;
 	ShutdownFactories(bBySuperset);
-	CreateFactories(bSaveExistingList);
+	CreateFactories();
 	Query(bBySuperset, bInitial, bInNoSort);
 
 	if(!bInitial)
@@ -359,7 +339,7 @@ function RefreshSubsets()
 		l.bOldElement = True;
 
 	l = UBrowserSubsetList(SubsetList.Next);
-	while(l != None && l.bOldElement)
+	while(l != None && l.bOldElement && L.SubsetFactory.Owner != None)
 	{
 		NextSubset = UBrowserSubsetList(l.Next);
 		l.SubsetFactory.Owner.Owner.Refresh(True);
@@ -397,7 +377,7 @@ function QueryFinished(UBrowserServerListFactory Fact, bool bSuccess, optional s
 		ErrorString = ErrorMsg;
 
 		// don't ping and report success if we have no servers.
-		if(bDone && UnpingedList.Count() == 0)
+		if(bDone && PingedList.Count() == 0)
 		{
 			if( bFallbackFactories )
 			{
@@ -415,12 +395,20 @@ function QueryFinished(UBrowserServerListFactory Fact, bool bSuccess, optional s
 
 	if(bDone)
 	{
+		if(PingState==PS_RePinging)
+			return;
+		else if (PingState==PS_Done)
+		{
+			if(!bNoSort)
+				PingedList.Sort();
+			return;
+		}
 		RemoveOldServers();
 
 		PingState = PS_Pinging;
 		if(!bNoSort && !Fact.bIncrementalPing)
 			PingedList.Sort();
-		UnpingedList.PingServers(True, bNoSort || Fact.bIncrementalPing);
+		PingedList.PingServers(True, bNoSort || Fact.bIncrementalPing);
 	}
 }
 
@@ -429,7 +417,7 @@ function PingFinished()
 	PingState = PS_Done;
 }
 
-function CreateFactories(bool bUsePingedList)
+function CreateFactories()
 {
 	local int i;
 
@@ -440,14 +428,7 @@ function CreateFactories(bool bUsePingedList)
 		if(!bFallbackFactories || FallbackFactory == i)
 		{
 			Factories[i] = UBrowserServerListFactory(BuildObjectWithProperties(ListFactories[i]));
-			
-			Factories[i].PingedList = PingedList;
-			Factories[i].UnpingedList = UnpingedList;
-		
-			if(bUsePingedList)
-				Factories[i].Owner = PingedList;
-			else
-				Factories[i].Owner = UnpingedList;
+			Factories[i].Owner = PingedList;
 		}
 		QueryDone[i] = 0;
 	}	
@@ -488,8 +469,6 @@ function Paint(Canvas C, float X, float Y)
 
 function Tick(float Delta)
 {
-	PingedList.Tick(Delta);
-
 	if(PingedList.bNeedUpdateCount)
 	{
 		PingedList.UpdateServerCount();
@@ -515,11 +494,7 @@ function BeforePaint(Canvas C, float X, float Y)
 	local UBrowserSupersetList l;
 	local EPingState P;
 	local int PercentComplete;
-	local int TotalReturnedServers;
 	local string E;
-	local int TotalServers;
-	local int PingedServers;
-	local int MyServers;
 
 	Super.BeforePaint(C, X, Y);
 
@@ -531,36 +506,23 @@ function BeforePaint(Canvas C, float X, float Y)
 		P = l.SupersetWindow.PingState;
 		PingState = P;
 
-		if(P == PS_QueryServer)
-			TotalReturnedServers = l.SupersetWindow.UnpingedList.Count();
-
-		PingedServers = l.SupersetWindow.PingedList.Count();
-		TotalServers = l.SupersetWindow.UnpingedList.Count() + PingedServers;
-		MyServers = PingedList.Count();
-	
+		if(l.SupersetWindow.TotalServers > 0)
+			PercentComplete = l.SupersetWindow.TotalPinged*100.0/l.SupersetWindow.TotalServers;
 		E = l.SupersetWindow.ErrorString;
 	}
 	else
 	{
 		P = PingState;
-		if(P == PS_QueryServer)
-			TotalReturnedServers = UnpingedList.Count();
-
-		PingedServers = PingedList.Count();
-		TotalServers = UnpingedList.Count() + PingedServers;
-		MyServers = PingedList.Count();
-
+		if(TotalServers > 0)
+			PercentComplete = TotalPinged*100.0/TotalServers;
 		E = ErrorString;
 	}
-
-	if(TotalServers > 0)
-		PercentComplete = PingedServers*100.0/TotalServers;
 
 	switch(P)
 	{
 	case PS_QueryServer:
-		if(TotalReturnedServers > 0)
-			W.DefaultStatusBarText(QueryServerText$" ("$ServerCountLeader$TotalReturnedServers$" "$ServerCountName$")");
+		if(PingedList.TotalServers > 0)
+			W.DefaultStatusBarText(QueryServerText$" ("$ServerCountLeader$PingedList.TotalServers$" "$ServerCountName$")");
 		else
 			W.DefaultStatusBarText(QueryServerText);
 		break;
@@ -569,10 +531,10 @@ function BeforePaint(Canvas C, float X, float Y)
 		break;
 	case PS_Pinging:
 	case PS_RePinging:
-		W.DefaultStatusBarText(PingingText$" "$PercentComplete$"% "$CompleteText$". "$ServerCountLeader$MyServers$" "$ServerCountName$", "$PlayerCountLeader$PingedList.TotalPlayers$" "$PlayerCountName);
+		W.DefaultStatusBarText(PingingText$" "$PercentComplete$"% "$CompleteText$". "$ServerCountLeader$PingedList.TotalServers$" "$ServerCountName$", "$PlayerCountLeader$PingedList.TotalPlayers$" "$PlayerCountName);
 		break;
 	case PS_Done:
-		W.DefaultStatusBarText(ServerCountLeader$MyServers$" "$ServerCountName$", "$PlayerCountLeader$PingedList.TotalPlayers$" "$PlayerCountName);
+		W.DefaultStatusBarText(ServerCountLeader$PingedList.TotalServers$" "$ServerCountName$", "$PlayerCountLeader$PingedList.TotalPlayers$" "$PlayerCountName);
 		break;
 	}
 }

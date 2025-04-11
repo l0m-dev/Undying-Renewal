@@ -10,6 +10,7 @@ native static final function DestroyTexture(texture Texture); // calls: delete T
 native static final function Screenshot(PlayerPawn Player, string Filename, optional bool bHideHud, optional bool bHideConsole);
 native static final function string GetSavePath();
 native static final function ComputeRenderSize(Canvas Canvas);
+//native static final function bool ReplaceFunction(class<Object> ReplaceClass, class<Object> WithClass, name ReplaceFunctionName, name WithFunctionName, optional name InState);
 
 defaultproperties
 {

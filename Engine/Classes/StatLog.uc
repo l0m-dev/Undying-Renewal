@@ -10,7 +10,7 @@ class StatLog extends Info
 	native;
 
 // Internal
-var int		Context;
+var native private const int Context;
 
 // State
 var bool	bWorld;

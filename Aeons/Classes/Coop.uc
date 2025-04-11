@@ -591,8 +591,20 @@ function bool PickupQuery( Pawn Other, Inventory item )
 	local pawn OtherPlayer;
 	local Inventory Copy;
 	local Weapon CopyWeapon;
+	local JournalPickup Journal;
 
-	if (Item.IsA('Weapon') || Item.IsA('Spell'))
+	// if a pickup has been Trigger()-ed, it will already be given to everyone
+	// be careful what items you spawn below and who you give them to
+	Journal = JournalPickup(Item);
+	if (Journal != None)
+	{
+		for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
+		{
+			if ( OtherPlayer.bIsPlayer && OtherPlayer != Other && AeonsPlayer(OtherPlayer) != None )
+				Journal.GiveJournal(AeonsPlayer(OtherPlayer));
+		}
+	}
+	else if (Item.IsA('Weapon') || Item.IsA('Spell'))
 	{
 		for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
 		{

@@ -278,8 +278,6 @@ var transient vector LastClientLocation;
 var() globalconfig bool bDisableMovementBuffering;
 const SmoothAdjustLocationTime = 0.35f;
 
-var byte SentMergeCount, MergeCount;
-
 replication
 {
 	// Things the server should send to the client.
@@ -639,9 +637,6 @@ function SendServerMove( SavedMove Move, optional SavedMove OldMove)
 		OldTimeDelta = FMin(255, (Level.TimeSeconds - OldMove.TimeStamp) * 500);
 		OldAccel = OldMove.Compress();
 	}
-
-	SentMergeCount = 1;
-	MergeCount = Move.MergeCount;
 	
 	ServerMove
 	(
@@ -698,13 +693,6 @@ function ServerMove
 	// If this move is outdated, discard it.
 	if ( CurrentTimeStamp >= TimeStamp )
 		return;
-
-	if ( SentMergeCount == 1 && MergeCount > 31 )
-	{
-		SentMergeCount = 0;
-		MergeCount = 0;
-		return;
-	}
 	
 	// if OldTimeDelta corresponds to a lost packet, process it first
 	if (  OldTimeDelta != 0 )
@@ -861,38 +849,22 @@ function ServerMove
 
 	OldBase = Base;
 
-	// Perform actual movement, reproduced step by step as on client (approximate)
+	// Perform actual movement.
 	if ( (Level.Pauser == "") && (DeltaTime > 0) )
-	{
-		if ( SentMergeCount == 1 )
-		{
-			SentMergeCount = 0;
-			DeltaTime /= float(MergeCount) + 1;
-			while ( MergeCount > 0 )
-			{
-				MoveAutonomous( DeltaTime, NewbRun, NewbDuck, false, Accel, rot(0,0,0) );
-				MergeCount--;
-			}
-		}
-		// Important input is usually the cause for buffer breakup, so it happens last on the client.
 		MoveAutonomous(DeltaTime, NewbRun, NewbDuck, NewbPressedJump, Accel, DeltaRot);
-	}
 
 	LastClientTimestamp = TimeStamp;
 	LastClientLocation = ClientLoc;
 
+	if ( LastClientTimestamp == 0 )
+		return;
+
 	// Accumulate movement error.
-	// Higor: game speed fix, mandatory update takes twice as long, netspeed effect capped to 10000
-	DeltaTime = (Level.TimeSeconds - LastUpdateTime) / Level.TimeDilation;
-	if ( DeltaTime > 1000.0/FMin(Player.CurrentNetSpeed,10000) )
-	{
-		LocDiff = Location - LastClientLocation;
-		ClientErr = LocDiff Dot LocDiff;
+	if ( Level.TimeSeconds - LastUpdateTime > 500.0/Player.CurrentNetSpeed )
 		ClientErr = 10000;
-	}
-	else if ( DeltaTime > 180.0/FMin(Player.CurrentNetSpeed,10000) )
+	else if ( Level.TimeSeconds - LastUpdateTime > 180.0/Player.CurrentNetSpeed )
 	{
-		LocDiff = Location - LastClientLocation;
+		LocDiff = Location - ClientLoc;
 		ClientErr = LocDiff Dot LocDiff;
 	}
 
@@ -925,6 +897,7 @@ function ServerMove
 			BaseJoint
 		);
 	}
+	LastClientTimestamp = 0;
 	//log("Server "$Role$" moved "$self$" stamp "$TimeStamp$" location "$Location$" Acceleration "$Acceleration$" Velocity "$Velocity);
 }
 
@@ -1529,7 +1502,8 @@ function ReplicateMove
 			PendingMove.bFireDefSpell = PendingMove.bFireDefSpell || bJustFiredDefSpell || (bFireDefSpell != 0);
 			PendingMove.bForceFireDefSpell = PendingMove.bForceFireDefSpell || bJustFiredDefSpell;
 			PendingMove.Delta = TotalTime;
-			PendingMove.MergeCount++;
+			// todo: investigate
+			//PendingMove.MergeCount++;
 		}
 		else
 		{
@@ -1691,7 +1665,10 @@ function HandleWalking()
 
 simulated event Destroyed()
 {
+	local SavedMove NextMove;
+
 	Super.Destroyed();
+	
 	if ( myHud != None )
 		myHud.Destroy();
 	if ( Scoring != None )
@@ -1699,14 +1676,16 @@ simulated event Destroyed()
 
 	While ( FreeMoves != None )
 	{
+		NextMove = FreeMoves.NextMove;
 		FreeMoves.Destroy();
-		FreeMoves = FreeMoves.NextMove;
+		FreeMoves = NextMove;
 	}
 
 	While ( SavedMoves != None )
 	{
+		NextMove = SavedMoves.NextMove;
 		SavedMoves.Destroy();
-		SavedMoves = SavedMoves.NextMove;
+		SavedMoves = NextMove;
 	}
 }
 

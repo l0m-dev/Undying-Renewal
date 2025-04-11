@@ -12,7 +12,7 @@ class Console extends Object
 //#exec Texture Import File=Textures\Border.pcx
 
 // Internal.
-var private const int vtblOut;
+var native private const int vtblOut;
 
 // Constants.
 const MaxBorder=6;

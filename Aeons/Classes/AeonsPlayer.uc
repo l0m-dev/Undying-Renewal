@@ -447,7 +447,7 @@ replication
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
 		bDoubleShotgun, bDrawInvList,
 		bAllowSpellSelectionHUD, bPhoenix,
-		Book, ServerSavesList;
+		Book, Objectives, ServerSavesList;
 
 	reliable if( Role<ROLE_Authority && bNetOwner )
 		JumpHeldTime; //, FireHeldTime
@@ -463,7 +463,7 @@ replication
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
 		ClientPlayTakeHit, GiveJournalClient,
-		ScreenMessage, ProcessObjectives;
+		ScreenMessage;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
@@ -500,6 +500,11 @@ event PreBeginPlay()
 	// bDrawInvList = true;		// Draw the inventory list
 	
 	bRenderWeapon = true;
+
+	// give em somethin' to read
+	GiveBook();
+
+	InvDisplayMan = spawn(class 'InvDisplayManager',self,,Location);
 	
 	wind = spawn(class 'PlayerWind',self,,Location);
 	wind.setBase(self);
@@ -516,6 +521,21 @@ event PreBeginPlay()
 	//TypingIndicator = spawn(class 'TypingIndicator',self,,Location + vect(0,0,128));
 	//TypingIndicator.setBase(self);
 }
+
+simulated event Destroyed()
+{
+	local actor a;
+
+	Super.Destroyed();
+
+	if ( Book != None )
+		Book.Destroy();
+	if ( InvDisplayMan != None )
+		InvDisplayMan.Destroy();
+	if ( wind != None )
+		wind.Destroy();
+}
+
 
 //==============
 // Encroachment
@@ -1065,7 +1085,7 @@ exec function TestJournal( string JournalEntryName )
 }
 
 //----------------------------------------------------------------------------
-simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
+function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
 	local JournalEntry TempEntry;
 
@@ -1076,6 +1096,9 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 	
 	if ( JournalClass != None )
 	{	
+		if ( Level.NetMode != NM_Standalone )
+			GiveJournalClient(JournalClass, bShowImmediate);
+
 		TempEntry = Spawn(JournalClass);
 			
 		if (TempEntry!=None)
@@ -1085,11 +1108,6 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 				TempEntry.Destroy();
 				return false;
 			}
-		}
-
-		if (Level.NetMode == NM_DedicatedServer)
-		{
-			GiveJournalClient(JournalClass, bShowImmediate);
 		}
 	}
 
@@ -1101,22 +1119,32 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 
 simulated function GiveJournalClient(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
-	GiveJournal(JournalClass, bShowImmediate);
-}
-
-/*
-function GiveJournalClient(int journalId, class<JournalEntry> JournalEntryClass, bool bRead)
-{
 	local JournalEntry TempEntry;
 
-	TempEntry = Spawn(JournalEntryClass);
-				
-	if ( TempEntry != None )
-	{ 
-		BookJournal(Book).SetJournalEntry(journalId, TempEntry, bRead);
+	if (Role == ROLE_Authority)
+	{
+		return;
 	}
+
+	if (Book == None)
+	{
+		return;
+	}
+
+	TempEntry = Spawn(JournalClass);
+			
+	if (TempEntry!=None)
+	{
+		if (!Book.AddEntry( TempEntry, true ))
+		{
+			TempEntry.Destroy();
+			return;
+		}
+	}
+
+	if ( bShowImmediate )
+		ShowBook();
 }
-*/
 
 /*exec brady doesn't want this to be bindable*/ 
 exec function ShowBook()
@@ -8175,7 +8203,7 @@ function ProcessObjectives( string ObjectivesText )
 	local bool Process;
 	local bool EatChar;
 	
-	log("ProcessObjectives: " $ ObjectivesText);
+	//log("ProcessObjectives: " $ ObjectivesText);
 
 	Remainder = ObjectivesText;
 
@@ -8297,7 +8325,7 @@ function AddObjective( int ObjectiveNumber )
 		return;
 	}
 
-	log("AddObjective: " $ ObjectiveNumber);
+	//log("AddObjective: " $ ObjectiveNumber);
 
 	for ( i=0; i<ArrayCount(Objectives); i++ )
 	{
@@ -8384,7 +8412,7 @@ function RemoveObjective( int ObjectiveNumber )
 {
 	local int i, j, FoundSlot;
 
-	log("RemoveObjective: " $ ObjectiveNumber);
+	//log("RemoveObjective: " $ ObjectiveNumber);
 
 	for ( i=0; i<ArrayCount(Objectives); i++ )
 	{

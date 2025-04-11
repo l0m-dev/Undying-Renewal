@@ -412,8 +412,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 		AeonsPlayer(PlayerPawn).GameStateMod = Spawn(class'Aeons.GameStateModifier', PlayerPawn);
 
 	// -------------------------------------------------------------------------
-	
-	AeonsPlayer(PlayerPawn).InvDisplayMan = spawn(class 'InvDisplayManager',PlayerPawn,,Location);
 
 	// give the player all weapons and all spells
 	AeonsPlayer(PlayerPawn).GiveStartupWeapons();
@@ -434,9 +432,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 			newWeapon.WeaponSet(PlayerPawn);
 		}
 	}
-	
-	// give em somethin' to read
-	AeonsPlayer(PlayerPawn).GiveBook();
 	
 	// default Defense/Misc Spell
 	/*

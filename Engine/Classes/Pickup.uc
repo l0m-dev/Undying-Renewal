@@ -128,7 +128,6 @@ auto state Pickup
 				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
-			AmbientSound = none;
 		}
 	}
 
@@ -137,11 +136,6 @@ auto state Pickup
 		local PlayerPawn P;
 		
 		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			break;
-		}
-
-		if ( p!= none )
 			Touch(P);
 	}
 
@@ -154,7 +148,8 @@ auto state Pickup
 
 function PickupFunction(Pawn Other)
 {
-	SetOwner(Other);
+	AmbientSound = None;
+	//SetOwner(Other); // unnecessary
 }
 
 //

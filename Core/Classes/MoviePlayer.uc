@@ -22,7 +22,7 @@ enum EMovieFlags
 	MOVFLAG_ExitOnKeyPress
 };
 
-var int					privatemembers;		// filler for the space needed for a struct pointer
+var native private const int privatemembers;		// filler for the space needed for a struct pointer
 
 native(2014) final function int Init();
 native(2015) final function int Destroy();

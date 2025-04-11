@@ -50,16 +50,7 @@ function SaveFavorites()
 	local UBrowserServerList I;
 
 	FavoriteCount = 0;
-	for(I = UBrowserServerList(PingedList.Next); i!=None; I = UBrowserServerList(I.Next))
-	{
-		if(FavoriteCount == 100)
-			break;
-		Favorites[FavoriteCount] = I.HostName$"\\"$I.IP$"\\"$string(I.QueryPort)$"\\"$string(I.bKeepDescription);
-
-		FavoriteCount++;
-	}
-
-	for(I = UBrowserServerList(UnPingedList.Next); i!=None; I = UBrowserServerList(I.Next))
+	for(I = UBrowserServerList(Owner.Next); i!=None; I = UBrowserServerList(I.Next))
 	{
 		if(FavoriteCount == 100)
 			break;

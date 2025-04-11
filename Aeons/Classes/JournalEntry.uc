@@ -423,4 +423,5 @@ defaultproperties
      Icon=Texture'Aeons.bk_book'
      MAX_LINES=150
      NumPages=1
+     RemoteRole=ROLE_None
 }

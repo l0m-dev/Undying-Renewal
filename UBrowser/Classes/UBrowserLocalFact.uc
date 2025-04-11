@@ -10,8 +10,6 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 {
 	Super.Query(bBySuperset, bInitial);
 
-	Owner = PingedList;
-
 	// Update status bar
 	Owner.Owner.PingFinished();
 

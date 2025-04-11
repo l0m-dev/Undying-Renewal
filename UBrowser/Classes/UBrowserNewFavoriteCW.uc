@@ -15,7 +15,7 @@ function OKPressed()
 	W = UBrowserFavoriteServers(UBrowserRightClickMenu(ParentWindow.OwnerWindow).Grid.GetParent(class'UBrowserFavoriteServers'));
 	F = W.Factories[0];
 	
-	L = UBrowserServerList(F.PingedList.CreateItem(F.PingedList.Class));
+	L = UBrowserServerList(F.Owner.CreateItem(F.Owner.Class));
 
 	L.HostName = DescriptionEdit.GetValue();
 	L.IP = IPEdit.GetValue();

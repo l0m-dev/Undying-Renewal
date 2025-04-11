@@ -14,9 +14,9 @@ var() Texture SourceTexture;
 var   bool bRedraw;
 
 
-var transient const int Junk1;	// C++ stuff
-var transient const int Junk2;	// C++ stuff
-var transient const int Junk3;	// C++ stuff
+var native private const int Junk1;	// C++ stuff
+var native private const int Junk2;	// C++ stuff
+var native private const int Junk3;	// C++ stuff
 var transient const float LocalTime;	// C++ stuff
 
 

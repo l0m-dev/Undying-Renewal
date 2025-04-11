@@ -59,6 +59,12 @@ var JournalEntry ObjectivesEntry;
 var ScriptedTexture Textures[4];
 var int TextureStatus[4];
 
+replication
+{
+	reliable if (Role < ROLE_Authority)
+		ServerJournalRead;
+}
+
 //----------------------------------------------------------------------------
 
 simulated function ForceLoad()
@@ -144,27 +150,11 @@ simulated function PostBeginPlay()
 
 simulated function PostNetBeginPlay()
 {
-	if (Level.NetMode == NM_Client && Owner != None && ViewPort(PlayerPawn(Owner).Player) != None)
-	{
-		TestRep();
-	}
-}
-
-/*
-simulated function Tick(float a)
-{
 	if (Level.NetMode == NM_Client)
-	{
-		if (AeonsPlayer(Owner).Book==Self)
-		{
-			TestRep();
-			Disable('Tick');
-		}
-	}
+		LoadReplicatedJournals();
 }
-*/
 
-simulated function TestRep()
+simulated function LoadReplicatedJournals()
 {
 	local JournalEntry TempEntry;
 	local int i;
@@ -172,19 +162,18 @@ simulated function TestRep()
 	
 	for ( i=0; i<NumJournals; i++ )
 	{
-		if (( JournalsClassesRep[i] != none)) 
+		if ( JournalsClassesRep[i] != none ) 
 		{
-			//JournalEntryClass = Class<JournalEntry>(DynamicLoadObject(string(JournalsClassesRep[i]), class'Class'));
 			JournalEntryClass = JournalsClassesRep[i];
 			if ( JournalEntryClass != None )
 			{
 				TempEntry = Spawn(JournalEntryClass);
-				if (TempEntry != None)
-				{
-					if (!AddEntry( TempEntry, true ))
-					{
-						TempEntry.Destroy();
-					}
+
+				if ( TempEntry != None )
+				{ 
+					JournalNames[i] = String(TempEntry.Class);
+					Journals[i] = TempEntry;
+					Journals[i].bRead = bool(JournalRead[i]);
 				}
 			}
 		}
@@ -393,7 +382,11 @@ simulated function RefreshPages()
 			Entry.bRead = True;
 			// journals don't travel with player so we need to store an extra array of bools of what entries have been read or not
 			if ( CurrentJournalIndex >= 0 ) 
+			{
 				JournalRead[CurrentJournalIndex] = 1;
+				if ( Level.NetMode == NM_Client )
+					ServerJournalRead(CurrentJournalIndex);
+			}
 
 			// If this journal entry was the newest unread entry, assign a different entry as the latest.
 			NewestUnread = None;
@@ -427,6 +420,11 @@ simulated function JournalEntry GetJournalEntry( int Index )
 		return Journals[Index];
 	else
 		return None;
+}
+
+function ServerJournalRead( int Index )
+{
+	JournalRead[Index] = 1;
 }
 
 

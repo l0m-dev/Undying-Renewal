@@ -6,22 +6,20 @@
 class UBrowserServerListFactory extends UWindowList
 	abstract;
 
-var UBrowserServerList PingedList;
-var UBrowserServerList UnpingedList;
 var UBrowserServerList Owner;
-
-
 var bool bIncrementalPing;		// Servers are pinged as they come in
+
+var Player ViewPortOwner;
 
 function Query(optional bool bBySuperset, optional bool bInitial)
 {
+	if(ViewPortOwner==None)
+		ViewPortOwner = Owner.GetPlayerOwner().Player; // Assign this variable to avoid future problems.
 }
 
 function Shutdown(optional bool bBySuperset)
 {
-	Owner = None;
-	PingedList = None;
-	UnpingedList = None;
+	//Owner = None;
 }
 
 function QueryFinished(bool bSuccess, optional string ErrorMsg)
@@ -39,8 +37,9 @@ function UBrowserServerList FoundServer(string IP, int QueryPort, string Categor
 	if(NewListEntry == None)
 	{
 		// Add it to the server list(s)
-		NewListEntry = UBrowserServerList(Owner.CreateItem(Owner.Class));
+		NewListEntry = UBrowserServerList(Owner.Append(Owner.Class));
 
+		NewListEntry.bNeverPinged = True;
 		NewListEntry.IP = IP;
 		NewListEntry.QueryPort = QueryPort;
 
@@ -52,18 +51,23 @@ function UBrowserServerList FoundServer(string IP, int QueryPort, string Categor
 		NewListEntry.Category = Category;
 		NewListEntry.GameName = GameName;
 		NewListEntry.bLocalServer = False;
-
-		Owner.AppendItem(NewListEntry);
 	}
 
 	NewListEntry.bOldServer = False;
-
+	if(Owner.Owner.PingState!=PS_Pinging)
+	{
+		Owner.Owner.PingState = PS_Pinging;
+		Owner.PingServers(True, False);
+	}
 	return NewListEntry;
 }
 
 function PlayerPawn GetPlayerOwner()
 {
-	return Owner.GetPlayerOwner();
+	if(ViewPortOwner!=None)
+		return ViewPortOwner.Actor;
+	ViewPortOwner = Owner.GetPlayerOwner().Player;
+	return ViewPortOwner.Actor;
 }
 
 defaultproperties

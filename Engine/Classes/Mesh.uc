@@ -2,47 +2,51 @@
 // Mesh
 //=============================================================================
 
-class Mesh expands Primitive;
+class Mesh expands Primitive
+	native
+	noexport;
 
 const MF_UNK			  = 0x00000001;
 const MF_HAS_LOD_DISTANCE = 0x10000000;
 
-var private native int Tris_vtableptr;
-var private native int Tris_SavedAr;
+var native private const int Tris_vtableptr;
+var native private const int Tris_SavedAr;
 var private native int Tris_SavedPos;
 var array<byte> Tris;
 var array<Texture> Textures;
 var array<float> TextureLOD;
 
-var private native int MRMMeshData;
-var int NumVerts;
-var int NumNormals;
+var native private const int MRMMeshData;
+var int Verts;
+var int Normals;
 
-var int Unk1;
+var byte Smoothing;
 var int Unk2;
 var int Flags;
 
-var private native int AnimData;
+var native private const int AnimData;
 
 /*
-struct UMesh : UPrimitive
+class ENGINE_API UMesh : public UPrimitive
 {
-    TLazyArray          			Tris; // FMeshTri
-    TArray          				Textures; // UTexture*
+	DECLARE_ABSTRACT_CLASS(UMesh,UPrimitive,0,Engine)
 
-	TArray		        			TextureLOD; // float
+	// Objects.
+	TLazyArray<FMeshTri>			Tris;
+	TArray<UTexture*>				Textures;
+	TArray<FLOAT>					TextureLOD;
 
 	// Counts.
-	UMRMMeshData*					MRMMeshData;
-	int								NumVerts;
-	int								NumNormals;
+	UMRMMeshData* MRMMeshData;
+	INT Verts;
+	INT Normals;
 
-	uint							Unk1;
-	uint							Unk2;
-	uint							Flags;
+	BYTE Smoothing;
+	DWORD Unk2;
+	DWORD Flags;
 
-	UAnimData*                      AnimData;
-};
+	class UAnimData* AnimData;
+}
 */
 
 defaultproperties

@@ -9,7 +9,7 @@ class StatLogFile extends StatLog
 var bool bWatermark;
 
 // Internal
-var int LogAr; // C++ FArchive*.
+var native private const int LogAr; // C++ FArchive*.
 
 // Configs
 var string StatLogFile;

@@ -35,7 +35,7 @@ var float CutsceneCameraHoldTime;
 
 replication
 {
-	unreliable if (Role == ROLE_Authority)
+	reliable if (Role == ROLE_Authority)
 		FromPointLookAt, ToPointLookAt;
 	reliable if (Role == ROLE_Authority && bNetInitial)
 		Take, pDist, ToPoint, FromPoint, TotalTime, MasterPoint;

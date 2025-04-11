@@ -40,6 +40,27 @@ event StartLevel()
 	Super.StartLevel();
 }
 
+function GiveJournal(AeonsPlayer Player)
+{
+	// give the journal and play the writing sound if successful
+	if( Player.GiveJournal(JournalClass, bShowImmediate) && bPlayWritingSound )
+		Player.PlaySound (JournalWritingSound, [Volume] 1.5);
+}
+
+function PickupFunction(Pawn Other)
+{
+	local AeonsPlayer AP;
+
+	Super.PickupFunction(Other);
+	
+	// give the journal and play the writing sound if successful
+	AP = AeonsPlayer(Other);
+	if( AP != None )
+		GiveJournal(AP);
+
+	Destroy();
+}
+
 auto state Pickup
 {
 	singular function ZoneChange( ZoneInfo NewZone )
@@ -85,60 +106,10 @@ auto state Pickup
 		
 	function Trigger( Actor Other, Pawn EventInstigator )
 	{
-		local PlayerPawn P;
-
 		// if journal pickup was triggered, let's not do the usual pickup sound
 		PickupSound = None;
 		
-		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			break;
-		}
-
-		if ( p!= none )
-			Touch(P);
-	}
-
-	// When touched by an actor.
-	function Touch( actor Other )
-	{
-		local AeonsPlayer AP;
-		
-		// If touched by a player pawn, let him pick this up.
-		if( ValidTouch(Other) )
-		{
-			// show the book with our Entry
-			ForEach AllActors(class 'AeonsPlayer', AP)
-			{
-				if(!AP.GiveJournal(JournalClass, bShowImmediate))
-					continue;
-				
-				if (Level.Game.LocalLog != None)
-					Level.Game.LocalLog.LogPickup(Self, AP);
-				if (Level.Game.WorldLog != None)
-					Level.Game.WorldLog.LogPickup(Self, AP);
-				//SpawnCopy(Pawn(AP));
-				if ( PickupMessageClass == None )
-					AP.ClientMessage(PickupMessage, 'Pickup');
-				else
-					AP.ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
-
-				AP.PlaySound (PickupSound);
-				
-				if ( bPlayWritingSound )
-					AP.PlaySound (JournalWritingSound, [Volume] 1.5);
-			}
-			
-			//if ( Level.Game.Difficulty > 1 )
-			//	Other.MakeNoise(0.1 * Level.Game.Difficulty);
-			//if ( Pawn(Other).MoveTarget == self )
-			//	Pawn(Other).MoveTimer = -1.0;		
-
-			Destroy();
-		}
-		//else if ( bTossedOut && (Other.Class == Class)
-		//		&& Inventory(Other).bTossedOut )
-		//		Destroy();
+		Super.Trigger( Other, EventInstigator );
 	}
 
 	// Landed on ground.

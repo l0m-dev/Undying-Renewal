@@ -71,6 +71,12 @@ function Timer()
 simulated function UpdateParticles()
 {
 	local int i;
+
+	if (Pawn(Owner) == none)
+	{
+		Destroy();
+		return;
+	}
 	
 	col = DeriveColor();
 
