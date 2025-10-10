@@ -12,7 +12,7 @@ class Phoenix expands AeonsWeapon;
 //#exec MESH NOTIFY SEQ=Fire TIME=0.6 FUNCTION=SmallExplosion
 //#exec MESH NOTIFY SEQ=Fire TIME=0.7 FUNCTION=FireWeapon
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //=============================================================================
 var Phoenix_Proj GuidedShell;

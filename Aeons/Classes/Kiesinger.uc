@@ -6,8 +6,8 @@ class Kiesinger expands ScriptedFlyer;
 //#exec MESH JOINTNAME Neck=Head
 //#exec MESH MODIFIERS Skirt1:ClothCollide Cape1:ClothingBack LSleeve1:Cloth RSleeve1:Cloth
 
-//#exec MESH NOTIFY SEQ=Attack_Chest TIME=0.200 FUNCTION=PushBack		//
-//#exec MESH NOTIFY SEQ=Attack_Chest TIME=0.9500 FUNCTION=PushBackDone
+////#exec MESH NOTIFY SEQ=Attack_Chest TIME=0.200 FUNCTION=PushBack		//
+////#exec MESH NOTIFY SEQ=Attack_Chest TIME=0.9500 FUNCTION=PushBackDone
 //#exec MESH NOTIFY SEQ=Attack_Chest TIME=0.2 FUNCTION=CastShield
 
 //#exec MESH NOTIFY SEQ=defense_spell TIME=0.800 FUNCTION=CastDefenseSpell
@@ -23,17 +23,17 @@ class Kiesinger expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Lightning_Fingers TIME=0.75 FUNCTION=SummonSkull
 
 //#exec MESH NOTIFY SEQ=attack_chest TIME=0.147 FUNCTION=PlaySound_N ARG="ForceBlast"
-//#exec MESH NOTIFY SEQ=attack_chest TIME=0.235294 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=attack_chest TIME=0.941176 FUNCTION=C_FootScuff
+////#exec MESH NOTIFY SEQ=attack_chest TIME=0.235294 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=attack_chest TIME=0.941176 FUNCTION=C_FootScuff
 //#exec MESH NOTIFY SEQ=attack_traditional TIME=0.000 FUNCTION=PlaySound_N ARG="LightBuild"
-//#exec MESH NOTIFY SEQ=attack_traditional TIME=0.47619 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=attack_traditional TIME=0.833333 FUNCTION=C_FootScuff
-//#exec MESH NOTIFY SEQ=attack_dispell TIME=0.2 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=attack_dispell TIME=0.925 FUNCTION=C_FootScuff
+////#exec MESH NOTIFY SEQ=attack_traditional TIME=0.47619 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=attack_traditional TIME=0.833333 FUNCTION=C_FootScuff
+////#exec MESH NOTIFY SEQ=attack_dispell TIME=0.2 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=attack_dispell TIME=0.925 FUNCTION=C_FootScuff
 //#exec MESH NOTIFY SEQ=kill_suck TIME=0.000 FUNCTION=PlaySound_N ARG="Suck"
 //#exec MESH NOTIFY SEQ=kill_suck TIME=0.670 FUNCTION=PlaySound_N ARG="PatDeath"
-//#exec MESH NOTIFY SEQ=kill_suck TIME=0.141304 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=kill_suck TIME=0.793478 FUNCTION=C_FootScuff
+////#exec MESH NOTIFY SEQ=kill_suck TIME=0.141304 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=kill_suck TIME=0.793478 FUNCTION=C_FootScuff
 //#exec MESH NOTIFY SEQ=laugh TIME=0.170 FUNCTION=PlaySound_N ARG="Laugh"
 
 // Head only mesh
@@ -328,7 +328,7 @@ function CastPhoenix()
 
 	PhoenixTimer = Default.PhoenixTimer;
 
-	PlaySound_P( "PLaunch" );
+	PlaySound_P( "PLaunch V=0.25" ); // l0m: fixed sound being really loud
 }
 
 function bool CanCastSkullStorm()
@@ -1116,6 +1116,60 @@ state AIReallyAmbush expands AIAmbush
 	}
 }
 
+
+//****************************************************************************
+// AISpecialKill
+//****************************************************************************
+/*
+// Renewal test
+state AISpecialKill
+{
+	// *** overridden functions ***
+	function PostSpecialKill()
+	{
+		SK_TargetPawn.GotoState( 'SpecialKill', 'SpecialKillComplete' );
+		GotoState( 'AIWait' );
+	}
+
+	function StartSequence()
+	{
+		GotoState( , 'KIESSTART' );
+	}
+
+	// *** new (state only) functions ***
+	function OJDidIt()
+	{
+		local vector	DVect;
+		local int		lp;
+		local actor		Blood;
+
+		DVect = SK_TargetPawn.JointPlace('spine3').pos;
+		for ( lp = 0; lp < 2; lp++ )
+			Spawn( class'Aeons.WeakGibBits',,, DVect, rotator(VRand()) );
+		Blood = Spawn( class'Aeons.BloodParticles',,, DVect, SK_TargetPawn.Rotation );
+		Blood.SetBase( SK_TargetPawn, 'spine3', 'root');
+	}
+
+	function OJDidItAgain()
+	{
+		PlayerBleedOutFromJoint('spine3');
+	}
+
+
+KIESSTART:
+	DebugDistance( "before anim" );
+	SK_TargetPawn.PlayAnim( 'handmaiden_death', [TweenTime] 0.0  );
+	PlayAnim( 'kill_suck', [TweenTime] 0.0  );
+	FinishAnim();
+	PostSpecialKill();
+
+} // state AISpecialKill
+//
+//     SK_PlayerOffset=(X=40,Z=-40)
+//     bHasSpecialKill=True
+//
+*/
+
 defaultproperties
 {
      MomentumTransfer=1000
@@ -1174,4 +1228,6 @@ defaultproperties
      Mass=2000
      MenuName="Keisinger"
      CreatureDeathVerb="eldritched"
+     bIsBoss=True
+     bHackable=False
 }

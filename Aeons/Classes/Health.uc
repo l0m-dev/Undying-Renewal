@@ -16,11 +16,10 @@ var bool bHealingRoot;
 var float inc;
 var vector InitialLocation;
 var ParticleFX pfx;
-var string MaxHealthMessage;
+var localized string MaxHealthMessage;
 
 simulated function PreBeginPlay()
 {
-	MaxHealthMessage = Localize("Aeons.Health", "MaxHealthMessage", "Renewal");
 	Disable('Tick');
 }
 
@@ -89,7 +88,7 @@ simulated function Tick(float DeltaTime)
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( pfx != none )
 	{
@@ -112,6 +111,18 @@ function PickupFunction(Pawn Other)
 	}
 }
 
+function bool HandlePickupQuery( inventory Item )
+{
+	if ( item.IsA('Health') && Health(item).bHealthVial && GetRenewalConfig().bAutoUseHealthVials )
+	{
+		// don't do anything extra
+		// return false to say picking up wasn't handled by this function
+		return false;
+	}
+
+	return Super.HandlePickupQuery(Item);
+}
+
 auto state Pickup
 {
 	function bool ValidTouch( actor Other )
@@ -123,7 +134,16 @@ auto state Pickup
 		AP = AeonsPlayer(Other);
 		if ( AP != None )
 		{
-			// additional checks
+			// health vial check
+			if (bHealthVial && GetRenewalConfig().bAutoUseHealthVials)
+			{
+				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget >= 100)
+					return false;
+
+				return Super.ValidTouch(Other);
+			}
+
+			// health limit check
 			Inv = AP.Inventory.FindItemInGroup(default.InventoryGroup);
 			if (Inv != None)
 				HealthPacks = Pickup(Inv).numCopies + 1;
@@ -133,12 +153,8 @@ auto state Pickup
 				(Level.Game.Difficulty == 1 && HealthPacks >= 10) ||
 				(Level.Game.Difficulty == 2 && HealthPacks >= 5)))
 			{
-				// don't limit picking up health vials if they are used automatically
-				if (!bHealthVial || !GetRenewalConfig().bAutoUseHealthVials)
-				{
-					AP.ClientMessage(MaxHealthMessage, 'Pickup');
-					return false;
-				}
+				AP.ClientMessage(MaxHealthMessage, 'Pickup');
+				return false;
 			}
 		}
 
@@ -161,7 +177,7 @@ auto state Pickup
 			if (bActivatable && Pawn(Other).SelectedItem==None) 
 				Pawn(Other).SelectedItem=Copy;
 			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
-			if (AP == None || !GetRenewalConfig().bShowQuickSelectHint || !Ap.ShowSelectItemHint(PickupMessage))
+			if (AP == None || !GetRenewalConfig().bShowQuickSelectHint || !AP.ShowSelectItemHint(PickupMessage))
 			{
 				// hint was not shown
 				if ( PickupMessageClass == None )
@@ -172,11 +188,13 @@ auto state Pickup
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
 
-			if ((AP != None && Level.Game.Difficulty == 0 && HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
+			if (AP != None)
 			{
-				// Picking up health when I really need it.
-				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget < 100)
+				if ((Level.Game.Difficulty == 0 && HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
+				{
+					// Picking up health when I really need it.
 					Copy.Activate();
+				}
 			}
 		}
 	}
@@ -204,6 +222,7 @@ state Activated
 				
 				Owner.PlaySound(ActivateSound);
 				HealthModifier(AP.HealthMod).HealthSurplus += HealAmt;
+				HealthModifier(AP.HealthMod).UpdateProjectedHealthTarget();
 				numCopies --;
 				//HealthModifier(AP.HealthMod).NumHealths --;
 			}
@@ -217,8 +236,11 @@ state Activated
 		}
 	}
 
-	Begin:
+	function BeginState()
+	{
+		Super.BeginState();
 		Activate();
+	}
 }
 
 state Deactivated
@@ -241,6 +263,7 @@ defaultproperties
      bAmbientGlow=False
      PickupMessage="You gained a Health Pack"
      ItemName="Health"
+     MaxHealthMessage="You cannot carry any more Health"
      PickupViewMesh=SkelMesh'Aeons.Meshes.health_m'
      PickupSound=Sound'Aeons.Inventory.I_HealthPU01'
      ActivateSound=Sound'Wpn_Spl_Inv.Inventory.I_HealthUse01'

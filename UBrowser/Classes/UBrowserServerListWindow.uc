@@ -294,6 +294,8 @@ function Refresh(optional bool bBySuperset, optional bool bInitial, optional boo
 		TagServersAsOld();
 	}
 
+	PingedList.bPinged = false;
+
 	PingState = PS_QueryServer;
 	ShutdownFactories(bBySuperset);
 	CreateFactories();
@@ -377,12 +379,12 @@ function QueryFinished(UBrowserServerListFactory Fact, bool bSuccess, optional s
 		ErrorString = ErrorMsg;
 
 		// don't ping and report success if we have no servers.
-		if(bDone && PingedList.Count() == 0)
+		if(bDone && PingedList.Count() == 0 && !PingedList.bPinged)
 		{
 			if( bFallbackFactories )
 			{
 				FallbackFactory++;
-				if( ListFactories[FallbackFactory] != "" )
+				if( FallbackFactory < ArrayCount(ListFactories) && ListFactories[FallbackFactory] != "" )
 					Refresh();	// try the next fallback master server
 				else
 					FallbackFactory = 0;

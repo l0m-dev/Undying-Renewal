@@ -62,7 +62,7 @@ exec function dbg()
 {
 	local UWindowWindow Window;
 
-	Window = CreateWindow("UndyingShellPC.RenewalWindow", 300, 200, true);
+	Window = CreateWindow("UndyingShellPC.RenewalWindow", 350, 220, true);
 	Window.bLeaveOnScreen = True;
 	Window.SetPropertyText("bDebug", "true");
 }
@@ -82,11 +82,22 @@ exec function StopRepeating()
 		Repeater.Stop();
 }
 
+// gets called 3 times (from Spawn, SpawnPlayActor and LoadMap)
 function StartLevel()
 {
-	SetShellPauses(false);
+	//SetShellPauses(false);
 	CrouchTime = 0;
 	super.StartLevel();
+}
+
+// called after setting Player
+function TravelPreAccept()
+{
+	super.TravelPreAccept();
+	if ( Level.NetMode != NM_Client )
+		EnableSaveGame();
+	else
+		DisableSaveGame();
 }
 
 function TurnOffShadow()
@@ -121,16 +132,15 @@ event PreBeginPlay()
 	EnableLog('GameState');
 	EnableLog('GameEvents');
 	EnableLog('Pickups');
+
+	if ( RGC() )
+		AirControl = 0.4;
 }
-	
-simulated event PostBeginPlay()
+
+// left for backwards compatibility with mods
+event PostBeginPlay()
 {
-	// needs to be simulated
 	Super.PostBeginPlay();
-	if (Level.NetMode == NM_Standalone || Level.NetMode != NM_Client)
-		EnableSaveGame();
-	else
-		DisableSaveGame();
 }
 
 function bool IsAlert()
@@ -227,7 +237,48 @@ exec function MakeWet(bool bWet)
 	}
 }
 
-exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
+exec function DetachJoint()
+{
+	local vector start, end, eyeOffset, HitLocation, HitNormal;
+	local int HitJoint;
+	local Actor A, B;
+	
+	eyeOffset.z = eyeHeight;
+	
+	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
+	end = start + (Vector(ViewRotation) * 65536);
+	
+	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
+
+	if ( A != none )
+	{
+		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
+		if ( B != none )
+		{
+			B.Velocity = vect(0,0,456);
+			B.DesiredRotation = RotRand();
+		}
+	}
+}
+
+exec function DestroyJoint()
+{
+	local vector start, end, eyeOffset, HitLocation, HitNormal;
+	local int HitJoint;
+	local Actor A;
+	
+	eyeOffset.z = eyeHeight;
+	
+	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
+	end = start + (Vector(ViewRotation) * 65536);
+	
+	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
+
+	if ( A != none )
+		A.DestroyLimb(A.JointName(HitJoint));
+}
+
+function DetachJointEx(optional sound PawnImpactSound, optional int Distance)
 {
 	local vector start, end, eyeOffset, HitLocation, HitNormal, x, y, z;
 	local int HitJoint;
@@ -249,25 +300,28 @@ exec function DetachJoint(optional sound PawnImpactSound, optional int Distance)
 
 	GetAxes(ViewRotation, x, y, z);
 
-	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss)
+	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss )
 	{
 		B = A.DetachLimb(A.JointName(HitJoint), Class 'BodyPart');
-		B.Velocity = (y + vect(0,0,0.25)) * 256;
-		B.DesiredRotation = RotRand(true);
-		B.bBounce = true;
-		B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+		if ( B != none )
+		{
+			B.Velocity = (y + vect(0,0,0.25)) * 256;
+			B.DesiredRotation = RotRand(true);
+			B.bBounce = true;
+			B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
 
-		ScriptedPawn(A).bHacked = true;
+			ScriptedPawn(A).bHacked = true;
 
-		ReplicateDetachLimb(A, A.JointName(HitJoint), B.Velocity, B.DesiredRotation);
+			ReplicateDetachLimb(A, A.JointName(HitJoint), B.Velocity, B.DesiredRotation);
 
-		Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Normal(B.Velocity));
-		if (PawnImpactSound != None)
-			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
+			Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Normal(B.Velocity));
+			if (PawnImpactSound != None)
+				PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
+		}
 	}
 }
 
-exec function DestroyJoint()
+function DestroyJointEx()
 {
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
@@ -795,7 +849,7 @@ state Dying
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
 
-		if ( Weapon != None ) // fix weapon detaching for othe clients
+		if ( Weapon != None ) // fix weapon detaching for other clients
 			Weapon.SetBase(None);
 	}
 	
@@ -856,7 +910,10 @@ state DialogScene expands PlayerWalking
 	{
 		UnFreeze();
 		EnableSaveGame();
-		bFire = 0;
+		// commented out to fix client firing when skipping a cutscene in multiplayer
+		// shotgun and molotov code needed slight changes to account for this
+		// we could keep this for singleplayer, but it seems unnecessary now
+		//bFire = 0;
 		bFireAttSpell = 0;
 		bFireDefSpell = 0;
 		if (Level.NetMode != NM_Client)
@@ -1418,6 +1475,7 @@ exec function SetSkill(int Skill)
 		return;
 	
 	Level.Game.Difficulty = Skill;
+	UpdateURL("Difficulty", string(Skill), false);
 }
 
 exec function GetGameEvent(name EventName)
@@ -1468,5 +1526,4 @@ defaultproperties
      Mesh=SkelMesh'Aeons.Meshes.Patrick_m'
      CollisionRadius=22
      CollisionHeight=57
-     AirControl=0.4
 }

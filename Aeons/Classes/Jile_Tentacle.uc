@@ -16,7 +16,7 @@ class Jile_Tentacle expands Jile;
 //#exec MESH NOTIFY SEQ=tentacle_snap TIME=0.813 FUNCTION=DoNearDamage	//
 //#exec MESH NOTIFY SEQ=tentacle_snap TIME=1.000 FUNCTION=PlaySnap		//
 
-//#exec MESH NOTIFY SEQ=Tentacle_Die TIME=0.0 FUNCTION=PlaySound_N ARG="Die PVar=0.2"
+////#exec MESH NOTIFY SEQ=Tentacle_Die TIME=0.0 FUNCTION=PlaySound_N ARG="Die PVar=0.2"
 //#exec MESH NOTIFY SEQ=Tentacle_Grow TIME=0.0 FUNCTION=PlaySound_N ARG="Grow PVar=0.2"
 //#exec MESH NOTIFY SEQ=Tentacle_Idle TIME=0.0238095 FUNCTION=PlaySound_N ARG="Mvmt CHANCE=0.8 PVar=0.2 V=0.7 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Tentacle_Snap TIME=0.125 FUNCTION=PlaySound_N ARG="Snap PVar=0.2"

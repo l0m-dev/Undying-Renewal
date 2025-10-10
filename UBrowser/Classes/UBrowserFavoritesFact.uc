@@ -38,7 +38,7 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 
 	for(i=0;i<FavoriteCount;i++)
 	{
-		L = FoundServer(ParseOption(Favorites[i], 1), Int(ParseOption(Favorites[i], 2)), "", "Unreal", ParseOption(Favorites[i], 0));
+		L = FoundServer(ParseOption(Favorites[i], 1), Int(ParseOption(Favorites[i], 2)), "", "Undying", ParseOption(Favorites[i], 0));
 		L.bKeepDescription = ParseOption(Favorites[i], 3) ~= (string(True));
 	}
 

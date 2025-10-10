@@ -23,7 +23,8 @@ simulated function BeginPlay()
 	if ( bCausesDamage )
 	{
 		A = spawn(class 'FireTrigger', Pawn(Owner),,Location, Rotator(vect(0,0,1)));
-		A.SetBase(self);
+		if ( A != None )
+			A.SetBase(self);
 	}
 }
 

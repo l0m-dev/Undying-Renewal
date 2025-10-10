@@ -129,7 +129,7 @@ function SkipToTake(int NewTake, float NewAge)
 
 function Tick(float DeltaTime)	
 {
-	Age += DeltaTime;
+	//Age += DeltaTime;
 }
 
 state PlayCSTake

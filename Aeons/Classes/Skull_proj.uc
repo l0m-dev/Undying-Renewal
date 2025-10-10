@@ -42,7 +42,7 @@ var(Sound)  SkullSoundParams GreetSounds[10];
 var(Sound)  SkullSoundParams ChatSounds[10];
 var(Sound)  SkullSoundParams ScreamSounds[10];
 
-var(Sound)	sound	SpawningSounds[1];				// Spawning Sounds
+var(Sound)	sound	SpawningSounds;					// Spawning Sounds
 //var(Sound)	sound	GreetingSounds[5];				// Greeting Sounds
 var(Sound)	sound	CommentSounds[3];				// Comment sounds
 var(Sound)	sound	ScreamingSounds[2];				// Screaming sounds

@@ -43,5 +43,5 @@ defaultproperties
 {
      MasterServerTCPPort=28900
      MasterServerTimeout=10
-     GameName="unreal"
+     GameName="undying"
 }

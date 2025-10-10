@@ -4,14 +4,15 @@
 class CreateGameWindow expands ShellWindow;
 
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
-#exec Texture Import File=CreateGame_0.bmp Mips=Off
-#exec Texture Import File=CreateGame_1.bmp Mips=Off
-#exec Texture Import File=CreateGame_2.bmp Mips=Off
-//#exec Texture Import File=Video_3.bmp Mips=Off
-#exec Texture Import File=CreateGame_4.bmp Mips=Off
-#exec Texture Import File=CreateGame_5.bmp Mips=Off
+//#exec Texture Import File=CreateGame_0.bmp Mips=Off
+//#exec Texture Import File=CreateGame_1.bmp Mips=Off
+//#exec Texture Import File=CreateGame_2.bmp Mips=Off
+//#exec Texture Import File=CreateGame_3.bmp Mips=Off
+//#exec Texture Import File=CreateGame_4.bmp Mips=Off
+//#exec Texture Import File=CreateGame_5.bmp Mips=Off
 
 //#exec Texture Import File=video_advan_up.bmp Mips=Off
 //#exec Texture Import File=video_advan_dn.bmp Mips=Off
@@ -119,9 +120,9 @@ function Created()
 	Advanced.bBurnable = true;
 	Advanced.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Advanced.UpTexture =   texture'video_advan_up';
-	Advanced.DownTexture = texture'video_advan_dn';
-	Advanced.OverTexture = texture'video_advan_ov';
+	Advanced.UpTexture =   texture'ShellTextures.video_advan_up';
+	Advanced.DownTexture = texture'ShellTextures.video_advan_dn';
+	Advanced.OverTexture = texture'ShellTextures.video_advan_ov';
 	Advanced.DisabledTexture = None;
 
 	// Max Players Slider
@@ -235,6 +236,7 @@ function Created()
 
 
 // Listen Button
+/*
 	Listen = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
 	//Listen.TexCoords.X = NewRegion(0,0,82,36);
@@ -285,13 +287,14 @@ function Created()
 	Dedicated.DownTexture =		None;
 	Dedicated.OverTexture =		None;
 	Dedicated.DisabledTexture =	None;
+*/
 
 
 // Change Dedicated button	
 	GameTypeLabel = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 	
 	GameTypeLabel.TexCoords = NewRegion(0,0,204,54);
-	GameTypeLabel.Template = NewRegion(556,260,180,48);
+	GameTypeLabel.Template = NewRegion(556,275,180,48);
 	
 	GameTypeLabel.Manager = Self;
 	GameTypeLabel.Style = 5;
@@ -327,9 +330,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'Video_ok_up';
-	OK.DownTexture = texture'Video_ok_dn';
-	OK.OverTexture = texture'Video_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.Video_ok_up';
+	OK.DownTexture = texture'ShellTextures.Video_ok_dn';
+	OK.OverTexture = texture'ShellTextures.Video_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -349,15 +352,15 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'Video_cancel_up';
-	Cancel.DownTexture = texture'Video_cancel_dn';
-	Cancel.OverTexture = texture'Video_cancel_ov';
+	Cancel.UpTexture =   texture'ShellTextures.Video_cancel_up';
+	Cancel.DownTexture = texture'ShellTextures.Video_cancel_dn';
+	Cancel.OverTexture = texture'ShellTextures.Video_cancel_ov';
 	Cancel.DisabledTexture = None;
 
 // Server name label
 	ServerNameLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
 
-	ServerNameLabel.Template=NewRegion(566, 190, 158, 38);
+	ServerNameLabel.Template=NewRegion(566, 200, 158, 38);
 	ServerNameLabel.Manager = Self;
 	TextColor.R = 255;
 	TextColor.G = 255;
@@ -369,7 +372,7 @@ function Created()
 // Map name Label
 	MapNameLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
 
-	MapNameLabel.Template=NewRegion(560, 235, 164, 38);
+	MapNameLabel.Template=NewRegion(560, 250, 164, 38);
 	MapNameLabel.Manager = Self;
 	TextColor.R = 255;
 	TextColor.G = 215;
@@ -390,7 +393,7 @@ function Created()
 
 	if (AdvCreateGame == None )
 	{
-		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 400, 100, 300, 200);
+		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 450, 100, 350, 220);
 		AdvCreateGame.HideWindow();
 
 		AdvGameplayPage = AdvCreateGameWindow(AdvCreateGame).GameplayPage;
@@ -692,7 +695,7 @@ function MaxPlayersChanged()
 
 function GetCurrentSettings()
 {
-	SetServerMode(default.bDedicated);
+	//SetServerMode(default.bDedicated);
 }
 
 function CreateGamePressed()
@@ -738,7 +741,7 @@ function AdvCreateGamePressed()
 	PlayNewScreenSound();
 
 	if (AdvCreateGame == None ) 
-		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 400, 100, 300, 200);
+		AdvCreateGame = Root.CreateWindow(class'AdvCreateGameWindow', Root.WinWidth - 450, 100, 350, 220);
 	else
 		AdvCreateGame.ShowWindow();		
 }
@@ -773,8 +776,8 @@ function Resized()
 	if ( Down != None ) 
 		Down.ManagerResized(RootScaleX, RootScaleY);
 
-	Listen.ManagerResized(RootScaleX, RootScaleY);
-	Dedicated.ManagerResized(RootScaleX, RootScaleY);
+	//Listen.ManagerResized(RootScaleX, RootScaleY);
+	//Dedicated.ManagerResized(RootScaleX, RootScaleY);
 	ServerNameLabel.ManagerResized(RootScaleX, RootScaleY);
 	MapNameLabel.ManagerResized(RootScaleX, RootScaleY);
 	GameTypeLabel.ManagerResized(RootScaleX, RootScaleY);
@@ -835,6 +838,7 @@ function Paint(Canvas C, float X, float Y)
 
 }
 
+/*
 function NotifyBeforeLevelChange()
 {
 	Super.NotifyBeforeLevelChange();	
@@ -843,6 +847,7 @@ function NotifyBeforeLevelChange()
 	ParentWindow.Close();
 	MainMenuWindow(AeonsRootWindow(Root).MainMenu).Close();
 }
+*/
 
 
 function Close(optional bool bByParent)
@@ -878,10 +883,10 @@ defaultproperties
      DedicatedText="Dedicated"
      ListenText="Listen"
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
-     BackNames(0)="UndyingShellPC.CreateGame_0"
-     BackNames(1)="UndyingShellPC.CreateGame_1"
-     BackNames(2)="UndyingShellPC.CreateGame_2"
-     BackNames(3)="UndyingShellPC.Video_3"
-     BackNames(4)="UndyingShellPC.CreateGame_4"
-     BackNames(5)="UndyingShellPC.CreateGame_5"
+     BackNames(0)="ShellTextures.CreateGame_0"
+     BackNames(1)="ShellTextures.CreateGame_1"
+     BackNames(2)="ShellTextures.CreateGame_2"
+     BackNames(3)="ShellTextures.CreateGame_3"
+     BackNames(4)="ShellTextures.CreateGame_4"
+     BackNames(5)="ShellTextures.CreateGame_5"
 }

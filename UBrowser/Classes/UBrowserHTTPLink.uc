@@ -118,7 +118,7 @@ function HandleServer(string Text)
 	Address = ParseDelimited(Text, " ", 1);
 	Port = ParseDelimited(Text, " ", 3);
 
-	OwnerFactory.FoundServer(Address, int(Port), "", "Unreal");
+	OwnerFactory.FoundServer(Address, int(Port), "", "Undying");
 }
 
 function GotMatch(int MatchData)

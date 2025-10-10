@@ -4,7 +4,7 @@
 class HealthModifier expands PlayerModifier;
 
 var travel int HealthSurplus, NumHealths, SuperHealthSurplus, ProjectedHealthTarget;
-var float t;
+var float t, MaxHealthSurplus, MaxSuperHealthSurplus;
 
 simulated function PreBeginPlay()
 {
@@ -12,7 +12,15 @@ simulated function PreBeginPlay()
 
 	// fixes picking up health before we tick (on custom maps that give us health packs on start)
 	if ( Owner != None ) 
-		ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus;
+		UpdateProjectedHealthTarget();
+
+	if ( RGC() )
+		MaxHealthSurplus = 200.0;
+}
+
+simulated function UpdateProjectedHealthTarget()
+{
+	ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus;
 }
 
 function int Dispel(optional bool bCheck)
@@ -56,10 +64,10 @@ auto state Activated
 			t -= 0.2;
 			if (HealthSurplus > 0)
 			{
-				if (Pawn(Owner).Health < 200.0)
+				if (Pawn(Owner).Health < MaxHealthSurplus)
 				{
-					if (Pawn(Owner).Health > 199.0) {
-						Pawn(Owner).Health = 200;
+					if (Pawn(Owner).Health > (MaxHealthSurplus - 1.0)) {
+						Pawn(Owner).Health = MaxHealthSurplus;
 					} else {
 						Pawn(Owner).Health += 1.0;
 					}
@@ -68,7 +76,7 @@ auto state Activated
 					HealthSurplus = 0;
 				}
 			} else if ( SuperHealthSurplus > 0 ) {
-				if (Pawn(Owner).Health < 200)
+				if (Pawn(Owner).Health < MaxSuperHealthSurplus)
 				{
 					Pawn(Owner).Health += 1.0;
 					SuperHealthSurplus --;
@@ -80,7 +88,7 @@ auto state Activated
 			}
 		}
 
-		ProjectedHealthTarget = Pawn(Owner).Health + HealthSurplus + SuperHealthSurplus;
+		UpdateProjectedHealthTarget();
 		
 		if (Level.Game.Difficulty == 0)
 		{
@@ -120,4 +128,6 @@ defaultproperties
      bTimedTick=True
      MinTickTime=0.15
      RemoteRole=ROLE_None
+     MaxHealthSurplus=100
+     MaxSuperHealthSurplus=100
 }

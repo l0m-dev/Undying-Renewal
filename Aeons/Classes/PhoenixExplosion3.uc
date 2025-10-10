@@ -3,7 +3,7 @@
 //=============================================================================
 class PhoenixExplosion3 expands PhoenixExplosions;
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 

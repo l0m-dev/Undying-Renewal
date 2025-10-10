@@ -4,8 +4,8 @@
 class EctoplasmTrail expands AnimSpriteEffect;
 
 //#exec Texture Import Name=FX_ectoTrail01 File=FX_ectoTrail01.pcx Group=Trails Mips=On
-//#exec OBJ LOAD FILE=FX.utx PACKAGE=Aeons.EctoplasmTrail
-//#exec OBJ LOAD FILE=SmokeEffect1.utx PACKAGE=UNREALSHARE.SEffect1
+////#exec OBJ LOAD FILE=FX.utx PACKAGE=Aeons.EctoplasmTrail
+////#exec OBJ LOAD FILE=SmokeEffect1.utx PACKAGE=UNREALSHARE.SEffect1
 
 var() float destroyAtDrawScale;
 // var() float iterativeScaleFactor;

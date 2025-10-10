@@ -3,7 +3,7 @@
 //=============================================================================
 class DefaultFootSoundSet expands FootSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\FootSteps.uax PACKAGE=FootSteps
+#exec OBJ LOAD FILE=..\Sounds\FootSteps.uax PACKAGE=FootSteps
 
 defaultproperties
 {

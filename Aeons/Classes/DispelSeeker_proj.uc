@@ -14,7 +14,7 @@ function int Dispel(optional bool bCheck)
 		return 0;
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	if ( ParticleFXClass != none )
 	{
@@ -24,7 +24,7 @@ function PreBeginPlay()
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	log (""$self.name$" is destroyed", 'Misc');
 	if (pFX != none)

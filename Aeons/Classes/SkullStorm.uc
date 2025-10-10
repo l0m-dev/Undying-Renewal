@@ -92,7 +92,7 @@ function PreBeginPlay ()
 	// castingLevel = 4;
 }
 
-function spawnEffect(texture tex, vector Loc)
+simulated function spawnEffect(texture tex, vector Loc)
 {
 	switch(tex.ImpactID)
 	{
@@ -371,7 +371,7 @@ function bool ProcessCastingLevel()
 function FireAttSpell( float Value )
 {
 	//log ("SkullStorm FireAttSpell, Player State = "$AeonsPlayer(Owner).GetStateName(), 'Misc');
-	if (!(AeonsPlayer(Owner).GetStateName() == 'DialogScene') && !(AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene'))
+	if ( !AeonsPlayer(Owner).IsInCutsceneState() )
 	{
 		//log("SkullStorm FireAttSpell called ... ", 'Misc');
 		//logStack('Misc');

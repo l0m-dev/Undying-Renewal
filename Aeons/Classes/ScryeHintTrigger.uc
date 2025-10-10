@@ -5,7 +5,7 @@ class ScryeHintTrigger expands Trigger;
 
 //#exec TEXTURE IMPORT NAME=TrigScryeHint FILE=TrigScryeHint.pcx GROUP=System Mips=Off Flags=2
 
-#exec OBJ LOAD FILE=\Aeons\Sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\Sounds\Shell_HUD.uax PACKAGE=Shell_HUD
 
 var bool bCanPlayScryeSound, bEventSeen;
 var int NumTimesTriggered;
@@ -16,14 +16,13 @@ var sound ScryeHintSounds[5];
 var() bool bDisableAfterPlayerScrye;
 var() float Vol1, Vol2, Vol3;
 
-var string ScryeHintMessage;
+var localized string ScryeHintMessage;
 
 //=============================================================================
 
 function PreBeginPlay()
 {
 	super.PreBeginPlay();
-	ScryeHintMessage = Localize("Aeons.ScryeHintTrigger", "ScryeHintMessage", "Renewal");
 }
 
 function PassThru(Actor Other)
@@ -137,4 +136,5 @@ defaultproperties
      Vol3=1
      Texture=Texture'Aeons.System.TrigScryeHint'
      DrawScale=0.5
+     ScryeHintMessage="Use Scrye to reveal the past when you hear whispering"
 }

@@ -46,7 +46,7 @@ function Paint(Canvas C, float X, float Y)
 
 	TextSize(C, Text, W, H);
 
-	bScrollingText = false;//(W >= WinWidth);
+	bScrollingText = (W >= WinWidth);
 	
 	TextY = (WinHeight - H) / 2;
 	switch (Align)

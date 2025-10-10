@@ -179,7 +179,6 @@ state FoundSecretState
 
 Begin:
 	Enable('Tick');
-	Sleep(2);
 	SendBufferedData("\\list\\\\gamename\\"$GameName$"\\final\\");
 	WaitFor("ip\\", 30, NextIP);
 }

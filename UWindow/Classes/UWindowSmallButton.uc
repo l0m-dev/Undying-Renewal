@@ -20,8 +20,8 @@ function AutoWidth(Canvas C)
 	
 	TextSize(C, RemoveAmpersand(Text), W, H);
 
-	if(WinWidth < W + 10)
-		WinWidth = W + 10;
+	//if(WinWidth < W + 10*Root.ScaleY)
+		WinWidth = W + 10*Root.ScaleY;
 }
 
 function BeforePaint(Canvas C, float X, float Y)

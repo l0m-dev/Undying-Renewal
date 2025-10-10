@@ -3662,7 +3662,10 @@ function JumpOffPawn()
 event TravelPostAccept()
 {
 	if ( Health <= 0 )
+	{
 		Health = Default.Health;
+		bBehindView = false; // bBehindView is set in Dying state, but EndState won't get called when switching levels 
+	}
 }
 
 // This pawn was possessed by a player.
@@ -5596,6 +5599,7 @@ state SpecialKill
 
 		// set the player's fov back (they may be zoomed in)
 		DesiredFOV = DefaultFOV;
+		FOVAngle = DefaultFOV;
 		bFire = 0;
 		bFireAttSpell = 0;
 		bCanExitSpecialState = false;

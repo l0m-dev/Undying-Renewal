@@ -15,7 +15,7 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 
 	//l = Array_Size(RecentServer);
 	//for ( i=0; i<l; i++ )
-	//	FoundServer(RecentServer[i].ServerIP, RecentServer[i].ServerPort, "", "Unreal", RecentServer[i].ServerName);
+	//	FoundServer(RecentServer[i].ServerIP, RecentServer[i].ServerPort, "", "Undying", RecentServer[i].ServerName);
 
 	Super.Query();
 	QueryFinished(True);

@@ -4,7 +4,7 @@
 class FireFly expands DefSpell;
 
 // Sounds
-// #exec AUDIO IMPORT FILE="E_Spl_FireFly01.wav" NAME="E_Spl_FireFly01" GROUP="Spells"
+//// #exec AUDIO IMPORT FILE="E_Spl_FireFly01.wav" NAME="E_Spl_FireFly01" GROUP="Spells"
 //#exec AUDIO IMPORT FILE="E_Spl_FireFlyLoop01.wav" NAME="E_Spl_FireFlyLoop01" GROUP="Spells"
 //#exec AUDIO IMPORT FILE="E_Spl_FireFlyHit01.wav" NAME="E_Spl_FireFlyHit01" GROUP="Spells"
 //#exec AUDIO IMPORT FILE="E_Spl_FireFlyGen01.wav" NAME="E_Spl_FireFlyGen01" GROUP="Spells"

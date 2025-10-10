@@ -3,7 +3,7 @@
 //=============================================================================
 class ShellWindow expands ManagerWindow;
 
-//#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
+#exec OBJ LOAD FILE=..\textures\FX.utx PACKAGE=FX
 
 var() texture Back[6];
 var() BinkTexture AnimatedBack;
@@ -78,6 +78,9 @@ function Paint(Canvas C, float X, float Y)
 
 	C.DrawColor = BackColor;
 	
+	// Direct3D and Glide have issues with seamless tiling when applying bilinear filtering, bNoSmooth = true completely disables that filtering
+	// to get the bilinear filtering back, we need to reimport textures with bilinear filtering preapplied
+	// originally, textures were drawn from 1, 1 to Tex.USize-2, Tex.VSize-2 to hide the borders caused by bilinear filtering
 	C.bNoSmooth = true;
 
 	//if (Root.ActiveWindow != Self)

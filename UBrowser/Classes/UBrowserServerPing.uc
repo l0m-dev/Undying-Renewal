@@ -6,7 +6,8 @@ class UBrowserServerPing extends UdpLink;
 var UBrowserServerList	Server;
 
 var IpAddr				ServerIPAddr;
-var float				ElapsedTime;
+var float				RequestSentTime;
+var float				LastDelta;
 var name				QueryState;
 var bool				bInitial;
 var bool				bJustThisServer;
@@ -57,7 +58,7 @@ function ValidateServer()
 {
 	if(Server.ServerPing != Self)
 	{
-		Log("ORPHANED: "$Self@Server.ServerPing);
+		Log("ORPHANED: "$Self);
 		Destroy();
 	}
 }
@@ -166,7 +167,7 @@ function AddRule(string Rule, string Value)
 state Binding
 {
 Begin:
-	if( BindPort(2000+Rand(4000), true) == 0 )
+	if( BindPort() == 0 )
 	{
 		Log("UBrowserServerPing: Port failed to bind.  Attempt "$BindAttempts);
 		BindAttempts++;
@@ -482,7 +483,7 @@ Begin:
 	AddRule(ServerAddressText, "unreal://"$Server.IP$":"$string(Server.GamePort));
 
 	SendText( ServerIPAddr, "\\status\\" );
-	SetTimer(PingTimeout + Rand(200)/100, False);
+	SetTimer(PingTimeout + FRand(), False);
 }
 
 function string ParseReply(string Text, string Key)
@@ -500,6 +501,7 @@ state GetInfo
 	event ReceivedText(IpAddr Addr, string Text)
 	{
 		local string Temp;
+		local float ElapsedTime;
 
 		// Make sure this packet really is for us.
 		Temp = IpAddrToString(Addr);
@@ -507,7 +509,8 @@ state GetInfo
 			return;
 
 		ValidateServer();
-		Server.Ping = 1000*ElapsedTime;
+		ElapsedTime = (Level.TimeSeconds - RequestSentTime) / Level.TimeDilation;
+		Server.Ping = Max(1000*ElapsedTime - (0.5*LastDelta) - 10, 4); // subtract avg client and server frametime from ping.
 		if(!Server.bKeepDescription)
 			Server.HostName = Server.IP;
 		Server.GamePort = 0;
@@ -588,7 +591,7 @@ state GetInfo
 
 	event Tick(Float DeltaTime)
 	{
-		ElapsedTime = ElapsedTime + DeltaTime;
+		LastDelta = DeltaTime;
 	}
 
 	event Timer()
@@ -621,30 +624,10 @@ state GetInfo
 	}
 
 Begin:
-	ElapsedTime = 0;
 	Enable('Tick');
+	RequestSentTime = Level.TimeSeconds;
 	SendText( ServerIPAddr, "\\info\\" );
-	SetTimer(PingTimeout + Rand(200)/100, False);
-	//log(""$Self@"start ping");
-	/*
-	//Log("Ping Timeout from "$Server.IP$" Giving Up");
-
-	Server.HostName = ""$Self;
-	Server.Ping = 123;
-	//Server.GamePort = 7777;
-	//Server.MapName = "Manor_Gardens1";
-	Server.MapDisplayName = "Manor_Gardens2";
-	Server.MapTitle = "Manor_Gardens3";
-	Server.NumPlayers = 1;
-	Server.MaxPlayers = 32;
-
-	Server.GameVer = 420;
-	Server.MinNetVer = 400;
-
-	Disable('Tick');
-
-	Server.PingDone(bInitial, bJustThisServer, True, bNoSort);
-	*/
+	SetTimer(PingTimeout + FRand(), False);
 }
 
 state Resolving
@@ -688,5 +671,5 @@ defaultproperties
      PasswordText="Requires Password"
      MaxBindAttempts=5
      BindRetryTime=10
-     PingTimeout=10
+     PingTimeout=1
 }

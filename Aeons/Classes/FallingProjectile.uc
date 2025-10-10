@@ -3,7 +3,7 @@
 //=============================================================================
 class FallingProjectile expands Projectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 var() const enum ECollision
 {
@@ -148,8 +148,8 @@ auto state FallingState
 			Trail = spawn(TrailClass,self,,Location);
 			Trail.setBase(self);
 		}
-		else
-			warn(" TrailClass == None ");
+		//else
+		//	warn(" TrailClass == None ");
 
 	}
 

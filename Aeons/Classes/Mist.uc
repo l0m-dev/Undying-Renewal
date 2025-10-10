@@ -55,7 +55,7 @@ var() float					PreAttackWhipDistance;		// TEMP
 //****************************************************************************
 // Inherited functions.
 //****************************************************************************
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	local int	lp;
 
@@ -83,7 +83,7 @@ function PreBeginPlay()
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	local int	lp;
 

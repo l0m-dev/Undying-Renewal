@@ -3,12 +3,24 @@
 //=============================================================================
 class BulletAmmo expands Ammo;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
-// #exec MESH IMPORT MESH=bulletammo_m SKELFILE=bulletammo_m.ngf
+//// #exec MESH IMPORT MESH=bulletammo_m SKELFILE=bulletammo_m.ngf
 //#exec MESH IMPORT MESH=RevolverAmmo_m SKELFILE=RevolverAmmo.ngf
 
 //#exec AUDIO IMPORT  FILE="I_RevAmmoPU01.WAV" NAME="I_RevAmmoPU01" GROUP="Inventory"
+
+function Activate()
+{
+	local AeonsWeapon wep;
+		
+	if (Pawn(Owner) != none)
+	{
+		wep = AeonsWeapon(Pawn(Owner).Weapon);
+		if ( Wep.isA('Revolver') )
+			Super.Activate();
+	}
+}
 
 state Activated
 {
@@ -23,14 +35,12 @@ state Activated
 			{
 				if ( wep.bAltAmmo )
 				{
-					bActive = true;
 					// wep.AmmoType.AmmoAmount += wep.ClipCount;
 					wep.ClipCount = 0;			// Empty the clip
 					wep.bAltAmmo = false;		// Normal Ammo Type
-					wep.AmmoType.bActive = false;
+					wep.AmmoType.GotoState('Deactivated');
 					wep.AmmoType = Ammo(Pawn(Owner).FindInventoryType(wep.AmmoName));
 					wep.gotoState('NewClip');	// Load the New Clip
-					bActive = true;
 				}
 				else
 				{

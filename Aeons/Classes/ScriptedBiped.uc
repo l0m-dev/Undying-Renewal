@@ -602,6 +602,30 @@ function BFallSmall()
 //****************************************************************************
 
 //****************************************************************************
+// AINoScript
+// No or lost script.
+//****************************************************************************
+state AINoScript
+{
+	// *** ignored functions ***
+
+	// *** overridden functions ***
+
+	// *** new (state only) functions ***
+	function Timer()
+	{
+		PlaySound_P( "EventIdle" );
+		SetTimer( 30.0 + FRand() * 20.0, false );
+	}
+
+RESUME:
+BEGIN:
+	WaitForLanding();
+	PlayWait();
+	SetTimer( FVariant( 40.0, 20.0 ), false );
+} // state AINoScript
+
+//****************************************************************************
 // AIWait
 // wait for encounter at current location
 //****************************************************************************
@@ -612,6 +636,14 @@ state AIWait
 	{
 		global.BeginState();
 		Dispatch();
+	}
+
+	function TriggerEvent()
+	{
+		if ( FRand() < 0.05 ) // FRand() < 0.016
+		{
+			PlaySound_P( "EventIdle" );
+		}
 	}
 
 	function CueNextEvent()

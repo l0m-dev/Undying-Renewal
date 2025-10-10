@@ -44,7 +44,8 @@ function Created()
 	Super.Created();
 }
 
-static function bool LocalizationExists(String SectionName, String KeyName, String PackageName, optional out String resultStr) {
+static final function bool LocalizationExists(String SectionName, String KeyName, String PackageName, optional out String resultStr)
+{
 	local String notFoundStr;
 	
 	notFoundStr = "<?int?"$PackageName$"."$SectionName$"."$KeyName$"?>";
@@ -98,7 +99,8 @@ function AfterCreate()
 	DesiredHeight = ControlOffset * Root.ScaleY;
 }
 
-function ResolutionChanged(float W, float H)
+// changed ResolutionChanged to Resized because ResolutionChanged wasn't always called
+function Resized()
 {
 	DesiredHeight = ControlOffset * Root.ScaleY;
 }

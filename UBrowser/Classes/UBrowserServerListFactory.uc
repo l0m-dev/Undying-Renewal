@@ -30,8 +30,13 @@ function QueryFinished(bool bSuccess, optional string ErrorMsg)
 function UBrowserServerList FoundServer(string IP, int QueryPort, string Category, string GameName, optional string HostName)
 {
 	local UBrowserServerList NewListEntry;
+	local bool bInstantPing;
 
+	bInstantPing = Owner.Owner != None && Owner.Owner.PingedList == Owner;
 	NewListEntry = Owner.FindExistingServer(IP, QueryPort);
+
+	if(NewListEntry == None && bInstantPing && Owner.Owner.PingedList != None)
+		NewListEntry = Owner.Owner.PingedList.FindExistingServer(IP, QueryPort);
 
 	// Don't add if it's already in the existing list
 	if(NewListEntry == None)
@@ -51,6 +56,12 @@ function UBrowserServerList FoundServer(string IP, int QueryPort, string Categor
 		NewListEntry.Category = Category;
 		NewListEntry.GameName = GameName;
 		NewListEntry.bLocalServer = False;
+
+		if(bInstantPing)
+		{
+			NewListEntry.PingServer(True, True, Owner.Owner.bNoSort);
+			Owner.bPinged = true;
+		}
 	}
 
 	NewListEntry.bOldServer = False;

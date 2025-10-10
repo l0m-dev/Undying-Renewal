@@ -9,6 +9,7 @@ var UWindowSmallCloseButton CloseButton;
 var AdvCreateGameGeneralPage GameplayPage;
 
 var localized string ServerTab;
+var localized string CoopTab;
 var UWindowPageControlPage Network;
 
 var string StatusBarText;
@@ -36,6 +37,7 @@ function Created()
 
 	GameplayPage = AdvCreateGameGeneralPage(UWindowScrollingDialogClient(AddScrollPage(class'RenewalWindow'.default.GameplayTab, class'AdvCreateGameGeneralPage').Page).ClientArea);
 	AddScrollPage(ServerTab, class'AdvCreateGameServerPage');
+	AddScrollPage(CoopTab, class'AdvCreateGameCoopPage');
 
 	CloseButton = UWindowSmallCloseButton(CreateControl(class'UWindowSmallCloseButton', 0, 0, 1, 1));
 	
@@ -51,7 +53,7 @@ function ToolTip(string strTip)
 
 function Resized()
 {
-	SetSize(300 * Root.ScaleY, 200 * Root.ScaleY);
+	SetSize(350 * Root.ScaleY, 220 * Root.ScaleY);
 	WinLeft = Root.WinWidth - WinWidth - 100 * Root.ScaleY;
 	WinTop = 100 * Root.ScaleY;
 
@@ -103,4 +105,5 @@ function Close(optional bool bByParent)
 defaultproperties
 {
      ServerTab="Server"
+     CoopTab="Co-op"
 }

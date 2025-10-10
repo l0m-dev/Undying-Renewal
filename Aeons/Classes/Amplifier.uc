@@ -36,7 +36,7 @@ simulated function PreBeginPlay()
 }
 
 //=============================================================================
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( pfx != none )
 	{

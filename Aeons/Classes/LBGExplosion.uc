@@ -4,7 +4,7 @@
 class LBGExplosion expands Explosion;
 
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 

@@ -3,7 +3,7 @@
 //=============================================================================
 class Spear_proj expands WeaponProjectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 var() float WindStrMult;
 var() float FadeDelay;

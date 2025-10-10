@@ -3,10 +3,10 @@
 //=============================================================================
 class ScriptedProjectile expands ScriptedPawn;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Footsteps.uax PACKAGE=Footsteps
-//#exec OBJ LOAD FILE=\Aeons\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Footsteps.uax PACKAGE=Footsteps
+#exec OBJ LOAD FILE=..\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
 
 
 //****************************************************************************

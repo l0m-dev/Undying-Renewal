@@ -205,12 +205,12 @@ state UWindow
 		{
 			Root.bUWindowActive = True;
 			
-			if (!bInitialized)
+			if(!bInitialized)
 			{
 				//fix
 				Root.SetupFonts(Canvas);
 				
-				if (!ViewPort.Actor.Level.bLoadBootShellPSX2)
+				if(!ViewPort.Actor.Level.bLoadBootShellPSX2)
 				{
 					Root.CloseActiveWindow();
 

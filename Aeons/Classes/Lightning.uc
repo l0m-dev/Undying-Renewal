@@ -795,19 +795,7 @@ state Holding
 			GotoState('Release');
 	}
 
-	Begin:
-		setTimer(0.05,true);
-		sndID = PlaySound(HoldSounds[Rand(3)]);
-		loopAnim('Lightning_cycle');
-		timeDampening = 3.0;
-		
-	End:
-}
-
-////////////////////////////////////////////////////////////////////////////////////////
-state Release
-{
-	function BeginState()
+	function EndState()
 	{
 		local int i;
 		
@@ -815,9 +803,7 @@ state Release
 			lts[i].Destroy();
 
 		//GhelzUse(1);
-	}
 
-	Begin:
 		StopSound(sndID);
 		Shaft.Destroy();
 
@@ -836,7 +822,22 @@ state Release
 			pFX.Shutdown();
 			pFX = none;
 		}
+	}
 
+	Begin:
+		setTimer(0.05,true);
+		sndID = PlaySound(HoldSounds[Rand(3)]);
+		loopAnim('Lightning_cycle');
+		timeDampening = 3.0;
+		
+	End:
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+state Release
+{
+
+	Begin:
 		// Test PlayActuator here!!
 		PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_FadeOut, 0.1f);
 		playAnim('Lightning_end');
@@ -869,12 +870,15 @@ function FireAttSpell( float Value )
 			{
 				if ( PawnOwner.useMana(SpeargunChargeManaCost) )
 					ChargeSpear();
+				else
+					FailedSpellCast();
 			} else if ( PawnOwner.Mana >= manaCostPerLevel[localCastingLevel] ) {
 				GhelzUse(manaCostPerLevel[castingLevel]);
 				gotoState('NormalFire');
 				if ( Owner.bHidden )
 					CheckVisibility();
 			} else {
+				FailedSpellCast();
 				GotoState('Idle');
 			}
 		}

@@ -116,10 +116,8 @@ state NormalFire
 				StopSound(SndID);
 			AmbientSound = None;
 
-			// Check the player's state
-			PlayerState = AeonsPlayer(Owner).GetStateName();
 			// Cutscenes and dialog scene states force bFire = 0, but we don't want to actually fire the projectile in if the player is in a lock down state.
-			if ( (PlayerState != 'PlayerCutscene') && (PlayerState != 'DialogScene') && (PlayerState != 'SpecialKill') )
+			if ( !AeonsPlayer(Owner).IsInCutsceneState() )
 			{
 				if ( useInternalMana(ChargedMana) )
 				{
@@ -243,7 +241,7 @@ state Idle
 
 	simulated function Timer()
 	{
-		if ( (FRand() < 0.5) && (AeonsPlayer(Owner).GetStateName() != 'DialogScene') && (AeonsPlayer(Owner).GetStateName() != 'PlayerCutScene'))
+		if ( (FRand() < 0.5) && !AeonsPlayer(Owner).IsInCutsceneState() )
 		{
 			PlaySound(SnortSound);
 			spawn(class 'TWCNoseParticleFX',Pawn(Owner),,JointPlace('RWhiskerBase').pos, PlayerPawn(Owner).ViewRotation);
@@ -310,10 +308,8 @@ state ClientFiring
 			StopSound(SndID);
 			AmbientSound = None;
 
-			// Check the player's state
-			PlayerState = AeonsPlayer(Owner).GetStateName();
 			// Cutscenes and dialog scene states force bFire = 0, but we don't want to actually fire the projectile in if the player is in a lock down state.
-			if ( (PlayerState != 'PlayerCutscene') && (PlayerState != 'DialogScene') && (PlayerState != 'SpecialKill') )
+			if ( !AeonsPlayer(Owner).IsInCutsceneState() )
 			{
 				if ( useInternalMana(ChargedMana) )
 				{

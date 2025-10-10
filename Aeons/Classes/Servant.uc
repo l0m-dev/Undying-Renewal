@@ -142,7 +142,8 @@ state AIBumpAvoid
 		SVect = Location + X * CollisionRadius;
 		EVect = Location + X * CollisionRadius * 3.0;
 		A = Trace( HitLocation, HitNormal, HitJoint, EVect, SVect, true );
-		DebugInfoMessage( ".ClearAhead() hit " $ A.name );
+		if ( A != None )
+			DebugInfoMessage( ".ClearAhead() hit " $ A.name );
 		return ( PlayerPawn(A) == none );
 	}
 

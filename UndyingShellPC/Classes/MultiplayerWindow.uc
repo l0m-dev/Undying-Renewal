@@ -3,28 +3,24 @@
 //=============================================================================
 class MultiplayerWindow expands ShellWindow;
 
-#exec Texture Import File=Multiplayer_0.bmp Mips=Off
-#exec Texture Import File=Multiplayer_1.bmp Mips=Off
-#exec Texture Import File=Multiplayer_2.bmp Mips=Off
-#exec Texture Import File=Multiplayer_3.bmp Mips=Off
-#exec Texture Import File=Multiplayer_4.bmp Mips=Off
-#exec Texture Import File=Multiplayer_5.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_0.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_1.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_2.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_3.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_4.bmp Mips=Off
+//#exec Texture Import File=Multiplayer_5.bmp Mips=Off
 
-//#exec Texture Import File=audio_ok_ov.BMP	Mips=Off Flags=2
-//#exec Texture Import File=audio_ok_up.BMP	Mips=Off Flags=2
-//#exec Texture Import File=audio_ok_dn.BMP	Mips=Off Flags=2
+//#exec Texture Import File=player_setup_ov.bmp	Mips=Off Flags=2
+//#exec Texture Import File=player_setup_up.bmp	Mips=Off Flags=2
+//#exec Texture Import File=player_setup_dn.bmp	Mips=Off Flags=2
 
-#exec Texture Import File=player_setup_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=player_setup_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=player_setup_dn.bmp	Mips=Off Flags=2
+//#exec Texture Import File=find_game_ov.bmp	Mips=Off Flags=2
+//#exec Texture Import File=find_game_up.bmp	Mips=Off Flags=2
+//#exec Texture Import File=find_game_dn.bmp	Mips=Off Flags=2
 
-#exec Texture Import File=find_game_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=find_game_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=find_game_dn.bmp	Mips=Off Flags=2
-
-#exec Texture Import File=create_game_ov.bmp	Mips=Off Flags=2
-#exec Texture Import File=create_game_up.bmp	Mips=Off Flags=2
-#exec Texture Import File=create_game_dn.bmp	Mips=Off Flags=2
+//#exec Texture Import File=create_game_ov.bmp	Mips=Off Flags=2
+//#exec Texture Import File=create_game_up.bmp	Mips=Off Flags=2
+//#exec Texture Import File=create_game_dn.bmp	Mips=Off Flags=2
 
 var UWindowWindow PlayerSetupWindow;
 var UWindowWindow FindGameWindow;
@@ -72,12 +68,12 @@ function Created()
 	FindGame.bBurnable = true;
 	FindGame.OverSound=sound'Aeons.Shell_Blacken01';
 
-	FindGame.UpTexture =   texture'find_game_up';
-	FindGame.DownTexture = texture'find_game_dn';
-	FindGame.OverTexture = texture'find_game_ov';
+	FindGame.UpTexture =   texture'ShellTextures.find_game_up';
+	FindGame.DownTexture = texture'ShellTextures.find_game_dn';
+	FindGame.OverTexture = texture'ShellTextures.find_game_ov';
 	FindGame.DisabledTexture = None;
 
-	FindGame.bDrawShadow = true;
+	//FindGame.bDrawShadow = true;
 
 //  CreateGame Button 210 70 160 48
 	CreateGame = ShellButton(CreateWindow(class'ShellButton', 210*RootScaleX, 70*RootScaleY, 154*RootScaleX, 74*RootScaleY));
@@ -96,12 +92,12 @@ function Created()
 	CreateGame.bBurnable = true;
 	CreateGame.OverSound=sound'Aeons.Shell_Blacken01';
 
-	CreateGame.UpTexture =   texture'create_game_up';
-	CreateGame.DownTexture = texture'create_game_dn';
-	CreateGame.OverTexture = texture'create_game_ov';
+	CreateGame.UpTexture =   texture'ShellTextures.create_game_up';
+	CreateGame.DownTexture = texture'ShellTextures.create_game_dn';
+	CreateGame.OverTexture = texture'ShellTextures.create_game_ov';
 	CreateGame.DisabledTexture = None;
 
-	CreateGame.bDrawShadow = true;
+	//CreateGame.bDrawShadow = true;
 
 //  PlayerSetup Button 56 228 146 56
 	PlayerSetup = ShellButton(CreateWindow(class'ShellButton', 56*RootScaleX, 228*RootScaleY, 164*RootScaleX, 64*RootScaleY));
@@ -120,12 +116,12 @@ function Created()
 	PlayerSetup.bBurnable = true;
 	PlayerSetup.OverSound=sound'Aeons.Shell_Blacken01';
 
-	PlayerSetup.UpTexture =   texture'player_setup_up';
-	PlayerSetup.DownTexture = texture'player_setup_dn';
-	PlayerSetup.OverTexture = texture'player_setup_ov';
+	PlayerSetup.UpTexture =   texture'ShellTextures.player_setup_up';
+	PlayerSetup.DownTexture = texture'ShellTextures.player_setup_dn';
+	PlayerSetup.OverTexture = texture'ShellTextures.player_setup_ov';
 	PlayerSetup.DisabledTexture = None;
 
-	PlayerSetup.bDrawShadow = true;
+	//PlayerSetup.bDrawShadow = true;
 
 //  Back Button 216 384 156 70
 	Back = ShellButton(CreateWindow(class'ShellButton', 216*RootScaleX, 384*RootScaleY, 160*RootScaleX, 64*RootScaleY));
@@ -136,12 +132,14 @@ function Created()
 	Back.Manager = Self;
 	Back.Style=5;
 
-	Back.UpTexture =   texture'sload_cancel_up';
-	Back.DownTexture = texture'sload_cancel_dn';
-	Back.OverTexture = texture'sload_cancel_ov';
+	Back.UpTexture =   texture'ShellTextures.sload_cancel_up';
+	Back.DownTexture = texture'ShellTextures.sload_cancel_dn';
+	Back.OverTexture = texture'ShellTextures.sload_cancel_ov';
 	
 	Back.bBurnable = true;
 	Back.OverSound=sound'Aeons.Shell_Blacken01';
+
+	Back.bDrawShadow = true;
 
 	//Root.Console.bBlackout = True;
 
@@ -323,24 +321,33 @@ function ShowWindow()
 function FixConfiguredSpeeds()
 {
 	local int MinNetSpeed;
+	local int MinLanSpeed;
+	local bool bChanged;
 
 	MinNetSpeed = 20000;
+	MinLanSpeed = 40000;
 
-	if (class'Player'.default.ConfiguredInternetSpeed < MinNetSpeed || class'Player'.default.ConfiguredLanSpeed < MinNetSpeed)
+	// class'Player'.default ConfiguredInternetSpeed and ConfiguredLanSpeed will be loaded from ini
+	if (class'Player'.default.ConfiguredInternetSpeed < MinNetSpeed)
 	{
-		if (class'Player'.default.ConfiguredInternetSpeed < MinNetSpeed)
-		{
-			GetPlayerOwner().Player.ConfiguredInternetSpeed = MinNetSpeed;
-			class'Player'.default.ConfiguredInternetSpeed = MinNetSpeed;
-			GetPlayerOwner().ConsoleCommand("NETSPEED "$MinNetSpeed);
-		}
-		if (class'Player'.default.ConfiguredLanSpeed < MinNetSpeed)
-		{
-			GetPlayerOwner().Player.ConfiguredLanSpeed = MinNetSpeed;
-			class'Player'.default.ConfiguredLanSpeed = MinNetSpeed;
-			GetPlayerOwner().ConsoleCommand("LANSPEED "$MinNetSpeed);
-		}
+		GetPlayerOwner().Player.ConfiguredInternetSpeed = MinNetSpeed;
+		class'Player'.default.ConfiguredInternetSpeed = MinNetSpeed;
+		GetPlayerOwner().ConsoleCommand("NETSPEED "$MinNetSpeed);
 
+		bChanged = true;
+	}
+
+	if (class'Player'.default.ConfiguredLanSpeed < MinLanSpeed)
+	{
+		GetPlayerOwner().Player.ConfiguredLanSpeed = MinLanSpeed;
+		class'Player'.default.ConfiguredLanSpeed = MinLanSpeed;
+		GetPlayerOwner().ConsoleCommand("LANSPEED "$MinLanSpeed);
+
+		bChanged = true;
+	}
+
+	if (bChanged)
+	{
 		GetPlayerOwner().Player.CurrentNetSpeed = MinNetSpeed;
 
 		GetPlayerOwner().Player.SaveConfig();
@@ -352,10 +359,10 @@ function FixConfiguredSpeeds()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.Multiplayer_0"
-     BackNames(1)="UndyingShellPC.Multiplayer_1"
-     BackNames(2)="UndyingShellPC.Multiplayer_2"
-     BackNames(3)="UndyingShellPC.Multiplayer_3"
-     BackNames(4)="UndyingShellPC.Multiplayer_4"
-     BackNames(5)="UndyingShellPC.Multiplayer_5"
+     BackNames(0)="ShellTextures.Multiplayer_0"
+     BackNames(1)="ShellTextures.Multiplayer_1"
+     BackNames(2)="ShellTextures.Multiplayer_2"
+     BackNames(3)="ShellTextures.Multiplayer_3"
+     BackNames(4)="ShellTextures.Multiplayer_4"
+     BackNames(5)="ShellTextures.Multiplayer_5"
 }

@@ -3,7 +3,7 @@
 //=============================================================================
 class SPStandingStone expands ScriptedPawn;
 
-//#exec MESH IMPORT MESH=StandingStone_m SKELFILE=StandingStone.ngf
+////#exec MESH IMPORT MESH=StandingStone_m SKELFILE=StandingStone.ngf
 
 defaultproperties
 {

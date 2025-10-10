@@ -3,7 +3,7 @@
 //=============================================================================
 class Hound expands ScriptedPawn;
 
-// #exec OBJ LOAD FILE=\Aeons\Textures\HoundSpawn.utx PACKAGE=HoundSpawn
+//// #exec OBJ LOAD FILE=..\Textures\HoundSpawn.utx PACKAGE=HoundSpawn
 
 //#exec MESH IMPORT MESH=Hound_m SKELFILE=Hound.ngf
 //#exec MESH MODIFIERS Cloth:Hair Cloth_Head:Hair Cloth_L_Arm:Hair Cloth_R_Arm:Hair Cloth_Spine:Hair
@@ -53,10 +53,10 @@ class Hound expands ScriptedPawn;
 //#exec MESH NOTIFY SEQ=run TIME=0.903226 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=run TIME=0.903226 FUNCTION=PlaySound_N ARG="CarpetS PVar=0.2 V=0.3 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Creature_Special_Kill TIME=0.0344828 FUNCTION=PlaySound_N ARG="SpecialKill V=1.3"
-//#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0196078 FUNCTION=PlaySound_N ARG="Damage PVar=0.2 V=1.4 VVar=0.1"
+////#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0196078 FUNCTION=PlaySound_N ARG="Damage PVar=0.2 V=1.4 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.352941 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.509804 FUNCTION=C_BareFS
-//#exec MESH NOTIFY SEQ=Death TIME=0.0322581 FUNCTION=PlaySound_N ARG="Death PVar=0.1 V=1.4 VVar=0.1"
+////#exec MESH NOTIFY SEQ=Death TIME=0.0322581 FUNCTION=PlaySound_N ARG="Death PVar=0.1 V=1.4 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Hunt TIME=0.225806 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=Hunt TIME=0.225806 FUNCTION=PlaySound_N ARG="CarpetS PVar=0.2 V=0.3 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Hunt TIME=0.451613 FUNCTION=C_BareFS
@@ -720,20 +720,24 @@ state AIJumpAtEnemy
 	{
 		local vector EnemyVelocity;
 		local vector EnemyAdjustedLoc;
+		local float SavedAirSpeed;
 		
-		if (RGC())
+		if ( RGC() )
 		{
-			EnemyVelocity = Enemy.Velocity; // * GetJumpAttackTime()
-			EnemyVelocity.Z *= 0.1;
+			EnemyVelocity = Enemy.Velocity;
+			EnemyVelocity.Z = 0; // ignore vertical velocity since we don't account for gravity
 			
-			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
 			// don't add velocity if player is coming towards us
-			if (Normal(EnemyAdjustedLoc + EnemyVelocity - Location) dot Normal(EnemyAdjustedLoc - Location) > 0.0)
+			if ( Normal(EnemyVelocity) dot Normal(Location - Enemy.Location) < 0.95 )
 				AddVelocity( EnemyVelocity );
+
+			// JumpTo requires ground position
+			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
 			
-			AirSpeed = 999999;
+			SavedAirSpeed = AirSpeed;
+			AirSpeed = Region.Zone.ZoneTerminalVelocity; // don't clamp speed to current AirSpeed in CalculateJump
 			JumpTo( EnemyAdjustedLoc );
-			AirSpeed = default.AirSpeed;
+			AirSpeed = SavedAirSpeed;
 			GotoState( , 'JUMPED' );
 		}
 		else

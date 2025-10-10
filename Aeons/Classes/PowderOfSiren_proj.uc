@@ -29,7 +29,7 @@ auto state fubar expands FallingState
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	spawn(class 'Siren_particles',self,,Location + vect(0,0,32));
 }

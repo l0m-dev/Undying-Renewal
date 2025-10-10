@@ -86,9 +86,9 @@ function Created()
 	Back.bBurnable = true;
 	Back.OverSound=sound'Aeons.Shell_Blacken01';
 
-	Back.UpTexture =   texture'sload_cancel_up';
-	Back.DownTexture = texture'sload_cancel_dn';
-	Back.OverTexture = texture'sload_cancel_ov';
+	Back.UpTexture =   texture'ShellTextures.sload_cancel_up';
+	Back.DownTexture = texture'ShellTextures.sload_cancel_dn';
+	Back.OverTexture = texture'ShellTextures.sload_cancel_ov';
 	
 	/*
 	FaceButton = ShellButton(CreateWindow(class'ShellButton', 60*RootScaleX, 350*RootScaleY, 160*RootScaleX, 40*RootScaleY));
@@ -372,12 +372,12 @@ defaultproperties
      NameText="Name"
      FaceText="Face"
      BodyText="Body"
-     BackNames(0)="UndyingShellPC.PSetup_0"
-     BackNames(1)="UndyingShellPC.PSetup_1"
-     BackNames(2)="UndyingShellPC.PSetup_2"
-     BackNames(3)="UndyingShellPC.PSetup_3"
-     BackNames(4)="UndyingShellPC.PSetup_4"
-     BackNames(5)="UndyingShellPC.PSetup_5"
+     BackNames(0)="ShellTextures.PSetup_0"
+     BackNames(1)="ShellTextures.PSetup_1"
+     BackNames(2)="ShellTextures.PSetup_2"
+     BackNames(3)="ShellTextures.PSetup_3"
+     BackNames(4)="ShellTextures.PSetup_4"
+     BackNames(5)="ShellTextures.PSetup_5"
      PlayerMeshes(0)=(Mesh="Aeons.Meshes.Patrick_m",Sequence=Walk)
      PlayerMeshes(1)=(Mesh="Aeons.Meshes.AaronGhost_m",Sequence=Walk)
      PlayerMeshes(2)=(Mesh="Aeons.Meshes.Bethany_m",Sequence=Walk)

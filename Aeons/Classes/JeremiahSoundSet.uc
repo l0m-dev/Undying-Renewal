@@ -3,7 +3,7 @@
 //=============================================================================
 class JeremiahSoundSet expands SharedHumanSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
+////#exec OBJ LOAD FILE=..\Sounds\Voiceover.uax PACKAGE=Voiceover
 
 var(Sounds) CreatureSoundGroup	VDeath;
 

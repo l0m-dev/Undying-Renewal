@@ -3,8 +3,8 @@
 //=============================================================================
 class JournalPickup expands Pickup;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\LevelMechanics.uax PACKAGE=LevelMechanics
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var() class<JournalEntry>	JournalClass;
 var() bool					bShowImmediate; // whether or not to bring up book on pickup

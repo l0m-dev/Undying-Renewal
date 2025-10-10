@@ -25,13 +25,16 @@ replication
 		AmmoAmount;
 }
 
-state Activated
+simulated function Inventory GetNext()
 {
-	function BeginState()
+	if ( bActivatable && AmmoAmount > 0 ) 
 	{
-		Super.BeginState();
-		bActive = default.bActive;
+		return self;
 	}
+	if ( Inventory != None )
+		return Inventory.GetNext();
+	else
+		return None;
 }
 
 event float BotDesireability(Pawn Bot)

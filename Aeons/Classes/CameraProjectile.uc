@@ -85,6 +85,7 @@ simulated function Actor FindLookAtActor(name LookAtTag, out Actor ReplicatedLoo
 	if (Role == ROLE_Authority)
 	{
 		ReplicatedLookAtActor = A;
+		//ReplicatedLookAtActor.bAlwaysRelevant = true;
 	}
 	else if (A == None)
 	{
@@ -201,12 +202,12 @@ simulated function float GetTotalPathLen(MasterCameraPoint P)
 						{
 							// log("Found Actor to move player to : "$A.name, 'Cutscenes');
 							//EyeHeight.z = Player.EyeHeight;
-							CutsceneManager.TeleportPlayer(Player, A.Location, A.Rotation);
+							CutsceneManager.TeleportPlayers(A.Location, A.Rotation);
 							break;
 						}
 					} else {
 						EyeHeight.z = default.Player.EyeHeight; // assumes all players have same EyeHeight
-						CutsceneManager.TeleportPlayer(Player, CP2.Location-Eyeheight, Rotator(CP2.Location-CP2.PrevPoint.Location));
+						CutsceneManager.TeleportPlayers(CP2.Location-Eyeheight, Rotator(CP2.Location-CP2.PrevPoint.Location));
 					}
 				}
 
@@ -705,14 +706,12 @@ simulated state PathInterpolation
 
 	simulated function EndState()
 	{
+		// TODO: remove or move to CutsceneManager
 		Player.bRenderSelf = true;
 		Player.bHidden = false;
 
 		if (MasterPoint.bHoldPlayer)
 			Player.UnFreeze();
-
-		if (ToPoint.bEndCutScene && (pDist > 0.5 || bSkipped))
-			Player.bRenderSelf = true;
 	}
 
 	Begin:

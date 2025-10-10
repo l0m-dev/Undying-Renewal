@@ -44,5 +44,4 @@ defaultproperties
      Textures(0)=Texture'Aeons.Particles.Smoke32_01'
      LODBias=101
      Style=STY_AlphaBlend
-     RemoteRole=ROLE_SimulatedProxy
 }

@@ -3,8 +3,8 @@
 //=============================================================================
 class ScriptedFX expands ParticleFX;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\fxB.utx PACKAGE=fxB
-//#exec OBJ LOAD FILE=\Aeons\Textures\Lightning.utx PACKAGE=Lightning
+#exec OBJ LOAD FILE=..\Textures\fxB.utx PACKAGE=fxB
+#exec OBJ LOAD FILE=..\Textures\Lightning.utx PACKAGE=Lightning
 
 //#exec Texture Import Name=Lightning File=Lightning.pcx Group=Particles Mips=Off
 //#exec Texture Import Name=Shaft File=Shaft.pcx Group=Particles Mips=Off

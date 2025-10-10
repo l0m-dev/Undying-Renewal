@@ -154,7 +154,7 @@ function IterateMaps(string MapPrefix)
 
 defaultproperties
 {
-     GameTypeText="Game Type"
+     GameTypeText="Game type"
      GameTypeHelp="Select game type"
      MapText="Map"
      MapHelp="Select map"

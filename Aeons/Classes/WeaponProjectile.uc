@@ -3,7 +3,7 @@
 //=============================================================================
 class WeaponProjectile expands Projectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 var(Projectile) sound FuseSound;
 var(Projectile) sound ExplodeSound;

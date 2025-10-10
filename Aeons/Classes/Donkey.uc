@@ -14,8 +14,8 @@ class Donkey expands Sheep;
 //****************************************************************************
 //#exec MESH NOTIFY SEQ=graze TIME=0.450 FUNCTION=GrazeLoop	//
 
-//#exec MESH NOTIFY SEQ=damage_stun TIME=0.04 FUNCTION=PlaySound_N ARG="Damage PVar=0.2 VVar=0.1"
-//#exec MESH NOTIFY SEQ=death TIME=0.016129 FUNCTION=PlaySound_N ARG="Death PVar=0.2 VVar=0.1"
+////#exec MESH NOTIFY SEQ=damage_stun TIME=0.04 FUNCTION=PlaySound_N ARG="Damage PVar=0.2 VVar=0.1"
+////#exec MESH NOTIFY SEQ=death TIME=0.016129 FUNCTION=PlaySound_N ARG="Death PVar=0.2 VVar=0.1"
 //#exec MESH NOTIFY SEQ=death TIME=0.451613 FUNCTION=PlaySound_N ARG="BodyFall PVar=0.2 V=0.6 VVar=0.1"
 //#exec MESH NOTIFY SEQ=graze TIME=0.142857 FUNCTION=PlaySound_N ARG="Chewing CHANCE=0.25 PVar=0.2 V=0.35 VVar=0.2"
 //#exec MESH NOTIFY SEQ=graze TIME=0.888889 FUNCTION=PlaySound_N ARG="Graze CHANCE=0.25 PVar=0.2 V=0.7 VVar=0.3"

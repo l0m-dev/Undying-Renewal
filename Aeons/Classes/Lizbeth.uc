@@ -79,10 +79,10 @@ class Lizbeth expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=death_beheading TIME=0.706522 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.2 V=0.7 VVar=0.2"
 //#exec MESH NOTIFY SEQ=death_beheading TIME=0.088 FUNCTION=PlaySound_N ARG="Scream"
 //#exec MESH NOTIFY SEQ=death_beheading TIME=0.728261 FUNCTION=BFallBig
-//#exec MESH NOTIFY SEQ=death_creature_special TIME=0.47541 FUNCTION=PlaySound_N ARG="ClawWhsh PVar=0.1 V=0.8 VVar=0.2"
-//#exec MESH NOTIFY SEQ=death_creature_special TIME=0.540984 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=death_creature_special TIME=0.639344 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=death_creature_special TIME=0.795082 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=death_creature_special TIME=0.47541 FUNCTION=PlaySound_N ARG="ClawWhsh PVar=0.1 V=0.8 VVar=0.2"
+////#exec MESH NOTIFY SEQ=death_creature_special TIME=0.540984 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=death_creature_special TIME=0.639344 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=death_creature_special TIME=0.795082 FUNCTION=C_FS
 //#exec MESH NOTIFY SEQ=hunt TIME=0.0 FUNCTION=C_BackLeft								//
 //#exec MESH NOTIFY SEQ=hunt TIME=0.46875 FUNCTION=C_BackRight						//
 //#exec MESH NOTIFY SEQ=jump_attack TIME=0.125 FUNCTION=PlaySound_N ARG="VAttack CHANCE=0.9 PVar=0.1 VVar=0.2"
@@ -633,9 +633,7 @@ state LizbethBossFightFrenzy expands AIScriptedState
 		
 		if( FrenzyTime <= 0.0 )
 		{
-			if (RGC())
-				SpawnHowler();
-			else
+			if( !RGC() )
 				HatedClass=Class'Aeons.DecayedSaint';
 			AmbientSound = Sound'CreatureSFX.Lizbeth.C_Lizbeth_HasteLp1';
 
@@ -695,8 +693,10 @@ state LizbethBossFightFrenzy expands AIScriptedState
 		}
 	}
 
-Damaged:
 Taunted:
+	if( RGC() )
+		SpawnHowler();
+Damaged:
 Resume:
 	DebugInfoMessage( ".LizbethBossFightFrenzy Taunted." );
 	GotoState( 'AIAttackPlayer' );

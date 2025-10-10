@@ -391,7 +391,7 @@ defaultproperties
      WorldStandard="ngLog"
      LogVersion="1.2"
      LogInfoURL="http://www.netgamesusa.com/ngLog/"
-     GameName="Unreal"
+     GameName="Undying"
      GameCreator="Epic MegaGames, Inc."
      GameCreatorURL="http://www.epicgames.com/"
      DecoderRingURL="http://unreal.epicgames.com/Unreal_Log_Decoder_Ring.html"

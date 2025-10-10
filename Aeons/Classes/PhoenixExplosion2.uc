@@ -6,7 +6,7 @@ class PhoenixExplosion2 expands PhoenixExplosions;
 // notes:
 // Area effect here and higher amplitudes/
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 

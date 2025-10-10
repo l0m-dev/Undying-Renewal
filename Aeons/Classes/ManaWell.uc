@@ -4,7 +4,7 @@
 class ManaWell expands Items;
 
 //#exec MESH IMPORT MESH=manaWell_m SKELFILE=ManaWell.ngf
-// #exec TEXTURE IMPORT NAME=ManaWell_Icon FILE=ManaWell_Icon.PCX GROUP=Icons FLAGS=2
+//// #exec TEXTURE IMPORT NAME=ManaWell_Icon FILE=ManaWell_Icon.PCX GROUP=Icons FLAGS=2
 
 var() int CapacityIncrease;
 

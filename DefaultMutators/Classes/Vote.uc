@@ -43,6 +43,15 @@ var localized string VoteRestartText;
 var localized string VoteMapText;
 var localized string VoteKickText;
 var localized string VoteResultText;
+var localized string VoteInProgressText;
+var localized string VoteNotInProgressText;
+var localized string CantVoteText;
+var localized string AlreadyVotedText;
+var localized string VotePassedText;
+var localized string VoteFailedText;
+var localized string VotedText;
+var localized string YesText;
+var localized string NoText;
 
 function PostBeginPlay()
 {
@@ -108,7 +117,7 @@ function StartVote(PlayerReplicationInfo PRI, EVoteType vt, optional string Args
 		}
 	}
 
-	NeededVotes = Ceil(NumPlayers * VOTE_FRACTION);
+	NeededVotes = class'Utility'.static.Ceil(NumPlayers * VOTE_FRACTION);
 	
 	// vote started
 	VoteState = VS_Active;
@@ -151,12 +160,12 @@ function EndVote()
 
 	if (VotedYes < NeededVotes)
 	{
-		Print("Vote failed.", RedColor);
+		Print(VoteFailedText, RedColor);
 		VoteState = VS_Inactive;
 		return;
 	}
 
-	Print("Vote passed.", GreenColor);
+	Print(VotePassedText, GreenColor);
 	VoteState = VS_Succeeded;
 
 	// timer to do the vote result action
@@ -184,16 +193,17 @@ function DoVoteResultAction()
 function AddVote(PlayerReplicationInfo PRI, EVoteOption Option, optional bool bHideMessage)
 {
 	local int i;
+	local string VotedMessage;
 
 	if (VoteState != VS_Active)
 	{
-		Reply(PRI, "Vote not in progress.", RedColor);
+		Reply(PRI, VoteNotInProgressText, RedColor);
 		return;
 	}
 
 	if (!CanVote(PRI))
 	{
-		Reply(PRI, "You can't vote right now.", RedColor);
+		Reply(PRI, CantVoteText, RedColor);
 		return;
 	}
 
@@ -202,14 +212,18 @@ function AddVote(PlayerReplicationInfo PRI, EVoteOption Option, optional bool bH
 		if (PlayerVotes[i].PlayerId == PRI.PlayerID)
 		{
 			// player already voted
-			Reply(PRI, "You already voted.", RedColor);
+			Reply(PRI, AlreadyVotedText, RedColor);
 			break;
 		}
 
 		if (PlayerVotes[i].PlayerId == -1)
 		{
 			if (!bHideMessage)
-				Print(PRI.PlayerName$" voted: "$OptionToString(Option));
+			{
+				VotedMessage = FormatString(VotedText, "%player", PRI.PlayerName);
+				VotedMessage = FormatString(VotedMessage, "%option", OptionToString(Option));
+				Print(VotedMessage);
+			}
 			PlayerVotes[i].PlayerId = PRI.PlayerID;
 			PlayerVotes[i].Option = Option;
 			break;
@@ -253,16 +267,17 @@ function EVoteOption GetVoteResponse(string Msg)
 	switch(Msg)
 	{
 		case "1":
-		case "YES":
+		case YesText:
 			return VOTE_YES;
 		case "2":
-		case "NO":
+		case NoText:
 			return VOTE_NO;
 	}
 
 	return VOTE_NONE;
 }
 
+// MutatorTeamMessage is called for every player
 function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplicationInfo PRI, coerce string Msg, name Type, optional bool bBeep )
 {
 	local string NextWord;
@@ -281,14 +296,13 @@ function bool MutatorTeamMessage( Actor Sender, Pawn Receiver, PlayerReplication
 		}
 	}
 
-	// ignore messages going to other players
-	if (Sender != Receiver)
-		return Super.MutatorTeamMessage( Sender, Receiver, PRI, Msg, Type, bBeep );
-
 	RemoveNextWord(Msg, NextWord);
 
 	if (Caps(NextWord) ~= "/VOTE")
 	{
+		if (Sender != Receiver)
+			return false;
+
 		//Msg = Trim(Msg);
 
 		RemoveNextWord(Msg, NextWord);
@@ -413,14 +427,14 @@ static final function RemoveNextWord(out string Text, out string NextWord)
 	Text = Mid(Text, i);
 }
 
-static final function string OptionToString(EVoteOption Option)
+final function string OptionToString(EVoteOption Option)
 {
 	switch(Option)
 	{
 		case VOTE_YES:
-			return "yes";
+			return YesText;
 		case VOTE_NO:
-			return "no";
+			return NoText;
 	}
 
 	return "none";
@@ -437,18 +451,6 @@ static final function color MakeRGB( int R, int G, int B )
 	return C;
 }
 
-static final function int Ceil(float num)
-{
-    local int inum;
-	inum = int(num);
-	
-    if (num == float(inum))
-	{
-        return inum;
-    }
-    return inum + 1;
-}
-
 defaultproperties
 {
      RedColor=(R=255,G=64,B=64,A=255)
@@ -458,4 +460,13 @@ defaultproperties
      VoteMapText="%player started a vote to change map to %map"
      VoteKickText="%player started a vote to kick %target"
      VoteResultText="Vote results: got %num out of %needed required votes"
+     VoteInProgressText="Vote in progress."
+     VoteNotInProgressText="Vote not in progress."
+     CantVoteText="You can't vote right now."
+     AlreadyVotedText="You already voted."
+     VotePassedText="Vote passed."
+     VoteFailedText="Vote failed."
+     VotedText="%player voted: %option"
+     YesText="yes"
+     NoText="no"
 }

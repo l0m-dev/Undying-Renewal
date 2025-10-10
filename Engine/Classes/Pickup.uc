@@ -146,6 +146,9 @@ auto state Pickup
 	}
 }
 
+// this function is mostly used for turning off the ambient sound and shutting down particles
+// it assumes the item does not respawn (if it does, it will be called on the copy that goes in the player's inventory)
+// todo: fix this by adding another function (ex. "PickedUp") or by calling PickupFunction for both items and checking bHeldItem
 function PickupFunction(Pawn Other)
 {
 	AmbientSound = None;

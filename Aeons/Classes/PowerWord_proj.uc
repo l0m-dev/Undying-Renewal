@@ -51,7 +51,7 @@ function PreBeginPlay()
 	
 }
 	
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	local Actor A;
 	Super.PostBeginPlay();
@@ -62,7 +62,7 @@ function PostBeginPlay()
 	// DrawScale = 2;
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	local int i;
 	

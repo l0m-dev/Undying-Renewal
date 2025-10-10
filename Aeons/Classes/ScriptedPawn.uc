@@ -4,8 +4,8 @@
 class ScriptedPawn expands Pawn 
 	abstract;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 
 //****************************************************************************
@@ -1745,12 +1745,13 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	if ( ( damageType == 'drown' ) || Region.Zone.bWaterZone )
 		bNoBloodPool = true;
 		
-	if (RGORE() && damageType == 'pellet' && bHackable && !bIsBoss)
+	// shotgun gore, on death
+	if ( RGORE() && damageType == 'pellet' && bHackable && !bIsBoss )
 	{
 		if (FRand() > 0.5)
-			Patrick(Killer).DetachJoint();
+			Patrick(Killer).DetachJointEx();
 		else
-			Patrick(Killer).DestroyJoint();
+			Patrick(Killer).DestroyJointEx();
 
 		Spawn(class 'SmokyBloodFX',Killer,,HitLocation); // or SmokyBloodSmallFX
 	}
@@ -1798,37 +1799,36 @@ function SpawnGibbedCarcass( vector Dir )
 	if (RGORE())
 	{
 		DamageRadius = 640;
-		//dir = Victims.Location - HitLocation;
-		dist = FMax(1,VSize(Dir));
-		Dir = Dir/dist;
-		damageScale = FMax(0, 1 - FMax(0,(dist - CollisionRadius)/DamageRadius));
 		
 		if (Health <= 0 && bHackable && !IsA('Rat'))
 		{
-			for (i=0; i<NumJoints(); i++)
+			for (i=NumJoints(); i>=0; i--)
 			{
-				//P = JointPlace( JointName(i) );
-				Vel = VRand() * 512;
-				if (Dir == vect(0, 0, 0))
-					return;
+				if (FRand() > 0.25)
+					continue;
+
 				Gib = DetachLimb(JointName(i), Class 'BodyPart');
+
 				if (Gib != None)
 				{
-					//	Gib.Velocity = Vel;
-					//else
-					//	Gib.Velocity = (-1/Dir + VRand()) * 64;*/
-					Gib.Velocity = -Dir * damageScale * 512 + (VRand() * 10);
-					Gib.Velocity.Z = 64;
+					Gib.Velocity = -Dir * 2 + VRand() * 64;
 					Gib.DesiredRotation = RotRand(true);
 					Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
 					
 					ReplicateDetachLimb(self, JointName(i), Gib.Velocity, Gib.DesiredRotation);
+
+					PlayDamageMethodImpact('Bullet', Gib.Location, Dir);
 				}
 				
 				//SetBase(self, JointName(i));
 			}
 
 			bHacked = true;
+			bHidden = true; // hide pawn since not all joints can be detached
+			bHackable = false; // prevent re-entry
+			bNoBloodPool = true;
+
+			KillHeldProps();
 		}
 	}
 	else
@@ -2821,7 +2821,10 @@ function CheckEnemySwitch( pawn Other )
 			  ( ( !Enemy.bIsPlayer && Other.bIsPlayer ) || ( !Other.bIsPlayer && ( FRand() < 0.99 ) ) ) )
 	{
 		OldEnemy = Enemy;
-		SetEnemy( Other );
+
+		// rgc: no infigting
+		if ( !RGC() || Other.bIsPlayer || AttitudeToCreature( Other ) != ATTITUDE_Friendly )
+			SetEnemy( Other );
 	}
 }
 
@@ -3801,7 +3804,7 @@ function float RelativeStrength( pawn Other )
 	if ( Other.IsA('ScriptedPawn') )
 		adjustedOther = 0.5 * ( Other.Health + ScriptedPawn(Other).InitHealth );	// average other's current and default health (result is potential health?)
 	else
-		adjustedOther = 0.5 * ( FMin(Other.Health, Other.default.Health) + Other.default.Health ); // cap to Other.default.Health to prevent issues if player's health overcharged
+		adjustedOther = 0.5 * ( FMin(Other.Health, Other.default.Health) + Other.default.Health ); // RGC()? cap to Other.default.Health to prevent issues if player's health overcharged
 	compare = 0.01 * float(adjustedOther - adjustedStrength);		// calculate strength factor as 1% of it's health less my health
 	if ( Intelligence == BRAINS_Human )
 	{
@@ -3878,7 +3881,7 @@ function EAttitude AttitudeTo( pawn Other )
 // return this actor's attitude to the (usually non-player) pawn passed
 function EAttitude AttitudeToCreature( pawn Other )
 {
-	if ( Other.Class == Class )
+	if ( Other.IsA(Class.Name) || IsA(Other.Class.Name) )
 		return ATTITUDE_Friendly;
 	else
 		return ATTITUDE_Ignore;

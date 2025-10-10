@@ -3,7 +3,8 @@
 //=============================================================================
 class ControlsWindow expands ShellWindow;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 // Textures ////////////////////////////////////////////////
 //#exec Texture Import File=Controls_0.bmp Mips=Off
@@ -307,9 +308,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'cntrl_ok_up';
-	OK.DownTexture = texture'cntrl_ok_dn';
-	OK.OverTexture = texture'cntrl_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.cntrl_ok_up';
+	OK.DownTexture = texture'ShellTextures.cntrl_ok_dn';
+	OK.OverTexture = texture'ShellTextures.cntrl_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -326,9 +327,9 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'cntrl_cancl_up';
-	Cancel.DownTexture = texture'cntrl_cancl_dn';
-	Cancel.OverTexture = texture'cntrl_cancl_ov';
+	Cancel.UpTexture =   texture'ShellTextures.cntrl_cancl_up';
+	Cancel.DownTexture = texture'ShellTextures.cntrl_cancl_dn';
+	Cancel.OverTexture = texture'ShellTextures.cntrl_cancl_ov';
 	Cancel.DisabledTexture = None;
 
 // DefaultsButton Button
@@ -345,9 +346,9 @@ function Created()
 	DefaultsButton.bBurnable = true;
 	DefaultsButton.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	DefaultsButton.UpTexture =   texture'Cntrl_defau_up';
-	DefaultsButton.DownTexture = texture'Cntrl_defau_dn';
-	DefaultsButton.OverTexture = texture'Cntrl_dafau_ov';
+	DefaultsButton.UpTexture =   texture'ShellTextures.Cntrl_defau_up';
+	DefaultsButton.DownTexture = texture'ShellTextures.Cntrl_defau_dn';
+	DefaultsButton.OverTexture = texture'ShellTextures.Cntrl_dafau_ov';
 	DefaultsButton.DisabledTexture = None;
 
 // Advanced button
@@ -363,9 +364,9 @@ function Created()
 	Advanced.bBurnable = true;
 	Advanced.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Advanced.UpTexture =   texture'video_advan_up';
-	Advanced.DownTexture = texture'video_advan_dn';
-	Advanced.OverTexture = texture'video_advan_ov';
+	Advanced.UpTexture =   texture'ShellTextures.video_advan_up';
+	Advanced.DownTexture = texture'ShellTextures.video_advan_dn';
+	Advanced.OverTexture = texture'ShellTextures.video_advan_ov';
 	Advanced.DisabledTexture = None;
 
 
@@ -1376,10 +1377,10 @@ defaultproperties
      LabelList(57)="Item Quick Select"
      LabelList(58)="Multiplayer, Chat"
      LabelList(59)="Show Scoreboard"
-     BackNames(0)="UndyingShellPC.Controls_0"
-     BackNames(1)="UndyingShellPC.Controls_1"
-     BackNames(2)="UndyingShellPC.Controls_2"
-     BackNames(3)="UndyingShellPC.Controls_3"
-     BackNames(4)="UndyingShellPC.Controls_4"
-     BackNames(5)="UndyingShellPC.Controls_5"
+     BackNames(0)="ShellTextures.Controls_0"
+     BackNames(1)="ShellTextures.Controls_1"
+     BackNames(2)="ShellTextures.Controls_2"
+     BackNames(3)="ShellTextures.Controls_3"
+     BackNames(4)="ShellTextures.Controls_4"
+     BackNames(5)="ShellTextures.Controls_5"
 }

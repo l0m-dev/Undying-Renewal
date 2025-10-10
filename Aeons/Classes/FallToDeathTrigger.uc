@@ -5,7 +5,7 @@ class FallToDeathTrigger expands Trigger;
 
 //#exec TEXTURE IMPORT FILE=TrigFallToDeath.pcx GROUP=System Mips=Off Flags=2
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
+#exec OBJ LOAD FILE=..\Sounds\Voiceover.uax PACKAGE=Voiceover
 
 var bool bActive;
 var PlayerPawn Player;

@@ -17,13 +17,13 @@
 #endif
 
 AUTOGENERATE_NAME(ReceivedText)
-AUTOGENERATE_NAME(ReceivedLine)
 AUTOGENERATE_NAME(ReceivedBinary)
-AUTOGENERATE_NAME(Resolved)
-AUTOGENERATE_NAME(ResolveFailed)
-AUTOGENERATE_NAME(Accepted)
-AUTOGENERATE_NAME(Opened)
+AUTOGENERATE_NAME(ReceivedLine)
 AUTOGENERATE_NAME(Closed)
+AUTOGENERATE_NAME(Opened)
+AUTOGENERATE_NAME(Accepted)
+AUTOGENERATE_NAME(ResolveFailed)
+AUTOGENERATE_NAME(Resolved)
 
 #ifndef NAMES_ONLY
 
@@ -77,7 +77,7 @@ public:
         ProcessEvent(FindFunctionChecked(IPDRV_Resolved),&Parms);
     }
     DECLARE_CLASS(AInternetLink,AInternetInfo,0|CLASS_Transient,IpDrv)
-    #include "AInternetLink.h"
+    NO_DEFAULT_CONSTRUCTOR(AInternetLink)
 };
 
 
@@ -129,7 +129,7 @@ public:
         ProcessEvent(FindFunctionChecked(IPDRV_ReceivedText),&Parms);
     }
     DECLARE_CLASS(AUdpLink,AInternetLink,0|CLASS_Transient,IpDrv)
-    #include "AUdpLink.h"
+    NO_DEFAULT_CONSTRUCTOR(AUdpLink)
 };
 
 enum ELinkState
@@ -216,7 +216,7 @@ public:
         ProcessEvent(FindFunctionChecked(IPDRV_Accepted),NULL);
     }
     DECLARE_CLASS(ATcpLink,AInternetLink,0|CLASS_Transient,IpDrv)
-    #include "ATcpLink.h"
+    NO_DEFAULT_CONSTRUCTOR(ATcpLink)
 };
 
 #endif

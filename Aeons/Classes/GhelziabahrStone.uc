@@ -19,7 +19,7 @@ class GhelziabahrStone expands AeonsWeapon;
 
 //#exec MESH IMPORT MESH=GhelzStonePickup_m SKELFILE=GhelziabahrStone3rd\GhelzStone.ngf
 
-//#exec OBJ LOAD FILE=\aeons\textures\FX.utx PACKAGE=FX
+#exec OBJ LOAD FILE=..\textures\FX.utx PACKAGE=FX
 
 //-----------------------------------------------------------------------------
 

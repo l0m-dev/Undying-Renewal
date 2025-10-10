@@ -51,6 +51,19 @@ class Trsanti expands ScriptedBiped;
 //****************************************************************************
 var PersistentWound Wound;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+
+	if (RGC())
+	{
+		LongRangeDistance = 2000.0;
+
+		MeleeSwitchDistance = 250.0;
+		RangedSwitchDistance = 400.0;
+	}
+}
+
 //****************************************************************************
 // Animation trigger functions.
 //****************************************************************************
@@ -156,10 +169,29 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 
 function bool DoFarAttack()
 {
+	local float		dist;
+
 	if ( Region.Zone.bWaterZone )
 		return false;
-	else
-		return super.DoFarAttack();
+
+	if ( !RGC() )
+		return Super.DoFarAttack();
+
+	if ( TriggerSwitchToMelee() )
+		return false;
+
+	if ( bHasFarAttack )
+	{
+		dist = DistanceTo( Enemy );
+
+		if ( FRand() < FarAttackBias )
+			return true;
+		if ( dist > LongRangeDistance )
+			return ( FRand() < 0.05 );
+		else
+			return true;
+	}
+	return false;
 }
 
 function bool TriggerSwitchToRanged()
@@ -626,6 +658,161 @@ BEGIN:
 	GotoState( 'Dying' );
 
 } // state AIInvokeDeath
+
+//****************************************************************************
+// AIFireWeapon
+// Fire ranged weapon and return via state stack.
+//****************************************************************************
+state AIFireWeapon
+{
+	// *** ignored functions ***
+	function Bump( actor Other ){}
+	function HearNoise( float Loudness, actor NoiseMaker ){}
+	function EffectorHearNoise( actor sensed ){}
+	function EffectorSeePlayer( actor sensed ){}
+	function EffectorWarnTarget( vector shotLocation, float projSpeed, vector FireDir ){}
+	function Trigger( actor Other, pawn EventInstigator ){}
+	//function Stoned( pawn Stoner ){}
+
+	// *** overridden functions ***
+	function HitWall( vector hitNormal, actor hitWall, byte textureID )
+	{
+		if ( RGC() )
+			MoveTimer = -1.0;
+	}
+
+	function WeaponFired( SPWeapon ThisWeapon )
+	{
+		if ( !RGC() )
+		{
+			Super.WeaponFired(ThisWeapon);
+			return;
+		}
+
+		if ( RangedWeapon.RecoilAnim != '' )
+		{
+			//ClearAnims();
+			PlayAnim( RangedWeapon.RecoilAnim, [TweenTime] 0.0 );
+			GotoState( , 'FIRED' );
+		}
+		else
+			GotoState( , 'TURRET' );
+	}
+
+	// *** new (state only) functions ***
+	// Determine a good point for repositioned far attack.
+	function vector GetRepoPoint()
+	{
+		local vector	TargetLoc;
+		local vector	X, Y, Z;
+		local vector	TPoint;
+		local float		MoveDist;
+		local bool		Testing;
+
+		//TargetLoc = EnemyAimSpot();
+		//GetAxes( rotator(Normal(TargetLoc - Location)), X, Y, Z );
+		GetAxes( Rotation , X, Y, Z );
+		
+		if ( FRand() < 0.5 )
+		{
+			// Move left.
+			MoveDist = -CollisionRadius * FVariant( 11.0, 1.0 );
+		}
+		else
+		{
+			// Move right.
+			MoveDist = CollisionRadius * FVariant( 11.0, 1.0 );
+		}
+		Testing = true;
+		while ( Testing )
+		{
+			TPoint = Location + Y * MoveDist;
+			if ( FastTrace( TPoint ) && pointReachable( TPoint ) )
+			{
+				Testing = false;
+			}
+			else
+			{
+				MoveDist = MoveDist * 0.8;
+				if ( abs(MoveDist) < CollisionRadius )
+					Testing = false;
+			}
+		}
+		return TPoint;
+	}
+
+	function Timer()
+	{
+		if ( !RGC() )
+			PopState();
+		
+		// reposition if we still want to far attack
+		if ( DoFarAttack() )
+			GotoState( , 'REPOSITION' );
+		else
+			GotoState( , 'STOPFIRE' );
+	}
+
+
+// Entry point when returning from AITakeDamage
+DAMAGED:
+	PopState();
+
+// Entry point when resuming this state
+RESUME:
+	PopState( , 'RESUME' );
+
+// Default entry point
+BEGIN:
+	TurnTo( EnemyAimSpot(), 10 * DEGREES );
+	if ( RangedWeapon.AimAnim != '' )
+	{
+		if ( RGC() )
+			PlayAnim( RangedWeapon.AimAnim, 2.0 );
+		else
+			PlayAnim( RangedWeapon.AimAnim );
+		FinishAnim();
+	}
+	if ( ClearShot( WeaponLoc(), EnemyAimSpot() ) != none )
+		PopState();
+	FireWeapon();
+	if ( RGC() )
+		SetTimer( 1.0 + FRand() * 2.0, false );
+	else
+		SetTimer( FVariant( 2.5, 0.50 ), false );
+
+TURRET:
+	// rgc: reposition if we don't have a clear shot
+	if ( RGC() && ClearShot( WeaponLoc(), EnemyAimSpot() ) != none )
+		GotoState( , 'REPOSITION' );
+	TurnTo( EnemyAimSpot(), 10 * DEGREES );
+	Sleep( 0.1 );
+	goto 'TURRET';
+
+STOPFIRE:
+	StopFiring();
+	FinishAnim();
+	PopState();
+
+FIRED:
+	FinishAnim();
+	goto 'TURRET';
+
+REPOSITION:
+	StopFiring();
+	FinishAnim();
+
+	TargetPoint = GetRepoPoint();
+	if ( pointReachable( TargetPoint ) )
+	{
+		PlayWalk();
+		MoveTo( TargetPoint, WalkSpeedScale * 0.5 + 0.5, 1.0 );
+
+		//StopMovement();
+		//PlayWait();
+	}
+	PopState();
+} // state AIFireWeapon
 
 
 //****************************************************************************

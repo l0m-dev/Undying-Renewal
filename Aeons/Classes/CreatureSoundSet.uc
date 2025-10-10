@@ -3,12 +3,12 @@
 //=============================================================================
 class CreatureSoundSet expands SoundContainer;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
-//#exec OBJ LOAD FILE=\Aeons\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Footsteps.uax PACKAGE=Footsteps
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\Voiceover.uax PACKAGE=Voiceover
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\Footsteps.uax PACKAGE=Footsteps
 
 var(Sounds) CreatureSoundGroup	PatDeath;
 

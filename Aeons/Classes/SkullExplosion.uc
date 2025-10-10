@@ -65,7 +65,7 @@ function HurtRadius( float DamageRadius, name DamageName, float Momentum, vector
 }
 */
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 

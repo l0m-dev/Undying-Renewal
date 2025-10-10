@@ -16,7 +16,7 @@ class AaronBoss expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=Attack1 TIME=0.227 FUNCTION=DoNearDamage
 //#exec MESH NOTIFY SEQ=Attack1 TIME=0.273 FUNCTION=DoNearDamage
 
-//#exec MESH NOTIFY SEQ=Block TIME=0.366 FUNCTION=BlockScythe
+////#exec MESH NOTIFY SEQ=Block TIME=0.366 FUNCTION=BlockScythe
 //#exec MESH NOTIFY SEQ=Block TIME=0.250 FUNCTION=BlockScythe
 
 //#exec MESH NOTIFY SEQ=Block TIME=0.463 FUNCTION=DoNearDamage
@@ -25,9 +25,9 @@ class AaronBoss expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=Block TIME=0.610 FUNCTION=DoNearDamage
 //#exec MESH NOTIFY SEQ=Block TIME=0.659 FUNCTION=DoNearDamage
 
-//#exec MESH NOTIFY SEQ=ChainThrow TIME=0.500 FUNCTION=PushBack
-//#exec MESH NOTIFY SEQ=ChainThrow TIME=0.970 FUNCTION=CheckChainThrow
-//#exec MESH NOTIFY SEQ=ChainReturn TIME=0.970 FUNCTION=EndChainThrow
+////#exec MESH NOTIFY SEQ=ChainThrow TIME=0.500 FUNCTION=PushBack
+////#exec MESH NOTIFY SEQ=ChainThrow TIME=0.970 FUNCTION=CheckChainThrow
+////#exec MESH NOTIFY SEQ=ChainReturn TIME=0.970 FUNCTION=EndChainThrow
 
 //#exec MESH NOTIFY SEQ=specialkill TIME=0.107 FUNCTION=OJDidIt
 //#exec MESH NOTIFY SEQ=specialkill TIME=0.182 FUNCTION=OJDidIt

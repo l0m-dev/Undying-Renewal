@@ -29,8 +29,11 @@ class DifficultyWindow expands ShellWindow;
 var string StartMap;
 
 var() ShellButton Buttons[4];
-var int		SmokingWindows[4];
-var float	SmokingTimers[4];
+var int		SmokingWindows[5];
+var float	SmokingTimers[5];
+
+var ShellButton Advanced;
+var bool bShowMutators;
 
 struct MutatorInfo
 {
@@ -45,6 +48,7 @@ var string MutatorBaseClass;
 
 var ShellLabelAutoWrap MutatorsLabel;
 var ShellLabelAutoWrap MutatorsHintLabel;
+var ShellButton InfoButton;
 var ShellButton MutatorsButtons[5]; // mutators currently displayed in the scrollable list
 var MutatorInfo MutatorList[250]; // complete list of available mutators
 var int CurrentRow; // current row in scrollable resolution list
@@ -55,6 +59,7 @@ var int NumberOfMutators;
 var bool bDedicated;
 
 var localized string SelectMutatorsText;
+var localized string AboutText;
 
 function Created()
 {
@@ -79,10 +84,8 @@ function Created()
 	Buttons[2].Template = NewRegion(214,385,162,85);
 	Buttons[3].Template = NewRegion(57,208,154,74);
 
-	for ( i=0; i<4; i++ )
+	for ( i=0; i<ArrayCount(Buttons); i++ )
 	{
-		SmokingWindows[i] = -1;
-
 		Buttons[i].bBurnable = true;
 		Buttons[i].OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
@@ -90,37 +93,60 @@ function Created()
 		Buttons[i].Style = 5;
 	}
 
+	for ( i=0; i<ArrayCount(SmokingWindows); i++ )
+	{
+		SmokingWindows[i] = -1;
+	}
+
 	Buttons[0].TexCoords = NewRegion(0,0,142,64);
 
-	Buttons[0].UpTexture =   texture'dfclt_easy_up';
-	Buttons[0].DownTexture = texture'dfclt_easy_dn';
-	Buttons[0].OverTexture = texture'dfclt_easy_ov';
+	Buttons[0].UpTexture =   texture'ShellTextures.dfclt_easy_up';
+	Buttons[0].DownTexture = texture'ShellTextures.dfclt_easy_dn';
+	Buttons[0].OverTexture = texture'ShellTextures.dfclt_easy_ov';
 
 
 	Buttons[1].TexCoords = NewRegion(0,0,164,64);
 
-	Buttons[1].UpTexture =   texture'dfclt_nightm_up';		
-	Buttons[1].DownTexture = texture'dfclt_nightm_dn';		
-	Buttons[1].OverTexture = texture'dfclt_nightm_ov';		
+	Buttons[1].UpTexture =   texture'ShellTextures.dfclt_nightm_up';		
+	Buttons[1].DownTexture = texture'ShellTextures.dfclt_nightm_dn';		
+	Buttons[1].OverTexture = texture'ShellTextures.dfclt_nightm_ov';		
 
 
 	Buttons[2].TexCoords = NewRegion(0,0,162,85);
 
-	Buttons[2].UpTexture =   texture'dfclt_cancl_up';		
-	Buttons[2].DownTexture = texture'dfclt_cancl_dn';
-	Buttons[2].OverTexture = texture'dfclt_cancl_ov';		
+	Buttons[2].UpTexture =   texture'ShellTextures.dfclt_cancl_up';		
+	Buttons[2].DownTexture = texture'ShellTextures.dfclt_cancl_dn';
+	Buttons[2].OverTexture = texture'ShellTextures.dfclt_cancl_ov';		
 
 
 	Buttons[3].TexCoords = NewRegion(0,0,154,74);
 
-	Buttons[3].UpTexture =   texture'dfclt_mediu_up';
-	Buttons[3].DownTexture = texture'dfclt_mediu_dn';
-	Buttons[3].OverTexture = texture'dfclt_mediu_ov';
+	Buttons[3].UpTexture =   texture'ShellTextures.dfclt_mediu_up';
+	Buttons[3].DownTexture = texture'ShellTextures.dfclt_mediu_dn';
+	Buttons[3].OverTexture = texture'ShellTextures.dfclt_mediu_ov';
 	
-	// mutator stuff
+	// Advanced button
+	Advanced = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+
+	Advanced.Template = NewRegion(620,30,160,64);
+
+	Advanced.TexCoords = NewRegion(0,0,160,64);
+
+	Advanced.Manager = Self;
+	Advanced.Style = 5;
+
+	Advanced.bBurnable = true;
+	Advanced.OverSound=sound'Shell_HUD.Shell_Blacken01';	
+
+	Advanced.UpTexture =   texture'ShellTextures.video_advan_up';
+	Advanced.DownTexture = texture'ShellTextures.video_advan_dn';
+	Advanced.OverTexture = texture'ShellTextures.video_advan_ov';
+	Advanced.DisabledTexture = None;
+
+	Advanced.bDrawShadow = true;
 	
 	// Mutator buttons
-	for( i=0; i<5; i++ )
+	for( i=0; i<ArrayCount(MutatorsButtons); i++ )
 	{
 		MutatorsButtons[i] = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 
@@ -182,7 +208,7 @@ function Created()
 	
 	MutatorsLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
 
-	MutatorsLabel.Template=NewRegion(584, 100, 204, 54);
+	MutatorsLabel.Template=NewRegion(564, 100, 244, 54);
 	MutatorsLabel.Manager = Self;
 	MutatorsLabel.Text = SelectMutatorsText;
 	TextColor.R = 255;
@@ -194,7 +220,7 @@ function Created()
 	
 	MutatorsHintLabel = ShellLabelAutoWrap(CreateWindow(class'ShellLabelAutoWrap', 1,1,1,1));
 
-	MutatorsHintLabel.Template=NewRegion(584, 116, 204, 54);
+	MutatorsHintLabel.Template=NewRegion(564, 116, 244, 54);
 	MutatorsHintLabel.Manager = Self;
 	MutatorsHintLabel.Text = "";
 	TextColor.R = 255;
@@ -203,7 +229,31 @@ function Created()
 	MutatorsHintLabel.SetTextColor(TextColor);
 	MutatorsHintLabel.Align = TA_Center;
 	MutatorsHintLabel.Font = 4;
+
+// Info button	
+	InfoButton = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+	InfoButton.Template = NewRegion(620,120,130,36);
+
+	InfoButton.Manager = Self;
+	InfoButton.Style = 5;
+	InfoButton.Text = AboutText;
+	TextColor.R = 255;
+	TextColor.G = 255;
+	TextColor.B = 255;
+	InfoButton.SetTextColor(TextColor);
+	InfoButton.TextStyle=1;
+	InfoButton.Align = TA_Center;
+	InfoButton.Font = 4;
+	InfoButton.TexCoords = NewRegion(0,0,204,54);
+	InfoButton.UpTexture = texture'Video_resol_up';
+	InfoButton.OverTexture = texture'Video_resol_ov';
+	InfoButton.DownTexture = texture'Video_resol_dn';
+	InfoButton.DisabledTexture =	None;
+
+	// set which button is activated by pressing space, without reordering code above
+	Buttons[3].ActivateWindow(0, false);
 	
+	SetMutatorsVisible(false);
 	LoadMutators();
 	RefreshButtons();
 	
@@ -237,7 +287,15 @@ function Message(UWindowWindow B, byte E)
 				case Buttons[3]:
 					StartGame(1);	//medium
 					break;
-				
+
+				case Advanced:
+					AdvancedPressed();
+					break;
+
+				case InfoButton:
+					InfoPressed();
+					break;
+
 				// mutator stuff
 				case MutatorsButtons[0]:
 				case MutatorsButtons[1]:
@@ -309,6 +367,11 @@ function OverEffect(ShellButton B)
 			SmokingWindows[3] = 1;
 			SmokingTimers[3] = 90;
 			break;
+
+		case Advanced:
+			SmokingWindows[4] = 1;
+			SmokingTimers[4] = 90;
+			break;
 	}
 }
 
@@ -319,9 +382,11 @@ function Paint(Canvas C, float X, float Y)
 	
 	Super.Paint(C, X, Y);
 
-	for ( i = 0; i < 4; i++ )
+	for ( i = 0; i < ArrayCount(Buttons); i++ )
 		Super.PaintSmoke(C, Buttons[i], SmokingWindows[i], SmokingTimers[i]);
 	
+	Super.PaintSmoke(C, Advanced, SmokingWindows[4], SmokingTimers[4]);
+
 	// mutator stuff
 	for ( i=0; i < NumberOfMutators; i++ )
 	{
@@ -373,8 +438,11 @@ function StartGame( int Difficulty )
 	
 	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ mutatorClassString;
 
+	// allow main menu to close
+	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;
+
 	Close();
-	MainMenuWindow(AeonsRootWindow(Root).MainMenu).Single.Close();
+	ParentWindow.Close();
 	MainMenuWindow(AeonsRootWindow(Root).MainMenu).StopShellAmbient();//Close();
 
 	//AeonsRootWindow(Root).MainMenu.ShowWindow();
@@ -394,8 +462,6 @@ function StartGame( int Difficulty )
 		GetPlayerOwner().ConsoleCommand("deletesavelevels");
 		GetPlayerOwner().ClientTravel(URL, TRAVEL_Absolute, false);
 	}
-	
-	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;
 }
 
 
@@ -409,10 +475,12 @@ function Resized()
 	RootScaleX = Root.ScaleX;
 	RootScaleY = Root.ScaleY;
 	
-	for ( i=0; i<4; i++ )
+	for ( i=0; i<ArrayCount(Buttons); i++ )
 	{
 		Buttons[i].ManagerResized(RootScaleX, RootScaleY);
 	}
+
+	Advanced.ManagerResized(RootScaleX, RootScaleY);
 	
 	// mutator stuff
 
@@ -429,6 +497,7 @@ function Resized()
 	
 	MutatorsLabel.ManagerResized(RootScaleX, RootScaleY);
 	MutatorsHintLabel.ManagerResized(RootScaleX, RootScaleY);
+	InfoButton.ManagerResized(RootScaleX, RootScaleY);
 }
 
 function Close(optional bool bByParent)
@@ -553,6 +622,55 @@ function RefreshButtons()
 	}
 }
 
+function SetMutatorsVisible(bool bShow)
+{
+	local int i;
+
+	if ( bShowMutators == bShow )
+		return;
+
+	bShowMutators = bShow;
+
+	if ( bShowMutators )
+	{
+		MutatorsLabel.ShowWindow();
+		MutatorsHintLabel.ShowWindow();
+		InfoButton.ShowWindow();
+		Up.ShowWindow();
+		Down.ShowWindow();
+
+		for( i=0; i<ArrayCount(MutatorsButtons); i++ )
+		{
+			MutatorsButtons[i].ShowWindow();
+		}
+	}
+	else
+	{
+		MutatorsLabel.HideWindow();
+		MutatorsHintLabel.HideWindow();
+		InfoButton.HideWindow();
+		Up.HideWindow();
+		Down.HideWindow();
+
+		for( i=0; i<ArrayCount(MutatorsButtons); i++ )
+		{
+			MutatorsButtons[i].HideWindow();
+		}
+	}
+}
+
+function AdvancedPressed()
+{
+	PlayNewScreenSound();
+	SetMutatorsVisible(!bShowMutators);
+}
+
+function InfoPressed()
+{
+	// open a file relative to System
+	class'StatLog'.static.BrowseRelativeLocalURL("../What are mutators.pdf");
+}
+
 function MutatorClicked(UWindowWindow B)
 {
 	local string mName;
@@ -574,12 +692,14 @@ function MutatorClicked(UWindowWindow B)
 defaultproperties
 {
      StartMap="CU_01"
-     BackNames(0)="UndyingShellPC.Difficulty_0"
-     BackNames(1)="UndyingShellPC.Difficulty_1"
-     BackNames(2)="UndyingShellPC.Difficulty_2"
-     BackNames(3)="UndyingShellPC.Difficulty_3"
-     BackNames(4)="UndyingShellPC.Difficulty_4"
-     BackNames(5)="UndyingShellPC.Difficulty_5"
+     BackNames(0)="ShellTextures.Difficulty_0"
+     BackNames(1)="ShellTextures.Difficulty_1"
+     BackNames(2)="ShellTextures.Difficulty_2"
+     BackNames(3)="ShellTextures.Difficulty_3"
+     BackNames(4)="ShellTextures.Difficulty_4"
+     BackNames(5)="ShellTextures.Difficulty_5"
      MutatorBaseClass="Engine.Mutator"
      SelectMutatorsText="SELECT MUTATORS"
+     AboutText="About"
+     bShowMutators=True
 }

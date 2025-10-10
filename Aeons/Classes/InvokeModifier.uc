@@ -12,12 +12,24 @@ function PreBeginPlay()
 	Super.PreBeginPlay();
 	SetTimer(1, true);
 	
-	Times[0] = 20;
-	Times[1] = 40;
-	Times[2] = 40;
-	Times[3] = 60;
-	Times[4] = 60;
-	Times[5] = 80;
+	if ( RGC() )
+	{
+		Times[0] = 30;
+		Times[1] = 50;
+		Times[2] = 60;
+		Times[3] = 80;
+		Times[4] = 100;
+		Times[5] = 120;
+	}
+	else
+	{
+		Times[0] = 20;
+		Times[1] = 40;
+		Times[2] = 40;
+		Times[3] = 60;
+		Times[4] = 60;
+		Times[5] = 80;
+	}
 }
 
 function bool AddSP(ScriptedPawn SP, int j)

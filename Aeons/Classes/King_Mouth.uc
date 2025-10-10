@@ -10,7 +10,7 @@ class King_Mouth expands King_Part;
 //#exec MESH NOTIFY SEQ=Multi_Mouthshot_Start TIME=0.01 FUNCTION=SetMouthClosed
 
 //#exec MESH NOTIFY SEQ=SuctionStarts TIME=0.000 FUNCTION=PlaySound_N ARG="SuctionStart"
-//#exec MESH NOTIFY SEQ=SuctionCycle TIME=0.000 FUNCTION=PlaySound_N ARG="SuctionLoop"
+////#exec MESH NOTIFY SEQ=SuctionCycle TIME=0.000 FUNCTION=PlaySound_N ARG="SuctionLoop"
 //#exec MESH NOTIFY SEQ=SuctionEnds TIME=0.000 FUNCTION=PlaySound_N ARG="SuctionEnd"
 
 

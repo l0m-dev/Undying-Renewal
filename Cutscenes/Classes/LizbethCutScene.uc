@@ -8,7 +8,7 @@ class LizbethCutScene expands CutSceneChar;
 
 //#exec MESH NOTIFY SEQ=0501 TIME=0.9375 FUNCTION=Scream
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\VoiceOver.uax PACKAGE=VoiceOver
+#exec OBJ LOAD FILE=..\Sounds\VoiceOver.uax PACKAGE=VoiceOver
 
 var() Sound ScreamSound;
 

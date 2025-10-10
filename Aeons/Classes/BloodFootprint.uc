@@ -4,7 +4,7 @@
 class BloodFootprint expands AeonsDecal
 	abstract;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\BloodFootprints.utx PACKAGE=BloodFootprints
+#exec OBJ LOAD FILE=..\Textures\BloodFootprints.utx PACKAGE=BloodFootprints
 
 
 simulated event PostBeginPlay();

@@ -3,7 +3,7 @@
 //=============================================================================
 class DynamiteAmmo expands Ammo;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //#exec MESH IMPORT MESH=Dynamite_m SKELFILE=Dynamite_m.ngf
 

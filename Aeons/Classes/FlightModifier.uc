@@ -3,7 +3,7 @@
 //=============================================================================
 class FlightModifier expands PlayerModifier;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //=============================================================================
 var() sound FlyingSound;
@@ -50,9 +50,7 @@ state Active
 				if ( ( AeonsPlayer(Owner).JumpHeldTime >= 0.2 ) &&
 					 ( !AeonsPlayer(Owner).InCrouch() ) &&
 					 !AeonsPlayer(Owner).Region.Zone.bWaterZone &&
-					 (AeonsPlayer(Owner).GetStateName() != 'PlayerCutscene') &&
-					 (AeonsPlayer(Owner).GetStateName() != 'DialogScene') &&
-					 (AeonsPlayer(Owner).GetStateName() != 'SpecialKill') &&
+					 !AeonsPlayer(Owner).IsInCutsceneState() &&
 					 ( Fuel >= 30 ) )
 				{
 					bActive = true;
@@ -197,6 +195,6 @@ defaultproperties
      SputterSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_FlyLoopEnd01'
      Fuel=60
      RemoteRole=ROLE_SimulatedProxy
-	 SoundRadius=255
+	 SoundRadius=30
      SoundVolume=96
 }

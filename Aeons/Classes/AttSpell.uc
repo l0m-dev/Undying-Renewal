@@ -5,7 +5,7 @@ class AttSpell extends AeonsSpell
     abstract;
 
 // NEEDAEON -need a spell sprite instead of using weapon sprite
-//#exec Texture Import File=Weapon.pcx Name=S_Weapon Mips=Off Flags=2
+////#exec Texture Import File=Weapon.pcx Name=S_Weapon Mips=Off Flags=2
 
 // general spell pickup sound
 //#exec AUDIO IMPORT FILE="E_Spl_GenPck01.wav" NAME="E_Spl_GenPck01" GROUP="Spells"
@@ -323,6 +323,10 @@ simulated function ClientIdleAttSpell()
 {
 	if (Level.NetMode != NM_Client)
 		return;
+
+	// fix hand showing on failed cast
+	if (AnimSequence == 'None')
+		PlayAnim('Down');
 	
 	//log("AttSpell: ClientIdleAttSpell");
 	if (GetStateName() != 'ClientIdle')
@@ -334,6 +338,10 @@ state Idle2
 	function BeginState()
 	{
 		bFiring = false;
+
+		// fix hand showing on failed cast, after level change
+		if (AnimSequence == 'None')
+			PlayAnim('Down');
 
 		ClientIdleAttSpell();
 	}

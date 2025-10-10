@@ -197,20 +197,27 @@ state Throw
 		// sndID = playSound(FuseSound,SLOT_Interact,0.5);
 	}
 
-	simulated function BeginState()
+	function BeginState()
 	{
 		Velocity = ((vector(Rotation) + vect(0,0,0.25)) * speed) + Owner.Velocity;
 		Wind = Spawn(class 'DynamiteWind',,,Location);
 		Wind.setBase(self);
 		SetTimer(getSoundDuration(FuseSound), true);
+
+		sndID = PlaySound(Sound'E_Wpn_DynaFuse01', SLOT_Interact, 2.0);
 		
-		// fix
-		if ( Level.NetMode == NM_Standalone ) 
-			if ( FuseSound != none )
-				AmbientSound = FuseSound;
+		if ( FuseSound != none )
+			AmbientSound = FuseSound;
 	}
 
 	Begin:
+		if ( Level.NetMode != NM_Standalone )
+		{
+			// disable bClientAnim to replicate AmbientSound
+			bClientAnim = false;
+			Sleep(0.0);
+			bClientAnim = default.bClientAnim;
+		}
 		Sleep(fuseLen);
 		GotoState('Blow');
 		

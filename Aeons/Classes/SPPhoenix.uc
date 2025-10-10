@@ -3,7 +3,7 @@
 //=============================================================================
 class SPPhoenix expands ScriptedFlyer;
 
-//#exec MESH IMPORT MESH=SPPhoenix_m SKELFILE=SPPhoenix.ngf
+////#exec MESH IMPORT MESH=SPPhoenix_m SKELFILE=SPPhoenix.ngf
 
 
 //****************************************************************************

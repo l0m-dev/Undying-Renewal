@@ -71,15 +71,24 @@ function QueryFinished(UBrowserServerListFactory Fact, bool bSuccess, optional s
 // Functions for server list entries only.
 function PingServer(bool bInitial, bool bJustThisServer, bool bNoSort)
 {
-	Log("PingServer: "$Self);
-	if(ServerPing != None)
-	{
-		Log("PingServer ERROR, PING ALREADY EXISTS: "$ServerPing@Self);
-	}
+	local bool bInstantPing;
+	local int PingAttempts;
+
+	bInstantPing = bInitial && bJustThisServer && 
+		UBrowserServerList(Sentinel) != None && 
+		UBrowserServerList(Sentinel).Owner != None && 
+		UBrowserServerList(Sentinel).Owner.PingedList == Sentinel;
+
 	// Create the UdpLink to ping the server
 	ServerPing = GetPlayerOwner().GetEntryLevel().Spawn(class'UBrowserServerPing');
 	ServerPing.Server = Self;
-	ServerPing.StartQuery('GetInfo', 2);
+	PingAttempts = 2;
+	if(bInstantPing)
+	{
+		PingAttempts = 4;
+		ServerPing.PingTimeout += 3;
+	}
+	ServerPing.StartQuery('GetInfo', PingAttempts);
 	ServerPing.bInitial = bInitial;
 	ServerPing.bJustThisServer = bJustThisServer;
 	ServerPing.bNoSort = bNoSort;
@@ -88,11 +97,6 @@ function PingServer(bool bInitial, bool bJustThisServer, bool bNoSort)
 
 function ServerStatus()
 {
-	Log("ServerStatus: "$Self);
-	if(ServerPing != None)
-	{
-		Log("ServerStatus ERROR, PING ALREADY EXISTS: "$ServerPing@Self);
-	}
 	// Create the UdpLink to ping the server
 	ServerPing = GetPlayerOwner().GetEntryLevel().Spawn(class'UBrowserServerPing');
 	ServerPing.Server = Self;
@@ -167,6 +171,9 @@ function PingDone(bool bInitial, bool bJustThisServer, bool bSuccess, bool bNoSo
 			else
 				OldSentinel.PingNext(bInitial, bNoSort);
 		}
+
+	if(bSuccess)
+		ServerStatus();
 }
 
 function ConsiderForSubsets()
@@ -197,9 +204,17 @@ function PingServers(bool bInitial, bool bNoSort)
 
 	for(l = UBrowserServerList(Next);l != None;l = UBrowserServerList(l.Next)) 
 	{
-		l.bPinging = False;
-		l.bPingFailed = False;
-		l.bPinged = False;
+		if(bPinged)
+		{
+			if(l.ServerPing != None && l.ServerPing.bJustThisServer)
+				l.ServerPing.bJustThisServer = false;
+		}
+		else
+		{
+			l.bPinging = False;
+			l.bPingFailed = False;
+			l.bPinged = False;
+		}
 	}
 
 	PingNext(bInitial, bNoSort);
@@ -219,7 +234,7 @@ function PingNext(bool bInitial, bool bNoSort)
 	bDone = True;
 	for(l = UBrowserServerList(Next);l != None;l = UBrowserServerList(l.Next)) 
 	{
-		if(!l.bPinged)
+		if(l.bPinged)
 			Owner.TotalPinged++;
 		Owner.TotalServers++;
 
@@ -355,6 +370,6 @@ function bool DecodeServerProperties(string Data)
 
 defaultproperties
 {
-     MaxSimultaneousPing=10
+     MaxSimultaneousPing=20
      PlayerListSortColumn=1
 }

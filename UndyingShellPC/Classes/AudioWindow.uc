@@ -3,13 +3,14 @@
 //=============================================================================
 class AudioWindow expands ShellWindow;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 //#exec Texture Import File=Audio_0.bmp Mips=Off
 //#exec Texture Import File=Audio_1.bmp Mips=Off
 //#exec Texture Import File=Audio_2.bmp Mips=Off
 //#exec Texture Import File=Audio_3.bmp Mips=Off
-#exec Texture Import File=Audio_4R.bmp Mips=Off
+//#exec Texture Import File=Audio_4.bmp Mips=Off
 //#exec Texture Import File=Audio_5.bmp Mips=Off
 
 
@@ -107,6 +108,13 @@ var bool bInitialized;
 var int		SmokingWindows[2];
 var float	SmokingTimers[2];
 
+var ShellLabel DriverLabel;
+var ShellButton ChangeDriver;
+
+var ShellLabel SoundVolumeLabel;
+var ShellLabel BackgroundVolumeLabel;
+var ShellLabel VoiceVolumeLabel;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -143,9 +151,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'UndyingShellPC.Video_ok_up';
-	OK.DownTexture = texture'UndyingShellPC.Video_ok_dn';
-	OK.OverTexture = texture'UndyingShellPC.Video_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.Video_ok_up'; // unused: audio_ok_up
+	OK.DownTexture = texture'ShellTextures.Video_ok_dn'; // unused: audio_ok_dn
+	OK.OverTexture = texture'ShellTextures.Video_ok_ov'; // unused: audio_ok_ov
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -165,9 +173,9 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'UndyingShellPC.Video_cancel_up';
-	Cancel.DownTexture = texture'UndyingShellPC.Video_cancel_dn';
-	Cancel.OverTexture = texture'UndyingShellPC.Video_cancel_ov';
+	Cancel.UpTexture =   texture'ShellTextures.Video_cancel_up';
+	Cancel.DownTexture = texture'ShellTextures.Video_cancel_dn';
+	Cancel.OverTexture = texture'ShellTextures.Video_cancel_ov';
 	Cancel.DisabledTexture = None;
 
 // HighQuality
@@ -355,6 +363,72 @@ function Created()
 	BackgroundVolumeDown.OverTexture = texture'audio_voi_dnarr_ov';
 	BackgroundVolumeDown.DisabledTexture = None;
 
+	// Volume labels
+	TextColor.R = 225;
+	TextColor.G = 75;
+	TextColor.B = 0;
+
+	SoundVolumeLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+	SoundVolumeLabel.Template=NewRegion(108,188, 50, 20);
+	SoundVolumeLabel.Manager = Self;
+	SoundVolumeLabel.Text = "";
+	SoundVolumeLabel.SetTextColor(TextColor);
+	SoundVolumeLabel.Align = TA_Left;
+	SoundVolumeLabel.Font = 4;
+
+	BackgroundVolumeLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+	BackgroundVolumeLabel.Template=NewRegion(172,129, 50, 20);
+	BackgroundVolumeLabel.Manager = Self;
+	BackgroundVolumeLabel.Text = "";
+	BackgroundVolumeLabel.SetTextColor(TextColor);
+	BackgroundVolumeLabel.Align = TA_Left;
+	BackgroundVolumeLabel.Font = 4;
+
+	VoiceVolumeLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+	VoiceVolumeLabel.Template=NewRegion(269,142, 50, 20);
+	VoiceVolumeLabel.Manager = Self;
+	VoiceVolumeLabel.Text = "";
+	VoiceVolumeLabel.SetTextColor(TextColor);
+	VoiceVolumeLabel.Align = TA_Left;
+	VoiceVolumeLabel.Font = 4;
+
+	// Driver label.  Galaxy, etc
+	DriverLabel = ShellLabel(CreateWindow(class'ShellLabel', 1,1,1,1));
+
+	DriverLabel.Template=NewRegion(500, 283, 280, 38);
+	DriverLabel.Manager = Self;
+	DriverLabel.Text = "";
+	TextColor.R = 255;
+	TextColor.G = 255;
+	TextColor.B = 255;
+	DriverLabel.SetTextColor(TextColor);
+	DriverLabel.Align = TA_Center;
+	DriverLabel.Font = 4;
+
+	// Change Driver button	
+	ChangeDriver = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
+
+	// position and size in designed resolution of 800x600
+	ChangeDriver.Template = NewRegion(556,320,180,48);
+
+	ChangeDriver.Manager = Self;
+	ChangeDriver.Style = 5;
+	ChangeDriver.Text = class'VideoWindow'.default.ChangeDriverText;
+	TextColor.R = 255;
+	TextColor.G = 255;
+	TextColor.B = 255;
+	ChangeDriver.SetTextColor(TextColor);
+	ChangeDriver.TextStyle=1;
+	ChangeDriver.Align = TA_Center;
+	ChangeDriver.Font = 4;
+
+	ChangeDriver.TexCoords = NewRegion(0,0,204,54);
+
+	ChangeDriver.UpTexture =		texture'Video_resol_up';
+	ChangeDriver.DownTexture =		texture'Video_resol_up';
+	ChangeDriver.OverTexture =		texture'Video_resol_ov';
+	ChangeDriver.DisabledTexture =	None;
+
 
 	SoundVolumeChanged(0);
 	VoiceVolumeChanged(0);
@@ -404,6 +478,13 @@ function Resized()
 
 	OK.ManagerResized(RootScaleX, RootScaleY);
 	Cancel.ManagerResized(RootScaleX, RootScaleY);
+
+	DriverLabel.ManagerResized(RootScaleX, RootScaleY);
+	ChangeDriver.ManagerResized(RootScaleX, RootScaleY);
+
+	SoundVolumeLabel.ManagerResized(RootScaleX, RootScaleY);
+	BackgroundVolumeLabel.ManagerResized(RootScaleX, RootScaleY);
+	VoiceVolumeLabel.ManagerResized(RootScaleX, RootScaleY);
 }
 
 //----------------------------------------------------------------------------
@@ -425,6 +506,8 @@ function SoundVolumeChanged(float Delta)
 	SoundVolumeSlider.Template.Y = SoundCenter.y - SoundRadius * sin( SoundThetaStart + (SoundVolume/255.0) * ThetaRange) - SoundVolumeSlider.Template.H/2;
 	
 	SoundVolumeSlider.ManagerResized(RootScaleX, RootScaleY);
+
+	SoundVolumeLabel.SetText(string(int(SoundVolume/2.55)));
 
 	if ( Abs(Delta) > 0.0 ) 
 	{	
@@ -454,6 +537,8 @@ function BackgroundVolumeChanged(float Delta)
 	BackgroundVolumeSlider.Template.Y = BackgroundCenter.y - BackgroundRadius * sin( BackgroundThetaStart + (BackgroundVolume/255.0) * ThetaRange ) - BackgroundVolumeSlider.Template.H/2;
 	
 	BackgroundVolumeSlider.ManagerResized(RootScaleX, RootScaleY);
+
+	BackgroundVolumeLabel.SetText(string(int(BackgroundVolume/2.55)));
 	
 	if ( Abs(Delta) > 0.0 ) 
 	{	
@@ -483,6 +568,8 @@ function VoiceVolumeChanged(float Delta)
 	VoiceVolumeSlider.Template.Y = VoiceCenter.y - VoiceRadius * sin( VoiceThetaStart + (VoiceVolume/255.0) * ThetaRange ) - VoiceVolumeSlider.Template.H/2;
 
 	VoiceVolumeSlider.ManagerResized(RootScaleX, RootScaleY);
+
+	VoiceVolumeLabel.SetText(string(int(VoiceVolume/2.55)));
 	
 	if ( Abs(Delta) > 0.0 ) 
 	{	
@@ -516,6 +603,9 @@ function int ForcePowerOfTwo( int Value )
 
 function GetCurrentSettings()
 {
+	local string AudioDriverClassName, ClassLeft, ClassRight;
+	local int i;
+
 	// get current values for Music, Sound and VoiceOver Volumes and remember them in case they cancel
 	OrigSoundVolume = int(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice SoundVolume "));
 	OrigBackgroundVolume = int(GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice BackgroundVolume "));
@@ -546,6 +636,22 @@ function GetCurrentSettings()
 	SoundVolumeChanged(0);
 	VoiceVolumeChanged(0);
 	BackgroundVolumeChanged(0);
+
+	AudioDriverClassName = GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.AudioDevice Class");
+	i = InStr(AudioDriverClassName, "'");
+	// Get class name from class'...'
+	if(i != -1)
+	{
+		AudioDriverClassName = Mid(AudioDriverClassName, i+1);
+		i = InStr(AudioDriverClassName, "'");
+		AudioDriverClassName = Left(AudioDriverClassName, i);
+		ClassLeft = Left(AudioDriverClassName, InStr(AudioDriverClassName, "."));
+		ClassRight = Mid(AudioDriverClassName, InStr(AudioDriverClassName, ".") + 1);
+
+		DriverLabel.Text = Localize(ClassRight, "ClassCaption", ClassLeft);
+	}
+	else
+		DriverLabel.Text = AudioDriverClassName;
 
 	// Will save changes by default
 	bSaveChanges = True;
@@ -650,6 +756,10 @@ function Message(UWindowWindow B, byte E)
 					PlayNewScreenSound();
 					Close();
 					break;
+
+				case ChangeDriver:
+					ChangeDriverPressed();
+					break;
 			}
 			break;
 
@@ -701,6 +811,24 @@ function OverEffect(ShellButton B)
 	}
 }
 
+function ChangeDriverPressed()
+{
+	//	ConfirmDriver = MessageBox(ConfirmDriverTitle, ConfirmDriverText, MB_YesNo, MR_No);
+	
+	AeonsRootWindow(Root).RelaunchedFrom = 2;
+	AeonsRootWindow(Root).SaveConfig();
+
+	if ( !GetPlayerOwner().Level.bLoadBootShellPSX2 )
+	{
+		GetPlayerOwner().EnableSaveGame();
+		GetPlayerOwner().ConsoleCommand("SaveGame 99");
+	}
+	GetPlayerOwner().ConsoleCommand("deletesavelevels");
+	GetPlayerOwner().ConsoleCommand("RELAUNCH -changeaudio?-nointro");
+	
+	Close();
+}
+
 function Close(optional bool bByParent)
 {
 	//SoundEmitter.SoundRadius = 0;
@@ -738,10 +866,10 @@ defaultproperties
      BackgroundRadius=128
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      CheckboxSound=Sound'Shell_HUD.Shell.SHELL_CheckBox'
-     BackNames(0)="UndyingShellPC.Audio_0"
-     BackNames(1)="UndyingShellPC.Audio_1"
-     BackNames(2)="UndyingShellPC.Audio_2"
-     BackNames(3)="UndyingShellPC.Audio_3"
-     BackNames(4)="UndyingShellPC.Audio_4R"
-     BackNames(5)="UndyingShellPC.Audio_5"
+     BackNames(0)="ShellTextures.Audio_0"
+     BackNames(1)="ShellTextures.Audio_1"
+     BackNames(2)="ShellTextures.Audio_2"
+     BackNames(3)="ShellTextures.Audio_3"
+     BackNames(4)="ShellTextures.Audio_4"
+     BackNames(5)="ShellTextures.Audio_5"
 }

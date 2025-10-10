@@ -3,7 +3,7 @@
 //=============================================================================
 class CeltCutscene expands CutsceneChar;
 
-// #exec MESH IMPORT MESH=Celt_m SKELFILE=Celt.ngf INHERIT=ScriptedBiped_m
+//// #exec MESH IMPORT MESH=Celt_m SKELFILE=Celt.ngf INHERIT=ScriptedBiped_m
 
 // Celt ============================================
 //#exec MESH IMPORT MESH=Celt_m SKELFILE=Celt.ngf

@@ -92,7 +92,7 @@ function Fire( float Value )
 //----------------------------------------------------------------------------
 function Fire( float Value )
 {
-	if ( (AeonsPlayer(Owner).GetStateName() == 'DialogScene') || (AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene') || (AeonsPlayer(Owner).GetStateName() == 'SpecialKill'))
+	if ( AeonsPlayer(Owner).IsInCutsceneState() )
 		return;
 
 //	LogActor("Shotgun: Fire: Value =" $ Value);
@@ -120,12 +120,13 @@ simulated function PlayFiring()
 {
 	//log("PlayFiring Called within the Shotgun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
-	if (RGORE())
+	// shotgun gore, on already dead pawns
+	if ( RGORE() )
 	{
-		if (FRand() > 0.5)
-			Patrick(Owner).DetachJoint(None, 200);
+		if ( FRand() > 0.5 )
+			Patrick(Owner).DetachJointEx(None, 200);
 		else
-			Patrick(Owner).DestroyJoint();
+			Patrick(Owner).DestroyJointEx();
 	}
 //new	if ( Role == ROLE_Authority )
 //		ClipCount--;
@@ -402,14 +403,6 @@ state NewClip
 {
 	ignores Fire, Reload;
 
-	function Finish()
-	{
-		if ( bChangeWeapon )
-			GotoState('DownWeapon');
-		else
-			GotoState('Idle');
-	}
-
 	function BeginState()
 	{
 		PlayerPawn(Owner).bReloading = true;
@@ -481,7 +474,7 @@ state Idle
 
 	simulated function Timer()
 	{
-		if ( VSize(PlayerPawn(Owner).Velocity) < 300 && (PlayerPawn(Owner).GetStateName() != 'DialogScene') && (PlayerPawn(Owner).GetStateName() != 'PlayerCutScene') && (PlayerPawn(Owner).GetStateName() != 'SpecialKill'))
+		if ( VSize(PlayerPawn(Owner).Velocity) < 300 && !AeonsPlayer(Owner).IsInCutsceneState() )
 			if (FRand() > 0.75)
 				gotoState(getStateName(),'Flourish');
 	}
@@ -496,8 +489,8 @@ state Idle
 	Begin:
 		ClientIdleWeapon();
 		PlayIdleAnim();
-		if ( Pawn(Owner).bFire != 0 && !Region.Zone.bNeutralZone )
-			Global.Fire(0);
+		//if ( Pawn(Owner).bFire != 0 && !Region.Zone.bNeutralZone )
+		//	Global.Fire(0);
 		enable('Tick');
 		setTimer(8 + FRand()*5,true);
 }

@@ -1,10 +1,10 @@
 class WaterZone expands ZoneInfo;
 
 //#exec Texture Import File=WaterZoneInfo.pcx Name=WaterZoneInfo Mips=Off Flags=2
-//#exec AUDIO IMPORT FILE="Sounds\Game\WaterSplash0.WAV" NAME="WaterSplash0" GROUP="Game"
-//#exec AUDIO IMPORT FILE="Sounds\Game\WaterExit0.WAV" NAME="WaterExit0" GROUP="Game"
+////#exec AUDIO IMPORT FILE="Sounds\Game\WaterSplash0.WAV" NAME="WaterSplash0" GROUP="Game"
+////#exec AUDIO IMPORT FILE="Sounds\Game\WaterExit0.WAV" NAME="WaterExit0" GROUP="Game"
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 defaultproperties
 {

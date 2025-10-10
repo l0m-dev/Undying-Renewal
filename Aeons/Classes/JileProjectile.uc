@@ -3,7 +3,7 @@
 //=============================================================================
 class JileProjectile expands SPThrownProjectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 var ParticleFX				TrailFX;
 

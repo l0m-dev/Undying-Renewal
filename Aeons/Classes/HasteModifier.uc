@@ -3,7 +3,7 @@
 //=============================================================================
 class HasteModifier expands PlayerModifier;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var travel bool 	bHUDEffect;		// HUD can be activated?
 var travel float 	str;			// strength of HUD Effect
@@ -212,7 +212,7 @@ defaultproperties
 {
      ActiveLoopSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_Haste01'
      EffectEndSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_HasteEnd01'
-     SoundRadius=255
+     SoundRadius=30
      SoundVolume=96
      RemoteRole=ROLE_SimulatedProxy
 }

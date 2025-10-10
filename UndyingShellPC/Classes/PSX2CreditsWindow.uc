@@ -147,10 +147,10 @@ function HideWindow()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.PSX2Credits_0"
-     BackNames(1)="UndyingShellPC.PSX2Credits_1"
-     BackNames(2)="UndyingShellPC.PSX2Credits_2"
-     BackNames(3)="UndyingShellPC.PSX2Credits_3"
-     BackNames(4)="UndyingShellPC.PSX2Credits_4"
-     BackNames(5)="UndyingShellPC.PSX2Credits_5"
+     BackNames(0)="ShellTextures.PSX2Credits_0"
+     BackNames(1)="ShellTextures.PSX2Credits_1"
+     BackNames(2)="ShellTextures.PSX2Credits_2"
+     BackNames(3)="ShellTextures.PSX2Credits_3"
+     BackNames(4)="ShellTextures.PSX2Credits_4"
+     BackNames(5)="ShellTextures.PSX2Credits_5"
 }

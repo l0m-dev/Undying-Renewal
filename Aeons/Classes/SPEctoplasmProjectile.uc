@@ -39,7 +39,7 @@ function PreBeginPlay()
 	super.PreBeginPlay();
 }
 
-function PostBeginPlay()
+simulated function PostBeginPlay()
 {
 	Super.PostBeginPlay();
 	ectoTrail = Spawn(class 'EctoplasmTrail_particles',self);
@@ -48,7 +48,7 @@ function PostBeginPlay()
 }
 
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( ectoTrail != None )
 		ectoTrail.Shutdown();

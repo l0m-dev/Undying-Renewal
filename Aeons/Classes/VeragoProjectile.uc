@@ -104,6 +104,7 @@ BEGIN:
 	SetPhysics( PHYS_Projectile );
 	TrailFX = Spawn( class'SkullStorm_Particles', self,, Location );
 	TrailFX.SetBase( self );
+	TrailFX.RemoteRole = ROLE_SimulatedProxy;
 	Velocity = vector(Rotation) * Speed;
 }
 

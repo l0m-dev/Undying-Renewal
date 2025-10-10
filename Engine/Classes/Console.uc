@@ -407,6 +407,9 @@ function DrawTransitionScreen(Canvas C)
 	C.DrawColor.B = 255;
 	C.DrawColor.A = 255;
 	
+	// setting bNoSmooth to true fixes the tiling, but it looks really bad
+	// for now, draw the textures from 1, 1 to Tex.USize-1, Tex.VSize-1
+	// the proper fix is to reimport the textures with bilinear filtering preapplied
 	C.bNoSmooth = false;
 
 	DrawStretchedTextureSegment( C, C.OrgX, C.OrgY, C.SizeX, C.SizeY, 0, 0, 1, 1, texture'Engine.noisy1pfx' ); // black background
@@ -416,7 +419,7 @@ function DrawTransitionScreen(Canvas C)
 		for (h = 0; h < NumTilesY; h++)
 		{
 			Tex = Back[w+h*NumTilesX];
-			DrawStretchedTextureSegment( C, InnerLeft + TileWidth*w, InnerTop + TileHeight*h, TileWidth, TileHeight, 0, 0, Tex.USize, Tex.VSize, Tex );
+			DrawStretchedTextureSegment( C, InnerLeft + TileWidth*w, InnerTop + TileHeight*h, TileWidth, TileHeight, 1, 1, Tex.USize-1, Tex.VSize-1, Tex );
 		}
 	}
 

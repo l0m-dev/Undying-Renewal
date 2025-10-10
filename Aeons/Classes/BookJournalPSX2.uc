@@ -3,7 +3,7 @@
 //=============================================================================
 class BookJournalPSX2 expands BookJournalBase;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var() bool bCapsOnly;
 
@@ -52,7 +52,7 @@ function TravelPostAccept()
 
 			if ( JournalEntryClass != None )
 			{
-				TempEntry = Spawn(JournalEntryClass);
+				TempEntry = Spawn(JournalEntryClass, Owner);
 				
 				if ( TempEntry != None ) 
 					Journals[i] = TempEntry;

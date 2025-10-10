@@ -56,7 +56,7 @@ function Shutdown(optional bool bBySuperset)
 
 defaultproperties
 {
-     BeaconProduct="unreal"
+     BeaconProduct="undying"
      ServerBeaconPort=8777
      bIncrementalPing=True
 }

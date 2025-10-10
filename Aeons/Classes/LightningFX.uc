@@ -3,7 +3,7 @@
 //=============================================================================
 class LightningFX expands ScriptedFX;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\Lightning.utx PACKAGE=Lightning
+#exec OBJ LOAD FILE=..\Textures\Lightning.utx PACKAGE=Lightning
 
 defaultproperties
 {

@@ -3,8 +3,8 @@
 //=============================================================================
 class BookJournal expands BookJournalBase;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\Pages.utx PACKAGE=Pages
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Textures\Pages.utx PACKAGE=Pages
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //#exec MESH IMPORT MESH=BookJournal_m SKELFILE=BookJournal.ngf SMOOTHING=88
 //#exec MESHMAP SCALE 0.35 0.01 0.01
@@ -137,7 +137,7 @@ simulated function PostBeginPlay()
 
 	if ( ObjectivesEntry == None && Level.NetMode != NM_DedicatedServer )
 	{
-		ObjectivesEntry = Spawn(class'ObjectivesJournal');
+		ObjectivesEntry = Spawn(class'ObjectivesJournal', Owner);
 		ObjectivesEntry.RemoteRole = ROLE_None;
 	}
 
@@ -167,7 +167,7 @@ simulated function LoadReplicatedJournals()
 			JournalEntryClass = JournalsClassesRep[i];
 			if ( JournalEntryClass != None )
 			{
-				TempEntry = Spawn(JournalEntryClass);
+				TempEntry = Spawn(JournalEntryClass, Owner);
 
 				if ( TempEntry != None )
 				{ 
@@ -197,7 +197,7 @@ simulated function TravelPostAccept()
 
 			if ( JournalEntryClass != None )
 			{
-				TempEntry = Spawn(JournalEntryClass);
+				TempEntry = Spawn(JournalEntryClass, Owner);
 				
 				if ( TempEntry != None )
 				{ 
@@ -346,7 +346,7 @@ simulated event RenderTexture(ScriptedTexture Tex)
 			if ( CurrentEntry.CUrrentPage == CurrentEntry.NumPages-1 )
 			{
 				CurrentEntry.NumPages++;
-				log("Increased NumPages to " $ CurrentEntry.NumPages );
+				//log("Increased NumPages to " $ CurrentEntry.NumPages );
 			}
 		}
 		

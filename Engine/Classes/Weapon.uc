@@ -410,30 +410,36 @@ function setHand(float Hand)
 
 function toggleAmmoType()
 {
+	local Ammo NewAmmo;
+	
 	if ( (AmmoType.AmmoAmount <= 0) && (AmmoType != none) )
 	{
+		AmmoType.GotoState('Deactivated');
 		if ( bAltAmmo )
 		{
-			AmmoType = Ammo(Pawn(Owner).FindInventoryType(AmmoName));
-			bAltAmmo = false;
+			NewAmmo = Ammo(Pawn(Owner).FindInventoryType(AmmoName));
 		} else {
-			AmmoType = Ammo(Pawn(Owner).FindInventoryType(AltAmmoName));
-			bAltAmmo = true;
+			NewAmmo = Ammo(Pawn(Owner).FindInventoryType(AltAmmoName));
 		}
+		if ( NewAmmo != None )
+			NewAmmo.Activate();
 	}
 }
 
 function checkAltAmmo()
 {
+	local Ammo NewAmmo;
+
 	if (AmmoType != none)
 		if ( AmmoType.AmmoAmount <= 0 )
 		{
 			if ( bAltAmmo )
 			{
-				AmmoType.bActive = false;
-				AmmoType = Ammo(Pawn(Owner).FindInventoryType(AmmoName));
-				bAltAmmo = false;
-				PlayerPawn(Owner).SelectedItem = AmmoType;
+				AmmoType.GotoState('Deactivated');
+				NewAmmo = Ammo(Pawn(Owner).FindInventoryType(AmmoName));
+				if ( NewAmmo != None )
+					NewAmmo.Activate();
+				PlayerPawn(Owner).SelectedItem = NewAmmo;
 			}
 			// don't automaticly switch to Alternate ammo type.
 			//else

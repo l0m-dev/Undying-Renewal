@@ -3,7 +3,7 @@
 //=============================================================================
 class Explosion expands Effects;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //#exec TEXTURE IMPORT NAME=Explosion FILE=Explosion.pcx GROUP=System Mips=Off Flags=2
 
@@ -30,7 +30,8 @@ function GibRadius( float DamageRadius, vector HitLocation, DamageInfo DInfo, pa
 {
 	local actor Victims;
 
-	if (!RGORE() || DInfo.DamageType == 'LBG_Concussive')
+	// explosion gore, on dead pawns
+	if( !RGORE() || DInfo.DamageType == 'LBG_Concussive' )
 		return;
 
 	if( DInfo.DamageRadius == 0.0 )
@@ -78,7 +79,7 @@ simulated function WallDecal(Vector HitLocation, Vector HitNormal)
 	}
 }
 
-function GenerateDecal()
+simulated function GenerateDecal()
 {
 	WallDecal(Location,vect(0,0,1));
 	WallDecal(Location,vect(0,0,-1));
@@ -88,7 +89,7 @@ function GenerateDecal()
 	WallDecal(Location,vect(-1,0,0));
 }
 
-function PlayEffectSound(optional float Volume)
+simulated function PlayEffectSound(optional float Volume)
 {
 	local float Decision, Vol;
 	
@@ -107,9 +108,9 @@ function PlayEffectSound(optional float Volume)
 		PlaySound(Sounds[0],SLOT_Interact, Vol ,,SoundRadius, 1.0);
 }
 
-function CreateExplosion(Pawn Instigator);
+simulated function CreateExplosion(Pawn Instigator);
 
-function BeginPlay()
+simulated function BeginPlay()
 {
 	Super.BeginPlay();
 	if ( !bTriggered )
@@ -129,7 +130,7 @@ function Trigger(Actor Other, Pawn Instigator)
 	if (!bTriggerMultiple)
 		Destroy();
 }
-
+//132
 defaultproperties
 {
      DamageRadius=256
@@ -144,4 +145,6 @@ defaultproperties
      DrawType=DT_Sprite
      Style=STY_Masked
      Texture=Texture'Aeons.System.Explosion'
+     bAlwaysRelevant=True
+     RemoteRole=ROLE_SimulatedProxy
 }

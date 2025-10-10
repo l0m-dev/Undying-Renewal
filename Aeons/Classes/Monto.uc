@@ -4,7 +4,7 @@
 class Monto expands ScriptedFlyer;
 
 //#exec MESH IMPORT MESH=Monto_m SKELFILE=Monto.ngf
-//#exec MESH MODIFIERS Cloth:Jello
+////#exec MESH MODIFIERS Cloth:Jello
 
 //****************************************************************************
 // Animation sequence notifications.
@@ -74,7 +74,7 @@ class Monto expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Attack_Ranged_01_Start TIME=0.578947 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_01_Start TIME=0.578947 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_01_Start TIME=0.578947 FUNCTION=PlaySound_N ARG="Head PVar=0.2"
-//#exec MESH NOTIFY SEQ=Attack_Ranged_01_Start TIME=0.0 FUNCTION=TrackLp
+////#exec MESH NOTIFY SEQ=Attack_Ranged_01_Start TIME=0.0 FUNCTION=TrackLp
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Cycle TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Cycle TIME=0.0 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Cycle TIME=0.0322581 FUNCTION=PlaySound_N ARG="VIdle CHANCE=0.4 PVar=0.15 V=0.9 VVar=0.1"
@@ -94,9 +94,9 @@ class Monto expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Start TIME=0.0 FUNCTION=PlaySound_N ARG="LightStart"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Start TIME=0.727273 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Attack_Ranged_02_Start TIME=0.0 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Attack_Ranged_02_Start TIME=0.0 FUNCTION=LightLp
+////#exec MESH NOTIFY SEQ=Attack_Ranged_02_Start TIME=0.0 FUNCTION=LightLp
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0322581 FUNCTION=PlaySound_N ARG="VDamage PVar=0.15"
+////#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0322581 FUNCTION=PlaySound_N ARG="VDamage PVar=0.15"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.0645161 FUNCTION=PlaySound_N ARG="Whoosh PVar=0.15"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.387097 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.419355 FUNCTION=PlaySound_N ARG="VIdle CHANCE=0.4 PVar=0.15 V=0.9 VVar=0.1"
@@ -105,7 +105,7 @@ class Monto expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.564516 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.596774 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Damage_Stun TIME=0.709677 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Death_01_End TIME=0.047619 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
+////#exec MESH NOTIFY SEQ=Death_01_End TIME=0.047619 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
 //#exec MESH NOTIFY SEQ=Death_01_End TIME=0.238095 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_End TIME=0.238095 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_End TIME=0.238095 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
@@ -114,7 +114,7 @@ class Monto expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Death_01_Fall TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp CHANCE=0.4 PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.0 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.0206186 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
+////#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.0206186 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.103093 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.134021 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.134021 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
@@ -125,7 +125,7 @@ class Monto expands ScriptedFlyer;
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.628866 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.701031 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_01_Start TIME=0.896907 FUNCTION=PlaySound_N ARG="Click PVar=0.2 V=0.9 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Death_02 TIME=0.0 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
+////#exec MESH NOTIFY SEQ=Death_02 TIME=0.0 FUNCTION=PlaySound_N ARG="VDeath PVar=0.15"
 //#exec MESH NOTIFY SEQ=Death_02 TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_02 TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Death_02 TIME=0.0 FUNCTION=PlaySound_N ARG="Slurp PVar=0.2 V=0.9 VVar=0.1"
@@ -652,7 +652,10 @@ state AIEnergyBlast expands AIFarAttackAnim
 
 		GetAxes( Rotation, X, Y, Z );
 		StartLoc = StartLoc + X * 50.0;
-		TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, true, 3000 ));
+		if ( RGC() )
+			TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, true, 6000 ));
+		else
+			TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, true, 3000 ));
 		LB = Spawn( class'LtngBlast_proj', self,, StartLoc, rotator(TDir) );
 		if ( LB != none )
 		{

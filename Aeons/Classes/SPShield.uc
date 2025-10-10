@@ -10,7 +10,7 @@ var() float					FullDrawScale;		//
 var() float					GrowTime;			//
 var() float					ShrinkTime;			//
 var() float					Strength;			//
-//var() vector				Offset;				//
+var() vector				Offset;				// unused, left for backwards compatibility with mods
 
 
 //****************************************************************************

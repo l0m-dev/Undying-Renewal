@@ -34,6 +34,7 @@ simulated function Tick(float DeltaTime)
 			{
 				ForEach AllActors(class 'ParticleFX', P, Event)
 				{
+					P.bSteadyState = P.default.bSteadyState;
 					P.ParticlesPerSec.Base = P.default.ParticlesPerSec.Base;
 				}
 				bPlayerInMyZone = true;
@@ -43,7 +44,9 @@ simulated function Tick(float DeltaTime)
 			{
 				ForEach AllActors(class 'ParticleFX', P, Event)
 				{
+					P.bSteadyState = false; // allow particles to age initially
 					P.ParticlesPerSec.Base = 0;
+					P.Age += P.Lifetime.Base; // age particles
 				}
 				bPlayerInMyZone = false;
 			}

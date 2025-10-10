@@ -7,7 +7,7 @@ var ParticleFX ps, ps_Smoke;
 
 simulated function Destroyed()
 {
-	if (Level.NetMode != NM_DedicatedServer)
+	if (ps != None)
 	{
 		ps.Shutdown();
 		ps_Smoke.Shutdown();

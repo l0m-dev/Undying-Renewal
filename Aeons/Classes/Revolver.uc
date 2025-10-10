@@ -110,7 +110,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 //----------------------------------------------------------------------------
 function Fire( float Value )
 {
-	if ( (AeonsPlayer(Owner).GetStateName() == 'DialogScene') || (AeonsPlayer(Owner).GetStateName() == 'PlayerCutscene') || (AeonsPlayer(Owner).GetStateName() == 'SpecialKill'))
+	if ( AeonsPlayer(Owner).IsInCutsceneState() )
 		return;
 
 //	LogActor("Revolver: Fire: Value =" $ Value);
@@ -123,13 +123,14 @@ function Fire( float Value )
 	{
 		checkAltAmmo();
         PlayFireEmpty();
-        if (AmmoType.AmmoAmount > 0)
-		{
+		// if we check for AmmoAmount, we won't switch to best weapon if we are out of ammo and try to shoot
+        //if (AmmoType.AmmoAmount > 0)
+		//{
 			//log("Revolver going to NewClip State A", 'Misc');
 			GoToState('NewClip');
 			//if (Level.NetMode == NM_DedicatedServer)
 			//	ClientReloadWeapon(true);
-		}
+		//}
     } 
 	else 
 	{
@@ -358,7 +359,7 @@ state Idle
 
 	simulated function Timer()
 	{
-		if ( VSize(PlayerPawn(Owner).Velocity) < 300 && (PlayerPawn(Owner).GetStateName() != 'DialogScene') && (PlayerPawn(Owner).GetStateName() != 'PlayerCutScene') && (PlayerPawn(Owner).GetStateName() != 'SpecialKill'))
+		if ( VSize(PlayerPawn(Owner).Velocity) < 300 && !AeonsPlayer(Owner).IsInCutsceneState() )
 			if (FRand() > 0.75)
 				gotoState(getStateName(),'Flourish');
 	}

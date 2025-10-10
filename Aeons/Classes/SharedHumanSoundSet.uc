@@ -3,7 +3,7 @@
 //=============================================================================
 class SharedHumanSoundSet expands CreatureSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+////#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 var(Sounds) CreatureSoundGroup	Hand;
 var(Sounds) CreatureSoundGroup	Whoosh;

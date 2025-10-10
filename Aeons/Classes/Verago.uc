@@ -207,7 +207,7 @@ function CommMessage( actor sender, string message, int param )
 	}
 }
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	VeragoFX = Spawn( class'VeragoFaceFX', self,, JointPlace('head').pos );
@@ -215,7 +215,7 @@ function PreBeginPlay()
 		VeragoFX.SetBase( self, 'head' );
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	KillPFX();
 	super.Destroyed();
@@ -500,7 +500,7 @@ function BroadcastQuit()
 	}
 }
 
-function KillPFX()
+simulated function KillPFX()
 {
 	if ( VeragoFX != none )
 	{

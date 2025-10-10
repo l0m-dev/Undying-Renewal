@@ -3,7 +3,7 @@
 //=============================================================================
 class BodyFallSImpactSoundSet expands ImpactSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 defaultproperties
 {

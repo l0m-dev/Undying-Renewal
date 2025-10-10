@@ -12,6 +12,7 @@ var() sound	InvFoundSound;
 var() sound	InvNotFoundSound;
 var() name FailEvent;
 var() localized string PrefixMsg;
+var() localized string PrefixNeedMsg;
 var() localized string TheString;
 var() localized string AString;
 var string Msg;
@@ -113,6 +114,7 @@ function Touch( actor Other )
 					}
 					A.Trigger( Other, Other.Instigator );
 				}
+				Player = AeonsPlayer(Other);
 				GotoState('Holding');
 			}
 
@@ -134,11 +136,6 @@ state Holding
 	{
 		local string str;
 
-		ForEach AllActors(class 'AeonsPlayer', Player)
-		{
-			break;
-		}
-		
 		if ( Player != none )
 		{
 			str = GetOverlayString();
@@ -232,6 +229,7 @@ function string GetOverlayString()
 defaultproperties
 {
      PrefixMsg="You used"
+     PrefixNeedMsg="You need"
      TheString="the"
      AString="a"
      TextColor=(R=255,G=255,B=255)

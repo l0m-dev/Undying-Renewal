@@ -3,10 +3,10 @@
 //=============================================================================
 class AeonsRootWindow extends UWindowRootWindow;
 
-//#exec AUDIO IMPORT FILE="Shell_Blacken01.WAV" GROUP="Shell"
+////#exec AUDIO IMPORT FILE="Shell_Blacken01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_FlameLoop01.WAV" GROUP="Shell"
 //#exec AUDIO IMPORT FILE="Shell_Mvmt01.WAV" GROUP="Shell"
-//#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
+////#exec AUDIO IMPORT FILE="Shell_Select01.WAV" GROUP="Shell"
 
 // moved these to UWindowRootWindow but they are still needed here to compile, otherwise the compiler throws: missing audio_x
 // these are completely separate variables, which ones you access depends on the variable type and there is no inheritance
@@ -23,6 +23,8 @@ var vector ScreenPosition, LastScreenPosition;
 var float FlameSoundTimer;
 
 var UWindowWindow ActiveWindow;
+
+var config int RelaunchedFrom;
 
 function BeginPlay() 
 {
@@ -114,6 +116,33 @@ function NotifyBeforeLevelChange()
 	}
 }
 
+
+function SetupFonts(optional Canvas C)
+{
+	local Font LargeFont, MedFont, SmallFont;
+	
+	LargeFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().LargeFont, class'Font'));
+	MedFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().MediumFont, class'Font'));
+	SmallFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SmallFont, class'Font'));
+	
+	Fonts[F_Normal] = 	SmallFont;
+	Fonts[F_Bold] = 	SmallFont;
+	Fonts[F_Large] =	LargeFont;
+	Fonts[F_LargeBold]= LargeFont;
+	Fonts[4] =			MedFont;
+	Fonts[5] =			Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SaveNameFont, class'Font'));
+
+	Fonts[6] =			Font(DynamicLoadObject("UWindowFonts.Tahoma10", class'Font'));
+	Fonts[7] =			Font(DynamicLoadObject("UWindowFonts.UTFont12", class'Font'));
+	
+	if ( C != None )
+	{
+		C.LargeFont = LargeFont;
+		C.BigFont = LargeFont;
+		C.MedFont = MedFont;
+		C.SmallFont = SmallFont;
+	}
+}
 
 function Resized()
 {
