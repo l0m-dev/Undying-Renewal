@@ -3,7 +3,7 @@
 //=============================================================================
 class WaterWorm expands Effects;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\PiratesCoveG.utx PACKAGE=PiratesCoveG
+#exec OBJ LOAD FILE=..\Textures\PiratesCoveG.utx PACKAGE=PiratesCoveG
 //#exec MESH IMPORT MESH=WaterWorm_m SKELFILE=WaterWorm.ngf 
 
 var() Texture NewTexture;

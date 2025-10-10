@@ -3,7 +3,7 @@
 //=============================================================================
 class ShalasModifier expands PlayerModifier;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var bool 	bHUDEffect;
 var float 	absorbManaPct;

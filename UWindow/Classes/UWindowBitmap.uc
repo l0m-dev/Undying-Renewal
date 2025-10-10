@@ -1,6 +1,6 @@
 class UWindowBitmap extends UWindowWindow;
 
-//#exec Texture Import Name=ScreenShot File=Textures\screenshot.pcx Mips=Off
+////#exec Texture Import Name=ScreenShot File=Textures\screenshot.pcx Mips=Off
 
 var Texture T;
 var Region	R;

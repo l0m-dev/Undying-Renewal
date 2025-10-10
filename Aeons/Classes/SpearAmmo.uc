@@ -5,7 +5,7 @@ class SpearAmmo expands Ammo;
 
 //#exec MESH IMPORT MESH=spearBundle_m SKELFILE=spearBundle.ngf
 //#exec MESH IMPORT MESH=spearAmmo_m SKELFILE=spearBundle.ngf
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 defaultproperties
 {

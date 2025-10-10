@@ -3,7 +3,7 @@
 //=============================================================================
 class ManorGrandFireplace expands FullFireFX;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
 
 defaultproperties
 {

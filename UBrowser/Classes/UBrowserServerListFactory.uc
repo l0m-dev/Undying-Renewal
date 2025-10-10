@@ -6,22 +6,20 @@
 class UBrowserServerListFactory extends UWindowList
 	abstract;
 
-var UBrowserServerList PingedList;
-var UBrowserServerList UnpingedList;
 var UBrowserServerList Owner;
-
-
 var bool bIncrementalPing;		// Servers are pinged as they come in
+
+var Player ViewPortOwner;
 
 function Query(optional bool bBySuperset, optional bool bInitial)
 {
+	if(ViewPortOwner==None)
+		ViewPortOwner = Owner.GetPlayerOwner().Player; // Assign this variable to avoid future problems.
 }
 
 function Shutdown(optional bool bBySuperset)
 {
-	Owner = None;
-	PingedList = None;
-	UnpingedList = None;
+	//Owner = None;
 }
 
 function QueryFinished(bool bSuccess, optional string ErrorMsg)
@@ -32,15 +30,21 @@ function QueryFinished(bool bSuccess, optional string ErrorMsg)
 function UBrowserServerList FoundServer(string IP, int QueryPort, string Category, string GameName, optional string HostName)
 {
 	local UBrowserServerList NewListEntry;
+	local bool bInstantPing;
 
+	bInstantPing = Owner.Owner != None && Owner.Owner.PingedList == Owner;
 	NewListEntry = Owner.FindExistingServer(IP, QueryPort);
+
+	if(NewListEntry == None && bInstantPing && Owner.Owner.PingedList != None)
+		NewListEntry = Owner.Owner.PingedList.FindExistingServer(IP, QueryPort);
 
 	// Don't add if it's already in the existing list
 	if(NewListEntry == None)
 	{
 		// Add it to the server list(s)
-		NewListEntry = UBrowserServerList(Owner.CreateItem(Owner.Class));
+		NewListEntry = UBrowserServerList(Owner.Append(Owner.Class));
 
+		NewListEntry.bNeverPinged = True;
 		NewListEntry.IP = IP;
 		NewListEntry.QueryPort = QueryPort;
 
@@ -53,17 +57,28 @@ function UBrowserServerList FoundServer(string IP, int QueryPort, string Categor
 		NewListEntry.GameName = GameName;
 		NewListEntry.bLocalServer = False;
 
-		Owner.AppendItem(NewListEntry);
+		if(bInstantPing)
+		{
+			NewListEntry.PingServer(True, True, Owner.Owner.bNoSort);
+			Owner.bPinged = true;
+		}
 	}
 
 	NewListEntry.bOldServer = False;
-
+	if(Owner.Owner.PingState!=PS_Pinging)
+	{
+		Owner.Owner.PingState = PS_Pinging;
+		Owner.PingServers(True, False);
+	}
 	return NewListEntry;
 }
 
 function PlayerPawn GetPlayerOwner()
 {
-	return Owner.GetPlayerOwner();
+	if(ViewPortOwner!=None)
+		return ViewPortOwner.Actor;
+	ViewPortOwner = Owner.GetPlayerOwner().Player;
+	return ViewPortOwner.Actor;
 }
 
 defaultproperties

@@ -3,7 +3,7 @@
 //=============================================================================
 class SphereOfColdExplosion expands Explosion;
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	local int i;
 	

@@ -4,7 +4,7 @@
 class PowderOfSiren expands Items;
 
 //#exec MESH IMPORT MESH=powderOfSiren_m SKELFILE=PowderSiren.ngf
-// #exec TEXTURE IMPORT NAME=PowderOfSiren_Icon FILE=PowderOfSiren_Icon.PCX GROUP=Icons FLAGS=2
+//// #exec TEXTURE IMPORT NAME=PowderOfSiren_Icon FILE=PowderOfSiren_Icon.PCX GROUP=Icons FLAGS=2
 
 var particleFX effect;
 var PowderOfSiren_proj pSiren;

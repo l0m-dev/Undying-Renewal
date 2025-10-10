@@ -3,7 +3,8 @@
 //=============================================================================
 class AdvVideoWindow expands ShellWindow;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 //#exec Texture Import File=AdvVideo_0.bmp Mips=Off
 //#exec Texture Import File=AdvVideo_1.bmp Mips=Off
@@ -171,9 +172,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'Cntrl_ok_up';
-	OK.DownTexture = texture'Cntrl_ok_dn';
-	OK.OverTexture = texture'Cntrl_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.Cntrl_ok_up';
+	OK.DownTexture = texture'ShellTextures.Cntrl_ok_dn';
+	OK.OverTexture = texture'ShellTextures.Cntrl_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -190,9 +191,9 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'Cntrl_cancl_up';
-	Cancel.DownTexture = texture'Cntrl_cancl_dn';
-	Cancel.OverTexture = texture'Cntrl_cancl_ov';
+	Cancel.UpTexture =   texture'ShellTextures.Cntrl_cancl_up';
+	Cancel.DownTexture = texture'ShellTextures.Cntrl_cancl_dn';
+	Cancel.OverTexture = texture'ShellTextures.Cntrl_cancl_ov';
 	Cancel.DisabledTexture = None;
 
 	Root.Console.bBlackout = True;
@@ -469,10 +470,10 @@ defaultproperties
 {
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      CheckboxSound=Sound'Shell_HUD.Shell.SHELL_CheckBox'
-     BackNames(0)="UndyingShellPC.AdvVideo_0"
-     BackNames(1)="UndyingShellPC.AdvVideo_1"
-     BackNames(2)="UndyingShellPC.AdvVideo_2"
-     BackNames(3)="UndyingShellPC.AdvVideo_3"
-     BackNames(4)="UndyingShellPC.AdvVideo_4"
-     BackNames(5)="UndyingShellPC.AdvVideo_5"
+     BackNames(0)="ShellTextures.AdvVideo_0"
+     BackNames(1)="ShellTextures.AdvVideo_1"
+     BackNames(2)="ShellTextures.AdvVideo_2"
+     BackNames(3)="ShellTextures.AdvVideo_3"
+     BackNames(4)="ShellTextures.AdvVideo_4"
+     BackNames(5)="ShellTextures.AdvVideo_5"
 }

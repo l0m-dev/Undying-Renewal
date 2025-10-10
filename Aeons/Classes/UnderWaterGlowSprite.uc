@@ -3,7 +3,7 @@
 //=============================================================================
 class UnderWaterGlowSprite expands GlowSprite;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\PiratesCoveG.utx PACKAGE=PiratesCoveG
+#exec OBJ LOAD FILE=..\Textures\PiratesCoveG.utx PACKAGE=PiratesCoveG
 
 defaultproperties
 {

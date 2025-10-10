@@ -8,7 +8,7 @@ class Molotov expands AeonsWeapon;
 //#exec MESH IMPORT MESH=Molotov1st_m SKELFILE=Molotov1st\Molotov1st_m.ngf MOVERELATIVE=0
 //#exec MESH ORIGIN MESH=Molotov1st_m YAW=64
 //#exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
-//#exec MESH NOTIFY SEQ=FireStart TIME=0.99 FUNCTION=FireWeapon
+////#exec MESH NOTIFY SEQ=FireStart TIME=0.99 FUNCTION=FireWeapon
 
 //#exec MESH IMPORT MESH=Molotov3rd_m SKELFILE=Molotov3rd\MolotovPat.ngf MOVERELATIVE=0
 
@@ -214,7 +214,7 @@ state Idle
 	Begin:
 		ClientIdleWeapon();
 		PlayIdleAnim();
-		//ClearAnims();
+		ClearAnims(); // needed for NormalFire state
 		FinishAnim();
 		SetTimer((1 + FRand() * 3), true);
 		bPointing=False;
@@ -227,7 +227,7 @@ state Idle
 		{
 			PlaySound(IdleSounds[Rand(2)]);
 		}
-		if ( Pawn(Owner).bFire!=0 ) Global.Fire(0.0);
+		//if ( Pawn(Owner).bFire!=0 ) Global.Fire(0.0);
 		Disable('AnimEnd');
 }
 
@@ -252,7 +252,7 @@ defaultproperties
      FuseLiteSound=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_MoltLight01'
      IdleSounds(0)=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_MoltSlosh01'
      IdleSounds(1)=Sound'Wpn_Spl_Inv.Weapons.E_Wpn_MoltSlosh02'
-     bReloadable=True
+     bReloadable=False
      ReloadTime=1
      ThirdPersonJointName=MolotovAtt
      AmmoName=Class'Aeons.MolotovAmmo'

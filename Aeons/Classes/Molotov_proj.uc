@@ -45,6 +45,12 @@ simulated function PostBeginPlay()
 	local rotator RandRot;
 
 	Super.PostBeginPlay();
+
+	if ( RGC() )
+	{
+		Speed = 1200;
+		Damage = 50;
+	}
 	
 	//if ( Owner.IsA('Pawn') )
 	//	Velocity = vector(Pawn(Owner).ViewRotation) * speed;
@@ -82,24 +88,15 @@ simulated function PostBeginPlay()
 		}
 	}
 
-	if (RGC())
-	{
+	if ( RGC() )
 		maxSkips = 0;
-		Speed = 1200;
-		Damage = 50;
-	}
 	else
-	{
 		maxSkips = 4;
-		Speed = 800;
-		Damage = 40;
-	}
 	numSkips = 0;
 
-	if (Level.NetMode != NM_Standalone)
-	{
+	// TODO: fix
+	if ( Level.NetMode != NM_Standalone )
 		maxSkips = 0;
-	}
 }
 
 //----------------------------------------------------------------------------

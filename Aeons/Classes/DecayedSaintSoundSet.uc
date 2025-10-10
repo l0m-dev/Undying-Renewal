@@ -3,7 +3,7 @@
 //=============================================================================
 class DecayedSaintSoundSet expands SharedHumanSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+////#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 var(Sounds) CreatureSoundGroup	Flesh;
 var(Sounds) CreatureSoundGroup	Flesh3;

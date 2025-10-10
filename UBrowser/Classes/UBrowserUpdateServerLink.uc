@@ -6,6 +6,7 @@ var config int			UpdateServerTimeout;
 var string				URIs[10];
 var int					CurrentURI;
 var int					MaxURI;
+var bool				PendingRetry;
 var UBrowserUpdateServerWindow	UpdateWindow;
 
 const GetMOTD = 3;
@@ -31,7 +32,20 @@ function SetupURIs()
 
 function BrowseCurrentURI()
 {
-	Browse(UpdateServerAddress, URIs[CurrentURI], UpdateServerPort, UpdateServerTimeout);
+	if(CurrentState == HadError && !bClosed)
+		PendingRetry = true;
+	else
+		Browse(UpdateServerAddress, URIs[CurrentURI], UpdateServerPort, UpdateServerTimeout);
+}
+
+event Closed()
+{
+	Super.Closed();
+	if(PendingRetry)
+	{
+		PendingRetry = false;
+		BrowseCurrentURI();
+	}
 }
 
 function Failure()

@@ -27,6 +27,11 @@ var float CutsceneTime;
 var float TakeTime;
 var float CameraHoldTime;
 
+// save teleport location for players joining during a cutscene
+var bool bTeleportJoiningPlayers;
+var vector LastTeleportLocation;
+var rotator LastTeleportRotation;
+
 const PLAYER_STATE_CHECK_TIME = 0.5; // server side
 const ACTIVE_CUTSCENE_CHECK_DELAY = 0.2; // client side
 
@@ -91,7 +96,7 @@ function Tick(float DeltaTime)
 		{
 			if (Player.getStateName() != 'PlayerCutScene')
 			{
-				log ("Player State is "$Player.getStateName(), 'Misc');
+				log ("Player is not in PlayerCutScene state. Player state is "$Player.getStateName(), 'Misc');
 				if (Level.NetMode == NM_Standalone)
 				{
 					CamProj.EndIt();
@@ -116,6 +121,9 @@ function PlayerLogin(PlayerPawn Player, bool bCutSceneStartSpot)
 	if (IsCutsceneActive())
 	{
 		SetupCutsceneForPlayer(Player);
+
+		if (bTeleportJoiningPlayers)
+			TeleportPlayer(Player, LastTeleportLocation, LastTeleportRotation);
 	}
 }
 
@@ -149,6 +157,9 @@ function StartCutscene(PlayerPawn Player, bool bNewFromPlayerStart, optional nam
 		log("Warning: CameraProjectile already exists"@CamProj);
 	}
 
+	// reset before calling SetupCameraProjectile
+	bTeleportJoiningPlayers = false;
+	
 	if (CamProj == None)
 		SetupCameraProjectile(Player);
 
@@ -299,21 +310,34 @@ function CutsceneCompleted()
 		Player.bHidden = false;	
 		Player.StopCutScene();
 	}
+	
+	bTeleportJoiningPlayers = false;
 }
 
-function TeleportPlayer(PlayerPawn aPlayer, vector Loc, rotator Rot)
+function TeleportPlayers(vector Loc, rotator Rot)
 {
 	local PlayerPawn Player;
+
+	// save teleport location for players joining during a cutscene
+	bTeleportJoiningPlayers = true;
+	LastTeleportLocation = Loc;
+	LastTeleportRotation = Rot;
 
 	// teleport all players
 	foreach AllActors(class'PlayerPawn', Player)
 	{
-		Player.SetCollision( false, false, false );
-		Player.SetLocation( Loc );
-		Player.SetRotation( Rot );
-		Player.ClientSetRotation( Player.Rotation );
-		Player.SetCollision( true, true, true );
+		TeleportPlayer(Player, Loc, Rot);
 	}
+}
+
+function TeleportPlayer(PlayerPawn Player, vector Loc, rotator Rot)
+{
+	Player.SetCollision( false, false, false );
+	Player.SetLocation( Loc );
+	Player.SetRotation( Rot );
+	Player.ViewRotation = Rot;
+	Player.ClientSetLocation( Loc, Rot );
+	Player.SetCollision( true, true, true );
 }
 
 function SetupCameraProjectile(PlayerPawn Player)
@@ -407,7 +431,7 @@ simulated static final function CutsceneManager GetCutsceneManager(LevelInfo Lev
 	foreach Level.AllActors(class'CutsceneManager', CutsceneManager)
 		break;
 
-	if (CutsceneManager == None)
+	if (CutsceneManager == None && Level.NetMode != NM_Client)
 		CutsceneManager = Level.Spawn(class'CutsceneManager');
 	
 	return CutsceneManager;

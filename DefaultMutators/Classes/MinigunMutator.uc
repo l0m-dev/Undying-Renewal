@@ -1,15 +1,10 @@
 class MinigunMutator extends Mutator
 	transient;
 
-// only for singleplayer
-
 event PreBeginPlay()
 {
-	if (Level.NetMode == NM_Standalone)
-	{
-		DefaultWeapon = class'Minigun';
-		Level.Game.DefaultWeapon = DefaultWeapon;
-	}
+	DefaultWeapon = class'Minigun';
+	Level.Game.DefaultWeapon = DefaultWeapon;
 }
 
 function bool CheckReplacement(Actor Other, out byte bSuperRelevant)

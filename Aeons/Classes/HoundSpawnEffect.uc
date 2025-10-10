@@ -3,7 +3,7 @@
 //=============================================================================
 class HoundSpawnEffect expands Effects;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\FXB.utx PACKAGE=FXB
+#exec OBJ LOAD FILE=..\Textures\FXB.utx PACKAGE=FXB
 
 var() float rate;
 var() Texture Textures[8];

@@ -46,6 +46,7 @@ var localized string	NonDedicatedText;
 var localized string	WorldLogWorkingText;
 var localized string	WorldLogWorkingTrue;
 var localized string	WorldLogWorkingFalse;
+var localized string	PasswordText;
 
 // config
 var config int			MaxBindAttempts;
@@ -166,7 +167,7 @@ function AddRule(string Rule, string Value)
 state Binding
 {
 Begin:
-	if( BindPort(2000, true) == 0 )
+	if( BindPort() == 0 )
 	{
 		Log("UBrowserServerPing: Port failed to bind.  Attempt "$BindAttempts);
 		BindAttempts++;
@@ -297,51 +298,61 @@ state GetStatus
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(GameVersionText, Value);
+				In = Out;
 			}
 			else if(Value ~= "minnetver")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(MinNetVersionText, Value);
+				In = Out;
 			}
 			else if(Value ~= "gametype")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(GameTypeText, Value);
+				In = Out;
 			}
-/*			else if(Value ~= "gamemode") // "openplaying"
+			else if(Value ~= "gamemode") // "openplaying"
 			{
 				bOK = GetNextValue(In, Out, Value);
-				AddRule(GameModeText, Value);
-			}*/
+				//AddRule(GameModeText, Value);
+				In = Out;
+			}
 			else if(Value ~= "timelimit") 
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(TimeLimitText, Value);
+				In = Out;
 			}
 			else if(Value ~= "fraglimit") 
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(FragLimitText, Value);
+				In = Out;
 			}
 			else if(Value ~= "MultiplayerBots") 
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(MultiplayerBotsText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "AdminName") 
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(AdminNameText, Value);
+				In = Out;
 			}
 			else if(Value ~= "AdminEMail")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(AdminEmailText, Value);
+				In = Out;
 			}
 			else if(Value ~= "WantWorldLog")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(WorldLogText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "WorldLog")
 			{
@@ -355,16 +366,19 @@ state GetStatus
 				//}
 				//else
 				//	AddRule(WorldLogText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "mutators")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(MutatorsText, Value);
+				In = Out;
 			}
 			else if(Value ~= "goalteamscore")
 			{
 				bOK = GetNextValue(In, Out, Value);
-				//AddRule(GoalTeamScoreText, Value);		
+				//AddRule(GoalTeamScoreText, Value);	
+				In = Out;	
 			}
 			else if(Value ~= "minplayers")
 			{
@@ -373,46 +387,55 @@ state GetStatus
 				//	AddRule(MultiplayerBotsText, FalseString);
 				//else
 				//	AddRule(MinPlayersText, Value@PlayersText);		
+				In = Out;
 			}
 			else if(Value ~= "changelevels")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(ChangeLevelsText, LocalizeBoolValue(Value));		
+				In = Out;
 			}
 			else if(Value ~= "botskill")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(BotSkillText, Value);		
+				In = Out;
 			}
 			else if(Value ~= "maxteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(MaxTeamsText, Value);
+				In = Out;
 			}
 			else if(Value ~= "balanceteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(BalanceTeamsText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "playersbalanceteams")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(PlayersBalanceTeamsText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "friendlyfire")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(FriendlyFireText, Value);
+				In = Out;
 			}
 			else if(Value ~= "gamestyle")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				AddRule(GameModeText, Value);
+				In = Out;
 			}
 			else if(Value ~= "tournament")
 			{
 				bOK = GetNextValue(In, Out, Value);
 				//AddRule(TournamentText, LocalizeBoolValue(Value));
+				In = Out;
 			}
 			else if(Value ~= "listenserver")
 			{
@@ -421,6 +444,7 @@ state GetStatus
 					AddRule(ServerModeText, NonDedicatedText);
 				else
 					AddRule(ServerModeText, DedicatedText);
+				In = Out;
 			}
 		} until(!bOK);
 	}	
@@ -459,7 +483,7 @@ Begin:
 	AddRule(ServerAddressText, "unreal://"$Server.IP$":"$string(Server.GamePort));
 
 	SendText( ServerIPAddr, "\\status\\" );
-	SetTimer(PingTimeout + Rand(200)/100, False);
+	SetTimer(PingTimeout + FRand(), False);
 }
 
 function string ParseReply(string Text, string Key)
@@ -485,7 +509,7 @@ state GetInfo
 			return;
 
 		ValidateServer();
-		ElapsedTime = (Level.TimeSeconds - RequestSentTime) * Level.TimeDilation;
+		ElapsedTime = (Level.TimeSeconds - RequestSentTime) / Level.TimeDilation;
 		Server.Ping = Max(1000*ElapsedTime - (0.5*LastDelta) - 10, 4); // subtract avg client and server frametime from ping.
 		if(!Server.bKeepDescription)
 			Server.HostName = Server.IP;
@@ -501,8 +525,21 @@ state GetInfo
 		Server.MinNetVer = 0;
 
 		Temp = ParseReply(Text, "hostname");
-		if(Temp != "" && !Server.bKeepDescription)
-			Server.HostName = Temp;
+		if(Temp != "")
+		{
+			if(!Server.bKeepDescription)
+				Server.HostName = Temp;
+		}
+		else
+		{
+			// Invalid ping response
+			Disable('Tick');
+
+			Server.Ping = 9999;
+			Server.bNeverPinged = True;
+			Server.PingDone(bInitial, bJustThisServer, False, bNoSort);
+			return;
+		}
 
 		Temp = ParseReply(Text, "hostport");
 		if(Temp != "")
@@ -588,9 +625,9 @@ state GetInfo
 
 Begin:
 	Enable('Tick');
-	SendText( ServerIPAddr, "\\info\\" );
 	RequestSentTime = Level.TimeSeconds;
-	SetTimer(PingTimeout + Rand(200)/100, False);
+	SendText( ServerIPAddr, "\\info\\" );
+	SetTimer(PingTimeout + FRand(), False);
 }
 
 state Resolving
@@ -631,7 +668,8 @@ defaultproperties
      WorldLogWorkingText="ngWorldStats Status"
      WorldLogWorkingTrue="Processing Stats Correctly"
      WorldLogWorkingFalse="Not Processing Stats Correctly"
+     PasswordText="Requires Password"
      MaxBindAttempts=5
      BindRetryTime=10
-     PingTimeout=5
+     PingTimeout=1
 }

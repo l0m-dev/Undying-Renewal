@@ -4,7 +4,7 @@
 class AeonsSpell extends Spell
     abstract;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //=============================================================================
 // Hand
@@ -47,7 +47,7 @@ class AeonsSpell extends Spell
 
 /*
 // Load the sound package
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 */
 
 //=============================================================================
@@ -330,7 +330,7 @@ simulated function PlayOneshotAnim(name Anim, float Rate)
 	{
 		BringUp();
 		PlayAnim(Anim,Rate,,,0);
-		Finish();
+		GotoState('OneshotAnim');
 	}
 }
 
@@ -343,6 +343,20 @@ state PostAmplify
 	Begin:
 		// log(".....Post Amplify");
 		sleep(0.33);
+		Finish();
+
+}
+
+
+//----------------------------------------------------------------------------
+
+state OneshotAnim
+{
+	ignores FireAttSpell;
+	
+	Begin:
+		FinishAnim();
+		PutDown(); // prevents duplicating skulls
 		Finish();
 
 }

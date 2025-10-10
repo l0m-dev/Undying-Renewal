@@ -54,9 +54,9 @@ function Created()
 	Yes.bBurnable = true;
 	Yes.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Yes.UpTexture =   texture'Video_ok_up';
-	Yes.DownTexture = texture'Video_ok_dn';
-	Yes.OverTexture = texture'Video_ok_ov';
+	Yes.UpTexture =   texture'ShellTextures.Video_ok_up';
+	Yes.DownTexture = texture'ShellTextures.Video_ok_dn';
+	Yes.OverTexture = texture'ShellTextures.Video_ok_ov';
 
 
 
@@ -72,9 +72,9 @@ function Created()
 	No.bBurnable = true;
 	No.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	No.UpTexture =   texture'Video_cancel_up';
-	No.DownTexture = texture'Video_cancel_dn';
-	No.OverTexture = texture'Video_cancel_ov';
+	No.UpTexture =   texture'ShellTextures.Video_cancel_up';
+	No.DownTexture = texture'ShellTextures.Video_cancel_dn';
+	No.OverTexture = texture'ShellTextures.Video_cancel_ov';
 
 
 //--
@@ -234,6 +234,6 @@ function HideWindow()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.Confirm_L"
-     BackNames(1)="UndyingShellPC.Confirm_R"
+     BackNames(0)="ShellTextures.Confirm_L"
+     BackNames(1)="ShellTextures.Confirm_R"
 }

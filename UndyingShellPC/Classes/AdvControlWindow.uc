@@ -3,7 +3,8 @@
 //=============================================================================
 class AdvControlWindow expands ShellWindow;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 //#exec Texture Import File=AdvControls_0.bmp Mips=Off
 //#exec Texture Import File=AdvControls_1.bmp Mips=Off
@@ -86,9 +87,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'cntrl_ok_up';
-	OK.DownTexture = texture'cntrl_ok_dn';
-	OK.OverTexture = texture'cntrl_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.cntrl_ok_up';
+	OK.DownTexture = texture'ShellTextures.cntrl_ok_dn';
+	OK.OverTexture = texture'ShellTextures.cntrl_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -105,9 +106,9 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'cntrl_cancl_up';
-	Cancel.DownTexture = texture'cntrl_cancl_dn';
-	Cancel.OverTexture = texture'cntrl_cancl_ov';
+	Cancel.UpTexture =   texture'ShellTextures.cntrl_cancl_up';
+	Cancel.DownTexture = texture'ShellTextures.cntrl_cancl_dn';
+	Cancel.OverTexture = texture'ShellTextures.cntrl_cancl_ov';
 	Cancel.DisabledTexture = None;
 
 
@@ -343,10 +344,10 @@ defaultproperties
 {
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
      CheckboxSound=Sound'Shell_HUD.Shell.SHELL_CheckBox'
-     BackNames(0)="UndyingShellPC.AdvControls_0"
-     BackNames(1)="UndyingShellPC.AdvControls_1"
-     BackNames(2)="UndyingShellPC.AdvControls_2"
-     BackNames(3)="UndyingShellPC.AdvControls_3"
-     BackNames(4)="UndyingShellPC.AdvControls_4"
-     BackNames(5)="UndyingShellPC.AdvControls_5"
+     BackNames(0)="ShellTextures.AdvControls_0"
+     BackNames(1)="ShellTextures.AdvControls_1"
+     BackNames(2)="ShellTextures.AdvControls_2"
+     BackNames(3)="ShellTextures.AdvControls_3"
+     BackNames(4)="ShellTextures.AdvControls_4"
+     BackNames(5)="ShellTextures.AdvControls_5"
 }

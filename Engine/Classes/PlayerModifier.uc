@@ -4,7 +4,7 @@
 class PlayerModifier expands Invisible;
 
 // this is not working during UCC MAKE
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+////#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 // A player modifier inventory item is invisible to the player, but can be
 // turned on and off by weapons, spells, environmental changes, etc.

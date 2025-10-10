@@ -8,8 +8,8 @@ class AeonsWeapon extends Weapon;
 //////////////////////////////////////////////////////////////////////////////
 //#exec AUDIO IMPORT  FILE="E_Wpn_GenPck01.wav" NAME="E_Wpn_GenPck01" GROUP="Weapons"
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //////////////////////////////////////////////////////////////////////////////
 //	Variables
@@ -176,7 +176,7 @@ simulated function bool ClientFire( float Value )
 	//log("AeonsWeapon: ClientFire: ... bCanClientFire = "$bCanClientFire);
 	if ( bCanClientFire && ((Role == ROLE_Authority) || (AmmoType == None) || (AmmoType.AmmoAmount > 0)) )
 	{
-		if ( (Owner.GetStateName() == 'DialogScene') || (Owner.GetStateName() == 'PlayerCutscene') || (Owner.GetStateName() == 'SpecialKill') || (Owner.GetStateName() == 'Dying') )
+		if ( AeonsPlayer(Owner).IsInCutsceneState() || (Owner.GetStateName() == 'Dying') )
 			return false;
 		
 		if ( (PlayerPawn(Owner) != None) 

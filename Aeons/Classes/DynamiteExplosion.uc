@@ -4,7 +4,7 @@
 class DynamiteExplosion expands Explosion;
 
 /*
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 
@@ -31,7 +31,7 @@ function CreateExplosion(Pawn Instigator)
 }
 */
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	local Texture HitTexture;
 	local int flags;

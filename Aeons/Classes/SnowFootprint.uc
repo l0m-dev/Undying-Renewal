@@ -3,7 +3,7 @@
 //=============================================================================
 class SnowFootprint expands AeonsDecal;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\BloodFootprints.utx PACKAGE=BloodFootprints
+#exec OBJ LOAD FILE=..\Textures\BloodFootprints.utx PACKAGE=BloodFootprints
 
 simulated event PostBeginPlay();
 function StartLevel();

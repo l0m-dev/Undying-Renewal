@@ -22,7 +22,7 @@ function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, 
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	local Actor A;
 

@@ -18,7 +18,7 @@ var travel class<JournalEntry> JournalsClassesRep[150];
 replication
 {
 	reliable if (Role == ROLE_Authority && bNetOwner && bNetInitial)
-		NumJournals, JournalsClassesRep;
+		NumJournals, JournalsClassesRep, JournalRead;
 }
 
 // someone wants us to display a specific JournalEntry class in the book.

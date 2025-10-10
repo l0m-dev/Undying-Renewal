@@ -844,7 +844,7 @@ native(415) final function vector StaticJointDir( name BodyLoc, vector Dir );
 native(416) final function int JointParent( int iJoint );
 
 // Animation functions.
-native(259) final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move /* MOVE_Anim */, optional ECombine combine /* COMBINE_Replace */, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
+native(259) final function bool PlayAnim( name Sequence, optional float Rate, optional EMovement move /* MOVE_Anim */, optional ECombine combine /* COMBINE_Replace */, optional float TweenTime /* -1.0 */, optional name JointName /* 'None' */, optional bool AboveJoint /* False */, optional bool OverrideTarget /* False */ );
 native(274) final function int PlayAnimSound( name Sequence, sound Voice, optional float Amplitude, optional ESoundSlot Slot, optional float Volume, optional bool bNoOverride, optional float Radius, optional float Pitch, optional int Flags );
 native(260) final function bool LoopAnim( name Sequence, optional float Rate, optional EMovement move, optional ECombine combine, optional float TweenTime, optional name JointName, optional bool AboveJoint, optional bool OverrideTarget );
 native(294) final function bool TweenAnim( name Sequence, optional float Time, optional bool bCheckNotifys );
@@ -934,13 +934,16 @@ function ReplicateDetachLimb(Actor A, Name JointName, Vector Velocity, Rotator D
 simulated function ClientDetachLimb(Actor DetachActor, Name JointName, Vector Velocity, Rotator DesiredRotation)
 {
 	local Actor B;
-	if (DetachActor == None)
+	if ( DetachActor == None)
 		return;
 	B = DetachActor.DetachLimb(JointName, Class 'BodyPart');
-	B.Velocity = Velocity;
-	B.DesiredRotation = DesiredRotation;
-	B.bBounce = true;
-	B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+	if ( B != None)
+	{
+		B.Velocity = Velocity;
+		B.DesiredRotation = DesiredRotation;
+		B.bBounce = true;
+		B.SetCollisionSize((B.CollisionRadius * 0.65), (B.CollisionHeight * 0.15));
+	}
 }
 
 function ReplicateDestroyLimb(Actor A, Name BodyLoc)
@@ -1458,6 +1461,7 @@ event BroadcastLocalizedMessage( class<LocalMessage> Message, optional int Switc
 event PostBeginPlay();
 
 // This actor has just been loaded from a Save game
+// Not called anymore
 event PostLoadGame();
 
 // Event that after PostBeginPlay AND PostLoadGame

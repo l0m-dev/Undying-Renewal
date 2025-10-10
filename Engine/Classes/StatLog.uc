@@ -10,7 +10,7 @@ class StatLog extends Info
 	native;
 
 // Internal
-var int		Context;
+var native private const int Context;
 
 // State
 var bool	bWorld;
@@ -391,7 +391,7 @@ defaultproperties
      WorldStandard="ngLog"
      LogVersion="1.2"
      LogInfoURL="http://www.netgamesusa.com/ngLog/"
-     GameName="Unreal"
+     GameName="Undying"
      GameCreator="Epic MegaGames, Inc."
      GameCreatorURL="http://www.epicgames.com/"
      DecoderRingURL="http://unreal.epicgames.com/Unreal_Log_Decoder_Ring.html"

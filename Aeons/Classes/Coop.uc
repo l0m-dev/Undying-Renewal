@@ -30,27 +30,15 @@ var class<ChallengeBotInfo> BotConfigType;
 var() config string FirstMap;
 
 var string LastPortal;
-var CameraProjectile LastCamera; // interferes with None checks because of garbage collection
+var transient bool bLastPortalSet;
 
-function PreBeginPlay()
-{
-	Super.PreBeginPlay();
-
-	LastPortal = GameEngine(XLevel.Engine).LastURL.Portal;
-	LastCamera = None;
-
-	if (Level.bLoadBootShellPSX2)
-	{
-		Level.ServerTravel(FirstMap, false);
-	}
-}
-
+// called when starting a level, even when it was already started (by loading a save), unlike PreBeginPlay and InitGame
 function StartLevel()
 {
 	Super.StartLevel();
 
-	LastPortal = GameEngine(XLevel.Engine).LastURL.Portal;
-	LastCamera = None;
+	if ( Level.NetMode == NM_DedicatedServer )
+		LastPortal = GameEngine(XLevel.Engine).LastURL.Portal; // LastURL is set right before StartLevel call
 }
 
 function PostBeginPlay()
@@ -132,6 +120,11 @@ event InitGame( string Options, out string Error )
 	{
 		log("CoopWeaponMode "$bool(InOpt));
 		bCoopWeaponMode = bool(InOpt);
+	}
+
+	if ( Level.bLoadBootShellPSX2 )
+	{
+		Level.ServerTravel(FirstMap, false);
 	}
 }
 
@@ -240,7 +233,16 @@ event playerpawn Login
 	local PlayerPawn NewPlayer;
 
 	Log("CoopGame - Login");
-	NewPlayer = Super.Login(Portal, Options, Error, SpawnClass );
+
+	if ( !bLastPortalSet && (Level.NetMode == NM_ListenServer || Level.NetMode == NM_Standalone) )
+	{
+		// on a listen server Login is called before StartLevel, and if we are loading into a saved level, PreBeginPlay and InitGame won't get called to set LastPortal
+		// first login on a listen server is guaranteed to have the correct Portal passed to Login
+		LastPortal = Portal;
+		bLastPortalSet = true;
+	}
+	
+	NewPlayer = Super.Login(LastPortal, Options, Error, SpawnClass );
 	if ( NewPlayer != None )
 	{
 		if ( Left(NewPlayer.PlayerReplicationInfo.PlayerName, 6) == DefaultPlayerName )
@@ -591,8 +593,20 @@ function bool PickupQuery( Pawn Other, Inventory item )
 	local pawn OtherPlayer;
 	local Inventory Copy;
 	local Weapon CopyWeapon;
+	local JournalPickup Journal;
 
-	if (Item.IsA('Weapon') || Item.IsA('Spell'))
+	// if a pickup has been Trigger()-ed, it will already be given to everyone
+	// be careful what items you spawn below and who you give them to
+	Journal = JournalPickup(Item);
+	if (Journal != None)
+	{
+		for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
+		{
+			if ( OtherPlayer.bIsPlayer && OtherPlayer != Other && AeonsPlayer(OtherPlayer) != None )
+				Journal.GiveJournal(AeonsPlayer(OtherPlayer));
+		}
+	}
+	else if (Item.IsA('Weapon') || Item.IsA('Spell'))
 	{
 		for ( OtherPlayer=Level.PawnList; OtherPlayer!=None; OtherPlayer=OtherPlayer.NextPawn)	
 		{
@@ -680,7 +694,7 @@ defaultproperties
      ScoreBoardType=Class'Aeons.UndyingScoreboard'
      MapPrefix=""
      BeaconName="COOP"
-     GameName="Coop"
+     GameName="Co-op"
      bChangeLevels=True
      FirstMap="Manor_FrontGate"
      bTeamGame=True

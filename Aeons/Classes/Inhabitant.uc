@@ -73,8 +73,8 @@ class Inhabitant expands ScriptedPawn;
 //#exec MESH NOTIFY SEQ=Taunt2 TIME=0.0833333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Taunt2 TIME=0.308333 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Taunt2 TIME=0.541667 FUNCTION=PlaySound_N ARG="ShortVocal CHANCE=0.4 PVar=0.25 VVar=0.1"
-//#exec MESH NOTIFY SEQ=Turn TIME=0.5 FUNCTION=C_BareFS
-//#exec MESH NOTIFY SEQ=Turn TIME=0.55 FUNCTION=C_BareFS
+////#exec MESH NOTIFY SEQ=Turn TIME=0.5 FUNCTION=C_BareFS
+////#exec MESH NOTIFY SEQ=Turn TIME=0.55 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="ShortVocal PVar=0.25 V=1.5 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Wake TIME=0.0333333 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"
 //#exec MESH NOTIFY SEQ=Wake TIME=0.366667 FUNCTION=PlaySound_N ARG="WingFlap PVar=0.25 VVar=0.1"

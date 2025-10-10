@@ -248,8 +248,8 @@ function FrameHitTest FW_HitTest(UWindowFramedWindow W, float X, float Y)
 /* Client Area Drawing Functions */
 function DrawClientArea(UWindowClientWindow W, Canvas C)
 {
-	ScaleX = W.Root.ScaleX;//W.Root.WinWidth / 800.0;
-	ScaleY = W.Root.ScaleY;//W.Root.WinHeight / 600.0;
+	ScaleX = W.Root.ScaleX;//W.Root.WinWidth / W.Root.OriginalWidth;
+	ScaleY = W.Root.ScaleY;//W.Root.WinHeight / W.Root.OriginalHeight;
 	
 	//ComboBtnUp.W = default.ComboBtnUp.W * ScaleY;
 	

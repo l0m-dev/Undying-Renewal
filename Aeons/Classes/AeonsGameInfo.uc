@@ -4,10 +4,10 @@
 //=============================================================================
 class AeonsGameInfo expands GameInfo;
 
-//#exec AUDIO IMPORT FILE="Sounds\Generic\land1.WAV" NAME="Land1" GROUP="Generic"
-//#exec AUDIO IMPORT FILE="Sounds\Generic\lsplash.WAV" NAME="LSplash" GROUP="Generic"
-//#exec AUDIO IMPORT FILE="Sounds\pickups\genwep1.WAV" NAME="WeaponPickup" GROUP="Pickups"
-//#exec AUDIO IMPORT FILE="Sounds\Generic\teleport1.WAV" NAME="Teleport1" GROUP="Generic"
+////#exec AUDIO IMPORT FILE="Sounds\Generic\land1.WAV" NAME="Land1" GROUP="Generic"
+////#exec AUDIO IMPORT FILE="Sounds\Generic\lsplash.WAV" NAME="LSplash" GROUP="Generic"
+////#exec AUDIO IMPORT FILE="Sounds\pickups\genwep1.WAV" NAME="WeaponPickup" GROUP="Pickups"
+////#exec AUDIO IMPORT FILE="Sounds\Generic\teleport1.WAV" NAME="Teleport1" GROUP="Generic"
 
 var(DeathMessage) localized string DeathMessage[32];    // Player name, or blank if none.
 var(DeathMessage) localized string DeathModifier[5];
@@ -412,8 +412,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 		AeonsPlayer(PlayerPawn).GameStateMod = Spawn(class'Aeons.GameStateModifier', PlayerPawn);
 
 	// -------------------------------------------------------------------------
-	
-	AeonsPlayer(PlayerPawn).InvDisplayMan = spawn(class 'InvDisplayManager',PlayerPawn,,Location);
 
 	// give the player all weapons and all spells
 	AeonsPlayer(PlayerPawn).GiveStartupWeapons();
@@ -434,9 +432,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 			newWeapon.WeaponSet(PlayerPawn);
 		}
 	}
-	
-	// give em somethin' to read
-	AeonsPlayer(PlayerPawn).GiveBook();
 	
 	// default Defense/Misc Spell
 	/*

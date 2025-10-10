@@ -140,6 +140,8 @@ simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 				ecto.ectoTrail.ColorEnd.Base.g = ectoTrail.ColorEnd.Base.g;
 				ecto.ectoTrail.ColorEnd.Base.b = ectoTrail.ColorEnd.Base.b;
 				
+				ecto.EnterWallSound = None; // prevent sound spam
+				
 				Destroy();
 				
 			} else {

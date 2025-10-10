@@ -5,21 +5,21 @@ class Minigun expands AeonsWeapon;
 
 //-----------------------------------------------------------------------------
 // 1st Person View Mesh
-#exec MESH IMPORT MESH=Minigun_m SKELFILE=Minigun\Minigun.ngf MOVERELATIVE=0
+#exec MESH IMPORT MESH=Minigun_m SKELFILE=Minigun.ngf MOVERELATIVE=0
 
 //-----------------------------------------------------------------------------
 // Sounds
-#exec AUDIO IMPORT FILE="Minigun/E_Wpn_MinigunFire01.wav" NAME="E_Wpn_MinigunFire01" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="Minigun/E_Wpn_MinigunClick.wav" NAME="E_Wpn_MinigunClick" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="Minigun/E_Wpn_MinigunRotate.wav" NAME="E_Wpn_MinigunRotate" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="Minigun/E_Wpn_MinigunRotateUp.wav" NAME="E_Wpn_MinigunRotateUp" GROUP="Weapons"
-#exec AUDIO IMPORT FILE="Minigun/E_Wpn_MinigunRotateDown.wav" NAME="E_Wpn_MinigunRotateDown" GROUP="Weapons"
+#exec AUDIO IMPORT FILE="E_Wpn_MinigunFire01.wav" NAME="E_Wpn_MinigunFire01" GROUP="Weapons"
+#exec AUDIO IMPORT FILE="E_Wpn_MinigunClick.wav" NAME="E_Wpn_MinigunClick" GROUP="Weapons"
+#exec AUDIO IMPORT FILE="E_Wpn_MinigunRotate.wav" NAME="E_Wpn_MinigunRotate" GROUP="Weapons"
+#exec AUDIO IMPORT FILE="E_Wpn_MinigunRotateUp.wav" NAME="E_Wpn_MinigunRotateUp" GROUP="Weapons"
+#exec AUDIO IMPORT FILE="E_Wpn_MinigunRotateDown.wav" NAME="E_Wpn_MinigunRotateDown" GROUP="Weapons"
 
 //-----------------------------------------------------------------------------
 
-#exec MESH IMPORT MESH=Minigun3rd_m SKELFILE=Minigun\Minigun3rd\Minigun3rd.ngf
+#exec MESH IMPORT MESH=Minigun3rd_m SKELFILE=Minigun3rd\Minigun3rd.ngf
 
-#exec Texture Import File=Minigun/Minigun_Icon.bmp		Group=Icons	Mips=Off
+#exec Texture Import File=Minigun_Icon.bmp		Group=Icons	Mips=Off
 
 var int FireSoundId;
 var int RotateSoundId;

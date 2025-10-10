@@ -8,7 +8,7 @@ class AeonsParticleFX expands ParticleFX;
 // no longer dumbproxy: SpellParticleFX
 // doesn't need bNetTemporary=False anymore: GiveSpellParticleFX, ScytheWoundFX
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\fxB.utx PACKAGE=fxB
+#exec OBJ LOAD FILE=..\Textures\fxB.utx PACKAGE=fxB
 
 //----------------------------------------------------------------------------
 //	Import

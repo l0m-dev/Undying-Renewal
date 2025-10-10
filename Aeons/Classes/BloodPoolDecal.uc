@@ -3,7 +3,7 @@
 //=============================================================================
 class BloodPoolDecal expands AeonsDecal;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\MtFx.utx PACKAGE=MtFx
+#exec OBJ LOAD FILE=..\Textures\MtFx.utx PACKAGE=MtFx
 
 defaultproperties
 {

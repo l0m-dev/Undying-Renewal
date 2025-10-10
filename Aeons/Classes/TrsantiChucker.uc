@@ -52,6 +52,7 @@ function Invoke( actor Other )
 	if ( Health > 0 )
 	{
 		bIsInvoked = true;
+		Instigator = Pawn(Other); // will set instigator for SPDynamiteProj and prevent SpecialKill cutscene
 		GotoState( 'AIInvokeDeath' );
 	}
 	else
@@ -106,6 +107,8 @@ state AIFarAttackAnim
 		{
 			DynDelay = DynRecharge;
 			SendWarning( Proj, 2000.0, 2.0, 512.0 );
+
+			Proj.GotoState('Throw');
 		}
 	}
 
@@ -207,13 +210,15 @@ state AIInvokeDeath
 		{
 			InvokeCigar.SetBase( self, 'swordhand', 'root' );
 			SendWarning( Proj, 2000.0, 2.0, 512.0 );
+
+			InvokeCigar.GotoState('Throw');
 		}
 	}
 
 	function PopACap()
 	{
 		if ( InvokeCigar != none )
-			InvokeCigar.Timer();
+			InvokeCigar.GotoState('Blow');
 		SpawnGibbedCarcass( vect(0,0,1) );
 		Destroy();
 	}

@@ -10,8 +10,6 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 {
 	Super.Query(bBySuperset, bInitial);
 
-	Owner = PingedList;
-
 	// Update status bar
 	Owner.Owner.PingFinished();
 
@@ -58,7 +56,7 @@ function Shutdown(optional bool bBySuperset)
 
 defaultproperties
 {
-     BeaconProduct="unreal"
+     BeaconProduct="undying"
      ServerBeaconPort=8777
      bIncrementalPing=True
 }

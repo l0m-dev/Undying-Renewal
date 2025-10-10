@@ -10,14 +10,14 @@ var Pawn					SeekPawn;
 var Vector					SeekLoc;
 var SoCIce_particles		IceTrail;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	PlaySound(SpawnSound);
  	IceTrail = spawn(class 'SoCIce_particles',,,Location);
  	IceTrail.setBase(self);
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if (IceTrail != none)
 		IceTrail.Shutdown();

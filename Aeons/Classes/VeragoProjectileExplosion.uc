@@ -3,7 +3,7 @@
 //=============================================================================
 class VeragoProjectileExplosion expands Explosion;
 
-function CreateExplosion( pawn Instigator )
+simulated function CreateExplosion( pawn Instigator )
 {
 	super.CreateExplosion( Instigator );
 

@@ -3465,8 +3465,6 @@ public:
     FLOAT LastClientTimestamp;
     FVector LastClientLocation;
     BITFIELD bDisableMovementBuffering:1 GCC_PACK(4);
-    BYTE SentMergeCount GCC_PACK(4);
-    BYTE MergeCount;
     DECLARE_FUNCTION(execGUIExit);
     DECLARE_FUNCTION(execGUIEnter);
     DECLARE_FUNCTION(execRunActuator);
@@ -4018,47 +4016,6 @@ public:
     FLOAT HeadShotMult;
     DECLARE_CLASS(AProjectile,AVisible,0|CLASS_Transient,Engine)
     NO_DEFAULT_CONSTRUCTOR(AProjectile)
-};
-
-#define UCONST_MF_HAS_LOD_DISTANCE 0x10000000
-#define UCONST_MF_UNK 0x00000001
-
-class ENGINE_API UMesh : public UPrimitive
-{
-public:
-    INT Tris_vtableptr;
-    INT Tris_SavedAr;
-    INT Tris_SavedPos;
-    TArray<BYTE> Tris;
-    TArray<class UTexture*> Textures;
-    TArray<FLOAT> TextureLOD;
-    INT MRMMeshData;
-    INT NumVerts;
-    INT NumNormals;
-    INT Unk1;
-    INT Unk2;
-    INT flags;
-    INT AnimData;
-    DECLARE_CLASS(UMesh,UPrimitive,0,Engine)
-    NO_DEFAULT_CONSTRUCTOR(UMesh)
-};
-
-
-class ENGINE_API USkelMesh : public UMesh
-{
-public:
-    INT SkelProto;
-    TArray<BYTE> Joints;
-    TArray<BYTE> JointLocs;
-    INT JointVerts_vtableptr;
-    INT JointVerts_SavedAr;
-    INT JointVerts_SavedPos;
-    TArray<BYTE> JointVerts;
-    TArray<BYTE> PhysObj;
-    class USkelMesh* ParentMesh;
-    FPlace Origin;
-    DECLARE_CLASS(USkelMesh,UMesh,0,Engine)
-    NO_DEFAULT_CONSTRUCTOR(USkelMesh)
 };
 
 

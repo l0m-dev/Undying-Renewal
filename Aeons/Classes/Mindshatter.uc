@@ -8,14 +8,14 @@ class Mindshatter expands AttSpell;
 //----------------------------------------------------------------------------
 //
 //  Mindshatter Launch
-//#exec AUDIO IMPORT FILE="E_Spl_MindLaunch01.wav" NAME="E_Spl_MindLaunch01" GROUP="Spells"
+////#exec AUDIO IMPORT FILE="E_Spl_MindLaunch01.wav" NAME="E_Spl_MindLaunch01" GROUP="Spells"
 
 //  Mindshatter Loop
 //  - for use as a temp sound when you're hit with mindshatter, but don't know if it's 
 //     needed as we just might tweak out sounds via pitch and reverb for the player
 //     that gets hit
 //
-// #exec AUDIO IMPORT FILE="E_Spl_MindLoop01.wav" NAME="E_Spl_MindLoop01" GROUP="Spells"
+//// #exec AUDIO IMPORT FILE="E_Spl_MindLoop01.wav" NAME="E_Spl_MindLoop01" GROUP="Spells"
 
 //----------------------------------------------------------------------------
 //	Variables

@@ -3,7 +3,8 @@
 //=============================================================================
 class MainMenuWindow expands ShellWindow;
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 //#exec Texture Import File=Main_0.bmp Mips=Off
 //#exec Texture Import File=Main_1.bmp Mips=Off
@@ -21,17 +22,17 @@ class MainMenuWindow expands ShellWindow;
 //#exec Texture Import File=Main_Back_ov.bmp		Mips=Off
 //#exec Texture Import File=Main_Back_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_Disconnect_up.bmp		Mips=Off
-#exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Disconnect_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Disconnect_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Disconnect_dn.bmp		Mips=Off
 
-#exec Texture Import File=Main_Reconnect_up.bmp		Mips=Off
-#exec Texture Import File=Main_Reconnect_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Reconnect_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Reconnect_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Reconnect_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Reconnect_dn.bmp		Mips=Off
 
-#exec Texture Import File=renewal_up.bmp		Mips=Off
-#exec Texture Import File=renewal_ov.bmp		Mips=Off
-#exec Texture Import File=renewal_dn.bmp		Mips=Off
+//#exec Texture Import File=renewal_up.bmp		Mips=Off
+//#exec Texture Import File=renewal_ov.bmp		Mips=Off
+//#exec Texture Import File=renewal_dn.bmp		Mips=Off
 
 //#exec Texture Import File=Main_audio_up.bmp		Mips=Off
 //#exec Texture Import File=Main_audio_ov.bmp		Mips=Off
@@ -61,9 +62,9 @@ class MainMenuWindow expands ShellWindow;
 //#exec Texture Import File=Main_video_ov.bmp			Mips=Off
 //#exec Texture Import File=Main_video_dn.bmp			Mips=Off
 
-#exec Texture Import File=Main_Multiplayer_up.bmp		Mips=Off
-#exec Texture Import File=Main_Multiplayer_ov.bmp		Mips=Off
-#exec Texture Import File=Main_Multiplayer_dn.bmp		Mips=Off
+//#exec Texture Import File=Main_Multiplayer_up.bmp		Mips=Off
+//#exec Texture Import File=Main_Multiplayer_ov.bmp		Mips=Off
+//#exec Texture Import File=Main_Multiplayer_dn.bmp		Mips=Off
 
 //#exec Texture Import Name=Light File=Light.pcx Mips=Off Flags=4
 
@@ -96,8 +97,6 @@ var float	SmokingTimers[12];
 var int AmbientSoundID;
 
 var bool Initialized;
-var bool FromReLaunch;
-var bool LoadingAutosave;
 
 var int XCenter, YCenter;
 /*
@@ -107,6 +106,8 @@ var float locx, locy;
 var float velx, vely;
 */
 
+var int RelaunchedFrom;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -114,7 +115,6 @@ function Created()
 	local int i;
 	local color TextColor;
 	local float RootScaleX, RootScaleY;
-	local string SaveString;
 
 	Super.Created();
 
@@ -136,38 +136,38 @@ function Created()
 		Buttons[i].OverSound=sound'Shell_HUD.Shell_Blacken01';	
 	}
 
-	Buttons[0].UpTexture =   texture'Main_New_up';
-	Buttons[0].DownTexture = texture'Main_New_dn';
-	Buttons[0].OverTexture = texture'Main_New_ov';
+	Buttons[0].UpTexture =   texture'ShellTextures.Main_New_up';
+	Buttons[0].DownTexture = texture'ShellTextures.Main_New_dn';
+	Buttons[0].OverTexture = texture'ShellTextures.Main_New_ov';
 
-	Buttons[1].UpTexture =   texture'Main_audio_up';
-	Buttons[1].DownTexture = texture'Main_audio_dn';
-	Buttons[1].OverTexture = texture'Main_audio_ov';
+	Buttons[1].UpTexture =   texture'ShellTextures.Main_audio_up';
+	Buttons[1].DownTexture = texture'ShellTextures.Main_audio_dn';
+	Buttons[1].OverTexture = texture'ShellTextures.Main_audio_ov';
 
-	Buttons[2].UpTexture =   texture'Main_Controls_up';		
-	Buttons[2].DownTexture = texture'Main_Controls_dn';		
-	Buttons[2].OverTexture = texture'Main_Controls_ov';		
+	Buttons[2].UpTexture =   texture'ShellTextures.Main_Controls_up';		
+	Buttons[2].DownTexture = texture'ShellTextures.Main_Controls_dn';		
+	Buttons[2].OverTexture = texture'ShellTextures.Main_Controls_ov';		
 	
-	Buttons[3].UpTexture =   texture'Main_credits_up';		
-	Buttons[3].DownTexture = texture'Main_credits_dn';
-	Buttons[3].OverTexture = texture'Main_credits_ov';		
+	Buttons[3].UpTexture =   texture'ShellTextures.Main_credits_up';		
+	Buttons[3].DownTexture = texture'ShellTextures.Main_credits_dn';
+	Buttons[3].OverTexture = texture'ShellTextures.Main_credits_ov';		
 	
-	Buttons[4].UpTexture =   texture'Main_quit_up';	
-	Buttons[4].DownTexture = texture'Main_quit_dn';	
-	Buttons[4].OverTexture = texture'Main_quit_ov';	
+	Buttons[4].UpTexture =   texture'ShellTextures.Main_quit_up';	
+	Buttons[4].DownTexture = texture'ShellTextures.Main_quit_dn';	
+	Buttons[4].OverTexture = texture'ShellTextures.Main_quit_ov';	
 	
-	Buttons[5].UpTexture =   texture'Main_Multiplayer_up';
-	Buttons[5].DownTexture = texture'Main_Multiplayer_dn';	
-	Buttons[5].OverTexture = texture'Main_Multiplayer_ov';		
+	Buttons[5].UpTexture =   texture'ShellTextures.Main_Multiplayer_up';
+	Buttons[5].DownTexture = texture'ShellTextures.Main_Multiplayer_dn';	
+	Buttons[5].OverTexture = texture'ShellTextures.Main_Multiplayer_ov';		
 	Buttons[5].Style = 5;		
 	
-	Buttons[6].UpTexture =   texture'Main_sload_up';	
-	Buttons[6].DownTexture = texture'Main_sload_dn';
-	Buttons[6].OverTexture = texture'Main_sload_ov';
+	Buttons[6].UpTexture =   texture'ShellTextures.Main_sload_up';	
+	Buttons[6].DownTexture = texture'ShellTextures.Main_sload_dn';
+	Buttons[6].OverTexture = texture'ShellTextures.Main_sload_ov';
 
-	Buttons[7].UpTexture   = texture'Main_video_up';		
-	Buttons[7].DownTexture = texture'Main_video_dn';		
-	Buttons[7].OverTexture = texture'Main_video_ov';		
+	Buttons[7].UpTexture   = texture'ShellTextures.Main_video_up';		
+	Buttons[7].DownTexture = texture'ShellTextures.Main_video_dn';		
+	Buttons[7].OverTexture = texture'ShellTextures.Main_video_ov';		
 
 //positions and sizes at 800x600.. other resolutions can use these to move and resize
 	Buttons[0].Template = NewRegion( 188,50,160,64);
@@ -190,9 +190,9 @@ function Created()
 	BackToGame.Manager = Self;
 	BackToGame.Style=5;
 
-	BackToGame.UpTexture   = texture'Main_Back_Up';
-	BackToGame.DownTexture = texture'Main_Back_Dn';
-	BackToGame.OverTexture = texture'Main_Back_Ov';
+	BackToGame.UpTexture   = texture'ShellTextures.Main_Back_Up';
+	BackToGame.DownTexture = texture'ShellTextures.Main_Back_Dn';
+	BackToGame.OverTexture = texture'ShellTextures.Main_Back_Ov';
 
 	BackToGame.bBurnable = true;
 	BackToGame.OverSound=sound'Aeons.Shell_Blacken01';
@@ -207,9 +207,9 @@ function Created()
 	Disconnect.Manager = Self;
 	Disconnect.Style=5;
 
-	Disconnect.UpTexture   = texture'Main_Disconnect_Up';
-	Disconnect.DownTexture = texture'Main_Disconnect_Dn';
-	Disconnect.OverTexture = texture'Main_Disconnect_Ov';
+	Disconnect.UpTexture   = texture'ShellTextures.Main_Disconnect_Up';
+	Disconnect.DownTexture = texture'ShellTextures.Main_Disconnect_Dn';
+	Disconnect.OverTexture = texture'ShellTextures.Main_Disconnect_Ov';
 
 	Disconnect.bBurnable = true;
 	Disconnect.OverSound=sound'Aeons.Shell_Blacken01';
@@ -224,9 +224,9 @@ function Created()
 	Reconnect.Manager = Self;
 	Reconnect.Style=5;
 
-	Reconnect.UpTexture   = texture'Main_Reconnect_Up';
-	Reconnect.DownTexture = texture'Main_Reconnect_Dn';
-	Reconnect.OverTexture = texture'Main_Reconnect_Ov';
+	Reconnect.UpTexture   = texture'ShellTextures.Main_Reconnect_Up';
+	Reconnect.DownTexture = texture'ShellTextures.Main_Reconnect_Dn';
+	Reconnect.OverTexture = texture'ShellTextures.Main_Reconnect_Ov';
 
 	Reconnect.bBurnable = true;
 	Reconnect.OverSound=sound'Aeons.Shell_Blacken01';
@@ -241,9 +241,9 @@ function Created()
 	RenewalButton.Manager = Self;
 	RenewalButton.Style=5;
 
-	RenewalButton.UpTexture   = texture'renewal_up';
-	RenewalButton.DownTexture = texture'renewal_dn';
-	RenewalButton.OverTexture = texture'renewal_ov';
+	RenewalButton.UpTexture   = texture'ShellTextures.renewal_up';
+	RenewalButton.DownTexture = texture'ShellTextures.renewal_dn';
+	RenewalButton.OverTexture = texture'ShellTextures.renewal_ov';
 
 	RenewalButton.bBurnable = true;
 	RenewalButton.OverSound=sound'Aeons.Shell_Blacken01';
@@ -264,16 +264,61 @@ function Created()
 
 	Initialized = True;
 	Root.Console.bBlackout = True;
+}
+
+function AfterCreate()
+{
+	local string SaveString;
+	
+	Super.AfterCreate();
+
+	RelaunchedFrom = AeonsRootWindow(Root).RelaunchedFrom;
+	if (RelaunchedFrom != 0)
+	{
+		// reset config variable
+		AeonsRootWindow(Root).RelaunchedFrom = 0;
+		AeonsRootWindow(Root).SaveConfig();
+	}
 
 	// Check for a temporary save file, used when the player changes Video Drivers in the middle of the game.
 	SaveString = GetPlayerOwner().GetSaveGameList();
-	if ((InStr (SaveString, "99,")) >= 0)
+	if ((InStr (SaveString, "98,")) >= 0)
 	{
-		// added default 32 bits by renewal
-		GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
-		FromRelaunch = True;
+		if (RelaunchedFrom == 0)
+			RelaunchedFrom = -1;
+	}
 
-		LoadingAutosave = ((InStr (SaveString, "99,Autosave")) >= 0);
+	if (RelaunchedFrom != 0)
+	{
+		// shell ambient sound will stop after loading a game
+		// this can't be fixed by calling StopShellAmbient() here because LoadGame happens the next tick
+		switch (RelaunchedFrom)
+		{
+			case -1:
+				// allow main menu to close
+				GetPlayerOwner().Level.bLoadBootShellPSX2 = false;	
+				
+				Close();
+
+				// load autosave after a crash from slot 98
+				GetPlayerOwner().ConsoleCommand("LoadGame 98");
+				GetPlayerOwner().ConsoleCommand("DeleteGame 98");
+				break;
+			case 1:
+				// added default 32 bits by renewal
+				//GetPlayerOwner().ConsoleCommand("SetRes "$ GetPlayerOwner().ConsoleCommand("GetCurrentRes") $ "x" $ 32);
+				VideoPressed();
+				GetPlayerOwner().ConsoleCommand("LoadGame 99");
+				GetPlayerOwner().ConsoleCommand("DeleteGame 99");
+				break;
+			case 2:
+				AudioPressed();
+				GetPlayerOwner().ConsoleCommand("LoadGame 99");
+				GetPlayerOwner().ConsoleCommand("DeleteGame 99");
+				break;
+		}
+
+		RelaunchedFrom = 0;
 	}
 }
 
@@ -467,7 +512,7 @@ function WebsitePressed()
 
 function VideoPressed()
 {
-	if (!FromRelaunch)
+	if (RelaunchedFrom != 1)
 		PlayNewScreenSound(); //PlayExitSound();
 
 	if (Video == None ) 
@@ -493,7 +538,8 @@ function ControlsPressed()
 
 function AudioPressed()
 {
-	PlayNewScreenSound(); //PlayExitSound();
+	if ( RelaunchedFrom != 2 )
+		PlayNewScreenSound(); //PlayExitSound();
 
 	if ( Audio == None )
 		Audio = ManagerWindow(Root.CreateWindow(class'AudioWindow', 100, 100, 200, 200, Root, True));
@@ -625,7 +671,7 @@ function RenewalButtonPressed()
 	//GetPlayerOwner().ConsoleCommand("start http://undying.ea.com");
 	
 	if ( Renewal == None )
-		Renewal = Root.CreateWindow(class'RenewalWindow', Root.WinWidth - 400, 100, 300, 200);
+		Renewal = Root.CreateWindow(class'RenewalWindow', Root.WinWidth - 450, 100, 350, 220);
 	else
 		Renewal.ShowWindow();
 	
@@ -645,8 +691,8 @@ function StopShellAmbient()
 
 function Close(optional bool bByParent)
 {
-	//if BackToGame isn't visible we want the shell to stay up
-	if ( !BackToGame.bWindowVisible && !LoadingAutosave ) 
+	//if the level has bLoadBootShellPSX2 set, we want the shell to stay up
+	if ( GetPlayerOwner().Level.bLoadBootShellPSX2 ) 
 		return;
 
 	StopShellAmbient();
@@ -683,29 +729,6 @@ function Paint(Canvas C, float X, float Y)
 	// leave the current behavior for now
 	//if (PrevSiblingWindow != None)
 	//	return;
-	
-	if (FromRelaunch)
-	{
-		if (!LoadingAutosave)
-			VideoPressed();
-		GetPlayerOwner().ConsoleCommand("LoadGame 99");
-		GetPlayerOwner().ConsoleCommand("DeleteGame 99");
-		FromRelaunch=False;
-		return;
-	}
-
-	// if some time has passed make sure we are done with autosaving
-	if (LoadingAutosave && GetEntryLevel().TimeSeconds > 0.5) // use bStartup instead?
-	{
-		LoadingAutosave=False;
-	}
-
-	if (LoadingAutosave && !GetPlayerOwner().Level.bLoadBootShellPSX2)
-	{
-		Close();
-		LoadingAutosave=False;
-		return;
-	}
 	
 	Super.Paint(C, X, Y);
 
@@ -867,10 +890,10 @@ function Resized()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.Main_0"
-     BackNames(1)="UndyingShellPC.Main_1"
-     BackNames(2)="UndyingShellPC.Main_2"
-     BackNames(3)="UndyingShellPC.Main_3"
-     BackNames(4)="UndyingShellPC.Main_4"
-     BackNames(5)="UndyingShellPC.Main_5"
+     BackNames(0)="ShellTextures.Main_0"
+     BackNames(1)="ShellTextures.Main_1"
+     BackNames(2)="ShellTextures.Main_2"
+     BackNames(3)="ShellTextures.Main_3"
+     BackNames(4)="ShellTextures.Main_4"
+     BackNames(5)="ShellTextures.Main_5"
 }

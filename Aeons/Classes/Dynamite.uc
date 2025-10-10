@@ -5,19 +5,19 @@ class Dynamite expands Items;
 
 //=============================================================================
 // Molotov 1st person view
-//#exec MESH IMPORT MESH=Molotov1st_m SKELFILE=Molotov1st\Molotov1st_m.ngf MOVERELATIVE=0
-//#exec MESH ORIGIN MESH=Molotov1st_m YAW=64
-//#exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
+////#exec MESH IMPORT MESH=Molotov1st_m SKELFILE=Molotov1st\Molotov1st_m.ngf MOVERELATIVE=0
+////#exec MESH ORIGIN MESH=Molotov1st_m YAW=64
+////#exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
 
 //=============================================================================
 // Dynamite 1st persin view mesh
-//#exec MESH IMPORT MESH=Dynamite1st_m SKELFILE=Dynamite1st\Dynamite1st.ngf MOVERELATIVE=0
-//#exec MESH ORIGIN MESH=Dynamite1st_m YAW=64
+////#exec MESH IMPORT MESH=Dynamite1st_m SKELFILE=Dynamite1st\Dynamite1st.ngf MOVERELATIVE=0
+////#exec MESH ORIGIN MESH=Dynamite1st_m YAW=64
 
 // Notifys -------------------------------------------------------------------
-// #exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
-// #exec MESH NOTIFY SEQ=EndFire TIME=0.462 FUNCTION=ThrowLit
-//#exec MESH NOTIFY SEQ=FireEnd TIME=0.462 FUNCTION=ThrowLit
+//// #exec MESH NOTIFY SEQ=Fire TIME=0.719 FUNCTION=FireWeapon
+//// #exec MESH NOTIFY SEQ=EndFire TIME=0.462 FUNCTION=ThrowLit
+////#exec MESH NOTIFY SEQ=FireEnd TIME=0.462 FUNCTION=ThrowLit
 
 //=============================================================================
 // Dynamite - projectile and pickup
@@ -27,7 +27,7 @@ class Dynamite expands Items;
 //#exec AUDIO IMPORT FILE="..\Dynamite_proj\E_Wpn_DynaFuse01.wav" NAME="E_Wpn_DynaFuse01" GROUP="Weapons"
 
 // Load the sound package
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //=============================================================================
 var int sndID, returnID;
@@ -119,7 +119,6 @@ function DynamiteAmmo DynamiteDrop(class<Ammo> AmmoClass, float ProjSpeed, bool 
 
 	// Owner.PlaySound(FireSound, SLOT_None,2.0);
     // AeonsPlayer(Owner).MakePlayerNoise(1.0, 1280*3);
-	Owner.PlaySound(Sound'Wpn_Spl_Inv.Inventory.E_Wpn_DynaFuse01', SLOT_None, 2.0);
 	
 	dProj = DynamiteFire(class 'Dynamite_proj', 300, false, false);
 	//dProj.SpinRate(1.0);

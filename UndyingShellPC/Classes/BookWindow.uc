@@ -13,7 +13,7 @@ class BookWindow expands ShellWindow;
 //#exec Texture Import File=Book_4.bmp Mips=Off
 //#exec Texture Import File=Book_5.bmp Mips=Off
 
-//#exec Texture Import File=Book_Icon.bmp Flags=2 Mips=Off
+////#exec Texture Import File=Book_Icon.bmp Flags=2 Mips=Off
 //#exec Texture Import File=Book01_Icon.bmp Flags=2 Mips=Off
 //#exec Texture Import File=Book02_Icon.bmp Flags=2 Mips=Off
 
@@ -222,9 +222,9 @@ function Created()
 	BackToGame.Manager = Self;
 	BackToGame.Style=5;
 
-	BackToGame.UpTexture   = texture'Book_Back_Up';
-	BackToGame.DownTexture = texture'Book_Back_Dn';
-	BackToGame.OverTexture = texture'Book_Back_Ov';
+	BackToGame.UpTexture   = texture'ShellTextures.Book_Back_Up';
+	BackToGame.DownTexture = texture'ShellTextures.Book_Back_Dn';
+	BackToGame.OverTexture = texture'ShellTextures.Book_Back_Ov';
 
 	BackToGame.bBurnable = true;
 	BackToGame.OverSound=sound'Aeons.Shell_Blacken01';
@@ -847,10 +847,10 @@ defaultproperties
      MAX_VISIBLE_BOOKS=4
      UnreadColor=(R=255,G=255,B=255)
      ReadColor=(R=25,G=25,B=255)
-     BackNames(0)="UndyingShellPC.Book_0"
-     BackNames(1)="UndyingShellPC.Book_1"
-     BackNames(2)="UndyingShellPC.Book_2"
-     BackNames(3)="UndyingShellPC.Book_3"
-     BackNames(4)="UndyingShellPC.Book_4"
-     BackNames(5)="UndyingShellPC.Book_5"
+     BackNames(0)="ShellTextures.Book_0"
+     BackNames(1)="ShellTextures.Book_1"
+     BackNames(2)="ShellTextures.Book_2"
+     BackNames(3)="ShellTextures.Book_3"
+     BackNames(4)="ShellTextures.Book_4"
+     BackNames(5)="ShellTextures.Book_5"
 }

@@ -1,8 +1,9 @@
 class UBrowserRightClickMenu extends UWindowRightClickMenu;
 
-var UWindowPulldownMenuItem Play, Copy, Refresh, RefreshServer, PingAll, Info, Favorites, OpenLocation;
+var UWindowPulldownMenuItem Play, PasswordJoin, Copy, Refresh, RefreshServer, PingAll, Info, Favorites, OpenLocation;
 
 var localized string PlayName;
+var localized string JoinPasswordName;
 var localized string RefreshName;
 var localized string InfoName;
 var localized string FavoritesName;
@@ -21,6 +22,7 @@ function Created()
 	Info = AddMenuItem(InfoName, None);
 	Copy = AddMenuItem(CopyName, None);
 	Play = AddMenuItem(PlayName, None);
+	PasswordJoin = AddMenuItem(JoinPasswordName, None);
 	//OpenLocation = AddMenuItem(OpenLocationName, None);
 	AddMenuItem("-", None);
 	AddFavoriteItems();
@@ -41,6 +43,9 @@ function ExecuteItem(UWindowPulldownMenuItem I)
 	{
 	case Play:
 		Grid.JoinServer(List);
+		break;
+	case PasswordJoin:
+		Grid.PasswordJoinMenu(List);
 		break;
 	case Info:
 		if(!Info.bDisabled) 
@@ -73,6 +78,7 @@ function ShowWindow()
 {
 	Info.bDisabled = List == None || List.GamePort == 0;
 	Play.bDisabled = List == None || List.GamePort == 0;
+	PasswordJoin.bDisabled = List == None || List.GamePort == 0;
 	Copy.bDisabled = List == None || List.GamePort == 0;
 
 	Favorites.bDisabled = List == None;
@@ -85,6 +91,7 @@ function ShowWindow()
 defaultproperties
 {
      PlayName="&Play on This Server"
+     JoinPasswordName="Join with &Password"
      RefreshName="&Refresh All Servers"
      InfoName="&Server and Player Info"
      FavoritesName="Add to &Favorites"

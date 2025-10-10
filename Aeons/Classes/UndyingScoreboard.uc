@@ -18,9 +18,9 @@ var float ScaleX, ScaleY;
 function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	SmallestFont = Font(DynamicLoadObject("Comic.Comic10",class'Font')); // todo: get from canvas or renewal
-	SmallFont = Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
-	BigFont = Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
+	SmallestFont = Font(DynamicLoadObject(GetRenewalConfig().SmallFont,class'Font'));
+	SmallFont = Font(DynamicLoadObject(GetRenewalConfig().MediumFont,class'Font'));
+	BigFont = Font(DynamicLoadObject(GetRenewalConfig().MediumFont,class'Font'));
 	HugeFont = BigFont;
 }
 

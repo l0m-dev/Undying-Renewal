@@ -28,7 +28,7 @@ function PostBeginPlay()
 	
 	BaseLocation = Location;
 	
-/*	
+
 	P = Spawn( class'Engine.ParticleFX', self,, Location );
 	
 	P.ParticlesPerSec.Base = 100;
@@ -54,7 +54,7 @@ function PostBeginPlay()
 	P.SizeWidth.Base = 32;
 	P.SizeLength.Base = 32;
 	P.SizeEndScale.Base = 0.5;
-*/
+
 		
 }
 
@@ -74,7 +74,7 @@ function Tick(float DeltaTime)
 	
 	SetLocation( temp );
 
-	/*
+
 	if ( Player != None ) 
 	{
 		if ( Player.ScryeTimer > 0.0 ) 
@@ -122,7 +122,7 @@ function Tick(float DeltaTime)
 		FindPlayer();
 	}
 
-  */
+  
 }
 
 defaultproperties

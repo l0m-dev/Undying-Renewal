@@ -10,8 +10,8 @@ class Player extends Object
 // Player properties.
 
 // Internal.
-var native const int vfOut;
-var native const int vfExec;
+var native private const int vfOut;
+var native private const int vfExec;
 
 // The actor this player controls.
 var transient const playerpawn Actor;
@@ -38,5 +38,5 @@ const IDC_WAIT=6;
 defaultproperties
 {
      ConfiguredInternetSpeed=20000
-     ConfiguredLanSpeed=20000
+     ConfiguredLanSpeed=40000
 }

@@ -84,7 +84,10 @@ state AIEnergyBlast
 
 		GetAxes( Rotation, X, Y, Z );
 		StartLoc = StartLoc + X * 50.0;
-		TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, false, 3000 ));
+		if ( RGC() )
+			TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, false, 6000 ));
+		else
+			TDir = vector(WeaponAimAt( Enemy, StartLoc, WeaponAccuracy, false, 3000 ));
 		LB = Spawn( class'LtngBlast_proj', self,, StartLoc, rotator(TDir) );
 		if ( LB != none )
 		{

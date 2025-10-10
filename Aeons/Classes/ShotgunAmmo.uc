@@ -3,11 +3,23 @@
 //=============================================================================
 class ShotgunAmmo expands Ammo;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 //#exec MESH IMPORT MESH=ShotgunAmmo_m SKELFILE=ShotgunAmmo.ngf
 
 // Pickup Sound
 //#exec AUDIO IMPORT  FILE="I_ShotAmmoPU01.WAV" NAME="I_ShotAmmoPU01" GROUP="Inventory"
+
+function Activate()
+{
+	local AeonsWeapon wep;
+		
+	if (Pawn(Owner) != none)
+	{
+		wep = AeonsWeapon(Pawn(Owner).Weapon);
+		if ( Wep.isA('Shotgun') )
+			Super.Activate();
+	}
+}
 
 state Activated
 {
@@ -25,10 +37,9 @@ state Activated
 					// wep.AmmoType.AmmoAmount += wep.ClipCount;
 					wep.ClipCount = 0;			// Empty the clip
 					wep.bAltAmmo = false;		// Normal Ammo Type
-					wep.AmmoType.bActive = false;
+					wep.AmmoType.GotoState('Deactivated');
 					wep.AmmoType = Ammo(Pawn(Owner).FindInventoryType(wep.AmmoName));
 					wep.gotoState('NewClip');	// Load the New Clip
-					bActive = true;
 				}
 				else if ( wep.ClipCount == 1 )
 				{
@@ -52,7 +63,7 @@ state Activated
 state Deactivated
 {
 	Begin:
-		
+		bActive = false;
 }
 
 defaultproperties

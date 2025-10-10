@@ -73,11 +73,11 @@ class Howler expands ScriptedPawn;
 //#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.315436 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.328859 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=attack_specialkill TIME=0.484724 FUNCTION=PlaySound_N ARG="SpclKill P=.9"
-//#exec MESH NOTIFY SEQ=damage_stun TIME=0.0 FUNCTION=PlaySound_N ARG="VDamage PVAR=.2"
+////#exec MESH NOTIFY SEQ=damage_stun TIME=0.0 FUNCTION=PlaySound_N ARG="VDamage PVAR=.2"
 //#exec MESH NOTIFY SEQ=damage_stun TIME=0.103448 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=damage_stun TIME=0.241379 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=damage_stun TIME=0.413793 FUNCTION=C_StunShake01_01_075_100_020_075_010
-//#exec MESH NOTIFY SEQ=death TIME=0.0875 FUNCTION=PlaySound_N ARG="VDeath PVAR=.2"
+////#exec MESH NOTIFY SEQ=death TIME=0.0875 FUNCTION=PlaySound_N ARG="VDeath PVAR=.2"
 //#exec MESH NOTIFY SEQ=death TIME=0.1875 FUNCTION=C_BodyFall
 //#exec MESH NOTIFY SEQ=death TIME=0.3 FUNCTION=C_BareFS
 //#exec MESH NOTIFY SEQ=death TIME=0.35 FUNCTION=C_BareFS
@@ -132,7 +132,23 @@ function PreBeginPlay()
 //****************************************************************************
 function PlayJumpAttack()
 {
-	PlayAnim( 'attack_slash',, MOVE_None );
+	local float JumpAnimSpeed;
+
+	JumpAnimSpeed = 1.0;
+
+	if ( RGC() )
+	{
+		if ( Level.Game.Difficulty == 1 )
+		{
+			JumpAnimSpeed = 1.25;
+		}
+		else if ( Level.Game.Difficulty >= 2 )
+		{
+			JumpAnimSpeed = 1.5;
+		}
+	}
+
+	PlayAnim( 'attack_slash', JumpAnimSpeed, MOVE_None );
 }
 
 function PlayNearAttack()
@@ -207,7 +223,10 @@ function PreSetMovement()
 {
 	super.PreSetMovement();
 	bCanJump = true;
-	JumpAttackTime = 0.5;
+	if (RGC())
+		JumpAttackTime = 0.317; // from attack_slash
+	else
+		JumpAttackTime = 0.5;
 }
 
 function bool DoFarAttack()
@@ -718,20 +737,24 @@ state AIJumpAtEnemy
 	{
 		local vector EnemyVelocity;
 		local vector EnemyAdjustedLoc;
+		local float SavedAirSpeed;
 		
-		if (RGC())
+		if ( RGC() )
 		{
-			EnemyVelocity = Enemy.Velocity; // * GetJumpAttackTime()
-			EnemyVelocity.Z *= 0.1;
+			EnemyVelocity = Enemy.Velocity;
+			EnemyVelocity.Z = 0; // ignore vertical velocity since we don't account for gravity
 			
-			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
 			// don't add velocity if player is coming towards us
-			if (Normal(EnemyAdjustedLoc + EnemyVelocity - Location) dot Normal(EnemyAdjustedLoc - Location) > 0.0)
+			if ( Normal(EnemyVelocity) dot Normal(Location - Enemy.Location) < 0.95 )
 				AddVelocity( EnemyVelocity );
+
+			// JumpTo requires ground position
+			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
 			
-			AirSpeed = 999999;
+			SavedAirSpeed = AirSpeed;
+			AirSpeed = Region.Zone.ZoneTerminalVelocity; // don't clamp speed to current AirSpeed in CalculateJump
 			JumpTo( EnemyAdjustedLoc );
-			AirSpeed = default.AirSpeed;
+			AirSpeed = SavedAirSpeed;
 			GotoState( , 'JUMPED' );
 		}
 		else

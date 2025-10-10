@@ -3,7 +3,7 @@
 //=============================================================================
 class LtngBlast_proj expands SpellProjectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var int Charge;
 var int NumChains;
@@ -22,7 +22,7 @@ simulated function PreBeginPlay()
 	if (RGC())
 	{
 		Range = 4096;
-		Speed = 6000;
+		Speed = 6000; // we also need to change WeaponAimAt values for Monto and MiniMonto 
 	}
 	super.PreBeginPlay();
 }

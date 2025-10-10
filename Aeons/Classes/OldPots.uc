@@ -4,7 +4,7 @@
 class OldPots expands Container
 	abstract;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
 
 function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, DamageInfo DInfo)
 {

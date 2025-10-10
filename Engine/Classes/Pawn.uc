@@ -1408,7 +1408,7 @@ function bool AddInventory( inventory NewItem )
 	// Skip if already in the inventory.
 	local inventory Inv;
 	local inventory InvFound;
-	local inventory InvFoundExactParent, InvFoundExact;
+	local inventory PrevInv, InvFoundExact, InvFoundExactParent;
 	
 	// The item should not have been destroyed if we get here.
 	if (NewItem ==None )
@@ -1418,55 +1418,70 @@ function bool AddInventory( inventory NewItem )
 		if( Inv == NewItem )
 			return false;
 
-	// Add to front of inventory chain.
 	NewItem.SetOwner(Self);
 
 	InvFound = None;
+	InvFoundExact = None;
 	InvFoundExactParent = None;
 
 	for( Inv=Inventory; Inv!=None; Inv=Inv.Inventory )
-	{		
+	{
+		// Find inventory item with lower inventory group
 		if (Inv.InventoryGroup < NewItem.InventoryGroup)
 		{
-			InvFound = Inv;								
+			InvFound = Inv;
 		}
-		// added class check since BookJournal and TimeIncantation have the same InventoryGroup
-		if (Inv.Inventory != None && Inv.Inventory.InventoryGroup == NewItem.InventoryGroup && Inv.Inventory.class == NewItem.class)
+
+		// Find inventory item with same inventory group and class (added class check since BookJournal and TimeIncantation have the same InventoryGroup)
+		if (Inv.InventoryGroup > 0 && Inv.InventoryGroup == NewItem.InventoryGroup && Inv.class == NewItem.class)
 		{
-			InvFoundExactParent = Inv;
-			InvFoundExact = Inv.Inventory;
+			InvFoundExact = Inv;
+			InvFoundExactParent = PrevInv;
 			break;
 		}
+
+		PrevInv = Inv;
 	}
 
-	// fixes multiple inventory slots
-	if (InvFoundExact != None && InvFoundExact.InventoryGroup > 0)
+	// Merge duplicate inventory slots if a match is found
+	if( InvFoundExact != None )
 	{
-		// add current ammo and copies to new pickup
+		// Add current ammo and copies to new pickup
 		if (NewItem.IsA('Ammo'))
 			Ammo(NewItem).AddAmmo(Ammo(InvFoundExact).AmmoAmount);
-		else if (Pickup(NewItem).bCanHaveMultipleCopies)
+		else if (NewItem.IsA('Pickup') && Pickup(NewItem).bCanHaveMultipleCopies)
 			Pickup(NewItem).numCopies += Pickup(InvFoundExact).numCopies + 1;
 		
-		// replace references and remove current copy
-		InvFoundExactParent.Inventory = NewItem;
-		NewItem.Inventory = InvFoundExact.Inventory;
+		// Remove the old item
+		if ( InvFoundExactParent != None )
+		{
+			NewItem.Inventory = InvFoundExact.Inventory;
+			InvFoundExactParent.Inventory = NewItem;
+		}
+		else
+		{
+			NewItem.Inventory = Inventory;
+			Inventory = NewItem;
+		}
+
+		// Destroy the old item since NewItem might be used after AddInventory call
 		InvFoundExact.Destroy();
 
 		return true;
 	}
-		
+	
 	if ( InvFound != None )
 	{
+		// Add after inventory item with lower inventory group.
 		NewItem.Inventory = InvFound.Inventory;
 		InvFound.Inventory = NewItem;
 	}
 	else
 	{
+		// Add to front of inventory chain.
 		NewItem.Inventory = Inventory;
 		Inventory = NewItem;
 	}
-		
 	
 	return true;
 }
@@ -1478,17 +1493,35 @@ function bool DeleteInventory( inventory Item )
 	// If this item is in our inventory chain, unlink it.
 	local actor Link;
 	local int Count;
+	local bool bFound;
 
 	if ( Item == Weapon )
+	{
 		Weapon = None;
+		bFound = true;
+	}
+	if ( Item == AttSpell )
+	{
+		AttSpell = None;
+		bFound = true;
+	}
+	if ( Item == DefSpell )
+	{
+		DefSpell = None;
+		bFound = true;
+	}
 	if ( Item == SelectedItem )
+	{
 		SelectedItem = None;
+		bFound = true;
+	}
 	for( Link = Self; Link!=None; Link=Link.Inventory )
 	{
 		if( Link.Inventory == Item )
 		{
 			Link.Inventory = Item.Inventory;
 			Item.Inventory = None;
+			bFound = true;
 			break;
 		}
 		if ( Level.NetMode == NM_Client )
@@ -1499,6 +1532,7 @@ function bool DeleteInventory( inventory Item )
 		}
 	}
 	Item.SetOwner(None);
+	return bFound;
 }
 
 // Just changed to pendingWeapon
@@ -2547,7 +2581,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 					(InstigatedBy.IsA(Class.Name) || self.IsA(InstigatedBy.Class.Name)) )
 		{
 			// reduces damage to pawns of the same class
-			if (RGC())
+			if ( RGC() )
 				ActualDamage = ActualDamage * FMin(1 - ReducedDamagePct, 0.35); 
 		}
 		else if ( (!bAcceptDamage && !bAcceptMagicDamage) || 
@@ -2560,7 +2594,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 			DInfo.DamageLocation = HitLocation;
 		}
 
-		// small gameplay change: all damage to the player is a whole number now because of ReduceDamage returning an integer
+		// RGC()? small gameplay change: all damage to the player is a whole number now because of ReduceDamage returning an integer
 		DInfo.Damage = actualDamage;
 		actualDamage = (AdjustDamageByLocation( DInfo )).Damage;
 

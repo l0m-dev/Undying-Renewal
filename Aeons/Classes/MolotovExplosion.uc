@@ -6,7 +6,7 @@ class MolotovExplosion expands Explosion;
 var MolotovFire_proj fProj, clone;
 var() int numExplosionBits;
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	local int i;
 	local vector SpewDir;

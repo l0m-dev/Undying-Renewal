@@ -3,8 +3,8 @@
 //=============================================================================
 class DefaultImpactSoundSet expands ImpactSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\FootSteps.uax PACKAGE=FootSteps
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\FootSteps.uax PACKAGE=FootSteps
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 defaultproperties
 {

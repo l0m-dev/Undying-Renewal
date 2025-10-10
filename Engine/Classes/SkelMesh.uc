@@ -2,27 +2,34 @@
 // SkelMesh
 //=============================================================================
 
-class SkelMesh expands Mesh;
+class SkelMesh expands Mesh
+	native
+	noexport;
 
-var private native int SkelProto;
+var native private const int SkelProto;
 var array<byte> Joints;
 var array<byte> JointLocs;
-var private native int JointVerts_vtableptr;
-var private native int JointVerts_SavedAr;
+var native private const int JointVerts_vtableptr;
+var native private const int JointVerts_SavedAr;
 var private native int JointVerts_SavedPos;
 var array<byte> JointVerts;
-var array<byte> PhysObj;
+var array<byte> Modifiers;
 var SkelMesh ParentMesh;
 var Place Origin;
 
 /*
-DWI::SkelNode* SkelProto;
-TArray Joints;	    	 // DWIjoint 80 bytes each
-TArray JointLocs;	     // jointloc, 36 bytes each
-TLazyArray JointVerts;   // DWI::array<DWI::JointVert>, first 12 bytes are x,y,z
-TArray PhysObj;          // cloth, hair, jiggle physics
-USkelMesh* ParentMesh;
-FPlace Origin;
+class ENGINE_API USkelMesh : public UMesh
+{
+	DECLARE_CLASS(USkelMesh,UMesh,0,Engine)
+
+	DWI::SkelNode* SkelProto;
+	TArray<FJointInfo> Joints;
+	TArray<FJointLoc> JointLocs;
+	TLazyArray<FJointVert> JointVerts;
+	TArray<FModifierInfo> Modifiers;
+	USkelMesh* ParentMesh;
+	FPlace Origin;
+}
 */
 
 defaultproperties

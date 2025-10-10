@@ -3,7 +3,7 @@
 //=============================================================================
 class ShieldModifier expands PlayerModifier;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var travel bool 	bHUDEffect;
 var travel int		ShieldHealth, NumCracks, CrackID[8];
@@ -227,7 +227,7 @@ state Deactivated
 			ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 
 			// create shield breaking effect
-			if ( (AeonsPlayer(Owner).GetStateName() != 'PlayerCutscene') && (AeonsPlayer(Owner).GetStateName() != 'DialogScene') && (AeonsPlayer(Owner).GetStateName() != 'SpecialKill') )
+			if ( !AeonsPlayer(Owner).IsInCutsceneState() )
 			{
 				Owner.PlaySound(DeactivateSound);
 				spawn(class'ShieldHitFX',,,Owner.Location+vect(0,0,50),PlayerPawn(Owner).ViewRotation);

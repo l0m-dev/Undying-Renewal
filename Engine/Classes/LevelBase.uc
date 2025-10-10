@@ -8,14 +8,14 @@ class LevelBase extends Object
 	transient;
 
 // Internal.
-var private transient const int vtblOut;
+var native private const int vtblOut;
 
 // Database.
 var transient const array<actor> Actors;
-var transient const object Actors_Owner;
+var native private const object Actors_Owner;
 
 // Variables.
-var transient const NetDriver NetDriver;
+var native private const NetDriver NetDriver;
 var transient const Engine Engine;
 var transient const URL URL;
-var transient const DemoRecDriver DemoRecDriver;
+var native private const DemoRecDriver DemoRecDriver;

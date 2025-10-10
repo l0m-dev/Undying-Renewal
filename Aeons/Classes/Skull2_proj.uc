@@ -6,7 +6,7 @@ class Skull2_proj expands SpellProjectile
 
 //#exec MESH IMPORT MESH=Skull_Proj SKELFILE=skull_Proj.ngf
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 struct Sequence
 {
@@ -52,7 +52,7 @@ var(Skull_Sequences)	Sequence	ThreatenSeq[6];
 var(Skull_Sequences)	Sequence	SeeEnemySeq[3];
 var(Skull_Sequences)	Sequence	SecretSeq[3];
 
-var(Sound)	sound	SpawningSounds[1];				// Spawning Sounds
+var(Sound)	sound	SpawningSounds;					// Spawning Sounds
 var(Sound)	sound	CommentSounds[3];				// Comment sounds
 var(Sound)	sound	ScreamingSounds[2];				// Screaming sounds
 var(Sound)	sound	OnFireSound;
@@ -583,7 +583,7 @@ function Tick(float DeltaTime)
 }
 
 // Destroyed .. cleanup
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( SndID > 0 )
 		StopSound(SndID);
@@ -600,7 +600,8 @@ function Destroyed()
 	}
 
 	// kill the smoke trail
-	SmokeTrail.Shutdown();
+	if ( SmokeTrail != None )
+		SmokeTrail.Shutdown();
 }
 
 simulated function Fire()
@@ -633,11 +634,8 @@ simulated function Fire()
 	// SetCollisionSize(16, 16);
 
 	// Smoke Trail
-	if (Level.NetMode != NM_Client)
-	{
-		SmokeTrail = spawn(class'SkullStorm_particles', self,,Location);
-		SmokeTrail.setBase(self);
-	}
+	SmokeTrail = spawn(class'SkullStorm_particles', self,,Location);
+	SmokeTrail.setBase(self);
 
 	// Sound
 	PlaySound(ScreamingSounds[Rand(2)]);

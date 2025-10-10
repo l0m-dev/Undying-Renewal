@@ -120,7 +120,7 @@ state Typing
 		}
 		else if ( Key==IK_CTRL )
 		{
-			if ( Action == EInputAction.IST_Press )
+			if ( Action == IST_Press )
 				bControlDown = True;
 			else
 				bControlDown = False;

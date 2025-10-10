@@ -3,7 +3,7 @@
 //=============================================================================
 class SPThrownProjectile expands FallingProjectile;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 
 

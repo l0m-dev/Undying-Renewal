@@ -23,27 +23,13 @@ var localized string HdrHelp;
 var localized string PrecachingText;
 var localized string PrecachingHelp;
 
-var string VideoDriverClassName;
-
 function Created()
 {
-	local int i;
-
 	Super.Created();
 
 	AnimatedMenuCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', AnimatedMenuText, AnimatedMenuHelp));
 
 	SaveThumbnailsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', SaveThumbnailsText, SaveThumbnailsHelp));
-	
-	VideoDriverClassName = GetPlayerOwner().ConsoleCommand("get ini:Engine.Engine.GameRenderDevice Class");
-	i = InStr(VideoDriverClassName, "'");
-	// Get class name from class'...'
-	if(i != -1)
-	{
-		VideoDriverClassName = Mid(VideoDriverClassName, i+1);
-		i = InStr(VideoDriverClassName, "'");
-		VideoDriverClassName = Left(VideoDriverClassName, i);
-	}
 	
 	if (DoesRenderDevicePropertyExist('AntialiasMode'))
 	{

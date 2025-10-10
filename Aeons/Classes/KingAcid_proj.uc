@@ -5,14 +5,14 @@ class KingAcid_proj expands SpellProjectile;
 
 var KingAcidProj_particles	Trail;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	PlaySound(SpawnSound);
  	Trail = spawn(class 'KingAcidProj_particles',self,,Location);
  	Trail.setBase(self);
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if (Trail != none)
 		Trail.Shutdown();

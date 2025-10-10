@@ -54,9 +54,9 @@ function Created()
 	Yes.Manager = Self;
 	Yes.Style = 5;
 
-	Yes.UpTexture =   texture'Cntrl_ok_up';
-	Yes.DownTexture = texture'Cntrl_ok_dn';
-	Yes.OverTexture = texture'Cntrl_ok_ov';
+	Yes.UpTexture =   texture'ShellTextures.Cntrl_ok_up'; // unused: quit_yes_up
+	Yes.DownTexture = texture'ShellTextures.Cntrl_ok_dn'; // unused: quit_yes_dn
+	Yes.OverTexture = texture'ShellTextures.Cntrl_ok_ov'; // unused: quit_yes_ov
 	Yes.DisabledTexture = None;
 	
 		
@@ -70,9 +70,9 @@ function Created()
 	No.Manager = Self;
 	No.Style = 5;
 
-	No.UpTexture =   texture'Cntrl_cancl_up';
-	No.DownTexture = texture'Cntrl_cancl_dn';
-	No.OverTexture = texture'Cntrl_cancl_ov';
+	No.UpTexture =   texture'ShellTextures.Cntrl_cancl_up'; // unused: quit_no_up
+	No.DownTexture = texture'ShellTextures.Cntrl_cancl_dn'; // unused: quit_no_dn
+	No.OverTexture = texture'ShellTextures.Cntrl_cancl_ov'; // unused: quit_no_ov
 	No.DisabledTexture = None;
 
 //--	
@@ -204,10 +204,10 @@ function HideWindow()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.Quit_0"
-     BackNames(1)="UndyingShellPC.Quit_1"
-     BackNames(2)="UndyingShellPC.Quit_2"
-     BackNames(3)="UndyingShellPC.Quit_3"
-     BackNames(4)="UndyingShellPC.Quit_4"
-     BackNames(5)="UndyingShellPC.Quit_5"
+     BackNames(0)="ShellTextures.Quit_0"
+     BackNames(1)="ShellTextures.Quit_1"
+     BackNames(2)="ShellTextures.Quit_2"
+     BackNames(3)="ShellTextures.Quit_3"
+     BackNames(4)="ShellTextures.Quit_4"
+     BackNames(5)="ShellTextures.Quit_5"
 }

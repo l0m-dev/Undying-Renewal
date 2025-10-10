@@ -8,8 +8,8 @@ var globalconfig name ServerListNames[50];
 var globalconfig bool bKeepMasterServer;
 
 var UWindowPageControl		PageControl;
-var UWindowPageControlPage	Favorites, IRC, MOTD;
-var localized string		FavoritesName, IRCName, MOTDName;
+var UWindowPageControlPage	Favorites, IRC, MOTD, Recent;
+var localized string		FavoritesName, IRCName, MOTDName, RecentName;
 var string					ServerListWindowClass;
 var string					FavoriteServersClass;
 var string					UpdateServerClass;
@@ -46,6 +46,9 @@ function Created()
 	FC = class<UBrowserFavoriteServers>(DynamicLoadObject(FavoriteServersClass, class'Class'));
 	Favorites = PageControl.AddPage(FavoritesName, FC);
 
+	// Add recent servers
+	Recent = PageControl.AddPage(RecentName, class'UBrowserRecentServers');
+
 	C = class<UBrowserServerListWindow>(DynamicLoadObject(ServerListWindowClass, class'Class'));
 
 	for(i=0; i<50; i++)
@@ -68,6 +71,10 @@ function Created()
 
 		FactoryWindows[i] = W;
 	}
+
+	for(i=0; i<20; i++)
+		if(FactoryWindows[i] != None)
+			FactoryWindows[i].Refresh(False, True);
 
 	// Load custom UBrowser pages
 	if(i < 50)
@@ -195,6 +202,7 @@ defaultproperties
      ServerListNames(2)=UBrowserAll
      bKeepMasterServer=True
      FavoritesName="Favorites"
+     RecentName="Recent servers"
      IRCName="Chat"
      MOTDName="News"
      ServerListWindowClass="UBrowser.UBrowserServerListWindow"

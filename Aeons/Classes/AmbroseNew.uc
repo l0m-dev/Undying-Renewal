@@ -46,9 +46,9 @@ class ambrosenew expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=grow TIME=.641 FUNCTION=AmbroseGrow
 //#exec MESH NOTIFY SEQ=grow TIME=1.00 FUNCTION=AmbroseStartGiantNormal
 //#exec MESH NOTIFY SEQ=shrink TIME=.100 FUNCTION=AmbroseShrink
-//#exec MESH NOTIFY SEQ=shrink TIME=1.00 FUNCTION=AmbroseStartWeakened
+////#exec MESH NOTIFY SEQ=shrink TIME=1.00 FUNCTION=AmbroseStartWeakened
 
-//#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.00 FUNCTION=AmbrosePutStoneOnGround
+////#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.00 FUNCTION=AmbrosePutStoneOnGround
 //#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.440 FUNCTION=AmbrosePutStoneInHand
 //#exec MESH NOTIFY SEQ=stoneslaminaxe TIME=0.980 FUNCTION=AmbrosePutStoneInAxe
 
@@ -56,8 +56,8 @@ class ambrosenew expands ScriptedBiped;
 
 //#exec MESH NOTIFY SEQ=specialkill_swat TIME=0.153 FUNCTION=Obliterate
 
-//#exec MESH NOTIFY SEQ=walk_giant_intro TIME=1.000 FUNCTION=walk_giant
-//#exec MESH NOTIFY SEQ=walk_giant TIME=1.0 FUNCTION=walk_giant
+////#exec MESH NOTIFY SEQ=walk_giant_intro TIME=1.000 FUNCTION=walk_giant
+////#exec MESH NOTIFY SEQ=walk_giant TIME=1.0 FUNCTION=walk_giant
 
 
 //#exec MESH NOTIFY SEQ=attack_axeslam_giant TIME=0.146 FUNCTION=PlaySound_N ARG="VEffortA CHANCE=0.7 PVar=0.1"
@@ -81,8 +81,8 @@ class ambrosenew expands ScriptedBiped;
 
 //#exec MESH NOTIFY SEQ=death_beheadspin TIME=0.0 FUNCTION=PlaySound_N ARG="BSpin"
 
-//#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.46 FUNCTION=C_FS
-//#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.8 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.46 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=defense_houndthrow TIME=0.8 FUNCTION=C_FS
 
 //#exec MESH NOTIFY SEQ=grow TIME=0.0 FUNCTION=PlaySound_N ARG="GrowA"
 //#exec MESH NOTIFY SEQ=grow TIME=0.27665 FUNCTION=PlaySound_N ARG="GiantFS"
@@ -116,7 +116,7 @@ class ambrosenew expands ScriptedBiped;
 //#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="VEffortB CHANCE=0.5 PVar=0.1 V=.7 VVar=0.2"
 //#exec MESH NOTIFY SEQ=walk_giant TIME=0.583 FUNCTION=PlaySound_N ARG="GiantFS"
 //#exec MESH NOTIFY SEQ=walk_giant TIME=0.806 FUNCTION=PlaySound_N ARG="GiantFSScuff"
-//#exec MESH NOTIFY SEQ=walk_giant TIME=0.722222 FUNCTION=C_FS
+////#exec MESH NOTIFY SEQ=walk_giant TIME=0.722222 FUNCTION=C_FS
 
 //#exec MESH NOTIFY SEQ=defense_houndshake TIME=0.354 FUNCTION=PlaySound_N ARG="GrabA CHANCE=0.5 PVar0.2 VVar=0.2"
 

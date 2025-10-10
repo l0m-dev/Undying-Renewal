@@ -3,7 +3,7 @@
 //=============================================================================
 class DynamiteAmmo expands Ammo;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 //#exec MESH IMPORT MESH=Dynamite_m SKELFILE=Dynamite_m.ngf
 
@@ -176,19 +176,6 @@ auto state Pickup
 			}
 	}
 
-	function Trigger( Actor Other, Pawn EventInstigator )
-	{
-		local PlayerPawn P;
-		
-		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			break;
-		}
-
-		if ( p!= none )
-			Touch(P);
-	}
-
 	function Touch( actor Other )
 	{
 		local Inventory Copy;
@@ -218,12 +205,6 @@ auto state Pickup
 			PlaySound (PickupSound,,2.0);	
 			Pickup(Copy).PickupFunction(Pawn(Other));
 		}*/
-	}
-
-	function BeginState()
-	{
-		Super.BeginState();
-		NumCopies = 0;
 	}
 }
 

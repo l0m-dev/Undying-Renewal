@@ -68,7 +68,7 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 function Shutdown(optional bool bBySuperset)
 {
 	Super.Shutdown(bBySuperset);
-	SupersetWindow.RemoveSubset(Self);
+	//SupersetWindow.RemoveSubset(Self);
 }
 
 function ConsiderItem(UBrowserServerList L)
@@ -101,12 +101,12 @@ function ConsiderItem(UBrowserServerList L)
 	if(MaxPing != 0 && L.Ping > MaxPing)
 		return;
 
-	if( PingedList.FindExistingServer( L.IP, L.QueryPort ) != None)
+	if( Owner.FindExistingServer( L.IP, L.QueryPort ) != None)
 		return;
 
 	NewItem = UBrowserServerList(Owner.CopyExistingListItem(L.Class, L));
-	NewItem.Remove();
-	PingedList.AppendItem(NewItem);
+	
+	Owner.MoveItemSorted(NewItem);
 	Owner.bNeedUpdateCount = True;
 }
 

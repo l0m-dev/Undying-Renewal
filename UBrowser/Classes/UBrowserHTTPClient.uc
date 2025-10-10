@@ -114,8 +114,9 @@ function SetError(int Code)
 	CurrentState = HadError;
 	ErrorCode = Code;
 
-	if(!IsConnected() || !Close())
-		HTTPError(ErrorCode);
+	if(IsConnected())
+		Close();
+	HTTPError(ErrorCode);
 }
 
 event Closed()

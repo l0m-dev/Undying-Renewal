@@ -64,26 +64,6 @@ native(475) final function ReplaceTexture( Texture Tex );
 native(476) final function TextSize( string Text, out float XL, out float YL, Font Font );
 */
 
-function UpdateText()
-{
-	local int i;
-	
-	Text = "";
-	
-	Title = Localize(GetHumanName(), "Title", "Aeons");
-	Objectives = Localize(GetHumanName(), "Objectives", "Aeons");
-	for ( i=0; i<MAX_LINES; i++ )
-	{
-		Lines[i] = Localize(GetHumanName(), "Lines["$i$"]", "Aeons");
-		
-		if ( Lines[i] == "" || Left(Lines[i], 2) == "<?")
-			break;
-		log(Lines[i], 'Lines');
-		Text = Text $ Lines[i];	
-		Lines[i] = "";
-	}
-}
-
 function PostBeginPlay()
 {
 	local int i;
@@ -104,13 +84,6 @@ function PostBeginPlay()
 		Text = Text $ Lines[i];	
 		Lines[i] = "";
 	}
-}
-
-event StartLevel()
-{
-	// needed for non ansi languages
-	if (!bInitialized)
-		UpdateText();
 }
 
 static function string GetWord(string SearchString)
@@ -423,4 +396,5 @@ defaultproperties
      Icon=Texture'Aeons.bk_book'
      MAX_LINES=150
      NumPages=1
+     RemoteRole=ROLE_None
 }

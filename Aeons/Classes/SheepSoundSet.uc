@@ -3,7 +3,7 @@
 //=============================================================================
 class SheepSoundSet expands CreatureSoundSet;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+////#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 var(Sounds) CreatureSoundGroup	VDamage;
 var(Sounds) CreatureSoundGroup	VDeath;

@@ -61,6 +61,7 @@ var int SelectedSlot;
 var bool RememberBootShell;
 
 var sound ChangeSound;
+var sound SelectSound;
 
 var string OldServerSavesList;
 
@@ -178,9 +179,9 @@ function Created()
 
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'sload_cancel_up';
-	Cancel.DownTexture = texture'sload_cancel_dn';
-	Cancel.OverTexture = texture'sload_cancel_ov';
+	Cancel.UpTexture =   texture'ShellTextures.sload_cancel_up';
+	Cancel.DownTexture = texture'ShellTextures.sload_cancel_dn';
+	Cancel.OverTexture = texture'ShellTextures.sload_cancel_ov';
 	Cancel.DisabledTexture = None;
 
 
@@ -199,10 +200,10 @@ function Created()
 
 	Load.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Load.UpTexture =   texture'sload_Load_up';
-	Load.DownTexture = texture'sload_Load_dn';
-	Load.OverTexture = texture'sload_Load_ov';
-	Load.DisabledTexture = texture'sload_Load_dn';
+	Load.UpTexture =   texture'ShellTextures.sload_Load_up';
+	Load.DownTexture = texture'ShellTextures.sload_Load_dn';
+	Load.OverTexture = texture'ShellTextures.sload_Load_ov';
+	Load.DisabledTexture = texture'ShellTextures.sload_Load_dn';
 
 // Save Button
 	Save = ShellButton(CreateWindow(class'ShellButton', 10, 10, 10, 10));
@@ -219,10 +220,10 @@ function Created()
 
 	Save.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Save.UpTexture =   texture'sload_Save_up';
-	Save.DownTexture = texture'sload_Save_dn';
-	Save.OverTexture = texture'sload_Save_ov';
-	Save.DisabledTexture = texture'sload_Save_dn';
+	Save.UpTexture =   texture'ShellTextures.sload_Save_up';
+	Save.DownTexture = texture'ShellTextures.sload_Save_dn';
+	Save.OverTexture = texture'ShellTextures.sload_Save_ov';
+	Save.DisabledTexture = texture'ShellTextures.sload_Save_dn';
 
 // Delete Button
 	Delete = ShellButton(CreateWindow(class'ShellButton', 10, 10, 10, 10));
@@ -239,10 +240,10 @@ function Created()
 
 	Delete.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Delete.UpTexture =   texture'sload_Delete_up';
-	Delete.DownTexture = texture'sload_Delete_dn';
-	Delete.OverTexture = texture'sload_Delete_ov';
-	Delete.DisabledTexture = texture'sload_Delete_dn';
+	Delete.UpTexture =   texture'ShellTextures.sload_Delete_up';
+	Delete.DownTexture = texture'ShellTextures.sload_Delete_dn';
+	Delete.OverTexture = texture'ShellTextures.sload_Delete_ov';
+	Delete.DisabledTexture = texture'ShellTextures.sload_Delete_dn';
 
 //screenshot
 	ScreenShot = ShellBitmap(CreateWindow(class'ShellBitmap', 10,10,10,10));
@@ -408,6 +409,9 @@ function OverEffect(ShellButton B)
 
 function SelectSlot( int Slot ) 
 {
+	if ( (SelectSound != none) ) 
+		GetPlayerOwner().PlaySound( SelectSound,, 0.25, [Flags]482 );
+	
 	SelectedSlot = Slot + CurrentRow;
 
 /*
@@ -570,6 +574,9 @@ function DoLoad()
 
 	PlayNewScreenSound();
 
+	// allow main menu to close
+	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;	
+
 	Close();
 	ParentWindow.Close();
 	AeonsRootWindow(Root).MainMenu.Close();
@@ -589,9 +596,9 @@ function DoLoad()
 
 function LoadPressed()
 {
-	RememberBootShell = GetPlayerOwner().Level.bLoadBootShellPSX2;
+	//RememberBootShell = GetPlayerOwner().Level.bLoadBootShellPSX2;
 
-	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;	
+	//GetPlayerOwner().Level.bLoadBootShellPSX2 = false;	
 	ShowConfirm(Load);
 }
 
@@ -840,14 +847,12 @@ function UpdateScreenshot(bool bClear)
 	local texture NewTex;
 
 	// don't wait for garbage collector to destroy the loaded textures
-	// caused texture corruption after clicking on a non empty slot, loading a save, clicking on a non empty slot, then on an empty slot and clicking save game
-	//if (ScreenShot.T != None && bDynamicScreenshotLoaded)
-	//{
-	//	class'Utility'.static.DestroyTexture(ScreenShot.T);
-	//	ScreenShot.T = None; 
-	//	bDynamicScreenshotLoaded = false;
-	//	GetPlayerOwner().ConsoleCommand("FLUSH"); // causes lag in d3d renderer, but fixes texture corruption
-	//}
+	if (ScreenShot.T != None && bDynamicScreenshotLoaded)
+	{
+		class'Utility'.static.DestroyTexture(ScreenShot.T);
+		ScreenShot.T = None; 
+		bDynamicScreenshotLoaded = false;
+	}
 
 	if (bClear)
 	{
@@ -900,7 +905,7 @@ function UpdateButtons()
 	// after this call SaveStrings are filled with each save's information
 	ParseSavedGameList(SaveList);
 
-	log("LoadSaveWindow: UpdateButtons: SaveList = " $ SaveList);
+	//log("LoadSaveWindow: UpdateButtons: SaveList = " $ SaveList);
 
 	FreeSlot = -1;
 
@@ -942,11 +947,11 @@ function UpdateButtons()
 			
 			MapNames[slotIndex] = SaveMap;
 
-			log("map name  = " $ SaveMap);
+			//log("map name  = " $ SaveMap);
 
 			SaveTime = Right(Temp, Len(Temp)-Token-1);
 
-			log("save time = " $ SaveTime);
+			//log("save time = " $ SaveTime);
 			
 			listIndex = slotIndex - CurrentRow;
 			
@@ -1057,8 +1062,8 @@ function QuestionAnswered( UWindowWindow W, int Answer )
 			// answered no
 			else
 			{
-				GetPlayerOwner().Level.bLoadBootShellPSX2 = RememberBootShell;
-				RememberBootShell = false;
+				//GetPlayerOwner().Level.bLoadBootShellPSX2 = RememberBootShell;
+				//RememberBootShell = false;
 			}
 
 
@@ -1104,12 +1109,13 @@ function QuestionAnswered( UWindowWindow W, int Answer )
 defaultproperties
 {
 	 ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
-     BackNames(0)="UndyingShellPC.LoadSave_0"
-     BackNames(1)="UndyingShellPC.LoadSave_1"
-     BackNames(2)="UndyingShellPC.LoadSave_2"
-     BackNames(3)="UndyingShellPC.LoadSave_3"
-     BackNames(4)="UndyingShellPC.LoadSave_4"
-     BackNames(5)="UndyingShellPC.LoadSave_5"
+	 SelectSound=Sound'Shell_HUD.Shell.SHELL_Scroll'
+     BackNames(0)="ShellTextures.LoadSave_0"
+     BackNames(1)="ShellTextures.LoadSave_1"
+     BackNames(2)="ShellTextures.LoadSave_2"
+     BackNames(3)="ShellTextures.LoadSave_3"
+     BackNames(4)="ShellTextures.LoadSave_4"
+     BackNames(5)="ShellTextures.LoadSave_5"
      QuickSaveText="%time (Quicksave) - %map"
      SaveText="%time - %map"
      EmptyText="E m p t y "

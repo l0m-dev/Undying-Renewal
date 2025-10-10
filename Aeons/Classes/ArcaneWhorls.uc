@@ -24,6 +24,15 @@ function BeginPlay()
 	// fx = Spawn(class 'ActiveEtherTrapFX',,,Location, Rotator(vect(0,0,1)));
 }
 
+function PickupFunction(Pawn Other)
+{
+	Super.PickupFunction(Other);
+	
+	Player = AeonsPlayer(Other);
+	ClientGiveArcaneWhorls(Player);
+	GotoState('GiveWhorl');
+}
+
 auto state Pickup
 {	
 	// Validate touch, and if valid trigger event.
@@ -31,7 +40,7 @@ auto state Pickup
 	{
 		local Actor A;
 
-		if (Other.IsA('AeonsPlayer') && Pawn(Other).bIsPlayer && (Pawn(Other).Health > 0))
+		if (Other.IsA('AeonsPlayer') && Pawn(Other).bIsPlayer && (Pawn(Other).Health > 0) && Level.Game.PickupQuery(Pawn(Other), self))
 		{
 			if( Event != '' )
 				foreach AllActors( class 'Actor', A, Event )
@@ -39,31 +48,6 @@ auto state Pickup
 			return true;
 		}
 		return false;
-	}
-
-	function Touch( actor Other )
-	{
-		local Inventory Copy;
-		if ( ValidTouch(Other) ) 
-		{
-			Copy = SpawnCopy(Pawn(Other));
-			if (Level.Game.LocalLog != None)
-				Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
-			if (Level.Game.WorldLog != None)
-				Level.Game.WorldLog.LogPickup(Self, Pawn(Other));
-			if (bActivatable && Pawn(Other).SelectedItem==None) 
-				Pawn(Other).SelectedItem=Copy;
-			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
-			if ( PickupMessageClass == None )
-				Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
-			else
-				Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
-			PlaySound (PickupSound,,2.0);	
-			Pickup(Copy).PickupFunction(Pawn(Other));
-			Player = AeonsPlayer(Other);
-			ClientGiveArcaneWhorls(Player);
-			GotoState('GiveWhorl');
-		}
 	}
 
 	function BeginState()

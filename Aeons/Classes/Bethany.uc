@@ -5,10 +5,10 @@ class Bethany expands ScriptedFlyer;
 //#exec MESH IMPORT MESH=Bethany_m SKELFILE=Bethany.ngf INHERIT=Verago_m
 //#exec MESH MODIFIERS Sac1:Jello
 
-//#exec MESH NOTIFY SEQ=telekinesis TIME=0.90 FUNCTION=CastWard
-//#exec MESH NOTIFY SEQ=spell_circle TIME=0.90 FUNCTION=SummonCreature
-//#exec MESH NOTIFY SEQ=spell_draw TIME=0.90 FUNCTION=SummonCreature2
-//#exec MESH NOTIFY SEQ=forceblast TIME=0.200 FUNCTION=PushBack		
+////#exec MESH NOTIFY SEQ=telekinesis TIME=0.90 FUNCTION=CastWard
+////#exec MESH NOTIFY SEQ=spell_circle TIME=0.90 FUNCTION=SummonCreature
+////#exec MESH NOTIFY SEQ=spell_draw TIME=0.90 FUNCTION=SummonCreature2
+////#exec MESH NOTIFY SEQ=forceblast TIME=0.200 FUNCTION=PushBack		
 
 //#exec MESH NOTIFY SEQ=death_behead TIME=0.5 FUNCTION=LoseMyHead
 //#exec MESH NOTIFY SEQ=death_behead TIME=0.970 FUNCTION=LoopFallingDeath

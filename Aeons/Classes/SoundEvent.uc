@@ -61,6 +61,8 @@ state() Play_a_Sound
 {
 	function BeginState()
 	{
+		bAlwaysRelevant = true; // needs to be relevant to replicate StopSound
+
 		if ( bAutoTimerPlay )
 		{
 			SetTimer(TimerLen + (FRand() * TimerRandom), true);
@@ -335,4 +337,5 @@ defaultproperties
      CollisionRadius=384
      bCollideActors=False
      NetUpdateFrequency=1
+     RemoteRole=ROLE_DumbProxy
 }

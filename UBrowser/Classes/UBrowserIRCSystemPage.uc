@@ -451,7 +451,7 @@ function CheckAway()
 
 function CTCP(string Channel, string Nick, string Message)
 {
-	if(Channel == "")
+	if(Channel == "" || Channel == NickName)
 		SystemText("["$Nick$": "$Message$"]");
 	else
 		SystemText("["$Nick$":"$Channel$" "$Message$"]");

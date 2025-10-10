@@ -244,12 +244,14 @@ simulated function SetupDecalManager()
 
 simulated function AddDecal()
 {
-	DMan.NumDecals ++;
+	if (DMan != None)
+		DMan.NumDecals ++;
 }
 
 simulated function RemoveDecal()
 {
-	DMan.NumDecals --;
+	if (DMan != None)
+		DMan.NumDecals --;
 }
 
 simulated function RenewalConfig GetRenewalConfig()

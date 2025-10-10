@@ -31,10 +31,9 @@ state Activated
 					// wep.AmmoType.AmmoAmount += wep.ClipCount;
 					wep.ClipCount = 0;			// Empty the clip
 					wep.bAltAmmo = true;		// Normal Ammo Type
-					wep.AmmoType.bActive = false;
+					wep.AmmoType.GotoState('Deactivated');
 					wep.AmmoType = Ammo(Pawn(Owner).FindInventoryType(wep.AltAmmoName));
 					wep.gotoState('NewClip');	// Load the New Clip
-					bActive = true;
 				}
 				else if ( wep.ClipCount == 1 )
 				{
@@ -59,7 +58,7 @@ state Activated
 state Deactivated
 {
 	Begin:
-		
+		bActive = false;
 }
 
 defaultproperties

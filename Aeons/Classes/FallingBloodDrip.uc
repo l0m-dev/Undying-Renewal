@@ -3,13 +3,13 @@
 //=============================================================================
 class FallingBloodDrip expands FallingProjectile;
 
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	Velocity = Vector(rotation) * (Speed * (0.75 + FRand()));
 }
 
-function ProcessBounce(vector HitNormal, optional vector vel)
+simulated function ProcessBounce(vector HitNormal, optional vector vel)
 {
 	local vector HitLocation;
 	local int HitJoint;

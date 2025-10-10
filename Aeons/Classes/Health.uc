@@ -16,11 +16,10 @@ var bool bHealingRoot;
 var float inc;
 var vector InitialLocation;
 var ParticleFX pfx;
-var string MaxHealthMessage;
+var localized string MaxHealthMessage;
 
 simulated function PreBeginPlay()
 {
-	MaxHealthMessage = Localize("Aeons.Health", "MaxHealthMessage", "Renewal");
 	Disable('Tick');
 }
 
@@ -89,7 +88,7 @@ simulated function Tick(float DeltaTime)
 	}
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( pfx != none )
 	{
@@ -100,63 +99,77 @@ function Destroyed()
 
 function PickupFunction(Pawn Other)
 {
+	Super.PickupFunction(Other);
 	if ( pfx != none )
 	{
 		pfx.Shutdown();
 		pfx = none;
 	}
-	super.PickupFunction(Other);
+	if ( Other.IsA('AeonsPlayer') )
+	{
+		HealthModifier(AeonsPlayer(Other).HealthMod).NumHealths ++;
+	}
+}
+
+function bool HandlePickupQuery( inventory Item )
+{
+	if ( item.IsA('Health') && Health(item).bHealthVial && GetRenewalConfig().bAutoUseHealthVials )
+	{
+		// don't do anything extra
+		// return false to say picking up wasn't handled by this function
+		return false;
+	}
+
+	return Super.HandlePickupQuery(Item);
 }
 
 auto state Pickup
-{	
+{
+	function bool ValidTouch( actor Other )
+	{
+		local AeonsPlayer AP;
+		local Inventory Inv;
+		local int HealthPacks;
+
+		AP = AeonsPlayer(Other);
+		if ( AP != None )
+		{
+			// health vial check
+			if (bHealthVial && GetRenewalConfig().bAutoUseHealthVials)
+			{
+				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget >= 100)
+					return false;
+
+				return Super.ValidTouch(Other);
+			}
+
+			// health limit check
+			Inv = AP.Inventory.FindItemInGroup(default.InventoryGroup);
+			if (Inv != None)
+				HealthPacks = Pickup(Inv).numCopies + 1;
+			
+			if (GetRenewalConfig().bLimitHealth && (
+				(Level.Game.Difficulty == 0 && HealthPacks >= 15) ||
+				(Level.Game.Difficulty == 1 && HealthPacks >= 10) ||
+				(Level.Game.Difficulty == 2 && HealthPacks >= 5)))
+			{
+				AP.ClientMessage(MaxHealthMessage, 'Pickup');
+				return false;
+			}
+		}
+
+		return Super.ValidTouch(Other);
+	}
+
 	function Touch( actor Other )
 	{
 		local Inventory Copy;
 		local AeonsPlayer AP;
-		local bool bContinue;
-		local Inventory Inv;
-		local int HealthPacks;
 
-		if ( Other.IsA('AeonsPlayer') )
+		if ( ValidTouch(Other) ) 
 		{
-			AP = AeonsPlayer(Other);
-			Inv = PlayerPawn(Other).Inventory.FindItemInGroup(default.InventoryGroup);
-			if (Inv != None)
-				HealthPacks = Pickup(Inv).numCopies + 1;
-
-			if (((Level.Game.Difficulty == 0) && ( HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65 )) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
-			{
-				// Picking up health when I really need it.
-				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget < 100)
-				{
-					HealthModifier(AP.HealthMod).HealthSurplus += healingAmount;
-					if ( PickupMessageClass == None )
-					{
-						Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
-					} else
-						Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
-					PlaySound (PickupSound,,2.0);
-					if ( Level.Game.ShouldRespawn(self) )
-						GotoState('Sleeping');
-					else
-						Destroy();
-				}
-			} else {
-				// the limmit should be checked in HandlePickupQuery instead
-				if ((Level.Game.Difficulty == 0 && HealthPacks < 15) ||
-				    (Level.Game.Difficulty == 1 && HealthPacks < 10) ||
-				    (Level.Game.Difficulty == 2 && HealthPacks < 5) || !GetRenewalConfig().bLimitHealth) {
-					bContinue = true;
-				} else {
-					Pawn(Other).ClientMessage(MaxHealthMessage, 'Pickup');
-				}
-			}
-		}
-		if ( bContinue && ValidTouch(Other) )
-		{
-			// anything but the player
 			Copy = SpawnCopy(Pawn(Other));
+			AP = AeonsPlayer(Other);
 			if (Level.Game.LocalLog != None)
 				Level.Game.LocalLog.LogPickup(Self, Pawn(Other));
 			if (Level.Game.WorldLog != None)
@@ -164,44 +177,26 @@ auto state Pickup
 			if (bActivatable && Pawn(Other).SelectedItem==None) 
 				Pawn(Other).SelectedItem=Copy;
 			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
-
-			if (AP != None && GetRenewalConfig().bShowQuickSelectHint && Ap.ShowSelectItemHint(PickupMessage))
+			if (AP == None || !GetRenewalConfig().bShowQuickSelectHint || !AP.ShowSelectItemHint(PickupMessage))
 			{
-				// hint was shown successfully
-			}
-			else
-			{
+				// hint was not shown
 				if ( PickupMessageClass == None )
 					Pawn(Other).ClientMessage(PickupMessage, 'Pickup');
 				else
 					Pawn(Other).ReceiveLocalizedMessage( PickupMessageClass, 0, None, None, Self.Class );
 			}
-
-			Pickup(Copy).PickupFunction(Pawn(Other));
-			AmbientSound = none;
-			if ( Other.IsA('AeonsPlayer') )
-			{
-				HealthModifier(AeonsPlayer(Other).HealthMod).NumHealths ++;
-			}
 			PlaySound (PickupSound,,2.0);	
-		}
-		
-	}
+			Pickup(Copy).PickupFunction(Pawn(Other));
 
-	function Trigger( Actor Other, Pawn EventInstigator )
-	{
-		local PlayerPawn P;
-		
-		ForEach AllActors(class 'PlayerPawn', P)
-		{
-			Touch(P);
+			if (AP != None)
+			{
+				if ((Level.Game.Difficulty == 0 && HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
+				{
+					// Picking up health when I really need it.
+					Copy.Activate();
+				}
+			}
 		}
-	}
-
-	function BeginState()
-	{
-		Super.BeginState();
-		NumCopies = 0;
 	}
 }
 
@@ -227,6 +222,7 @@ state Activated
 				
 				Owner.PlaySound(ActivateSound);
 				HealthModifier(AP.HealthMod).HealthSurplus += HealAmt;
+				HealthModifier(AP.HealthMod).UpdateProjectedHealthTarget();
 				numCopies --;
 				//HealthModifier(AP.HealthMod).NumHealths --;
 			}
@@ -240,8 +236,11 @@ state Activated
 		}
 	}
 
-	Begin:
+	function BeginState()
+	{
+		Super.BeginState();
 		Activate();
+	}
 }
 
 state Deactivated
@@ -264,6 +263,7 @@ defaultproperties
      bAmbientGlow=False
      PickupMessage="You gained a Health Pack"
      ItemName="Health"
+     MaxHealthMessage="You cannot carry any more Health"
      PickupViewMesh=SkelMesh'Aeons.Meshes.health_m'
      PickupSound=Sound'Aeons.Inventory.I_HealthPU01'
      ActivateSound=Sound'Wpn_Spl_Inv.Inventory.I_HealthUse01'

@@ -5,46 +5,46 @@ class AeonsPlayer expands PlayerPawn
     config(user)
 	abstract;
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Voiceover.uax PACKAGE=Voiceover
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\Voiceover.uax PACKAGE=Voiceover
 
 // Deaths
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death01.wav" NAME="P_Death01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death02.wav" NAME="P_Death02" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death03.wav" NAME="P_Death03" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death04.wav" NAME="P_Death04" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death_Watr01.wav" NAME="P_Death_Watr01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Drown01.wav" NAME="P_Drown01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death01.wav" NAME="P_Death01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death02.wav" NAME="P_Death02" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death03.wav" NAME="P_Death03" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death04.wav" NAME="P_Death04" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Death_Watr01.wav" NAME="P_Death_Watr01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Deaths/P_Drown01.wav" NAME="P_Drown01" GROUP="Player"
 
 // Footsteps
-//#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn01.wav" NAME="P_Foot_Stn01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn02.wav" NAME="P_Foot_Stn02" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn03.wav" NAME="P_Foot_Stn03" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Watr01.wav" NAME="P_Foot_Watr01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn01.wav" NAME="P_Foot_Stn01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn02.wav" NAME="P_Foot_Stn02" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Stn03.wav" NAME="P_Foot_Stn03" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/FootSteps/P_Foot_Watr01.wav" NAME="P_Foot_Watr01" GROUP="Player"
 
 // Swimming Noises
-//#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim01.wav" NAME="P_Swim01" GROUP="SharedHuman"
-//#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim02.wav" NAME="P_Swim02" GROUP="SharedHuman"
-//#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
+////#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim01.wav" NAME="P_Swim01" GROUP="SharedHuman"
+////#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim02.wav" NAME="P_Swim02" GROUP="SharedHuman"
+////#exec AUDIO IMPORT FILE="Sounds/Swimming/P_Swim03.wav" NAME="P_Swim03" GROUP="SharedHuman"
 
 // Misc
 //#exec AUDIO IMPORT FILE="Sounds/Miscellaneous/P_Gasp_Air01.wav" NAME="P_Gasp_Air01" GROUP="Player"
 
 // Take Hits
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt02.wav" NAME="P_Hit_Hurt02" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt03.wav" NAME="P_Hit_Hurt03" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt04.wav" NAME="P_Hit_Hurt04" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Watr01.wav" NAME="P_Hit_Watr01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Watr02.wav" NAME="P_Hit_Watr02" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt01.wav" NAME="P_Hit_Hurt01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt02.wav" NAME="P_Hit_Hurt02" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt03.wav" NAME="P_Hit_Hurt03" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Hurt04.wav" NAME="P_Hit_Hurt04" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Watr01.wav" NAME="P_Hit_Watr01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/TakeHits/P_Hit_Watr02.wav" NAME="P_Hit_Watr02" GROUP="Player"
 
 // Jumps and Landings
-//#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Jump01.wav" NAME="P_Jump01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land01.wav" NAME="P_Land01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Grunt01.wav" NAME="P_Land_Grunt01" GROUP="Player"
-//#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Splash01.wav" NAME="P_Land_Splash01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Jump01.wav" NAME="P_Jump01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land01.wav" NAME="P_Land01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Grunt01.wav" NAME="P_Land_Grunt01" GROUP="Player"
+////#exec AUDIO IMPORT FILE="Sounds/Jumps-Landings/P_Land_Splash01.wav" NAME="P_Land_Splash01" GROUP="Player"
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
+#exec OBJ LOAD FILE=..\Sounds\CreatureSFX.uax PACKAGE=CreatureSFX
 
 var(Sounds) sound   Drown;
 var(Sounds) sound	BreathAgain;
@@ -290,7 +290,7 @@ var travel bool bEnteredJeremiahsRoom;
 
 var globalConfig bool bLogGameState;
 
-var private MasterCameraPoint MasterCamPoint; // unused, left for backwards compatibility
+var MasterCameraPoint MasterCamPoint; // unused, left for backwards compatibility with mods
 
 // Modifier states
 var travel bool bWardActive;
@@ -434,6 +434,15 @@ var float LetterboxFadeRatePlayer;
 
 var transient bool bRequestedSkipCutscene;
 
+var localized string SelectItemHint;
+
+var travel bool bOriginalWheels; // use original layout of weapon and offensive/defensive spell wheels
+
+var float SavedTimeDilation;
+var bool bModifiedTimeDilationForSelectObject;
+
+const SELECT_OBJECT_TIME_DILATION = 0.2;
+
 replication
 {
 	// Variables the server should send to the client.
@@ -447,7 +456,7 @@ replication
 		speedMultiplier, bWeaponSound, bMagicSound, OSMMod,
 		bDoubleShotgun, bDrawInvList,
 		bAllowSpellSelectionHUD, bPhoenix,
-		Book, ServerSavesList;
+		Book, Objectives, ServerSavesList;
 
 	reliable if( Role<ROLE_Authority && bNetOwner )
 		JumpHeldTime; //, FireHeldTime
@@ -463,7 +472,7 @@ replication
 	// Functions server can call.
 	unreliable if( Role==ROLE_Authority )
 		ClientPlayTakeHit, GiveJournalClient,
-		ScreenMessage, ProcessObjectives;
+		ScreenMessage;
 
 	// Functions client can call.
 	reliable if( Role<ROLE_Authority )
@@ -500,6 +509,11 @@ event PreBeginPlay()
 	// bDrawInvList = true;		// Draw the inventory list
 	
 	bRenderWeapon = true;
+
+	// give em somethin' to read
+	GiveBook();
+
+	InvDisplayMan = spawn(class 'InvDisplayManager',self,,Location);
 	
 	wind = spawn(class 'PlayerWind',self,,Location);
 	wind.setBase(self);
@@ -516,6 +530,19 @@ event PreBeginPlay()
 	//TypingIndicator = spawn(class 'TypingIndicator',self,,Location + vect(0,0,128));
 	//TypingIndicator.setBase(self);
 }
+
+simulated event Destroyed()
+{
+	Super.Destroyed();
+
+	if ( Book != None )
+		Book.Destroy();
+	if ( InvDisplayMan != None )
+		InvDisplayMan.Destroy();
+	if ( wind != None )
+		wind.Destroy();
+}
+
 
 //==============
 // Encroachment
@@ -874,21 +901,21 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 
 function SetShellPauses(bool bPauses)
 {
-	if (Level.NetMode != NM_DedicatedServer)
+	if ( Level.NetMode == NM_DedicatedServer )
+		return;
+
+	if ( Player != None )
 	{
-		if (Player == None)
-		{
-			return;
-		}
-		if (Level.NetMode == NM_Standalone || !bPauses)
+		if ( Level.NetMode == NM_Standalone || !bPauses )
 			WindowConsole(Player.Console).bShellPauses = bPauses;
 	}
 }
 
 simulated function DisableSaveGame()
 {
-	if (Level.NetMode != NM_Standalone)
+	if ( Level.NetMode != NM_Standalone )
 		return;
+
 	// always allow saving in multiplayer since it saves at the start of the level
 	SetShellPauses(true);
 	Level.bDontAllowSavegame = true;
@@ -897,7 +924,7 @@ simulated function DisableSaveGame()
 simulated function EnableSaveGame()
 {
 	SetShellPauses(false);
-	if (Level.NetMode != NM_Client)
+	if ( Level.NetMode != NM_Client )
 		Level.bDontAllowSavegame = false;
 }
 
@@ -1065,7 +1092,7 @@ exec function TestJournal( string JournalEntryName )
 }
 
 //----------------------------------------------------------------------------
-simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
+function bool GiveJournal(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
 	local JournalEntry TempEntry;
 
@@ -1076,7 +1103,10 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 	
 	if ( JournalClass != None )
 	{	
-		TempEntry = Spawn(JournalClass);
+		if ( Level.NetMode != NM_Standalone )
+			GiveJournalClient(JournalClass, bShowImmediate);
+
+		TempEntry = Spawn(JournalClass, self);
 			
 		if (TempEntry!=None)
 		{
@@ -1085,11 +1115,6 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 				TempEntry.Destroy();
 				return false;
 			}
-		}
-
-		if (Level.NetMode == NM_DedicatedServer)
-		{
-			GiveJournalClient(JournalClass, bShowImmediate);
 		}
 	}
 
@@ -1101,22 +1126,32 @@ simulated function bool GiveJournal(class<JournalEntry> JournalClass, optional b
 
 simulated function GiveJournalClient(class<JournalEntry> JournalClass, optional bool bShowImmediate )
 {
-	GiveJournal(JournalClass, bShowImmediate);
-}
-
-/*
-function GiveJournalClient(int journalId, class<JournalEntry> JournalEntryClass, bool bRead)
-{
 	local JournalEntry TempEntry;
 
-	TempEntry = Spawn(JournalEntryClass);
-				
-	if ( TempEntry != None )
-	{ 
-		BookJournal(Book).SetJournalEntry(journalId, TempEntry, bRead);
+	if (Role == ROLE_Authority)
+	{
+		return;
 	}
+
+	if (Book == None)
+	{
+		return;
+	}
+
+	TempEntry = Spawn(JournalClass, self);
+			
+	if (TempEntry!=None)
+	{
+		if (!Book.AddEntry( TempEntry, true ))
+		{
+			TempEntry.Destroy();
+			return;
+		}
+	}
+
+	if ( bShowImmediate )
+		ShowBook();
 }
-*/
 
 /*exec brady doesn't want this to be bindable*/ 
 exec function ShowBook()
@@ -3409,6 +3444,8 @@ simulated state PlayerCutScene
 		bSelectDefSpell = 0;
 		bSelectItem = 0;
 
+		bBehindView = false;
+
 		bRequestedSkipCutscene = false;
 	
 		DisableSaveGame();
@@ -3418,9 +3455,8 @@ simulated state PlayerCutScene
 		{
 			// If a cutscene is active and only the client state changed, the client will eventually go back to the PlayerCutScene state
 			// Make sure SetupCutsceneForPlayer is called on the client
-			ForEach AllActors(class 'CutsceneManager', CutsceneManager)
-				break;
-			if (CutsceneManager.IsCutsceneActive())
+			CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+			if (CutsceneManager != None && CutsceneManager.IsCutsceneActive())
 				CutsceneManager.SetupCutsceneForPlayer(self);
 		}
 	}
@@ -3712,7 +3748,14 @@ ignores SeePlayer, HearNoise, Bump;
 			else if ( SelectMode == SM_Weapon )
 				slot = AeonsHud(MyHud).Con_InvGroup[slot];
 			else if ( SelectMode == SM_Item )
+			{
 				slot = AeonsHud(MyHud).Item_InvGroup[slot];
+
+				// prevent selecting and using empty ammo items
+				Inv = Inventory.FindItemInGroup(slot);
+				if ( Inv.IsA('Ammo') && Ammo(Inv).AmmoAmount <= 0 )
+					return;
+			}
 
 			if ( slot >= 100 && bClicked )
 			{
@@ -3893,6 +3936,13 @@ ignores SeePlayer, HearNoise, Bump;
     {
 		if ( AeonsHUD(myHUD) != None )
             AeonsHUD(myHUD).InitSelectMode();
+
+		if ( !bModifiedTimeDilationForSelectObject && Level.NetMode == NM_Standalone && GetRenewalConfig().bSlomoSelection )
+		{
+			bModifiedTimeDilationForSelectObject = true;
+			SavedTimeDilation = Level.TimeDilation;
+			Level.TimeDilation = SELECT_OBJECT_TIME_DILATION;
+		}
     }
 
     function EndState()
@@ -3910,6 +3960,13 @@ ignores SeePlayer, HearNoise, Bump;
 		{
 			bSelectObject = false;
 			bAllowSelectionHUD = true;
+		}
+
+		if ( bModifiedTimeDilationForSelectObject )
+		{
+			bModifiedTimeDilationForSelectObject = false;
+			if ( Level.TimeDilation == SELECT_OBJECT_TIME_DILATION )
+				Level.TimeDilation = SavedTimeDilation;
 		}
    }
 }
@@ -6297,6 +6354,8 @@ exec function RenderWeapon()
 
 function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo)
 {
+	if( Speargun(Weapon) != None )
+		Speargun(Weapon).bZoomedIn = false;
 	spawn(class 'CarnageDecal',,,Location, rotator(vect(0,0,1)));
 	Super.Died(Killer, damageType, HitLocation, DInfo);	
 }
@@ -8175,7 +8234,7 @@ function ProcessObjectives( string ObjectivesText )
 	local bool Process;
 	local bool EatChar;
 	
-	log("ProcessObjectives: " $ ObjectivesText);
+	//log("ProcessObjectives: " $ ObjectivesText);
 
 	Remainder = ObjectivesText;
 
@@ -8297,7 +8356,7 @@ function AddObjective( int ObjectiveNumber )
 		return;
 	}
 
-	log("AddObjective: " $ ObjectiveNumber);
+	//log("AddObjective: " $ ObjectiveNumber);
 
 	for ( i=0; i<ArrayCount(Objectives); i++ )
 	{
@@ -8384,7 +8443,7 @@ function RemoveObjective( int ObjectiveNumber )
 {
 	local int i, j, FoundSlot;
 
-	log("RemoveObjective: " $ ObjectiveNumber);
+	//log("RemoveObjective: " $ ObjectiveNumber);
 
 	for ( i=0; i<ArrayCount(Objectives); i++ )
 	{
@@ -8509,8 +8568,8 @@ state CheatFlying
 function RequestSkipCutscene()
 {
 	local CutsceneManager CutsceneManager;
-	ForEach AllActors(class 'CutsceneManager', CutsceneManager)
-		break;
+
+	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
 	CutsceneManager.SkipCutscene();
 }
 
@@ -8656,7 +8715,7 @@ function bool ShowSelectItemHint(string Line1)
 
 	if (bFoundKey)
 	{
-		KeyName = FormatString(Localize("Misc", "SelectItemHint", "Renewal"), "%key", KeyName);
+		KeyName = FormatString(SelectItemHint, "%key", KeyName);
 		ShowInventoryMessage(Line1, KeyName, 6.0);
 	}
 
@@ -8664,6 +8723,14 @@ function bool ShowSelectItemHint(string Line1)
 	GetRenewalConfig().SaveConfig();
 
 	return bFoundKey;
+}
+
+simulated function bool IsInCutsceneState()
+{
+	local name StateName;
+
+	StateName = GetStateName();
+	return StateName == 'DialogScene' || StateName == 'PlayerCutscene' || StateName == 'SpecialKill';
 }
 
 //----------------------------------------------------------------------------
@@ -8725,4 +8792,5 @@ defaultproperties
      Sprite=Texture'Engine.S_Pawn'
      CollisionRadius=32
      CollisionHeight=64
+     SelectItemHint="Hold [%key] to select items"
 }

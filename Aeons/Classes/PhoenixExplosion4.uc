@@ -7,7 +7,7 @@ class PhoenixExplosion4 expands PhoenixExplosions;
 // add molotov effect explosion here and higher amplitudes.
 
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 

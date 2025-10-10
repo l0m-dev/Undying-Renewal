@@ -6,8 +6,8 @@ class Blood_Statue expands Pawn;
 //#exec MESH IMPORT MESH=Blood_Statue_m SKELFILE=Blood_Statue.ngf
 //#exec MESH ORIGIN X=32
 
-//#exec OBJ LOAD FILE=\Aeons\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Impacts.uax PACKAGE=Impacts
+#exec OBJ LOAD FILE=..\Sounds\LevelMechanics.uax PACKAGE=LevelMechanics
+#exec OBJ LOAD FILE=..\Sounds\Impacts.uax PACKAGE=Impacts
 
 
 //****************************************************************************

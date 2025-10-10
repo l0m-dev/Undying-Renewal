@@ -24,7 +24,7 @@ var() class<ParticleFX>		AttachFX;			//
 //****************************************************************************
 // Inherited functions.
 //****************************************************************************
-function PreBeginPlay()
+simulated function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
@@ -34,7 +34,7 @@ function PreBeginPlay()
 		MyPFX.SetBase( self );
 }
 
-function Destroyed()
+simulated function Destroyed()
 {
 	if ( MyPFX != none )
 		MyPFX.Destroy();

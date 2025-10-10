@@ -83,7 +83,7 @@ function PaintColumn(Canvas C, UWindowGridColumn Column, float MouseX, float Mou
 	if(List == None)
 		Count = 0;
 	else
-		Count = List.Count();
+		Count = List.CountShown();
 
 	if(bShowHorizSB)
 		BottomMargin = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
@@ -153,6 +153,8 @@ function Tick(float DeltaTime)
 
 	if(W.PingState == PS_Done)
 	{
+		TimePassed = TimePassed + DeltaTime;
+
 		if(TimePassed >= AutoPingInterval)
 		{
 			TimePassed = 0;
@@ -167,7 +169,6 @@ function Tick(float DeltaTime)
 			if(SelectedServer != None && !SelectedServer.bPinging)
 				SelectedServer.PingServer(False, True, True);
 		}
-		TimePassed = TimePassed + DeltaTime;
 	}
 }
 
@@ -248,10 +249,24 @@ function JoinServer(UBrowserServerList Server)
 {
 	if(Server != None && Server.GamePort != 0) 
 	{
-		GetPlayerOwner().ClientTravel("unreal://"$Server.IP$":"$Server.GamePort$UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).URLAppend$"?nosave", TRAVEL_Absolute, false);
+		AddRecentServer(Server);
+		if(!Class'UBrowserJoinPWD'.static.MakeClientJoinWithP(Server.IP$":"$Server.GamePort,GetPlayerOwner(),""))
+			GetPlayerOwner().ClientTravel("unreal://"$Server.IP$":"$Server.GamePort$UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).URLAppend$"?Password="$Rand(1000)$"?nosave", TRAVEL_Absolute, false);
 		Root.Console.CloseUWindow();
 		GetParent(class'UWindowFramedWindow').Close();
 	}
+}
+
+function JoinWithPassword(string ServerAddress, string Pass)
+{
+	local UBrowserJoinPW W;
+
+	GetPlayerOwner().ClientTravel("unreal://"$ServerAddress$"?Password="$Pass$"?nosave", TRAVEL_Absolute, false);
+	W = UBrowserJoinPW(GetParent(class'UBrowserJoinPW'));
+	if(W!=None)
+		W.Close();
+	Root.Console.CloseUWindow();
+	GetParent(class'UWindowFramedWindow').Close();
 }
 
 function DoubleClickRow(int Row)
@@ -443,6 +458,37 @@ function int ByPlayers(UBrowserServerList T, UBrowserServerList B)
 function ShowInfo(UBrowserServerList List)
 {
 	UBrowserServerListWindow(GetParent(class'UBrowserServerListWindow')).ShowInfo(List);
+}
+
+function PasswordJoinMenu(UBrowserServerList List)
+{
+	local UBrowserJoinPW PWWindow;
+
+	if(SelectedServer==None)
+		return;
+
+	PWWindow = UBrowserJoinPW(Root.FindChildWindow(class'UBrowserJoinPW'));
+
+	if(Server == None) return;
+
+	if(PWWindow==None)
+	{
+		PWWindow = UBrowserJoinPW(Root.CreateWindow(class'UBrowserJoinPW',10,40,295,80));
+		PWWindow.BringToFront();
+	}
+	else
+	{
+		PWWindow.BringToFront();
+	}
+	PWWindow.WindowTitle = "Join with password - "$List.HostName;
+	PWWindow.EditArea.Grid = Self;
+	PWWindow.EditArea.JoiningServerInfo = SelectedServer;
+	PWWindow.EditArea.ReceiveAddressInfo(SelectedServer.IP$":"$SelectedServer.GamePort);
+}
+
+final function AddRecentServer(UBrowserServerList List)
+{
+	UBrowserRecentServers(UBrowserMainClientWindow(GetParent(class'UBrowserMainClientWindow')).Recent.Page).AddRecentServer(List);
 }
 
 function Refresh()

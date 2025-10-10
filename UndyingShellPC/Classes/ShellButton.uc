@@ -76,15 +76,23 @@ function Paint(Canvas C, float X, float Y)
 	SaveStyle = C.Style;
 
 	// shadow
-	if ( false && bDrawShadow && Style == 5 && UpTexture != None )
+	if ( bDrawShadow && UpTexture != None )
 	{
 		ScaledShadowOffset = ShadowOffset*Root.ScaleY;
 
-		C.Style = 5;
+		if ( Style == 5 )
+		{
+			C.Style = 5;
+			C.DrawColor.a = 100;
+		}
+		else
+		{
+			C.Style = 1;
+		}
+
 		C.DrawColor.r = 0;
 		C.DrawColor.g = 0;
 		C.DrawColor.b = 0;
-		C.DrawColor.a = 100;
 		//C.bNoSmooth = false;
 
 		C.OrgX += ScaledShadowOffset;

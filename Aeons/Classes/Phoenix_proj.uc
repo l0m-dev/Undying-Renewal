@@ -3,7 +3,7 @@
 //=============================================================================
 class Phoenix_proj expands SpellProjectile;
 
-// #exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix_proj_m.ngf
+//// #exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix_proj_m.ngf
 //#exec MESH IMPORT MESH=Phoenix_m SKELFILE=Phoenix.ngf INHERIT=DarkBat_m
 
 var Pawn Guider;
@@ -58,7 +58,7 @@ simulated function ProcessTouch(Actor Other, Vector HitLocation)
 	if (bCanHitInstigator || Other != Owner)
 	{
 		Other.ProjectileHit(Instigator, HitLocation, (MomentumTransfer * Normal(Velocity)), self, getDamageInfo());
-		if (Other.IsA('Pawn'))
+		if (RGC() && Other.IsA('Pawn'))
 			Pawn(Other).OnFire(true);
 	}
 }
@@ -112,58 +112,56 @@ simulated function Destroyed()
 {
 	local Phoenix W;
 	local name StateName;
+	local SavedMove Next;
 	
 	StateName = GetStateName();
 	if (SmokeTrail != None)
 		SmokeTrail.Shutdown();
 
-	if (Level.NetMode != NM_Client)
+	switch (StateName)
 	{
-		switch (StateName)
-		{
-			case 'Flying':
-				if (LifeSpan > 0)
-				{
-					spawn(class 'PhoenixExplosion', Owner,,Location);
-					if (Level.NetMode == NM_Standalone)
-						spawn (class 'MolotovExplosion',Owner,,Location); // added for now
-				} else {
-					if ( ExpireSound != none )
-						PlaySound(ExpireSound,,2,,4096);
-				}
-				if ( (PlayerPawn(Guider) != None) )
-					PlayerPawn(Guider).ViewTarget = None;
-				break;
+		case 'Flying':
+			if (LifeSpan > 0)
+			{
+				spawn(class 'PhoenixExplosion', Owner,,Location);
+				if (RGC() && Level.NetMode == NM_Standalone)
+					spawn (class 'MolotovExplosion',Owner,,Location); // added for now
+			} else {
+				if ( ExpireSound != none )
+					PlaySound(ExpireSound,,2,,4096);
+			}
+			if ( (PlayerPawn(Guider) != None) )
+				PlayerPawn(Guider).ViewTarget = None;
+			break;
+		
+		case 'Release':
+			switch ( CastingLevel )
+			{
+				case 0:
+					spawn(class 'PhoenixExplosion0', Owner,,Location);
+					break;
+		
+				case 1:
+					spawn(class 'PhoenixExplosion1', Owner,,Location);
+					break;
+		
+				case 2:
+					spawn(class 'PhoenixExplosion2', Owner,,Location);
+					break;
+		
+				case 3:
+					spawn(class 'PhoenixExplosion3', Owner,,Location);
+					break;
+		
+				case 4:
+					spawn(class 'PhoenixExplosion4', Owner,,Location);
+					break;
 			
-			case 'Release':
-				switch ( CastingLevel )
-				{
-					case 0:
-						spawn(class 'PhoenixExplosion0', Owner,,Location);
-						break;
-			
-					case 1:
-						spawn(class 'PhoenixExplosion1', Owner,,Location);
-						break;
-			
-					case 2:
-						spawn(class 'PhoenixExplosion2', Owner,,Location);
-						break;
-			
-					case 3:
-						spawn(class 'PhoenixExplosion3', Owner,,Location);
-						break;
-			
-					case 4:
-						spawn(class 'PhoenixExplosion4', Owner,,Location);
-						break;
-				
-					case 5:
-						spawn(class 'PhoenixExplosion5', Owner,,Location);
-						break;
-				}	
-				break;
-		}
+				case 5:
+					spawn(class 'PhoenixExplosion5', Owner,,Location);
+					break;
+			}	
+			break;
 	}
 	
 	bDestroyed = true;
@@ -172,14 +170,16 @@ simulated function Destroyed()
 
 	While ( FreeMoves != None )
 	{
+		Next = FreeMoves.NextMove;
 		FreeMoves.Destroy();
-		FreeMoves = FreeMoves.NextMove;
+		FreeMoves = Next;
 	}
 
 	While ( SavedMoves != None )
 	{
+		Next = SavedMoves.NextMove;
 		SavedMoves.Destroy();
-		SavedMoves = SavedMoves.NextMove;
+		SavedMoves = Next;
 	}
 
 	if ( (Guider != None) && (Level.NetMode != NM_Client) )
@@ -525,7 +525,7 @@ function PhoenixExpired()
 	Destroy();
 }
 
-auto state Flying
+auto simulated state Flying
 {
 	function Timer()
 	{
@@ -540,7 +540,7 @@ auto state Flying
 		bCanHitInstigator = true;
 	}
 
-	function BeginState()
+	simulated function BeginState()
 	{
 		SmokeTrail = spawn(class'SkullStorm_particles', self,,Location);
 		SmokeTrail.setBase(self);

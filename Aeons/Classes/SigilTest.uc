@@ -3,8 +3,8 @@
 //=============================================================================
 class SigilTest expands Trigger;
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\fxB2.utx PACKAGE=fxB2
-//#exec OBJ LOAD FILE=\Aeons\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
+#exec OBJ LOAD FILE=..\Textures\fxB2.utx PACKAGE=fxB2
+#exec OBJ LOAD FILE=..\Sounds\Wpn_Spl_Inv.uax PACKAGE=Wpn_Spl_Inv
 
 var int Damage;
 var float MomentumTransfer;

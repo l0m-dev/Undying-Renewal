@@ -49,6 +49,19 @@ class TrsantiLt expands Trsanti;
 //****************************************************************************
 var PersistentWound Wound;
 
+function PreBeginPlay()
+{
+	super.PreBeginPlay();
+	
+	if (RGC())
+	{
+		LongRangeDistance = 800.0;
+
+		MeleeSwitchDistance = 100.0;
+		RangedSwitchDistance = 200.0;
+	}
+}
+
 //****************************************************************************
 // Animation trigger functions.
 //****************************************************************************

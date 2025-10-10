@@ -18,7 +18,7 @@ class Speargun expands AeonsWeapon;
 //#exec MESH IMPORT MESH=Spear_Tribesman_m SKELFILE=Spear_Tribesman.ngf
 //#exec MESH IMPORT MESH=Speargun_Jemaas_m SKELFILE=Speargun_Jemaas.ngf
 
-//#exec MESH IMPORT MESH=speargun_m SKELFILE=speargun_m.ngf
+////#exec MESH IMPORT MESH=speargun_m SKELFILE=speargun_m.ngf
 
 
 //=============================================================================
@@ -274,8 +274,8 @@ state Idle
 		if (Owner == None)
 			return;
 		
-		if (bZoomedIn && (AeonsPlayer(Owner).Weapon == self))
-			AeonsPlayer(Owner).DesiredFOV = AeonsPlayer(Owner).ZoomFOV;
+		//if (bZoomedIn && (AeonsPlayer(Owner).Weapon == self))
+		//	AeonsPlayer(Owner).DesiredFOV = AeonsPlayer(Owner).ZoomFOV;
 
 		if ( bCharged )
 		{

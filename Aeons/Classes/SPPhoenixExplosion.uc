@@ -3,7 +3,7 @@
 //=============================================================================
 class SPPhoenixExplosion expands Explosion;
 
-function CreateExplosion( pawn Inst )
+simulated function CreateExplosion( pawn Inst )
 {
 	local SPPhoenixQuake	PQ;
 	local int				lp;

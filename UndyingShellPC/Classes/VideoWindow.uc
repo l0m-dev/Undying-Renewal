@@ -4,7 +4,8 @@
 class VideoWindow expands ShellWindow;
 
 
-//#exec OBJ LOAD FILE=\aeons\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\sounds\Shell_HUD.uax PACKAGE=Shell_HUD
+#exec OBJ LOAD FILE=..\textures\ShellTextures.utx PACKAGE=ShellTextures
 
 //#exec Texture Import File=Video_0.bmp Mips=Off
 //#exec Texture Import File=Video_1.bmp Mips=Off
@@ -73,6 +74,9 @@ var bool bSaveChanges;
 var int		SmokingWindows[3];
 var float	SmokingTimers[3];
 
+var localized string ChangeDriverText;
+var localized string BitText;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -105,9 +109,9 @@ function Created()
 	Advanced.bBurnable = true;
 	Advanced.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Advanced.UpTexture =   texture'video_advan_up';
-	Advanced.DownTexture = texture'video_advan_dn';
-	Advanced.OverTexture = texture'video_advan_ov';
+	Advanced.UpTexture =   texture'ShellTextures.video_advan_up';
+	Advanced.DownTexture = texture'ShellTextures.video_advan_dn';
+	Advanced.OverTexture = texture'ShellTextures.video_advan_ov';
 	Advanced.DisabledTexture = None;
 
 	// Brightness Slider
@@ -240,7 +244,7 @@ function Created()
 
 	BitDepth_16.Manager = Self;
 	BitDepth_16.Style = 5;
-	BitDepth_16.Text = "16bit";
+	BitDepth_16.Text = "16"$BitText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -267,7 +271,7 @@ function Created()
 
 	BitDepth_32.Manager = Self;
 	BitDepth_32.Style = 5;
-	BitDepth_32.Text = "32bit";
+	BitDepth_32.Text = "32"$BitText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -291,7 +295,7 @@ function Created()
 
 	ChangeDriver.Manager = Self;
 	ChangeDriver.Style = 5;
-	ChangeDriver.Text = "Change Driver";
+	ChangeDriver.Text = ChangeDriverText;
 	TextColor.R = 255;
 	TextColor.G = 255;
 	TextColor.B = 255;
@@ -325,9 +329,9 @@ function Created()
 	OK.bBurnable = true;
 	OK.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	OK.UpTexture =   texture'Video_ok_up';
-	OK.DownTexture = texture'Video_ok_dn';
-	OK.OverTexture = texture'Video_ok_ov';
+	OK.UpTexture =   texture'ShellTextures.Video_ok_up';
+	OK.DownTexture = texture'ShellTextures.Video_ok_dn';
+	OK.OverTexture = texture'ShellTextures.Video_ok_ov';
 	OK.DisabledTexture = None;
 
 // Cancel Button
@@ -347,9 +351,9 @@ function Created()
 	Cancel.bBurnable = true;
 	Cancel.OverSound=sound'Shell_HUD.Shell_Blacken01';	
 
-	Cancel.UpTexture =   texture'Video_cancel_up';
-	Cancel.DownTexture = texture'Video_cancel_dn';
-	Cancel.OverTexture = texture'Video_cancel_ov';
+	Cancel.UpTexture =   texture'ShellTextures.Video_cancel_up';
+	Cancel.DownTexture = texture'ShellTextures.Video_cancel_dn';
+	Cancel.OverTexture = texture'ShellTextures.Video_cancel_ov';
 	Cancel.DisabledTexture = None;
 
 // Driver label.  OpenGl, D3D, Software, etc
@@ -569,9 +573,14 @@ function ChangeDriverPressed()
 {
 	//	ConfirmDriver = MessageBox(ConfirmDriverTitle, ConfirmDriverText, MB_YesNo, MR_No);
 	
-	GetPlayerOwner().EnableSaveGame();
-	
-	GetPlayerOwner().ConsoleCommand("SaveGame 99");
+	AeonsRootWindow(Root).RelaunchedFrom = 1;
+	AeonsRootWindow(Root).SaveConfig();
+
+	if ( !GetPlayerOwner().Level.bLoadBootShellPSX2 )
+	{
+		GetPlayerOwner().EnableSaveGame();
+		GetPlayerOwner().ConsoleCommand("SaveGame 99");
+	}
 	GetPlayerOwner().ConsoleCommand("deletesavelevels");
 	GetPlayerOwner().ConsoleCommand("RELAUNCH -changevideo?-nointro");
 	
@@ -881,10 +890,12 @@ function HideWindow()
 defaultproperties
 {
      ChangeSound=Sound'Shell_HUD.Shell.SHELL_SliderClick'
-     BackNames(0)="UndyingShellPC.Video_0"
-     BackNames(1)="UndyingShellPC.Video_1"
-     BackNames(2)="UndyingShellPC.Video_2"
-     BackNames(3)="UndyingShellPC.Video_3"
-     BackNames(4)="UndyingShellPC.Video_4"
-     BackNames(5)="UndyingShellPC.Video_5"
+     BackNames(0)="ShellTextures.Video_0"
+     BackNames(1)="ShellTextures.Video_1"
+     BackNames(2)="ShellTextures.Video_2"
+     BackNames(3)="ShellTextures.Video_3"
+     BackNames(4)="ShellTextures.Video_4"
+     BackNames(5)="ShellTextures.Video_5"
+     ChangeDriverText="Change Driver"
+     BitText="bit"
 }

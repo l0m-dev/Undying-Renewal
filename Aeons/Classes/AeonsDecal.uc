@@ -10,7 +10,7 @@ class AeonsDecal expands Decal;
 //#exec TEXTURE IMPORT FILE=bld01_DecalG.bmp GROUP=Decals
 //#exec TEXTURE IMPORT FILE=bld02_DecalG.bmp GROUP=Decals
 //#exec TEXTURE IMPORT FILE=bld03_DecalG.bmp GROUP=Decals
-// #exec TEXTURE IMPORT FILE=bld04_DecalG.bmp GROUP=Decals
+//// #exec TEXTURE IMPORT FILE=bld04_DecalG.bmp GROUP=Decals
 //#exec TEXTURE IMPORT FILE=bld05_DecalG.bmp GROUP=Decals
 //#exec TEXTURE IMPORT FILE=bld07_DecalG.bmp GROUP=Decals
 //#exec TEXTURE IMPORT FILE=scrnspry01_DecalG.bmp GROUP=Decals
@@ -47,7 +47,7 @@ class AeonsDecal expands Decal;
 //#exec TEXTURE IMPORT NAME=ExpDecal01 FILE=ExpDecal01.pcx GROUP=Decals
 //#exec TEXTURE IMPORT NAME=ExpDecal02 FILE=ExpDecal02.pcx GROUP=Decals
 //#exec TEXTURE IMPORT NAME=ExpDecal03 FILE=ExpDecal03.pcx GROUP=Decals
-// #exec TEXTURE IMPORT NAME=ExpDecal04 FILE=ExpDecal04.pcx GROUP=Decals
+//// #exec TEXTURE IMPORT NAME=ExpDecal04 FILE=ExpDecal04.pcx GROUP=Decals
 //#exec TEXTURE IMPORT NAME=ExpDecal04 FILE=ExpDecal04.bmp GROUP=Decals
 
 // Fire Burn mark decals
@@ -92,7 +92,7 @@ class AeonsDecal expands Decal;
 //#exec TEXTURE IMPORT NAME=BldSplat14 FILE=BldSplat14.pcx GROUP=Decals
 */
 
-// #exec TEXTURE IMPORT NAME=BloodDecal0 FILE=BloodDecal0.bmp GROUP=Decals
+//// #exec TEXTURE IMPORT NAME=BloodDecal0 FILE=BloodDecal0.bmp GROUP=Decals
 
 // Scrye Blood decals
 //#exec TEXTURE IMPORT NAME=BldScry01 FILE=BldScry01.bmp GROUP=Decals
@@ -100,10 +100,10 @@ class AeonsDecal expands Decal;
 
 // Carnage
 // km moved to a utx package
-//#exec TEXTURE IMPORT NAME=DeadGuyGibs01 FILE=DeadGuyGibs01.bmp GROUP=Decals
-//#exec TEXTURE IMPORT NAME=DeadGuyGibs02 FILE=DeadGuyGibs02.bmp GROUP=Decals
+////#exec TEXTURE IMPORT NAME=DeadGuyGibs01 FILE=DeadGuyGibs01.bmp GROUP=Decals
+////#exec TEXTURE IMPORT NAME=DeadGuyGibs02 FILE=DeadGuyGibs02.bmp GROUP=Decals
 
-//#exec OBJ LOAD FILE=\Aeons\Textures\BloodAndGuts.utx PACKAGE=BloodAndGuts
+#exec OBJ LOAD FILE=..\Textures\BloodAndGuts.utx PACKAGE=BloodAndGuts
 
 //=============================================================================
 //=============================================================================

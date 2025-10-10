@@ -51,7 +51,7 @@ function ToolTip(string strTip)
 
 function Resized()
 {
-	SetSize(300 * Root.ScaleY, 200 * Root.ScaleY);
+	SetSize(350 * Root.ScaleY, 220 * Root.ScaleY);
 	WinLeft = Root.WinWidth - WinWidth - 100 * Root.ScaleY;
 	WinTop = 100 * Root.ScaleY;
 

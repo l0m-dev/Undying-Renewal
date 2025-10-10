@@ -27,6 +27,7 @@ var bool				bPinging;
 var bool				bPingFailed;
 var bool				bPinged;
 var bool				bNoInitalPing;
+var bool				bNeverPinged;
 var bool				bOldServer;
 
 // Rules and Lists
@@ -70,10 +71,24 @@ function QueryFinished(UBrowserServerListFactory Fact, bool bSuccess, optional s
 // Functions for server list entries only.
 function PingServer(bool bInitial, bool bJustThisServer, bool bNoSort)
 {
+	local bool bInstantPing;
+	local int PingAttempts;
+
+	bInstantPing = bInitial && bJustThisServer && 
+		UBrowserServerList(Sentinel) != None && 
+		UBrowserServerList(Sentinel).Owner != None && 
+		UBrowserServerList(Sentinel).Owner.PingedList == Sentinel;
+
 	// Create the UdpLink to ping the server
 	ServerPing = GetPlayerOwner().GetEntryLevel().Spawn(class'UBrowserServerPing');
 	ServerPing.Server = Self;
-	ServerPing.StartQuery('GetInfo', 2);
+	PingAttempts = 2;
+	if(bInstantPing)
+	{
+		PingAttempts = 4;
+		ServerPing.PingTimeout += 3;
+	}
+	ServerPing.StartQuery('GetInfo', PingAttempts);
 	ServerPing.bInitial = bInitial;
 	ServerPing.bJustThisServer = bJustThisServer;
 	ServerPing.bNoSort = bNoSort;
@@ -86,7 +101,7 @@ function ServerStatus()
 	ServerPing = GetPlayerOwner().GetEntryLevel().Spawn(class'UBrowserServerPing');
 	ServerPing.Server = Self;
 	ServerPing.StartQuery('GetStatus', 2);
-	bPinging = True;
+	//bPinging = True;
 }
 
 function StatusDone(bool bSuccess)
@@ -95,7 +110,7 @@ function StatusDone(bool bSuccess)
 	ServerPing.Destroy();
 	ServerPing = None;
 
-	bPinging = False;
+	//bPinging = False;
 
 	RulesList.Sort();
 	PlayerList.Sort();
@@ -122,22 +137,17 @@ function PingDone(bool bInitial, bool bJustThisServer, bool bSuccess, bool bNoSo
 	bPingFailed = !bSuccess;
 	bPinged = True;
 
-	OldSentinel = UBrowserServerList(Sentinel);
+	if(bSuccess)
+		bNeverPinged = False;
+
 	if(!bNoSort)
 	{
-		Remove();
+		OldSentinel = UBrowserServerList(Sentinel);
 
-		// Move to the ping list
-		if(!bPingFailed || (OldSentinel != None && OldSentinel.Owner != None && OldSentinel.Owner.bShowFailedServers))
-		{
-			if(OldSentinel.Owner.PingedList != None)
-				OldSentinel.Owner.PingedList.AppendItem(Self);
-		}
-	}
-	else
-	{
-		if(OldSentinel != None && OldSentinel.Owner != None && OldSentinel != OldSentinel.Owner.PingedList)
-			Log("Unsorted PingDone lost as it's not in ping list!");
+		if(bPingFailed)
+			Remove();
+		else
+			OldSentinel.MoveItemSorted(Self);
 	}
 
 	if(Sentinel != None)
@@ -161,6 +171,9 @@ function PingDone(bool bInitial, bool bJustThisServer, bool bSuccess, bool bNoSo
 			else
 				OldSentinel.PingNext(bInitial, bNoSort);
 		}
+
+	if(bSuccess)
+		ServerStatus();
 }
 
 function ConsiderForSubsets()
@@ -191,9 +204,17 @@ function PingServers(bool bInitial, bool bNoSort)
 
 	for(l = UBrowserServerList(Next);l != None;l = UBrowserServerList(l.Next)) 
 	{
-		l.bPinging = False;
-		l.bPingFailed = False;
-		l.bPinged = False;
+		if(bPinged)
+		{
+			if(l.ServerPing != None && l.ServerPing.bJustThisServer)
+				l.ServerPing.bJustThisServer = false;
+		}
+		else
+		{
+			l.bPinging = False;
+			l.bPingFailed = False;
+			l.bPinged = False;
+		}
 	}
 
 	PingNext(bInitial, bNoSort);
@@ -206,17 +227,24 @@ function PingNext(bool bInitial, bool bNoSort)
 	local bool bDone;
 	
 	TotalPinging = 0;
+
+	Owner.TotalPinged = 0;
+	Owner.TotalServers = 0;
 	
 	bDone = True;
 	for(l = UBrowserServerList(Next);l != None;l = UBrowserServerList(l.Next)) 
 	{
+		if(l.bPinged)
+			Owner.TotalPinged++;
+		Owner.TotalServers++;
+
 		if(!l.bPinged)
 			bDone = False;
 		if(l.bPinging)
 			TotalPinging ++;
 	}
 	
-	if(bDone && Owner != None)
+	if(bDone)
 	{
 		bPinging = False;
 		Owner.PingFinished();
@@ -288,14 +316,17 @@ function UWindowList CopyExistingListItem(Class<UWindowList> ItemClass, UWindowL
 
 function int Compare(UWindowList T, UWindowList B)
 {
-	CompareCount++;
+	//CompareCount++;
 	return UBrowserServerList(Sentinel).Owner.Grid.Compare(UBrowserServerList(T), UBrowserServerList(B));
 }
 
-function AppendItem(UWindowList L)
+function UWindowList Append(Class<UWindowList> C)
 {
-	Super.AppendItem(L);
+	local UWindowList L;
+
+	L = Super.Append(C);
 	UBrowserServerList(Sentinel).bNeedUpdateCount = True;
+	return L;
 }
 
 function Remove()
@@ -327,6 +358,11 @@ function UpdateServerCount()
 	}
 }
 
+function bool ShowThisItem()
+{
+	return !bNeverPinged;
+}
+
 function bool DecodeServerProperties(string Data)
 {
 	return True;
@@ -334,6 +370,6 @@ function bool DecodeServerProperties(string Data)
 
 defaultproperties
 {
-     MaxSimultaneousPing=10
+     MaxSimultaneousPing=20
      PlayerListSortColumn=1
 }

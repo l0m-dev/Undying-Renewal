@@ -7,13 +7,13 @@ class Handmaiden expands ScriptedFlyer;
 
 //#exec MESH NOTIFY SEQ=Attack_Lightning_Start TIME=0.99 FUNCTION=StartLightningAttack
 
-//#exec MESH NOTIFY SEQ=taunt_end TIME=0.99 FUNCTION=EndRecharge
+////#exec MESH NOTIFY SEQ=taunt_end TIME=0.99 FUNCTION=EndRecharge
 
 //#exec MESH NOTIFY SEQ=Defense_Spell TIME=0.800 FUNCTION=CastVortex
 
-//#exec MESH NOTIFY SEQ=Special_Kill_Start TIME=0.99 FUNCTION=Special_Kill_Cycle
-//#exec MESH NOTIFY SEQ=Special_Kill_Cycle TIME=0.99 FUNCTION=Special_Kill_End
-//#exec MESH NOTIFY SEQ=Special_Kill_End TIME=0.99 FUNCTION=FinishSpecialKill
+////#exec MESH NOTIFY SEQ=Special_Kill_Start TIME=0.99 FUNCTION=Special_Kill_Cycle
+////#exec MESH NOTIFY SEQ=Special_Kill_Cycle TIME=0.99 FUNCTION=Special_Kill_End
+////#exec MESH NOTIFY SEQ=Special_Kill_End TIME=0.99 FUNCTION=FinishSpecialKill
 //#exec MESH NOTIFY SEQ=special_kill TIME=0.780 FUNCTION=DropPlayer
 
 

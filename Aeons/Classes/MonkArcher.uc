@@ -7,7 +7,7 @@ function PreBeginPlay()
 {
 	if (RGC())
 	{
-		 WeaponAccuracy = 1.0;
+		WeaponAccuracy = 1.0;
 	}
 	super.PreBeginPlay();
 }

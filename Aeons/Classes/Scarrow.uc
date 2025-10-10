@@ -4,7 +4,7 @@
 class Scarrow expands ScriptedPawn;
 
 //#exec MESH IMPORT MESH=Scarrow_m SKELFILE=Scarrow.ngf
-//#exec MESH ORIGIN MESH=Scarrow_m X=-30
+////#exec MESH ORIGIN MESH=Scarrow_m X=-30
 
 
 //****************************************************************************

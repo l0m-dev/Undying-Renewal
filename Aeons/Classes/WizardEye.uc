@@ -5,7 +5,7 @@ class WizardEye expands Items;
 
 // Use temp mesh for now
 //#exec MESH IMPORT MESH=WizardEye_m SKELFILE=WizardEye.ngf
-// #exec TEXTURE IMPORT NAME=WizEye_Icon FILE=WizEye_Icon.PCX GROUP=Icons FLAGS=2
+//// #exec TEXTURE IMPORT NAME=WizEye_Icon FILE=WizEye_Icon.PCX GROUP=Icons FLAGS=2
 
 var WizardEye_proj wizEye;
 

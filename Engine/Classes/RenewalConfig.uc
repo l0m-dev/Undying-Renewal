@@ -29,6 +29,8 @@ var config bool bMoreSkippableCutscenes;
 var config bool bAnimatedMenu;
 var config bool bSaveThumbnails;
 
+var config bool bSlomoSelection;
+
 // things that are not configurable
 var config bool bShowScryeHint;
 var config bool bShowQuickSelectHint;
@@ -57,16 +59,17 @@ defaultproperties
      bAltHud=False
 	 bShowUsedMana=False
 	 HudScale=1.0
-	 JournalFont="Aeons.Dauphin16_Skinny"
-	 LargeFont="Aeons.MorpheusFont"
-	 MediumFont="Aeons.Dauphin_Grey"
+	 JournalFont="AeonsFonts.Dauphin16_Skinny"
+	 LargeFont="AeonsFonts.MorpheusFont"
+	 MediumFont="AeonsFonts.Dauphin_Grey"
 	 SmallFont="Comic.Comic10"
-	 SaveNameFont="Aeons.Dauphin16_Skinny"
-	 JournalFont="Aeons.Dauphin16_Skinny"
+	 SaveNameFont="AeonsFonts.Dauphin16_Skinny"
+	 JournalFont="AeonsFonts.Dauphin16_Skinny"
 	 SaveNameColor="#ffffff"
 	 JournalColor="#ffffff"
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
+	 bSlomoSelection=False
 	 bShowScryeHint=True
 	 bShowQuickSelectHint=True
 	 fDebug=1.0

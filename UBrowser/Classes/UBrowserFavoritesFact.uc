@@ -38,7 +38,7 @@ function Query(optional bool bBySuperset, optional bool bInitial)
 
 	for(i=0;i<FavoriteCount;i++)
 	{
-		L = FoundServer(ParseOption(Favorites[i], 1), Int(ParseOption(Favorites[i], 2)), "", "Unreal", ParseOption(Favorites[i], 0));
+		L = FoundServer(ParseOption(Favorites[i], 1), Int(ParseOption(Favorites[i], 2)), "", "Undying", ParseOption(Favorites[i], 0));
 		L.bKeepDescription = ParseOption(Favorites[i], 3) ~= (string(True));
 	}
 
@@ -50,16 +50,7 @@ function SaveFavorites()
 	local UBrowserServerList I;
 
 	FavoriteCount = 0;
-	for(I = UBrowserServerList(PingedList.Next); i!=None; I = UBrowserServerList(I.Next))
-	{
-		if(FavoriteCount == 100)
-			break;
-		Favorites[FavoriteCount] = I.HostName$"\\"$I.IP$"\\"$string(I.QueryPort)$"\\"$string(I.bKeepDescription);
-
-		FavoriteCount++;
-	}
-
-	for(I = UBrowserServerList(UnPingedList.Next); i!=None; I = UBrowserServerList(I.Next))
+	for(I = UBrowserServerList(Owner.Next); i!=None; I = UBrowserServerList(I.Next))
 	{
 		if(FavoriteCount == 100)
 			break;

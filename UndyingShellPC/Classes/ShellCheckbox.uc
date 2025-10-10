@@ -70,15 +70,15 @@ function Paint(Canvas C, float X, float Y)
 }
 
 
-function LMouseUp(float X, float Y)
+function LMouseDown(float X, float Y)
 {
 	if(!bDisabled)
 	{	
 		bChecked = !bChecked;
 		SendMessage(DE_Change);
 	}
-	
-	Super.LMouseUp(X, Y);
+
+	Super.LMouseDown(X, Y);
 }
 
 defaultproperties

@@ -263,10 +263,10 @@ function HideWindow()
 
 defaultproperties
 {
-     BackNames(0)="UndyingShellPC.Credits_0"
-     BackNames(1)="UndyingShellPC.Credits_1"
-     BackNames(2)="UndyingShellPC.Credits_2"
-     BackNames(3)="UndyingShellPC.Credits_3"
-     BackNames(4)="UndyingShellPC.Credits_4"
-     BackNames(5)="UndyingShellPC.Credits_5"
+     BackNames(0)="ShellTextures.Credits_0"
+     BackNames(1)="ShellTextures.Credits_1"
+     BackNames(2)="ShellTextures.Credits_2"
+     BackNames(3)="ShellTextures.Credits_3"
+     BackNames(4)="ShellTextures.Credits_4"
+     BackNames(5)="ShellTextures.Credits_5"
 }

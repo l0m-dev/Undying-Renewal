@@ -3,7 +3,7 @@
 //=============================================================================
 class BloodImpactParticles expands ParticleFX;
 
-//#exec Texture Import Name=Blood File=Blood.bmp Mips=Off Flags=2
+////#exec Texture Import Name=Blood File=Blood.bmp Mips=Off Flags=2
 
 defaultproperties
 {

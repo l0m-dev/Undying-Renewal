@@ -76,6 +76,7 @@ function BeforePaint(Canvas C, float X, float Y)
 {
 	local float ClientWidth, ClientHeight;
 	local float FixedHeight;
+	local float ScaledScrollbarWidth;
 
 
 	if(FixedArea != None)
@@ -97,36 +98,38 @@ function BeforePaint(Canvas C, float X, float Y)
 	bShowVertSB = (ClientHeight > WinHeight - FixedHeight);
 	bShowHorizSB = (ClientWidth > WinWidth);
 
+	ScaledScrollbarWidth = LookAndFeel.Size_ScrollbarWidth*Root.ScaleY;
+
 	if(bShowHorizSB)
 	{
 		// re-examine need for vertical SB now we've got smaller client area.
 
 		ClientHeight = ClientArea.DesiredHeight;
 
-		if(ClientHeight <= WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight)
-			ClientHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight;
+		if(ClientHeight <= WinHeight - ScaledScrollbarWidth - FixedHeight)
+			ClientHeight = WinHeight - ScaledScrollbarWidth - FixedHeight;
 
-		bShowVertSB = (ClientHeight > WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight);
+		bShowVertSB = (ClientHeight > WinHeight - ScaledScrollbarWidth - FixedHeight);
 	}
 
 	if(bShowVertSB)
 	{
 		VertSB.ShowWindow();
 		VertSB.WinTop = 0;
-		VertSB.WinLeft = WinWidth - LookAndFeel.Size_ScrollbarWidth;
-		VertSB.WinWidth = LookAndFeel.Size_ScrollbarWidth;
+		VertSB.WinLeft = WinWidth - ScaledScrollbarWidth;
+		VertSB.WinWidth = ScaledScrollbarWidth;
 		if(bShowHorizSB) 
 		{
 			BRBitmap.ShowWindow();
-			BRBitmap.WinWidth = LookAndFeel.Size_ScrollbarWidth;
-			BRBitmap.WinHeight = LookAndFeel.Size_ScrollbarWidth;
-			BRBitmap.WinTop = WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight;
-			BRBitmap.WinLeft = WinWidth - LookAndFeel.Size_ScrollbarWidth;
+			BRBitmap.WinWidth = ScaledScrollbarWidth;
+			BRBitmap.WinHeight = ScaledScrollbarWidth;
+			BRBitmap.WinTop = WinHeight - ScaledScrollbarWidth - FixedHeight;
+			BRBitmap.WinLeft = WinWidth - ScaledScrollbarWidth;
 
 			BRBitmap.T = GetLookAndFeelTexture();
 			//BRBitmap.R = LookAndFeel.SBBackground;
 
-			VertSB.WinHeight = WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight;
+			VertSB.WinHeight = WinHeight - ScaledScrollbarWidth - FixedHeight;
 		}
 		else
 		{
@@ -147,10 +150,10 @@ function BeforePaint(Canvas C, float X, float Y)
 	{
 		HorizSB.ShowWindow();
 		HorizSB.WinLeft = 0;
-		HorizSB.WinTop = WinHeight - LookAndFeel.Size_ScrollbarWidth - FixedHeight;
-		HorizSB.WinHeight = LookAndFeel.Size_ScrollbarWidth;
+		HorizSB.WinTop = WinHeight - ScaledScrollbarWidth - FixedHeight;
+		HorizSB.WinHeight = ScaledScrollbarWidth;
 		if(bShowVertSB)
-			HorizSB.WinWidth = WinWidth - LookAndFeel.Size_ScrollbarWidth;
+			HorizSB.WinWidth = WinWidth - ScaledScrollbarWidth;
 		else
 			HorizSB.WinWidth = WinWidth;
 

@@ -17,7 +17,7 @@ class UWindowRootWindow extends UWindowWindow;
 //#exec TEXTURE IMPORT FILE=Textures\ShellCursor.bmp GROUP="Icons" MIPS=OFF
 
 //!! Japanese text (experimental).
-//#exec OBJ LOAD FILE=..\Textures\Japanese.utx
+////#exec OBJ LOAD FILE=..\Textures\Japanese.utx
 
 var UWindowWindow		MouseWindow;		// The window the mouse is over
 var bool				bMouseCapture;
@@ -80,7 +80,7 @@ function UWindowLookAndFeel GetLookAndFeel(String LFClassName)
 function Created() 
 {
 	LookAndFeel = GetLookAndFeel(LookAndFeelClass);
-	//SetupFonts();
+	SetupFonts();
 
 	DefaultNormalCursor.tex = Texture'MouseCursor';
 	DefaultNormalCursor.HotX = 0;
@@ -292,9 +292,6 @@ function RemoveHotkeyWindow(UWindowWindow W)
 
 function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
 {
-	if (Fonts[F_Normal] == None)
-		UpdateSmallFont(C);
-	
 	switch(Msg) {
 	case WM_KeyDown:
 		if(HotKeyDown(Key, X, Y))
@@ -349,8 +346,6 @@ function CloseActiveWindow()
 function Resized()
 {
 	ResolutionChanged(WinWidth, WinHeight);
-	
-	Fonts[F_Normal] = None;
 
 	ScaleX = WinWidth / OriginalWidth;
 	ScaleY = WinHeight / OriginalHeight;
@@ -368,15 +363,13 @@ function SetScale(float NewScale)
 	ClippingRegion.W = WinWidth;
 	ClippingRegion.H = WinHeight;
 
-	//SetupFonts();
+	SetupFonts();
 
 	Resized();
 }
 
 function SetupFonts(optional Canvas C)
 {
-	local Font LargeFont, MedFont, SmallFont;
-	
 	//!! Japanese text (experimental).
 	/*if( true )
 	{
@@ -386,7 +379,6 @@ function SetupFonts(optional Canvas C)
 		Fonts[F_LargeBold] = Font(DynamicLoadObject("Japanese.Japanese", class'Font'));
 		return;
 	}*/
-	/*
 	if(GUIScale == 2)
 	{
 		Fonts[F_Normal] = Font(DynamicLoadObject("UWindowFonts.Tahoma20", class'Font'));
@@ -400,51 +392,7 @@ function SetupFonts(optional Canvas C)
 		Fonts[F_Bold] = Font(DynamicLoadObject("UWindowFonts.TahomaB10", class'Font'));
 		Fonts[F_Large] = Font(DynamicLoadObject("UWindowFonts.Tahoma20", class'Font'));
 		Fonts[F_LargeBold] = Font(DynamicLoadObject("UWindowFonts.TahomaB20", class'Font'));
-	}
-	*/
-	
-	/*
-	Fonts[F_Normal] =	Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Bold] =		Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Large] =	Font(DynamicLoadObject("Comic.Comic18",		class'Font'));
-	Fonts[F_LargeBold]= Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
-	Fonts[4] =			Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
-	*/
-	/*
-	Fonts[F_Normal] =	AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Bold] =		AeonsHUd(GetPlayerOwner().MyHud).MySmallFont;//Font(DynamicLoadObject("Aeons.Dauphin10_pad2",		class'Font'));
-	Fonts[F_Large] =	AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Comic.Comic18",		class'Font'));
-	Fonts[F_LargeBold]= AeonsHUd(GetPlayerOwner().MyHud).MyLargeFont;//Font(DynamicLoadObject("Aeons.MorpheusFont",class'Font'));
-	Fonts[4] =			AeonsHUd(GetPlayerOwner().MyHud).MyMediumFont;//Font(DynamicLoadObject("Aeons.Dauphin_Grey",class'Font'));
-	Fonts[5] =			Font(DynamicLoadObject("dauphin.Dauphin16",class'Font'));
-	*/
-	
-	LargeFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().LargeFont, class'Font'));
-	MedFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().MediumFont, class'Font'));
-	
-	Fonts[F_Large] =	LargeFont;
-	Fonts[F_LargeBold]= LargeFont;
-	Fonts[4] =			MedFont;
-	Fonts[5] = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SaveNameFont, class'Font'));
-	UpdateSmallFont(C);
-	
-	if (C != None)
-	{
-		C.LargeFont = LargeFont;
-		C.BigFont = LargeFont;
-		C.MedFont = MedFont;
-	}
-}
-
-function UpdateSmallFont(optional Canvas C)
-{
-	Fonts[F_Normal] = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SmallFont, class'Font'));
-	Fonts[F_Bold] = Fonts[F_Normal];
-	
-	if (C != None)
-	{
-		C.SmallFont = Fonts[F_Normal];
-	}
+	}	
 }
 
 function ChangeLookAndFeel(string NewLookAndFeel)

@@ -69,12 +69,12 @@ state Activated
 		if (PlayerPawn(Owner) != None)
 			PlayerPawn(Owner).ScryeTimer -= DeltaTime;
 		
-		if ((PlayerPawn(Owner) == None) || (PlayerPawn(Owner).GetStatename() == 'PlayerCutscene') || (PlayerPawn(Owner).GetStatename() == 'DialogScene') || (PlayerPawn(Owner).GetStatename() == 'SpecialKill'))
+		if ((AeonsPlayer(Owner) == None) || AeonsPlayer(Owner).IsInCutsceneState())
 		{
 			if (bGlowOn)
 			{
 				gotoState('Deactivated');
-				if (PlayerPawn(Owner) != None)
+				if (AeonsPlayer(Owner) != None)
 					AeonsPlayer(Owner).ClientSetScryeModActive(false);
 			}
 		} else {
@@ -179,7 +179,8 @@ state Deactivated
 	{
 		ForEach AllActors(class 'ScriptedPawn', P)
 		{
-			P.ScryeGlow.GotoState('Deactivated');
+			if (P.ScryeGlow != None)
+				P.ScryeGlow.GotoState('Deactivated');
 		}
 		bGlowOn = false;
 	}
@@ -305,7 +306,7 @@ defaultproperties
      EndEvent=EndScrye
      ActiveLoopSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ScryeLoop01'
      EndSound=Sound'Wpn_Spl_Inv.Spells.E_Spl_ScryeEnd01'
-	 SoundRadius=255
+	 SoundRadius=30
      SoundVolume=96
      RemoteRole=ROLE_SimulatedProxy
 }

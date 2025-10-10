@@ -3,7 +3,7 @@
 //=============================================================================
 class SPSkullStormExplosion expands Explosion;
 
-function CreateExplosion( pawn Instigator )
+simulated function CreateExplosion( pawn Instigator )
 {
 	super.CreateExplosion( Instigator );
 

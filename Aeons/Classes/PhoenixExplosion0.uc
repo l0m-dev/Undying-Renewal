@@ -3,7 +3,7 @@
 //=============================================================================
 class PhoenixExplosion0 expands PhoenixExplosions;
 
-function CreateExplosion(Pawn Instigator)
+simulated function CreateExplosion(Pawn Instigator)
 {
 	Super.CreateExplosion(Instigator);
 	HurtRadius(DamageRadius, DamageType, MomentumTransfer, Location, getDamageInfo(DamageType) );
