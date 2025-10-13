@@ -1725,7 +1725,7 @@ simulated final function Actor GetTopOwner()
 	return Top;
 }
 
-static simulated final function TearOff(actor A)
+static final function TearOff(actor A)
 {
 	if (A != None)
 		A.RemoteRole = ROLE_None;

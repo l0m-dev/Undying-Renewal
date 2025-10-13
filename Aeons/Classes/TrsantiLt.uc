@@ -53,12 +53,14 @@ function PreBeginPlay()
 {
 	super.PreBeginPlay();
 	
-	if (RGC())
+	if ( RGC() )
 	{
 		LongRangeDistance = 800.0;
 
 		MeleeSwitchDistance = 100.0;
 		RangedSwitchDistance = 200.0;
+
+		bTakeHeadShot = false;
 	}
 }
 

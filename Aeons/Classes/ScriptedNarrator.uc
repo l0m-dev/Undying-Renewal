@@ -71,7 +71,7 @@ function CheckHatedEnemy( pawn Other )
 
 function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )
 {
-	DebugInfoMessage( ".Died(), Killer is " $ Killer.name $ ", damageType is " $ damageType );
+	DebugInfoMessage( ".Died(), Killer is " $ Killer $ ", damageType is " $ damageType );
 	if ( damageType == 'fire' )
 		Killer = FindPlayer();
 	MyKiller = Killer;

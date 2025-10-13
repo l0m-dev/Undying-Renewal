@@ -1726,7 +1726,7 @@ simulated function CleanUp()
 // Just died.
 function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )
 {
-	DebugInfoMessage( ".Died(), Killer is " $ Killer.name $ " damage is " $ damageType );
+	DebugInfoMessage( ".Died(), Killer is " $ Killer $ " damage is " $ damageType );
 
 	ClearAnims();
 
@@ -1748,10 +1748,13 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	// shotgun gore, on death
 	if ( RGORE() && damageType == 'pellet' && bHackable && !bIsBoss )
 	{
-		if (FRand() > 0.5)
-			Patrick(Killer).DetachJointEx();
-		else
-			Patrick(Killer).DestroyJointEx();
+		if ( Patrick(Killer) != None )
+		{
+			if (FRand() > 0.5)
+				Patrick(Killer).DetachJointEx();
+			else
+				Patrick(Killer).DestroyJointEx();
+		}
 
 		Spawn(class 'SmokyBloodFX',Killer,,HitLocation); // or SmokyBloodSmallFX
 	}
@@ -2056,10 +2059,13 @@ function float XYAngleToEnemy()
 {
 	local vector	DVect;
 
-	DVect = Enemy.Location - Location;
-	DVect.Z = 0.0;
 	if ( Enemy != none )
+	{
+		DVect = Enemy.Location - Location;
+		DVect.Z = 0.0;
 		return Normal(DVect) dot vector(Rotation);
+	}
+
 	return 0.0;
 }
 
@@ -2115,9 +2121,23 @@ function bool EnemyCanSee( vector Loc )
 // Return Enemy location, if direct line of sight or LastSeenPos.
 function vector EnemyAimSpot()
 {
-	if ( ( Enemy != none ) &&
-		 ( EyesCanSee( Enemy.Location ) || !Enemy.bIsPlayer ) )
-		return Enemy.Location;
+	local vector X, Y, Z;
+	local vector EnemyLoc;
+
+	if ( Enemy == none ) 
+		return LastSeenPos;
+
+	if ( bTakeHeadShot )
+	{
+		GetAxes( Enemy.Rotation, X, Y, Z );
+		EnemyLoc = Enemy.Location + ( Z * Enemy.EyeHeight );
+	}
+	else
+		EnemyLoc = Enemy.Location;
+
+	if ( !Enemy.bIsPlayer || EyesCanSee( EnemyLoc ) )
+		return EnemyLoc;
+
 	return LastSeenPos;
 }
 

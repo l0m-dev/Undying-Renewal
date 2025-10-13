@@ -301,7 +301,8 @@ native(235) static final function string Caps   ( coerce string S );
 native(236) static final function string Chr    ( int i );
 native(237) static final function int    Asc    ( string S );
 
-static simulated final function string Trim(coerce string S)
+// String helper functions.
+static final function string Trim(coerce string S)
 {
 	while (Left(S, 1) == " ")
 		S = Right(S, Len(S) - 1);
@@ -310,7 +311,21 @@ static simulated final function string Trim(coerce string S)
 	return S;
 }
 
-static simulated function string FormatString(string Text, string Match, string Replacement)
+static final function string LTrim(coerce string S)
+{
+	while (Left(S, 1) == " ")
+		S = Right(S, Len(S) - 1);
+	return S;
+}
+
+static final function string RTrim(coerce string S)
+{
+	while (Right(S, 1) == " ")
+		S = Left(S, Len(S) - 1);
+	return S;
+}
+
+static final function string FormatString(string Text, string Match, string Replacement)
 {
 	local int i;
 	

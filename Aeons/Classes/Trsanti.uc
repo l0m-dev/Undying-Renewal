@@ -55,12 +55,15 @@ function PreBeginPlay()
 {
 	super.PreBeginPlay();
 
-	if (RGC())
+	if ( RGC() )
 	{
 		LongRangeDistance = 2000.0;
 
 		MeleeSwitchDistance = 250.0;
 		RangedSwitchDistance = 400.0;
+
+		if ( FRand() < (0.25 * Level.Game.Difficulty) )
+			bTakeHeadShot = true;
 	}
 }
 
@@ -178,6 +181,10 @@ function bool DoFarAttack()
 		return Super.DoFarAttack();
 
 	if ( TriggerSwitchToMelee() )
+		return false;
+
+	// same condition as for entering AIRepositionAttack from AIFarAttack, so don't event enter AIFarAttack
+	if ( ClearShot( WeaponLoc(), EnemyAimSpot() ) != none )
 		return false;
 
 	if ( bHasFarAttack )
@@ -697,6 +704,20 @@ state AIFireWeapon
 		}
 		else
 			GotoState( , 'TURRET' );
+	}
+
+	function WeaponReload( SPWeapon ThisWeapon )
+	{
+		if ( RGC() )
+		{
+			if ( Enemy == None || !EyesCanSee( Enemy.Location ) )
+			{
+				GotoState( , 'STOPFIRE' );
+				return;
+			}
+		}
+
+		Super.WeaponReload(ThisWeapon);
 	}
 
 	// *** new (state only) functions ***

@@ -29,7 +29,7 @@ function PreBeginPlay()
 	Tag = QueryName;
 
 	// Bind the listen socket
-	boundport = BindPort(Level.Game.GetServerPort(), true);
+	boundport = BindPort(Level.Game.GetServerPort() + 1, true);
 	if( boundport == 0 )
 	{
 		Log("UdpServerQuery: Port failed to bind.");
