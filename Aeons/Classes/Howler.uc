@@ -223,7 +223,7 @@ function PreSetMovement()
 {
 	super.PreSetMovement();
 	bCanJump = true;
-	if (RGC())
+	if ( RGC() )
 		JumpAttackTime = 0.317; // from attack_slash
 	else
 		JumpAttackTime = 0.5;
@@ -237,7 +237,7 @@ function bool DoFarAttack()
 	dist = DistanceTo( Enemy );
 	maxJumpDist = MeleeRange * 4.0;
 	
-	if (RGC())
+	if ( RGC() )
 	{
 		// prevent him doing a far attack while standing still on an enemy that's far away
 		if (( dist > ( MeleeRange * 2.5 ) ) && VSize(Velocity) / GroundSpeed < 0.75)
@@ -286,10 +286,14 @@ function bool NearStrikeValid( actor Victim, int DamageNum )
 {
 	DebugInfoMessage( ".NearStrikeValid(), DamageNum is " $ DamageNum );
 
-	// only allow damage if the victim is in front of us
-	if ( RGC() && XYAngleToEnemy() < 0 )
+	if ( RGC() )
 	{
-		return false;
+		// only allow damage if the victim is in front of us
+		if ( XYAngleToEnemy() < 0 )
+			return false;
+
+		// in renewal, we use NearStrikeValid to cancel melee attacks and JointStrikeValid is too strict for that
+		return Super.NearStrikeValid( Victim, DamageNum );
 	}
 
 	switch ( DamageNum )
@@ -489,16 +493,16 @@ RESUME:
 
 // Default entry point
 BEGIN:
-	if (RGC())
+	if ( RGC() )
 	{
 		StopMovement();
 		PlayWait();
 
-		if( !NearStrikeValid(Enemy, 0) )
+		if ( !NearStrikeValid(Enemy, 0) )
 		{
 			bDidMeleeAttack = false;
 
-			if( FRand() < 0.25 * (Level.Game.Difficulty + 1) || DistanceTo( Enemy ) > 2.5*DamageRadius )
+			if ( FRand() < 0.25 * (Level.Game.Difficulty + 1) || DistanceTo( Enemy ) > 2.5*DamageRadius )
 			{
 				bMeleeAttackFail = false;
 				GotoState( 'AIFarAttack' );
@@ -545,9 +549,9 @@ DOATTACK:
 	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
 
 INATTACK:
-	if (RGC())
+	if ( RGC() )
 	{
-		if( !NearStrikeValid(Enemy, 0) )	// enemy lost
+		if ( !bDidMeleeDamage && !NearStrikeValid(Enemy, 0) )	// enemy lost
 		{
 			//StopTimer();
 			//GotoState( 'AIFarAttack' );

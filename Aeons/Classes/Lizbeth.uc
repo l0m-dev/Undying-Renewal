@@ -236,11 +236,11 @@ function PlayTaunt()
 
 function PreBeginPlay()
 {
-	if (RGC())
+	if ( RGC() )
 	{
 		FrenzyGroundSpeed = 600;
 		DamageRadius = 160;
-		MeleeRange = 200;
+		MeleeRange = 130;
 		ReactToDamageThreshold = 10;
 	}
 	super.PreBeginPlay();
@@ -535,37 +535,45 @@ function Tick( float DeltaTime )
 
 function bool SpawnHowler()
 {
-	local PlayerPawn Player;
-	
-	Player = PlayerPawn(FindPlayer());
-	
-	if (Howler != None && Howler.Health <= 0)
+	local vector	X, Y, Z;
+	local float 	Offset;
+	local Rotator	HowlerRot;
+	local vector	DVect;
+	local Pawn  	Player;
+
+	if( Howler != None && Howler.Health <= 0 )
 	{
 		Howler.Destroy();
 		Howler = None;
 	}
 	
-	if (Howler == None)
+	if( Howler == None )
 	{
-		Howler = spawn(class 'LizHowler',,,Player.Location, rot(0,0,0));
-		
-		if (Howler == None)
+		Offset = class'LizHowler'.default.CollisionRadius + CollisionRadius;
+		HowlerRot = Rotation;
+
+		// try to spawn the howler towards the player
+		Player = FindPlayer();
+		if( Player != None )
 		{
-			Howler = Spawn( class 'LizHowler',,,Player.Location + FMax( class 'LizHowler'.default.CollisionRadius + Player.CollisionRadius + 50, 72 ) * Vector(Player.Rotation) + vect(0,0,1) * 15 );
+			DVect = Normal(Player.Location - Location);
+			HowlerRot = Rotator(DVect);
+
+			Howler = spawn( Class 'LizHowler',,,Location + DVect * Offset, HowlerRot );
 		}
 		
-		if (Howler == None)
-		{
-			Howler = Spawn( class 'LizHowler',,,Player.Location - FMax( class 'LizHowler'.default.CollisionRadius + Player.CollisionRadius + 50, 72 ) * Vector(Player.Rotation) + vect(0,0,-1) * 15 );
-		}
+		// try to spawn the howler to the right and left
+		GetAxes( Rotation, X, Y, Z );
+		if( Howler == None )
+			Howler = Spawn( class 'LizHowler',,,Location + Y * Offset, HowlerRot );
+		if( Howler == None )
+			Howler = Spawn( class 'LizHowler',,,Location - Y * Offset, HowlerRot );
 		
-		if (Howler != None)
+		if( Howler != None )
 		{
-			//Howler.InitState(Player);
-			Howler.HatedEnemy = Player;
-			Howler.PlaySound_P( "howl" );
-		
-			Spawn( class'HoundSpawnEffect',,, Howler.Location );
+			Howler.PlaySoundScream();
+			Howler.GotoState( 'AIHuntPlayer' );
+			Spawn( class'HoundSpawnEffect',Howler,,Howler.Location );
 		}
 	}
 }

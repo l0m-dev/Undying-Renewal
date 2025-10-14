@@ -183,7 +183,7 @@ function C_BareFS()
 //****************************************************************************
 function PreBeginPlay()
 {
-	if (RGC())
+	if ( RGC() )
 	{
 		DamageRadius = 130;
 		MeleeRange = 100;
@@ -209,7 +209,7 @@ function bool DoFarAttack()
 {
 	local float		dist;
 	
-	if (!RGC())
+	if ( !RGC() )
 		return Super.DoFarAttack();
 
 	dist = DistanceTo( Enemy );
@@ -477,7 +477,7 @@ RESUME:
 
 // Default entry point
 BEGIN:
-	if (RGC())
+	if ( RGC() )
 	{
 		StopMovement();
 		PlayWait();
@@ -533,9 +533,9 @@ DOATTACK:
 	SetTimer( 5.0, false );		// BUGBUG: using timer to bail out when no animation present
 
 INATTACK:
-	if (RGC())
+	if ( RGC() )
 	{
-		if( DistanceTo(Enemy) > DamageRadius )	// enemy lost
+		if( !bDidMeleeDamage && DistanceTo(Enemy) > DamageRadius )	// enemy lost
 		{
 			//StopTimer();
 			//GotoState( 'AIFarAttack' );
@@ -708,13 +708,6 @@ state AIJumpAtEnemy
 	// *** ignored functions ***
 
 	// *** overridden functions ***
-	function bool PlayJumpAttackLanding()
-	{
-		if (RGC())
-			return true;
-		return PlayLanding();
-	}
-	
 	// trigger the jump toward the enemy
 	function TriggerJump()
 	{

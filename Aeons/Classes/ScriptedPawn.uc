@@ -7684,6 +7684,13 @@ state AIJumpAtEnemy
 		StopTimer();
 	}
 
+	function CheckEnemySwitch( pawn Other )
+	{
+		// don't switch enemies while jumping
+		if ( !RGC() )
+			Global.CheckEnemySwitch(Other);
+	}
+
 	// trigger the jump toward the enemy
 	function TriggerJump()
 	{
