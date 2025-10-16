@@ -86,7 +86,7 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 				// AeonsPlayer(Other).MindshatterMod.castingLevel = 3;
 				AeonsPlayer(Other).MindshatterMod.gotoState('Activated');
 				AeonsPlayer(Other).MindshatterMod.manaCost = manaCost;
-				if (Level.NetMode == NM_DedicatedServer)
+				if (Other.RemoteRole == ROLE_AutonomousProxy)
 					MindshatterModifier(AeonsPlayer(Other).MindshatterMod).ClientActivated(castingLevel);
 				spawn(class 'MindshatterExplosionFX',,,Other.Location + Eyeheight, Rotator(Velocity));
 				Other.ProjectileHit( Instigator, HitLocation, vect(0,0,0), self, GetDamageInfo() );

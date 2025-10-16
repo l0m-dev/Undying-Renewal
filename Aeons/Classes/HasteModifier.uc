@@ -98,14 +98,15 @@ state Activated
 		{
 			AeonsPlayer(Owner).Haste ( sMult[CastingLevel] );
 			speedMultiplier = sMult[CastingLevel];
-			AeonsPlayer(Owner).refireMultiplier = RefireMult[CastingLevel];
+			if ( Level.Game.Difficulty < 3 )
+				AeonsPlayer(Owner).refireMultiplier = RefireMult[CastingLevel];
 			SoundModifier(AeonsPlayer(Owner).SoundMod).adjVolume(sMult[CastingLevel]);
 
 			// The player gets a faster mana refresh rate above amplitude 3 ( Casting Level 2 internally )
-			if ( CastingLevel >= 2 )
+			if ( CastingLevel >= 2 && Level.Game.Difficulty < 3 )
 			{
 				// refresh mana faster
-				if (RGC())
+				if ( RGC() )
 					ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.2;
 				else
 					ManaModifier(AeonsPlayer(Owner).ManaMod).fHaste = 1.5;

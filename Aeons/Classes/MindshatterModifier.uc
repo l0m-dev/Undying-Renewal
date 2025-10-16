@@ -389,7 +389,7 @@ function int Dispel(optional bool bCheck)
 	if ( !bCheck )
 	{
 		GotoState('Deactivated');
-		if (Level.NetMode == NM_DedicatedServer)
+		if (Owner.RemoteRole == ROLE_AutonomousProxy)
 		{
 			ClientDeactivated();
 		}

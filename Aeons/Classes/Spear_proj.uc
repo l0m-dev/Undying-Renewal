@@ -166,8 +166,11 @@ auto state Flying
 						if (bGenBlood)
 						{
 							Wound = Spawn(class 'SpearWound',Other,,HitLocation, Rotator(Normal(OldLocation-Location)));
-							Wound.AttachJoint = HitJointName;
-							Wound.setup();
+							if (Wound != None)
+							{
+								Wound.AttachJoint = HitJointName;
+								Wound.setup();
+							}
 						}
 					} 
 					else 

@@ -115,11 +115,6 @@ simulated function PreBeginPlay()
 function ChargeSpear()
 {
 	Speargun(PlayerPawn(Owner).Weapon).Charge();
-	if (Level.NetMode == NM_DedicatedServer)
-	{
-		// move to client side fire spell?
-		Speargun(PlayerPawn(Owner).Weapon).ClientCharge();
-	}
 }
 
 simulated function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
@@ -229,6 +224,14 @@ function FireSpell()
 	// Activate Actuator
 	PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_HardShake, 100000.0f);
 }
+
+simulated function bool ClientFire( float Value )
+{
+	if ( PlayerPawn(Owner).Weapon.IsA('Speargun') && !Speargun(PlayerPawn(Owner).Weapon).bCharged )
+		return false;
+
+	return Super.ClientFire(Value);
+}	
 
 function UpdateMetalDecal(vector Loc, vector n)
 {

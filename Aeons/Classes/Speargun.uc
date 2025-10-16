@@ -41,7 +41,7 @@ var travel bool bZoomedIn;
 
 replication
 {
-	reliable if (Role == ROLE_Authority)
+	reliable if (Owner.RemoteRole == ROLE_AutonomousProxy)
 		ClientCharge, ClientRemoveCharge;
 	reliable if (Role == ROLE_Authority && bNetOwner)
 		bCharged;
@@ -55,33 +55,37 @@ function PreBeginPlay()
 	ProjectileSpeed = class'Spear_proj'.default.speed;
 }
 
-simulated function Charge()
+function Charge()
 {
-	ChargedFX = Spawn(class 'ChargedSpearFX',self,,Location);
-	AeonsPlayer(Owner).OverlayActor = ChargedFX;
+	ClientCharge();
 	// log("Speargun: Charge()", 'Misc');
 	bCharged = true;
 	AmbientSound = ChargedSound;
 	ChargeLen = 0;
 }
 
-simulated function RemoveCharge()
+function RemoveCharge()
 {
-	if (ChargedFX != none)
-		ChargedFX.Destroy();
-	AeonsPlayer(Owner).OverlayActor = none;
+	ClientRemoveCharge();
 	bCharged = false;
 	AmbientSound = None;
 }
 
 simulated function ClientCharge()
 {
-	Charge();
+	ChargedFX = Spawn(class 'ChargedSpearFX',self,,Location);
+	AeonsPlayer(Owner).OverlayActor = ChargedFX;
+	if ( Level.NetMode == NM_Client ) // needed since AmbientSound is not replicated if bClientAnim is set
+		AmbientSound = ChargedSound;
 }
 
 simulated function ClientRemoveCharge()
 {
-	RemoveCharge();
+	if (ChargedFX != none)
+		ChargedFX.Destroy();
+	AeonsPlayer(Owner).OverlayActor = none;
+	if ( Level.NetMode == NM_Client )
+		AmbientSound = None;
 }
 
 function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed, bool bWarn, bool bMakeImpactSound)
@@ -115,10 +119,6 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 
 	ChargeLen = 0;
 	RemoveCharge();
-	if (Level.NetMode == NM_DedicatedServer)
-	{
-		ClientRemoveCharge();
-	}
 	GameStateModifier(AeonsPlayer(Owner).GameStateMod).fSpears = 1.0;
 }
 
@@ -277,20 +277,19 @@ state Idle
 		//if (bZoomedIn && (AeonsPlayer(Owner).Weapon == self))
 		//	AeonsPlayer(Owner).DesiredFOV = AeonsPlayer(Owner).ZoomFOV;
 
-		if ( bCharged )
+		if ( Role == ROLE_Authority )
 		{
-			ChargeLen += DeltaTime;
-			if ( ChargeLen > ChargeTimer )
+			if ( bCharged )
 			{
-				//log("Speargun: Charge has run out ", 'Misc');
-				RemoveCharge();
-				if (Level.NetMode == NM_DedicatedServer)
+				ChargeLen += DeltaTime;
+				if ( ChargeLen > ChargeTimer )
 				{
-					ClientRemoveCharge();
+					//log("Speargun: Charge has run out ", 'Misc');
+					RemoveCharge();
 				}
+			} else {
+				ChargeLen = 0;
 			}
-		} else {
-			ChargeLen = 0;
 		}
 
 		if (Owner != None)
@@ -339,10 +338,6 @@ function Tick(float DeltaTime)
 	if ( ChargeLen >ChargeTimer )
 	{
 		RemoveCharge();
-		if (Level.NetMode == NM_DedicatedServer)
-		{
-			ClientRemoveCharge();
-		}
 	}
 
 	if ( bChangeWeapon )

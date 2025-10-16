@@ -12,7 +12,10 @@ function PickupFunction(Pawn Other)
 {
 	Super.PickupFunction(Other);
 
-	Other.AddManaCapacity(CapacityIncrease);
+     if ( Level.Game.Difficulty >= 3 )
+	     Other.AddManaCapacity(CapacityIncrease / 2);
+     else
+	     Other.AddManaCapacity(CapacityIncrease);
 	Other.DeleteInventory(self);
 }
 

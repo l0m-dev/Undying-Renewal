@@ -13,13 +13,13 @@ function Touch( actor Other )
 			if ( AeonsPlayer(Other).MindshatterMod.isInState('Activated') )
 			{
 				AeonsPlayer(Other).MindshatterMod.gotoState('Deactivated');
-				if (Level.NetMode == NM_Client)
+				if (Owner.RemoteRole == ROLE_AutonomousProxy)
 					MindshatterModifier(AeonsPlayer(Other).MindshatterMod).ClientDeactivated();
 			}
 			else
 			{
 				AeonsPlayer(Other).MindshatterMod.gotoState('Activated');
-				if (Level.NetMode == NM_Client)
+				if (Owner.RemoteRole == ROLE_AutonomousProxy)
 					MindshatterModifier(AeonsPlayer(Other).MindshatterMod).ClientActivated(2);
 			}
 		}

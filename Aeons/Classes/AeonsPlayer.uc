@@ -984,8 +984,9 @@ function ProjectileHit(Pawn Instigator, vector HitLocation, vector Momentum, pro
 
 function TakeDamage( Pawn instigatedBy, Vector hitlocation, Vector momentum, DamageInfo DInfo)
 {
-	local vector playerCoord1, playerCoord2, vd, nvd, PlayerLocation, DamageLocation;
-	local float dp;
+	local vector vd, PlayerLocation, DamageLocation;
+	local float dp, AbsorbedDamage;
+	local ShieldModifier ShieldModifier;
 
 	PlayerLocation = Location;
 	PlayerLocation.z = 0;
@@ -1000,61 +1001,61 @@ function TakeDamage( Pawn instigatedBy, Vector hitlocation, Vector momentum, Dam
 
 	//log("Incoming DamageType = "$DInfo.DamageType, 'Misc');
 	
-	if ( !((DInfo.DamageType == 'Fell') || (DInfo.DamageType == 'FellHard') || (DInfo.DamageType == 'Drown') || (DInfo.DamageType == 'Fire')) )
+	if ( (DInfo.DamageType == 'Fell') || (DInfo.DamageType == 'FellHard') || (DInfo.DamageType == 'Drown') || (DInfo.DamageType == 'Fire') )
 	{
-		if ( self.ShieldMod.isInState('Activated') )
-		{
-			if ( DInfo.DamageType == 'LightningBoltOfGods' )
-			{
-				if ( ShieldModifier(ShieldMod).shieldHealth > 0 )
-				{
-					if (Level.NetMode == NM_DedicatedServer && ShieldModifier(ShieldMod).shieldHealth > DInfo.Damage)
-							ShieldModifier(ShieldMod).ClientAddCrack(1.0);
-					ShieldMod.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
-				}
-				super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
-			} else {
-			
-				vd = vector(ViewRotation);
-				vd.z = 0;
-				playerCoord1 = ( Normal(DamageLocation - PlayerLocation) ) - vd;
-				playerCoord2 = ( Normal(DamageLocation - PlayerLocation) ) + vd;
-
-				dp = Normal(DamageLocation - PlayerLocation) dot vd;
-				
-				/*
-				log("", 'Misc');
-				log("DamageLocation = "$DamageLocation, 'Misc');
-				log("PlayerLocation = "$PlayerLocation, 'Misc');
-				log("Distance = "$( VSize(PlayerLocation - DamageLocation) ),'Misc');
-				log("dot product = "$dp, 'Misc');
-				log("", 'Misc');
-				*/
-				// if ( VSize(PlayerCoord2) < VSize(PlayerCoord1) )
-				if ( dp < 0 )
-				{
-					// Player takes damage
-					//ClientMessage("Shield does not protect the player"$Rand(100));
-					super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
-				} else {
-					// Shield Absorbs damage
-					// ClientMessage("Shield protects the player"$Rand(100));
-					if ( ShieldModifier(ShieldMod).shieldHealth > 0 )
-					{
-						if (Level.NetMode == NM_DedicatedServer &&  ShieldModifier(ShieldMod).shieldHealth > DInfo.Damage)
-							ShieldModifier(ShieldMod).ClientAddCrack(1.0);
-						ShieldMod.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
-					}
-					else
-						super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
-				}
-			}
-		} else {
-			// ClientMessage("TakeDamage: "$Dinfo.Damage);
-			super.TakeDamage( instigatedBy, hitlocation, momentum, DInfo );
-		}
-	} else {
 		super.TakeDamage( instigatedBy, hitlocation, momentum, DInfo );
+		return;
+	}
+	
+	// check for active shield
+	ShieldModifier = ShieldModifier(ShieldMod);
+	if ( !ShieldModifier.isInState('Activated') || ShieldModifier.shieldHealth <= 0 )
+	{
+		// ClientMessage("TakeDamage: "$Dinfo.Damage);
+		super.TakeDamage( instigatedBy, hitlocation, momentum, DInfo );
+		return;
+	}
+
+	if ( DInfo.DamageType == 'LightningBoltOfGods' )
+	{
+		// LightningBoltOfGods was supposed to break the shield and then damage the player?
+		// this didn't work properly, but it doesn't matter since LightningBoltOfGods is never even applied to the player
+		// updated the code in case we end up applying LightningBoltOfGods to the player too
+		ShieldModifier.shieldHealth = 0;
+		ShieldModifier.gotoState('Deactivated');
+
+		super.TakeDamage( instigatedBy, hitlocation, momentum, DInfo );
+		return;
+	}
+
+	vd = vector(ViewRotation);
+	vd.z = 0;
+
+	dp = Normal(DamageLocation - PlayerLocation) dot vd;
+
+	if ( dp >= 0 )
+	{
+		// Shield Absorbs damage
+		// ClientMessage("Shield protects the player"$Rand(100));
+		AbsorbedDamage = FMin(DInfo.Damage, ShieldModifier.shieldHealth);
+		ShieldModifier.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
+
+		if ( Level.Game.Difficulty >= 3 )
+		{
+			// start at 50% damage blocking, add 10% per level
+			DInfo.Damage = AbsorbedDamage * (5 - ShieldModifier.castingLevel) / 10.0;
+			if ( AcceptDamage(DInfo) )
+				Super.TakeDamage(instigatedBy, HitLocation, Momentum, DInfo);
+		}
+
+		if ( RemoteRole == ROLE_AutonomousProxy && ShieldModifier.shieldHealth > 0 )
+			ShieldModifier.ClientAddCrack(1.0);
+	}
+	else
+	{
+		// Player takes damage
+		//ClientMessage("Shield does not protect the player"$Rand(100));
+		super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
 	}
 }
 //----------------------------------------------------------------------------
@@ -2899,7 +2900,7 @@ ignores SeePlayer, HearNoise, Bump;
 			SetPhysics(PHYS_Falling);
 			if (bUpAndOut && CheckWaterJump(HitNormal)) //check for waterjump
 			{
-				velocity.Z = 330 + 2 * CollisionRadius; //set here so physics uses this for remainder of tick
+				velocity.Z = 330 + 2 * CollisionHeight; //set here so physics uses this for remainder of tick, RGC()? this was using CollisionRadius
 				PlayDuck();
 				GotoState('PlayerWalking');
 			}				
@@ -2945,7 +2946,7 @@ ignores SeePlayer, HearNoise, Bump;
 		bUpAndOut = ((X Dot Acceleration) > 0) && ((Acceleration.Z > 0) || (ViewRotation.Pitch > 2048));
 		if ( bUpAndOut && !Region.Zone.bWaterZone && CheckWaterJump(Temp) ) //check for waterjump
 		{
-			velocity.Z = 330 + 2 * CollisionRadius; //set here so physics uses this for remainder of tick
+			velocity.Z = 330 + 2 * CollisionHeight; //set here so physics uses this for remainder of tick, RGC()? this was using CollisionRadius
 			PlayDuck();
 			GotoState('PlayerWalking');
 		}				
@@ -5586,7 +5587,6 @@ function GiveStartupWeapons()
 			newWeapon.BecomeItem();
 			AddInventory(newWeapon);
 			newWeapon.BringUp();
-			//newWeapon.PutDown(); // commented out because stone was getting unselected on new game
 			newWeapon.GiveAmmo(self);
 			newWeapon.SetSwitchPriority(self);
 			newWeapon.WeaponSet(self);
@@ -6041,13 +6041,16 @@ function SpawnGibbedCarcass( vector Dir )
 		Vel.Z = 64;
 		
 		Gib = DetachLimb(JointName(i), Class 'BodyPart');
-		Gib.Velocity = Vel;
-		Gib.DesiredRotation = RotRand(true);
-		Gib.bBounce = true;
-		Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
-		//SetBase(self, JointName(i));
+		if (Gib != None)
+		{
+			Gib.Velocity = Vel;
+			Gib.DesiredRotation = RotRand(true);
+			Gib.bBounce = true;
+			Gib.SetCollisionSize((Gib.CollisionRadius * 0.65), (Gib.CollisionHeight * 0.15));
+			//SetBase(self, JointName(i));
 
-		ReplicateDetachLimb(self, JointName(i), Gib.Velocity, Gib.DesiredRotation);
+			ReplicateDetachLimb(self, JointName(i), Gib.Velocity, Gib.DesiredRotation);
+		}
 	}
 	
 	// km - this is a bit temp :)
@@ -8531,7 +8534,7 @@ state CheatFlying
 			return;
 
 		StartWalk();
-		if ( Level.NetMode == NM_DedicatedServer )
+		if ( RemoteRole == ROLE_AutonomousProxy )
 			GotoState(PlayerReStartState); // needed since state is only changed on the client
 	}
 	function AnimEnd()

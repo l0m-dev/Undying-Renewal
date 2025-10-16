@@ -26,6 +26,8 @@ class DifficultyWindow expands ShellWindow;
 //#exec Texture Import File=dfclt_nightm_ov.bmp	Mips=Off
 //#exec Texture Import File=dfclt_nightm_dn.bmp	Mips=Off
 
+#exec Texture Import File=Textures\dfclt_ultra_nightm_ov.bmp	Mips=Off
+
 var string StartMap;
 
 var() ShellButton Buttons[4];
@@ -60,6 +62,11 @@ var bool bDedicated;
 
 var localized string SelectMutatorsText;
 var localized string AboutText;
+
+var ShellButton UltraNightmareButton;
+var float UltraNightmareTimer;
+var ParticleFX BloodFX;
+var UWindowWindow Confirm;
 
 function Created()
 {
@@ -230,6 +237,18 @@ function Created()
 	MutatorsHintLabel.Align = TA_Center;
 	MutatorsHintLabel.Font = 4;
 
+// Ultra-Nightmare button
+	UltraNightmareButton = ShellButton(CreateWindow(class'ShellButton', 10, 10, 10, 10));
+	UltraNightmareButton.Template = NewRegion(253,213,84,84);
+	UltraNightmareButton.TexCoords = NewRegion(22,22,84,84);
+	UltraNightmareButton.OverSound= sound'Shell_HUD.HUD.SHELL_Scroll';
+	UltraNightmareButton.Manager = Self;
+	UltraNightmareButton.Style = 5;
+	UltraNightmareButton.UpTexture =   None;
+	UltraNightmareButton.DownTexture = texture'dfclt_ultra_nightm_ov';
+	UltraNightmareButton.OverTexture = texture'dfclt_ultra_nightm_ov';
+	UltraNightmareButton.bDisabled = true;
+
 // Info button	
 	InfoButton = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
 	InfoButton.Template = NewRegion(620,120,130,36);
@@ -286,6 +305,11 @@ function Message(UWindowWindow B, byte E)
 
 				case Buttons[3]:
 					StartGame(1);	//medium
+					break;
+
+				case UltraNightmareButton:
+					if (!UltraNightmareButton.bDisabled)
+						ShowConfirm(UltraNightmareButton);	//ultra-nightmare
 					break;
 
 				case Advanced:
@@ -379,6 +403,7 @@ function Paint(Canvas C, float X, float Y)
 {
 	local int i, j;
 	local string mName;
+	local vector ParticleLoc;
 	
 	Super.Paint(C, X, Y);
 
@@ -408,6 +433,73 @@ function Paint(Canvas C, float X, float Y)
 				break;
 			}
 		}
+	}
+
+	if ( UltraNightmareTimer > 0 )
+	{
+		if ( UltraNightmareButton.MouseIsOver() )
+		{
+			UltraNightmareTimer -= LastDelta;
+
+			if ( UltraNightmareTimer < 1.0 )
+			{
+				C.Style = 5;
+				C.DrawColor.R = 255;
+				C.DrawColor.G = 255;
+				C.DrawColor.B = 255;
+				C.DrawColor.A = byte((1.0 - UltraNightmareTimer) * 255);
+				DrawStretchedTextureSegment( C, UltraNightmareButton.WinLeft, UltraNightmareButton.WinTop, UltraNightmareButton.WinWidth, UltraNightmareButton.WinHeight, UltraNightmareButton.TexCoords.X, UltraNightmareButton.TexCoords.Y, UltraNightmareButton.TexCoords.W, UltraNightmareButton.TexCoords.H, UltraNightmareButton.OverTexture );
+			}
+
+			if ( UltraNightmareTimer <= 0 )
+			{
+				UltraNightmareButton.bDisabled = false;
+				GetPlayerOwner().PlaySound( Sound(DynamicLoadObject("CreatureSFX.Kiesinger.C_Kies_Laugh1", class'Sound')), SLOT_Interface, [Pitch]1.0, [Flags]482 );
+
+				if ( BloodFX == None )
+				{
+					BloodFX = GetPlayerOwner().Spawn(class'Aeons.BloodyMandorlaParticleFX');
+					BloodFX.bShellOnly = true;
+					BloodFX.bSteadyState = true;
+					BloodFX.LifeTime.Base = 5;
+					BloodFX.ParticlesAlive = 50;
+					BloodFX.SizeWidth.Base = 64;
+					BloodFX.SizeLength.Base = 64;
+				}
+			}
+		}
+		else
+		{
+			UltraNightmareTimer = default.UltraNightmareTimer;
+		}
+	}
+	else
+	{
+		if ( UltraNightmareButton.MouseIsOver() )
+		{
+			BloodFX.ParticlesPerSec.Base = 4;
+			BloodFX.ParticlesPerSec.Rand = 4;
+		}
+		else
+		{
+			BloodFX.ParticlesPerSec.Base = 0;
+			BloodFX.ParticlesPerSec.Rand = 0;
+		}
+	}
+
+	if ( BloodFX != None )
+	{
+		BloodFX.SizeWidth.Base = 64 * Root.ScaleY;
+		BloodFX.SizeLength.Base = 64 * Root.ScaleY;
+		
+		ParticleLoc.X = InnerLeft + 293 * Root.ScaleY;
+		ParticleLoc.Y = InnerTop + 253 * Root.ScaleY;
+		ParticleLoc.Z = 10.0; 
+		
+		BloodFX.SetRotation( rot(16400,0,0));
+		BloodFX.SetLocation( ParticleLoc );
+
+		C.DrawClippedActorFixedFov(BloodFX, 90, false, C.SizeX/Root.GUIScale, C.SizeY/Root.GUIScale, 0, 0, true);
 	}
 }
 
@@ -498,6 +590,11 @@ function Resized()
 	MutatorsLabel.ManagerResized(RootScaleX, RootScaleY);
 	MutatorsHintLabel.ManagerResized(RootScaleX, RootScaleY);
 	InfoButton.ManagerResized(RootScaleX, RootScaleY);
+
+	UltraNightmareButton.ManagerResized(RootScaleX, RootScaleY);
+
+	if ( Confirm != None ) 
+		Confirm.Resized();
 }
 
 function Close(optional bool bByParent)
@@ -689,6 +786,30 @@ function MutatorClicked(UWindowWindow B)
 	}
 }
 
+function ShowConfirm(UwindowWindow W)
+{
+	if (Confirm == None ) 
+		Confirm = ManagerWindow(Root.CreateWindow(class'ConfirmWindow', 0, 0, 200, 200, Root, True));
+
+	Confirm.ShowWindow();		
+	ConfirmWindow(Confirm).Owner = self;
+	ConfirmWindow(Confirm).QuestionWindow = W;
+}
+
+function QuestionAnswered( UWindowWindow W, int Answer )
+{
+	switch( W ) 
+	{
+		case UltraNightmareButton:
+			// answered yes
+			if ( Answer == 1 ) 
+			{
+				StartGame(3);
+			}
+			break;
+	}
+}
+
 defaultproperties
 {
      StartMap="CU_01"
@@ -702,4 +823,5 @@ defaultproperties
      SelectMutatorsText="SELECT MUTATORS"
      AboutText="About"
      bShowMutators=True
+     UltraNightmareTimer=3.0
 }

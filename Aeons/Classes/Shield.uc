@@ -9,7 +9,7 @@ class Shield expands AttSpell;
 
 simulated function PreBeginPlay()
 {
-	if (RGC())
+	if ( RGC() )
 	{
 		manaCostPerLevel[0] = 60;
 		manaCostPerLevel[1] = 60;

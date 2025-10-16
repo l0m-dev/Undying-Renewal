@@ -15,6 +15,8 @@ var() localized string  BackNames[6];
 
 var Texture SmokeTexture;
 
+var float LastDelta;
+
 // Confirm window stuff
 //var int Answer;
 //var UWindowWindow QuestionWindow;
@@ -119,17 +121,23 @@ function Paint(Canvas C, float X, float Y)
 	C.bNoSmooth = false;
 }
 
+function Tick(float Delta)
+{
+	LastDelta = Delta;
+}
+
 function PaintSmoke(Canvas C, ShellButton B, out int SmokingWindow, out float SmokingTimer)
 {
 	local int Brightness;
 
 	if ( SmokingWindow >= 0 )
 	{
-		SmokingTimer -= 1.0;
+		SmokingTimer -= LastDelta * 60.0;
 
 		if ( SmokingTimer <= 0.0 ) 
 		{
 			SmokingWindow = -1;
+			SmokingTimer = 0.0;
 		}
 
 		if ( SmokingTimer < 45 ) 

@@ -2118,27 +2118,59 @@ function bool EnemyCanSee( vector Loc )
 			   FastTrace( Loc, Enemy.Location + vect(0,0,1) * Enemy.BaseEyeHeight ) ) );
 }
 
-// Return Enemy location, if direct line of sight or LastSeenPos.
-function vector EnemyAimSpot()
+// Return the optimal aim spot for the target.
+function vector OptimalAimSpot(Pawn Target, optional bool bLeadTarget, optional vector ProjStart, optional float ProjSpeed)
 {
 	local vector X, Y, Z;
-	local vector EnemyLoc;
+	local vector TargetLoc;
+	local vector Offset;
+	local bool   bHasOffset;
 
-	if ( Enemy == none ) 
-		return LastSeenPos;
+	if ( bLeadTarget )
+		TargetLoc = Target.Location + Target.Velocity * ( VSize(Target.Location - ProjStart) / ProjSpeed );
+	else
+		TargetLoc = Target.Location;
+
+	GetAxes( Target.Rotation, X, Y, Z );
 
 	if ( bTakeHeadShot )
 	{
-		GetAxes( Enemy.Rotation, X, Y, Z );
-		EnemyLoc = Enemy.Location + ( Z * Enemy.EyeHeight );
+		Offset = Z * Target.BaseEyeHeight;
+		bHasOffset = true;
 	}
-	else
-		EnemyLoc = Enemy.Location;
+	else if ( bTakeFootShot )
+	{
+		Offset = Z * -Target.CollisionHeight;
+		bHasOffset = true;
+	}
 
-	if ( !Enemy.bIsPlayer || EyesCanSee( EnemyLoc ) )
-		return EnemyLoc;
+	// Can we see the target?
+	if ( bHasOffset && EyesCanSee(Target.Location + Offset) )
+		return TargetLoc + Offset;
+
+	// Try without the offset
+	if ( EyesCanSee(Target.Location) )
+		return TargetLoc;
+
+	if ( bHasOffset )
+		return LastSeenPos + Offset;
 
 	return LastSeenPos;
+}
+
+// Return Enemy location, if direct line of sight or LastSeenPos.
+function vector EnemyAimSpot()
+{
+	if ( Enemy == none ) 
+		return LastSeenPos;
+
+	if ( RGC() )
+		return OptimalAimSpot(Enemy);
+
+	if ( Enemy.bIsPlayer && !EyesCanSee(Enemy.Location) ) // TODO: why check Enemy.bIsPlayer?
+		return LastSeenPos;
+
+	return Enemy.Location;
 }
 
 // Return the location to move to when moving to Enemy.
@@ -3764,21 +3796,28 @@ function rotator WeaponAimAt( pawn Target, vector ProjStart, float Accuracy, opt
 	local vector		TLocation;
 	local vector		TX, TY, TZ;
 
-	if ( EyesCanSee( Target.Location ) )
+	if ( RGC() )
 	{
-		if ( bLeadTarget )
-			TLocation = Target.Location + Target.Velocity * ( VSize(Target.Location - ProjStart) / ProjSpeed );
-		else
-			TLocation = Target.Location;
+		TLocation = OptimalAimSpot(Target, bLeadTarget, ProjStart, ProjSpeed);
 	}
 	else
-		TLocation = LastSeenPos;
+	{
+		if ( EyesCanSee( Target.Location ) )
+		{
+			if ( bLeadTarget )
+				TLocation = Target.Location + Target.Velocity * ( VSize(Target.Location - ProjStart) / ProjSpeed );
+			else
+				TLocation = Target.Location;
+		}
+		else
+			TLocation = LastSeenPos;
 
-	GetAxes( Target.Rotation, TX, TY, TZ );
-	if ( bTakeHeadShot )
-		TLocation = TLocation + TZ * Target.BaseEyeHeight;
-	else if ( bTakeFootShot )
-		TLocation = TLocation - TZ * Target.CollisionHeight;
+		GetAxes( Target.Rotation, TX, TY, TZ );
+		if ( bTakeHeadShot )
+			TLocation = TLocation + TZ * Target.BaseEyeHeight;
+		else if ( bTakeFootShot )
+			TLocation = TLocation - TZ * Target.CollisionHeight;
+	}
 
 	return WeaponAim( TLocation, ProjStart, Accuracy );
 }

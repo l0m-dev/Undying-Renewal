@@ -151,7 +151,8 @@ auto state Pickup
 			if (GetRenewalConfig().bLimitHealth && (
 				(Level.Game.Difficulty == 0 && HealthPacks >= 15) ||
 				(Level.Game.Difficulty == 1 && HealthPacks >= 10) ||
-				(Level.Game.Difficulty == 2 && HealthPacks >= 5)))
+				(Level.Game.Difficulty == 2 && HealthPacks >= 5) ||
+				(Level.Game.Difficulty >= 3 && HealthPacks >= 2)))
 			{
 				AP.ClientMessage(MaxHealthMessage, 'Pickup');
 				return false;
