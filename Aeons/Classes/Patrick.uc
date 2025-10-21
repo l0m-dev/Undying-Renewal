@@ -1073,8 +1073,10 @@ state FallingDeath expands Dying
 		if (Flight != none)
 			Flight.GotoState('Idle');
 		LoopAnim('Jump_Cycle');
-		AttSpell.OwnerDead();
-		DefSpell.OwnerDead();
+		if (AttSpell != None)
+			AttSpell.OwnerDead();
+		if (DefSpell != None)
+			DefSpell.OwnerDead();
 		Behindview(true);
 		SetPhysics(PHYS_Falling);
 		BaseEyeheight = Default.BaseEyeHeight;
@@ -1122,8 +1124,10 @@ state FadingDeath expands Dying
 		DisableSaveGame();
 		bHidden = false;
 		// LoopAnim('Damage_Fire');
-		AttSpell.OwnerDead();
-		DefSpell.OwnerDead();
+		if (AttSpell != None)
+			AttSpell.OwnerDead();
+		if (DefSpell != None)
+			DefSpell.OwnerDead();
 		// Behindview(true);
 		// SetPhysics(PHYS_Falling);
 		BaseEyeheight = Default.BaseEyeHeight;
@@ -1161,8 +1165,10 @@ state InstantFadingDeath expands Dying
 		DisableSaveGame();
 		bHidden = false;
 		// LoopAnim('Damage_Fire');
-		AttSpell.OwnerDead();
-		DefSpell.OwnerDead();
+		if (AttSpell != None)
+			AttSpell.OwnerDead();
+		if (DefSpell != None)
+			DefSpell.OwnerDead();
 		// Behindview(true);
 		// SetPhysics(PHYS_Falling);
 		BaseEyeheight = Default.BaseEyeHeight;

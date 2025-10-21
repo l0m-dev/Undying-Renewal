@@ -55,8 +55,6 @@ state Activated
 			}
 		}
 	}
-	Begin:
-		Activate();
 }
 
 state Deactivated

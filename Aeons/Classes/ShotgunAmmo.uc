@@ -23,6 +23,14 @@ function Activate()
 
 state Activated
 {
+	function BeginState()
+	{
+		// prevent activation from TravelPreAccept, which would reload the weapon
+		if (!bActive)
+			Activate();
+		Super.BeginState();
+	}
+
 	function Activate()
 	{
 		local AeonsWeapon wep;
@@ -41,7 +49,7 @@ state Activated
 					wep.AmmoType = Ammo(Pawn(Owner).FindInventoryType(wep.AmmoName));
 					wep.gotoState('NewClip');	// Load the New Clip
 				}
-				else if ( wep.ClipCount == 1 )
+				else if ( wep.ClipCount < wep.ReloadCount )
 				{
 					wep.Reload();
 				}
@@ -56,8 +64,6 @@ state Activated
 			}
 		}
 	}
-	Begin:
-		Activate();
 }
 
 state Deactivated

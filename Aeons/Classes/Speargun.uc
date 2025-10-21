@@ -81,9 +81,12 @@ simulated function ClientCharge()
 
 simulated function ClientRemoveCharge()
 {
-	if (ChargedFX != none)
+	if ( ChargedFX != none )
+	{
+		if ( AeonsPlayer(Owner).OverlayActor == ChargedFX )
+			AeonsPlayer(Owner).OverlayActor = none;
 		ChargedFX.Destroy();
-	AeonsPlayer(Owner).OverlayActor = none;
+	}
 	if ( Level.NetMode == NM_Client )
 		AmbientSound = None;
 }
@@ -333,11 +336,17 @@ function Tick(float DeltaTime)
 {
 	if (Owner == None)
 		return;
-	ChargeLen += DeltaTime;
 
-	if ( ChargeLen >ChargeTimer )
+	if ( bCharged )
 	{
-		RemoveCharge();
+		ChargeLen += DeltaTime;
+		if ( ChargeLen > ChargeTimer )
+		{
+			//log("Speargun: Charge has run out ", 'Misc');
+			RemoveCharge();
+		}
+	} else {
+		ChargeLen = 0;
 	}
 
 	if ( bChangeWeapon )

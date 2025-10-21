@@ -24,6 +24,14 @@ function Activate()
 
 state Activated
 {
+	function BeginState()
+	{
+		// prevent activation from TravelPreAccept, which would reload the weapon
+		if (!bActive)
+			Activate();
+		Super.BeginState();
+	}
+
 	function Activate()
 	{
 		local AeonsWeapon wep;
@@ -58,9 +66,6 @@ state Activated
 			}
 		}
 	}
-	
-	Begin:
-		Activate();
 }
 
 state Deactivated

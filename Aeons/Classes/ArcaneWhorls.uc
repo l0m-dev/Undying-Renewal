@@ -75,11 +75,12 @@ state GiveWhorl
 		mMod.updateManaTimer();
 		Player.ManaWhorlsFound = Clamp(Player.ManaWhorlsFound+1, 0, 5);
 		Player.AttSpell.SetTexture(1, AeonsSpell(Player.AttSpell).SpellHandTextures[Player.ManaWhorlsFound-1]);
-		sleep(2.5);
+		sleep(1.25);
 		if (Level.NetMode != NM_DedicatedServer)
 		{
+			if ( Player.OverlayActor == HandFX )
+				Player.OverlayActor = none;
 			HandFX.Shutdown();
-			Player.OverlayActor = none;
 		}
 		Destroy();
 }
@@ -101,9 +102,10 @@ simulated state ClientGiveWhorl
 		HandFX.SetPlayer(Player);
 		Player.OverlayActor = HandFX;
 		Player.AttSpell.SetTexture(1, AeonsSpell(Player.AttSpell).SpellHandTextures[Player.ManaWhorlsFound-1]);
-		sleep(2.5);
+		sleep(1.25);
+		if ( Player.OverlayActor == HandFX )
+			Player.OverlayActor = none;
 		HandFX.Shutdown();
-		Player.OverlayActor = none;
 }
 
 defaultproperties

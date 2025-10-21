@@ -138,7 +138,8 @@ state Holding
 			if ( FadeToBlack )
 				Player.ClientAdjustGlow(1.0,vect(0,0,0));
 
-			Player.OverlayActor = none; // not replicated
+			if ( Player.OverlayActor == self )
+				Player.OverlayActor = none; // not replicated
 
 			Player = none;
 		}
@@ -149,7 +150,8 @@ state Holding
 				if ( FadeToBlack )
 					aPlayer.ClientAdjustGlow(1.0,vect(0,0,0));
 
-				aPlayer.OverlayActor = none; // not replicated
+				if ( aPlayer.OverlayActor == self )
+					aPlayer.OverlayActor = none; // not replicated
 			}
 		}
 
