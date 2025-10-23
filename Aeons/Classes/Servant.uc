@@ -215,4 +215,5 @@ defaultproperties
      ConcussiveScalar=1.5
      AccelRate=1600
      Health=60
+     TransientSoundRadius=1500
 }

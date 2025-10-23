@@ -16,25 +16,17 @@ simulated function ProcessTouch(Actor Other, Vector HitLocation){}
 
 simulated function HitWall (vector HitNormal, actor Wall, byte TextureID)
 {
-	local vector HitLocation, HitNormal2, start, end;
-	local int HitJoint;
-	
-	if (Physics == PHYS_None)
-		return;
-	
-	Start = Location;
-	End = Location + (vect(0,0,-1) * (CollisionHeight + 32));
-	
-	Trace(HitLocation, HitNormal2, HitJoint, end, start);
-	if (HitLocation != vect(0,0,0) && Velocity.Z < 2)
-	{
-		setPhysics(PHYS_None);
-	}
-	
-	Velocity = reflect(-Normal(Velocity), HitNormal);
+	Velocity = 0.25*(( Velocity dot HitNormal ) * HitNormal * (-2.0) + Velocity);   // Reflect off Wall w/damping
 	Speed = VSize(Velocity);
+
 	bFixedRotationDir = false;
 	RandSpin(12500);
+
+	if ( (Velocity.Z < 50) && (HitNormal.Z > 0.7) )
+	{
+		SetPhysics(PHYS_none);
+		bBounce = false;
+	}
 }
 
 simulated function Tick(float DeltaTime)

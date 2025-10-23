@@ -622,7 +622,7 @@ RESUME:
 BEGIN:
 	WaitForLanding();
 	PlayWait();
-	SetTimer( FVariant( 40.0, 20.0 ), false );
+	SetTimer( FVariant( 50.0, 20.0 ), false );
 } // state AINoScript
 
 //****************************************************************************

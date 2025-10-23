@@ -84,20 +84,27 @@ state HoundAnim
 
 function addUse(int amt)
 {
-	if (!RGC())
+	local Hound H;
+	local rotator HRot;
+
+	if ( !RGC() )
 	{
 		return;
 	}
+
 	useMeter += amt;
 	if ( useMeter > SpawnHoundLimit )
 	{
-		if ( Spawn( class'Hound',,,Location + FMax( class'Hound'.default.CollisionRadius + CollisionRadius + 50, 72 ) * Vector(Rotation) + vect(0,0,1) * 15 ) != None )
+		// AeonsPlayer(Owner).SpawnHound();
+		
+		HRot.Yaw = Pawn(Owner).ViewRotation.Yaw;
+		H = Spawn( class'Hound',,, Owner.Location + (class'Hound'.default.CollisionRadius + Owner.CollisionRadius + 64) * Vector(HRot) + vect(0,0,1) * class'Hound'.default.CollisionHeight, HRot );
+		if ( H != None )
 		{
+			H.InitState(PlayerPawn(Owner));
+
 			useMeter = 0;
-			if ( AeonsPlayer(Owner).SpawnHound() )
-			{
-				GotoState('HoundAnim');
-			}
+			GotoState('HoundAnim');
 		}
 		else
 		{

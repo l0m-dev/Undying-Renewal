@@ -29,8 +29,16 @@ state NormalFire
 	ignores FireAttSpell;
 	
 	Begin:
-		AeonsPlayer(owner).scryeTimer = 10 + castingLevel * 2 * int(RGC());
-		AeonsPlayer(owner).ScryeFullTime = 10 + castingLevel * 2 * int(RGC());
+		if ( RGC() )
+		{
+			AeonsPlayer(owner).ScryeFullTime = 10 + castingLevel * 2;
+			AeonsPlayer(owner).ScryeTimer = AeonsPlayer(owner).ScryeFullTime;
+		}
+		else
+		{
+			AeonsPlayer(owner).ScryeFullTime = 10;
+			AeonsPlayer(owner).ScryeTimer = 10;
+		}
 		AeonsPlayer(owner).ScryeMod.gotoState('Activated');
 		AeonsPlayer(owner).ScryeMod.castingLevel = localCastingLevel;
 		AeonsPlayer(owner).ClientSetScryeModActive(true, localCastingLevel);

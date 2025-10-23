@@ -348,6 +348,7 @@ function GiveTo( pawn Other )
 {
 	// I am being  picked up - check my conditional event and set the
 	// right flag in the player so that the player know he has picked me up
+	// Note: GiveTo is not called if we already have a copy of an item so CheckGameEvent won't get called
 	if ( ConditionalEvent != 'none' )
 	{
 		if ( Other.IsA('PlayerPawn') )

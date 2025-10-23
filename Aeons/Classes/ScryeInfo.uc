@@ -13,12 +13,11 @@ function Trigger(Actor Other, Pawn Instigator)
 {
 	ForEach AllActors(class 'AeonsPlayer', Player)
 	{
-		break;
+		Player.ScryeFullTime = NewScryeTimer;
+		Player.ScryeTimer = NewScryeTimer;
+		//Player.ScryeMod.GotoState('Activated');
+		//Player.ScryeMod.CastingLevel = 1;
 	}
-	
-	Player.ScryeTimer = NewScryeTimer;
-	//Player.ScryeMod.GotoState('Activated');
-	//Player.ScryeMod.CastingLevel = 1;
 }
 
 defaultproperties
