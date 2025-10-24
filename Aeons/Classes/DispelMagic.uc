@@ -86,16 +86,16 @@ state NormalFire
 		GhelzUse(manaCostPerLevel[castingLevel]);
 		
 		// Generate the effect
-		spawn (class 'DispelCastFX',,,Pawn(Owner).Location + vect(0,0,1) * Pawn(Owner).EyeHeight + vect(0,0,-12) );
+		spawn (class 'DispelCastFX',,,Owner.Location + vect(0,0,1) * PawnOwner.EyeHeight + vect(0,0,-12) );
 		if ( AeonsPlayer(Owner).bMagicSound )
 		{
 			Owner.PlaySound(FireSound,, 1);
 			AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 		}
 
-		ForEach RadiusActors(class 'Actor',A, 1280, Pawn(Owner).Location)
+		ForEach RadiusActors(class 'Actor',A, 1280, Owner.Location)
 		{
-			if ( (A != Pawn(Owner)) && (A.Owner != Pawn(Owner)) && (FastTrace(Pawn(Owner).Location, A.Location)) )
+			if ( (A != Owner) && (A.Owner != Owner) && (FastTrace(Owner.Location, A.Location)) )
 			{
 				OtherLevel = A.Dispel(true);
 				//log("DispelMagic.OtherLevel = "$OtherLevel, 'Misc');

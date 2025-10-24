@@ -1751,9 +1751,9 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 		if ( Patrick(Killer) != None )
 		{
 			if (FRand() > 0.5)
-				Patrick(Killer).DetachJointEx();
+				Patrick(Killer).DetachJointEx(None, 200);
 			else
-				Patrick(Killer).DestroyJointEx();
+				Patrick(Killer).DestroyJointEx(200);
 		}
 
 		Spawn(class 'SmokyBloodFX',Killer,,HitLocation); // or SmokyBloodSmallFX
@@ -5529,25 +5529,25 @@ state AIFollowOwner
 
 	function PingOwnerEnemy()
 	{
-		local ScriptedPawn		SP;
+		local Pawn		P;
 
 		// TODO check if able to attack
-		foreach RadiusActors( class'ScriptedPawn', SP, SightRadius * 1.5 )
-			if ( ( SP.Health > 0 ) &&
-				 ( SP.Enemy != none ) &&
-				 ( SP.Enemy == Owner ) &&
-				 AttackCandidate( SP ) )
+		foreach RadiusActors( class'Pawn', P, SightRadius * 1.5 )
+			if ( ( P.Health > 0 ) &&
+				 ( P.Enemy != none ) &&
+				 ( P.Enemy == Owner ) &&
+				 AttackCandidate( P ) )
 			{
-				DebugInfoMessage( ".PingOwnerEnemy(), attacking " $ SP.name );
-				SetEnemy( SP );
+				DebugInfoMessage( ".PingOwnerEnemy(), attacking " $ P.name );
+				SetEnemy( P );
 				GotoState( 'AIAttack' );
 				return;
 			}
 	}
 
-	function bool AttackCandidate( ScriptedPawn SP )
+	function bool AttackCandidate( Pawn P )
 	{
-		return ( CanPathTo( SP ) || ( ( bHasFarAttack || bCanSwitchToRanged ) && EyesCanSee( SP.Location ) ) );
+		return ( CanPathTo( P ) || ( ( bHasFarAttack || bCanSwitchToRanged ) && EyesCanSee( P.Location ) ) );
 	}
 
 

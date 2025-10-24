@@ -38,6 +38,8 @@ simulated function PreBeginPlay()
 //=============================================================================
 simulated function Destroyed()
 {
+	Super.Destroyed();
+	
 	if ( pfx != none )
 	{
 		pfx.Shutdown();

@@ -102,6 +102,8 @@ event TravelPreAccept()
 
 function Destroyed()
 {
+	Super.Destroyed();
+	
 	Deactivate();
 }
 

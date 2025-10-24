@@ -33,6 +33,7 @@ state() EtherTrapState
 			return 2;
 		
 		Destroy();
+		return 0;
 	}
 
 	function Tick(float DeltaTime)
@@ -107,6 +108,7 @@ state Holding
 	{
 		if ( bCheck )
 			return -1;
+		return 0;
 	}
 
 	function Timer()

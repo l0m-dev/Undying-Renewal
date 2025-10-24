@@ -148,34 +148,7 @@ simulated state Holding
 
 simulated state Release
 {
-	simulated function BeginState()
-	{
-		local int i;
-		
-		for (i=0; i<4; i++)
-			if (lts[i] != None)
-				lts[i].Destroy();
-	}
-
 	Begin:
-		StopSound(sndID);
-		Shaft.Destroy();
-
-		if (MetalDecal != none)
-		{
-			MetalDecal.Destroy();
-		}
-		if (sFX != none)
-		{
-			sFX.Shutdown();
-			sFX = none;
-		}
-
-		if (pFX != none)
-		{
-			pFX.Shutdown();
-			pFX = none;
-		}
 		Destroy();
 }
 

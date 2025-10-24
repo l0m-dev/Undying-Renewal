@@ -270,8 +270,8 @@ function int Dispel( optional bool bCheck )
 {
 	if ( bCheck )
 		return DispelLevel;
-	else
-		TakeDamage( none, Location, vect(0,0,0), getDamageInfo( 'dispel' ) );
+	TakeDamage( none, Location, vect(0,0,0), getDamageInfo( 'dispel' ) );
+	return 0;
 }
 
 function SetOpacity( float OValue )

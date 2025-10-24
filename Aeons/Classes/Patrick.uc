@@ -321,7 +321,7 @@ function DetachJointEx(optional sound PawnImpactSound, optional int Distance)
 	}
 }
 
-function DestroyJointEx()
+function DestroyJointEx(optional int Distance)
 {
 	local vector start, end, eyeOffset, HitLocation, HitNormal;
 	local int HitJoint;
@@ -329,15 +329,18 @@ function DestroyJointEx()
 
 	if (Role < ROLE_Authority)
 		return;
-	
+
 	eyeOffset.z = eyeHeight;
-	
+
+	if (Distance == 0)
+		Distance = 65536;
+
 	start = Location + eyeOffset + (Vector(ViewRotation) * CollisionRadius);
-	end = start + (Vector(ViewRotation) * 65536);
-	
+	end = start + (Vector(ViewRotation) * Distance);
+
 	A = Trace(HitLocation, HitNormal, HitJoint, end, start, true, true);
 
-	if ( A != none && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss )
+	if ( A != none && HitJoint != 0 && A.IsA('ScriptedPawn') && ScriptedPawn(A).Health <= 0 && ScriptedPawn(A).bHackable && !ScriptedPawn(A).bIsBoss )
 	{
 		A.DestroyLimb(A.JointName(HitJoint));
 		ScriptedPawn(A).bHacked = true;

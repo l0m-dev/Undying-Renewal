@@ -120,14 +120,6 @@ simulated function PlayFiring()
 {
 	//log("PlayFiring Called within the Shotgun");
 	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
-	// shotgun gore, on already dead pawns
-	if ( RGORE() )
-	{
-		if ( FRand() > 0.5 )
-			Patrick(Owner).DetachJointEx(None, 200);
-		else
-			Patrick(Owner).DestroyJointEx();
-	}
 //new	if ( Role == ROLE_Authority )
 //		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
@@ -353,6 +345,15 @@ simulated function FireWeapon()
 			CheckVisibility();
 
 		gotoState('NormalFire');
+	}
+
+	// shotgun gore, on already dead pawns
+	if ( RGORE() )
+	{
+		if ( FRand() > 0.5 )
+			Patrick(Owner).DetachJointEx(None, 200);
+		else
+			Patrick(Owner).DestroyJointEx(200);
 	}
 }
 

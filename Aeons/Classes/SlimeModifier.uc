@@ -7,14 +7,6 @@ var() float					EffectDuration;
 var float					EffectIntensity;
 
 
-function int Dispel( optional bool bCheck )
-{
-	if ( bCheck )
-		return CastingLevel;
-	else
-		GotoState( 'Deactivated' );
-}
-
 function Activate()
 {
 	GotoState( 'Activated' );

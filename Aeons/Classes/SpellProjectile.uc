@@ -106,6 +106,7 @@ simulated function int Dispel(optional bool bCheck)
 
 	spawn (class 'DispelParticleFX',,,Location);
 	Destroy();
+	return 0;
 }
 
 simulated function DamageInfo getDamageInfo(optional name DamageType)

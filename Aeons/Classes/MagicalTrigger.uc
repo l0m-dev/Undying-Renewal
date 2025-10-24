@@ -21,6 +21,7 @@ function int Dispel(optional bool bCheck)
 		return 0;
 	
 	Destroy();
+	return 0;
 }
 
 defaultproperties

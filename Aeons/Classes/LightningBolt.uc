@@ -558,11 +558,20 @@ simulated function CleanUp()
 	local int i;
 
 	for( i=0; i<4; ++i )
-		lts[i].Destroy();
+	{
+		if (lts[i] != none)
+		{
+			lts[i].Destroy();
+			lts[i] = none;
+		}
+	}
 
 	StopSound(sndID);
-	Shaft.Destroy();
-	Shaft = none;
+	if (Shaft != none)
+	{
+		Shaft.Destroy();
+		Shaft = none;
+	}
 
 	if (MetalDecal != none)
 	{

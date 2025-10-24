@@ -245,6 +245,7 @@ function int Dispel(optional bool bCheck)
 	
 	ectoTrail.Shutdown();
 	Destroy();
+	return 0;
 }
 
 defaultproperties

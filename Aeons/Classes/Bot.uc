@@ -213,13 +213,19 @@ function bool TriggerSwitchToMelee()
 function int Dispel( optional bool bCheck )
 {
 	if ( bCheck )
-		return ShieldDispelLevel;
-	else if ( Shield != none )
+	{
+		if ( Shield != none )
+			return ShieldDispelLevel;
+		else
+			return -1;
+	}
+	if ( Shield != none )
 	{
 		PlaySound_P( "ShieldDn" );
 		Shield.Shrink();
 		Shield = none;
 	}
+	return 0;
 }
 
 //****************************************************************************

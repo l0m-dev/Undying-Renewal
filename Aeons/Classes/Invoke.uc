@@ -199,6 +199,9 @@ state Holding
 	function Timer()
 	{
 		GhelzUse(FinalManaCost);
+		// let TargetPawn see as far as the owner
+		if ( RGC() )
+			TargetPawn.SightRadius = FMax(TargetPawn.SightRadius, Pawn(Owner).SightRadius);
 		TargetPawn.Invoke(PlayerPawn(Owner));
 		InvokeModifier(AeonsPlayer(Owner).InvokeMod).AddSP(TargetPawn, LocalCastingLevel);
 		if ( Owner.bHidden )

@@ -277,7 +277,7 @@ state Activated
 		// log("Mindshatter activated... my owner is " $Owner.name);
 		if (SndID == -1)
 			SndID = Owner.PlaySound(EffectSound,,1,,,Pitch);
-		log ("Starting Mindshatter Sound: " $ SndID);
+		//log ("Starting Mindshatter Sound: " $ SndID);
 		// setTimer(GetSoundDuration(EffectSound), true);
 		inc = 0; inc2 = 0; inc3 = 0; inc4 = 0; inc5 = 0;
 		EffectTimer = 0;
@@ -386,14 +386,9 @@ auto state Idle
 
 function int Dispel(optional bool bCheck)
 {
-	if ( !bCheck )
-	{
-		GotoState('Deactivated');
-		if (Owner.RemoteRole == ROLE_AutonomousProxy)
-		{
-			ClientDeactivated();
-		}
-	}
+	if ( !bCheck && bActive && Owner.RemoteRole == ROLE_AutonomousProxy )
+		ClientDeactivated();
+	return Super.Dispel(bCheck);
 }
 
 simulated function ClientActivated(byte level)

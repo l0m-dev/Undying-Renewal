@@ -145,6 +145,31 @@ function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInf
 	KillAllTentacles();
 }
 
+static final function bool ComputeLobVelocity(vector Start, vector End, float LaunchAngleDeg, float Gravity, out vector OutVelocity)
+{
+	local vector Delta, DeltaXY;
+	local float R, Theta, CosTheta, Denom, v0;
+
+	Gravity = -Gravity * 0.5;
+
+	Delta = End - Start;
+
+	DeltaXY = Delta;
+	DeltaXY.z = 0.0;
+	R = VSize(DeltaXY);
+
+	Theta = LaunchAngleDeg * (PI / 180.0);
+	CosTheta = Cos(Theta);
+
+	Denom = R * Tan(Theta) - Delta.Z;
+	if ( Denom <= 0.0 )
+		return false;
+
+	v0 = Sqrt((Gravity * R * R) / (2.0 * CosTheta * CosTheta * Denom));
+
+	OutVelocity = Normal(DeltaXY) * (v0 * CosTheta) + vect(0,0,1) * (v0 * Sin(Theta));
+	return true;
+}
 
 //****************************************************************************
 // New class functions.
@@ -155,6 +180,7 @@ function Spit()
 	local Projectile	SpitProj;
 	local vector		TargetDirection;
 	local rotator		LobRot;
+	local Vector		LaunchVel;
 
 	DebugInfoMessage( ".Spit() @" $ Level.TimeSeconds );
 	SpitProj = Spawn( class'JileProjectile', self,, JointPlace('head2').pos + ProjOffset );
@@ -162,11 +188,18 @@ function Spit()
 	{
 		if ( bLobSpit )
 		{
-			TargetDirection = vector(WeaponAimAt( Enemy, SpitProj.Location, LobAccuracy, true, SpitProj.Speed ));
-			LobRot = rotator(TargetDirection);
-			if ( ( LobRot.Pitch < 6300 ) || ( LobRot.Pitch > 49152 ) )
-				LobRot.Pitch += 10000;
-			SpitProj.Velocity = vector(LobRot) * SpitProj.Speed * LobScale;
+			if ( RGC() && ComputeLobVelocity(Location, EnemyAimSpot(), 45.0, Region.Zone.ZoneGravity.Z, LaunchVel) )
+			{
+				SpitProj.Velocity = LaunchVel;
+			}
+			else
+			{
+				TargetDirection = vector(WeaponAimAt( Enemy, SpitProj.Location, LobAccuracy, true, SpitProj.Speed ));
+				LobRot = rotator(TargetDirection);
+				if ( ( LobRot.Pitch < 6300 ) || ( LobRot.Pitch > 49152 ) )
+					LobRot.Pitch += 10000;
+				SpitProj.Velocity = vector(LobRot) * SpitProj.Speed * LobScale;
+			}
 		}
 		else
 		{

@@ -801,7 +801,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		// Slime
 		if ( SlimeMod.bActive )
 		{
-			DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).SlimeMod.castingLevel);
+			DispelCost = DispelManaCost(DispelCastingLevel, SlimeMod.castingLevel);
 			if ( manaBag > DispelCost )
 			{
 				SlimeMod.Dispel();
@@ -814,7 +814,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		// Sloth
 		if ( SlothMod.bActive )
 		{
-			DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).SlothMod.castingLevel);
+			DispelCost = DispelManaCost(DispelCastingLevel, SlothMod.castingLevel);
 			if ( manaBag > DispelCost )
 			{
 				SlothMod.Dispel();
@@ -827,7 +827,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		// Firefly
 		if ( FireflyMod.bActive )
 		{
-			DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).FireflyMod.castingLevel);
+			DispelCost = DispelManaCost(DispelCastingLevel, FireflyMod.castingLevel);
 			if ( manaBag > DispelCost )
 			{
 				FireflyMod.Dispel();
@@ -840,7 +840,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		// Sphere of Cold
 		if ( SphereOfColdMod.bActive )
 		{
-			DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).SphereOfColdMod.CastingLevel);
+			DispelCost = DispelManaCost(DispelCastingLevel, SphereOfColdMod.CastingLevel);
 			if ( manaBag > DispelCost )
 			{
 				SphereOfColdMod.Dispel();
@@ -854,7 +854,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		// Haste
 		if ( HasteMod.bActive )
 		{
-			DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).HasteMod.castingLevel);
+			DispelCost = DispelManaCost(DispelCastingLevel, HasteMod.castingLevel);
 			if ( manaBag > DispelCost )
 			{
 				HasteMod.Dispel();
@@ -863,7 +863,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		}
 
 		// Phase
-		DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).PhaseMod.CastingLevel);
+		DispelCost = DispelManaCost(DispelCastingLevel, PhaseMod.CastingLevel);
 		if ( manaBag > DispelCost )
 		{
 			PhaseMod.Dispel();
@@ -871,7 +871,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		}
 
 		// Shala's Vortex
-		DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).ShalasMod.CastingLevel);
+		DispelCost = DispelManaCost(DispelCastingLevel, ShalasMod.CastingLevel);
 		if ( manaBag > DispelCost )
 		{
 			ShalasMod.Dispel();
@@ -879,7 +879,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		}
 
 		// Shield
-		DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).ShieldMod.CastingLevel);
+		DispelCost = DispelManaCost(DispelCastingLevel, ShieldMod.CastingLevel);
 		if ( manaBag > DispelCost )
 		{
 			ShieldMod.Dispel();
@@ -887,7 +887,7 @@ function int DisableSpellModifiers(int manaBag, int DispelCastingLevel, bool bSe
 		}
 
 		// Silence
-		DispelCost = DispelManaCost(DispelCastingLevel, AeonsPlayer(Owner).SilenceMod.CastingLevel);
+		DispelCost = DispelManaCost(DispelCastingLevel, SilenceMod.CastingLevel);
 		if ( manaBag > DispelCost )
 		{
 			SilenceMod.Dispel();

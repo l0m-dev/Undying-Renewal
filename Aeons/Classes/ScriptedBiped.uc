@@ -622,7 +622,7 @@ RESUME:
 BEGIN:
 	WaitForLanding();
 	PlayWait();
-	SetTimer( FVariant( 50.0, 20.0 ), false );
+	SetTimer( 30.0 + FRand() * 40.0, false );
 } // state AINoScript
 
 //****************************************************************************
@@ -636,13 +636,18 @@ state AIWait
 	{
 		global.BeginState();
 		Dispatch();
+
+		if ( WaitMode == SBWAIT_Normal )
+			SpeechTime = 30.0 + FRand() * 40.0;
 	}
 
 	function TriggerEvent()
 	{
-		if ( FRand() < 0.05 ) // FRand() < 0.016
+		if ( SpeechTime <= 0.0  )
 		{
+			// not using SpeechTimer because we would have to override it in child states
 			PlaySound_P( "EventIdle" );
+			SpeechTime = 30.0 + FRand() * 20.0;
 		}
 	}
 

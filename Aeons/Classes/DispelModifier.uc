@@ -37,8 +37,7 @@ function int Dispel(optional bool bCheck)
 {
 	if ( !bCheck )
 		GotoState('Dispelled');
-	else
-		return 0;
+	return 0;
 }
 
 defaultproperties

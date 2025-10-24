@@ -8,14 +8,6 @@ var() float					SpeedScalar;
 var() float					RefireScalar;
 var float					speedMultiplier;
 
-function int Dispel( optional bool bCheck )
-{
-	if ( bCheck )
-		return CastingLevel;
-	else
-		GotoState( 'Deactivated' );
-}
-
 function PreBeginPlay()
 {
 	super.PreBeginPlay();

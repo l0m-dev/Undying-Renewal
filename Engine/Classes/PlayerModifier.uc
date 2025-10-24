@@ -49,8 +49,17 @@ simulated function PreBeginPlay()
 
 function int Dispel(optional bool bCheck)
 {
-	if ( !bCheck )
+	if ( bCheck )
+	{
+		if ( bActive )
+			return CastingLevel;
+		else
+			return -1;
+	}
+
+	if ( bActive )
 		GotoState('Deactivated');
+	return 0;
 }
 
 /*----------------------------------------------------------------------------

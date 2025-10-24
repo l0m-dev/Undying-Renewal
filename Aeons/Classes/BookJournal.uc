@@ -231,6 +231,8 @@ simulated function PreBeginPlay()
 
 simulated function Destroyed()
 {
+	Super.Destroyed();
+	
 	ClearNotifyActor();
 
 	if ( ObjectivesEntry != None )

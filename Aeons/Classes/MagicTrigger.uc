@@ -32,6 +32,7 @@ function int Dispel(optional bool bCheck)
 	// Player touches....
 	Super.Touch(P);
 	gotoState('Unlocked');
+	return 0;
 }
 
 
@@ -43,6 +44,7 @@ State Unlocked
 	{
 		if ( bCheck )
 			return -1;
+		return 0;
 	}
 	
 	Begin:

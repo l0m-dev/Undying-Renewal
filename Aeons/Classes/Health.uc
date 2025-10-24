@@ -90,6 +90,8 @@ simulated function Tick(float DeltaTime)
 
 simulated function Destroyed()
 {
+	Super.Destroyed();
+	
 	if ( pfx != none )
 	{
 		pfx.Shutdown();

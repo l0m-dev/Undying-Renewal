@@ -227,12 +227,16 @@ function DestroyShield()
 
 function int Dispel( optional bool bCheck )
 {
-	if( bCheck && (ShieldTimer > 0.0) && (ShieldHitPoints > 0.0) )
+	if( bCheck )
 	{
-		return 2;
+		if( (ShieldTimer > 0.0) && (ShieldHitPoints > 0.0) )
+			return 2;
+		else
+			return -1;
 	}
 
-	DestroyShield();
+	if( (ShieldTimer > 0.0) && (ShieldHitPoints > 0.0) )
+		DestroyShield();
 	return 0;
 }
 
