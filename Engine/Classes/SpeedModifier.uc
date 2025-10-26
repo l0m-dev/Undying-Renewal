@@ -36,7 +36,8 @@ function Tick(float DeltaTime)
 	
 	// PlayerTick is not called on the server so we need this to calculate VelocityBias
 	// it should only be calculated in walking and flying state
-	Player.VelocityBias = Player.GetTotalPhysicalEffect(DeltaTime);
+	if (RemoteRole == ROLE_AutonomousProxy)
+		Player.VelocityBias = Player.GetTotalPhysicalEffect(DeltaTime);
 
 	// hack to stop player from falling from other clients' perspectives
 	// needs to be fixed in native code

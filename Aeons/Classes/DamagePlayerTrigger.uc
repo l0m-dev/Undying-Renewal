@@ -6,6 +6,7 @@ class DamagePlayerTrigger expands Trigger;
 var() float DamagePerSec;
 var() name MyDamageType;
 var() localized string MyDamageString;
+var() float DamageMultiplier;
 
 function DamageInfo getDamageInfo(optional name DamageType)
 {
@@ -17,7 +18,7 @@ function DamageInfo getDamageInfo(optional name DamageType)
 	DInfo.Damage = 1;
 	DInfo.DamageType = DamageType;
 	DInfo.DamageString = MyDamageString;
-	DInfo.DamageMultiplier = 1.0;
+	DInfo.DamageMultiplier = DamageMultiplier;
 
 	return DInfo;
 
@@ -68,12 +69,29 @@ state() OtherTriggerTurnsOff
 function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	SetTimer(1.0 / DamagePerSec, true);
+
+	// limit this for now because Undying has some really high DamagePerSec numbers
+	// this was framerate dependent on framerates lower than DamagePerSec
+	DamagePerSec = FMin(DamagePerSec, 60.0);
+
+	TimeSinceTick = 0.0;
+	MinTickTime = 1.0 / DamagePerSec;
 }
 
-function Timer()
+// simulate bTimedTick, but fixed
+// this is already fixed in EngineRenewal, and we could just use bTimedTick
+// keep this for a little while
+function Tick( float DeltaTime )
 {
-	CheckTouchList();
+	TimeSinceTick += DeltaTime;
+
+	if( TimeSinceTick >= MinTickTime )
+	{
+		DamageMultiplier = default.DamageMultiplier * (TimeSinceTick / MinTickTime);
+		CheckTouchList();
+
+		TimeSinceTick = 0.0;
+	}
 }
 
 function Touch(Actor Other)
@@ -90,4 +108,5 @@ function Touch(Actor Other)
 defaultproperties
 {
      DamagePerSec=10
+     DamageMultiplier=1.0
 }
