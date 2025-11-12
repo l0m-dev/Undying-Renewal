@@ -527,8 +527,11 @@ function StartGame( int Difficulty )
 	}
 	
 	PlayNewScreenSound();
-	
-	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty $ "?mutator=" $ mutatorClassString;
+
+	URL = StartMap $ "?nosave?Difficulty=" $ Difficulty;
+
+	if (mutatorClassString != "")
+		URL = URL $ "?mutator=" $ mutatorClassString;
 
 	// allow main menu to close
 	GetPlayerOwner().Level.bLoadBootShellPSX2 = false;

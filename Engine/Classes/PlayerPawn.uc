@@ -80,7 +80,7 @@ var float shakevert; // max vertical shake magnitude
 var float maxshake;
 var float verttimer;
 var travel float ScryeTimer;
-var() float ScryeFullTime;
+var() travel float ScryeFullTime;
 var() float ScryeRampTime;
 var(Pawn) class<carcass> CarcassType;
 var travel globalconfig float MyAutoAim;

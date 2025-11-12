@@ -92,8 +92,11 @@ function Activate()
 					P = Owner.JointPlace(JointName);
 					A = Spawn(Pawn(Owner).OnFireParticles, Owner,, P.pos);
 					A.SetBase(Owner,JointName, 'root');
-					B = Spawn(Pawn(Owner).OnFireSmokeParticles, Owner,, P.pos);
-					B.SetBase(Owner,JointName, 'root');
+					if ( Pawn(Owner).OnFireSmokeParticles != none )
+					{
+						B = Spawn(Pawn(Owner).OnFireSmokeParticles, Owner,, P.pos);
+						B.SetBase(Owner,JointName, 'root');
+					}
 				}
 			}
 		}

@@ -266,8 +266,13 @@ state Guiding
 			if (GuidedShell.GetStateName() != 'Release')
 			{
 				GuidedShell.GotoState('Release');
+				if ( Owner.RemoteRole == ROLE_AutonomousProxy )
+				{
+					GuidedShell.ClientRelease();
+				}
 				GuidedShell.RemoteRole = ROLE_SimulatedProxy;
 				PCam = Spawn(class 'PhoenixCameraProjectile',GuidedShell,,GuidedShell.Location, GuidedShell.Rotation);
+				PhoenixCameraProjectile(PCam).Player = PlayerPawn(Owner);
 				PlayerPawn(Owner).ViewTarget = PCam;
 			}
 		}
@@ -317,11 +322,10 @@ state Guiding
 			GuidingPawn.ClientAdjustGlow(0.2,vect(-200,0,0));
 			GuidingPawn.ClientSetRotation(StartRotation);
 			GuidingPawn.DesiredFOV = GuidingPawn.default.DesiredFOV;
-			if (GuidingPawn.Health > 0)
+			if ( GuidingPawn.Health > 0 && GuidingPawn.GetStateName() == 'GuidingPhoenix' )
 			{
 				GuidingPawn.GotoState('PlayerWalking');//ClientGotoState
 			}
-			GuidingPawn.ViewTarget = None;
 			GuidingPawn = None;
 			// Test PlayActuator here!!
 			PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_FadeOut, 0.1f);

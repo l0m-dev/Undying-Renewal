@@ -26,7 +26,7 @@ replication
 {
 	// Things the server should send to the client.
 	unreliable if( Role==ROLE_Authority )
-		ClientAdjustPosition, bDestroyed;
+		ClientAdjustPosition, ClientRelease, bDestroyed;
 	unreliable if ( Role==ROLE_Authority && bNetOwner && bNetInitial )
 		GuidedRotation, OldGuiderRotation;
 	unreliable if( Role==ROLE_Authority && !bNetOwner )
@@ -57,8 +57,11 @@ simulated function ProcessTouch(Actor Other, Vector HitLocation)
 
 	if (bCanHitInstigator || Other != Owner)
 	{
+		// note: projectile will only explode if the pawn accepts damage
+		// this will make the phoenix just go through the pawn
 		Other.ProjectileHit(Instigator, HitLocation, (MomentumTransfer * Normal(Velocity)), self, getDamageInfo());
-		if (RGC() && Other.IsA('Pawn'))
+
+		if (bDestroyed && RGC() && Other.IsA('Pawn'))
 			Pawn(Other).OnFire(true);
 	}
 }
@@ -130,8 +133,6 @@ simulated function Destroyed()
 				if ( ExpireSound != none )
 					PlaySound(ExpireSound,,2,,4096);
 			}
-			if ( (PlayerPawn(Guider) != None) )
-				PlayerPawn(Guider).ViewTarget = None;
 			break;
 		
 		case 'Release':
@@ -163,7 +164,10 @@ simulated function Destroyed()
 			}	
 			break;
 	}
-	
+
+	if ( (PlayerPawn(Guider) != None) && (PlayerPawn(Guider).ViewTarget == self) )
+		PlayerPawn(Guider).ViewTarget = None;
+
 	bDestroyed = true;
 
 
@@ -579,6 +583,11 @@ state Release
 	}
 
 	Begin:
+}
+
+simulated function ClientRelease()
+{
+	GotoState('Release');
 }
 
 

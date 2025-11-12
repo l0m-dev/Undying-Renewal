@@ -33,76 +33,79 @@ state Active
 	{
 		local float FuelNeeded;
 		
-		if ( Owner != None ) 
+		if ( Owner == None ) 
 		{
-			// Die while flying?
-			if ( Pawn(Owner).Health <= 0 )
-			{
-				Owner.SetPhysics(PHYS_Falling);
-				Owner.GotoState('PlayerWalking');
-				GotoState('Idle');
-				return;
-			}
-			
-			// this part needs to go in FlightModifier
-			if ( Owner.GetStateName() != 'PlayerFlying')
-			{
-				if ( ( AeonsPlayer(Owner).JumpHeldTime >= 0.2 ) &&
-					 ( !AeonsPlayer(Owner).InCrouch() ) &&
-					 !AeonsPlayer(Owner).Region.Zone.bWaterZone &&
-					 !AeonsPlayer(Owner).IsInCutsceneState() &&
-					 ( Fuel >= 30 ) )
-				{
-					bActive = true;
-					AeonsPlayer(Owner).GotoState('PlayerFlying');//KeebFly();
-				} else
-				{
-					if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
-					{
-						GotoState('Idle');
-						return;
-					}
-				}
-			}
-
-			if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
-			{
-				Owner.SetPhysics(PHYS_Falling);
-				Owner.GotoState('PlayerWalking');
-				Fuel = FMax(0, Fuel-1.5); // prevents spamming to fly further
-				GotoState('Idle');
-				return;
-			}				
-			
-			if ( Pawn(Owner).Acceleration.Z > 0 )
-			{						
-				FuelNeeded = 1.5 + 1.5*Pawn(Owner).Acceleration.Z/Pawn(Owner).AirSpeed;
-			}	
-			else
-			{
-				FuelNeeded = 1.5;
-			}
-			
-			if ( FuelNeeded > Fuel )
-			{
-				// sorry but you are all out of mana
-				Owner.SetPhysics(PHYS_Falling);
-				Owner.GotoState('PlayerWalking');
-				Fuel = 0;
-				GotoState('Idle');
-			}
-			else
-			{
-				Fuel -= FuelNeeded;					
-				
-				/*
-				if ( Fuel >= 30 )
-					AmbientSound = FlyingSound;
-				else
-					AmbientSound = SputterSound;
-				*/
-			}						
+			return;
 		}
+
+		// Die while flying?
+		if ( Pawn(Owner).Health <= 0 )
+		{
+			Owner.SetPhysics(PHYS_Falling);
+			Owner.GotoState('PlayerWalking');
+			GotoState('Idle');
+			return;
+		}
+		
+		// this part needs to go in FlightModifier
+		if ( Owner.GetStateName() != 'PlayerFlying')
+		{
+			if ( ( AeonsPlayer(Owner).JumpHeldTime >= 0.2 ) &&
+					( !AeonsPlayer(Owner).InCrouch() ) &&
+					!AeonsPlayer(Owner).Region.Zone.bWaterZone &&
+					!AeonsPlayer(Owner).IsInCutsceneState() &&
+					( Fuel >= 30 ) )
+			{
+				bActive = true;
+				AeonsPlayer(Owner).GotoState('PlayerFlying');//KeebFly();
+			}
+			else
+			{
+				if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
+				{
+					GotoState('Idle');
+				}
+				return;
+			}
+		}
+
+		if ( AeonsPlayer(Owner).JumpHeldTime == 0 ) 
+		{
+			Owner.SetPhysics(PHYS_Falling);
+			Owner.GotoState('PlayerWalking');
+			Fuel = FMax(0, Fuel-1.5); // prevents spamming to fly further
+			GotoState('Idle');
+			return;
+		}				
+		
+		if ( Pawn(Owner).Acceleration.Z > 0 )
+		{						
+			FuelNeeded = 1.5 + 1.5*Pawn(Owner).Acceleration.Z/Pawn(Owner).AirSpeed;
+		}	
+		else
+		{
+			FuelNeeded = 1.5;
+		}
+		
+		if ( FuelNeeded > Fuel )
+		{
+			// sorry but you are all out of mana
+			Owner.SetPhysics(PHYS_Falling);
+			Owner.GotoState('PlayerWalking');
+			Fuel = 0;
+			GotoState('Idle');
+		}
+		else
+		{
+			Fuel -= FuelNeeded;					
+			
+			/*
+			if ( Fuel >= 30 )
+				AmbientSound = FlyingSound;
+			else
+				AmbientSound = SputterSound;
+			*/
+		}						
 	}
 	
 	function Tick( float DeltaTime ) 

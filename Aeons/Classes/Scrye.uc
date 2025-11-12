@@ -31,13 +31,13 @@ state NormalFire
 	Begin:
 		if ( RGC() )
 		{
-			AeonsPlayer(owner).ScryeFullTime = 10 + castingLevel * 2;
+			AeonsPlayer(owner).ScryeFullTime = class'AeonsPlayer'.default.ScryeFullTime + castingLevel * 2;
 			AeonsPlayer(owner).ScryeTimer = AeonsPlayer(owner).ScryeFullTime;
 		}
 		else
 		{
-			AeonsPlayer(owner).ScryeFullTime = 10;
-			AeonsPlayer(owner).ScryeTimer = 10;
+			AeonsPlayer(owner).ScryeFullTime = class'AeonsPlayer'.default.ScryeFullTime;
+			AeonsPlayer(owner).ScryeTimer = AeonsPlayer(owner).ScryeFullTime;
 		}
 		AeonsPlayer(owner).ScryeMod.gotoState('Activated');
 		AeonsPlayer(owner).ScryeMod.castingLevel = localCastingLevel;
