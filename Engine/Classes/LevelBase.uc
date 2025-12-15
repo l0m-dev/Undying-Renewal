@@ -8,7 +8,7 @@ class LevelBase extends Object
 	transient;
 
 // Internal.
-var native private const int vtblOut;
+var native private const pointer vtblOut;
 
 // Database.
 var transient const array<actor> Actors;

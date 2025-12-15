@@ -43,6 +43,7 @@ simulated function PreBeginPlay()
 function Fire( float Value )
 {
 	bPointing = true;
+	CalculateAutoAimDir();
 	CheckVisibility();
 	GotoState('NormalFire');
 }

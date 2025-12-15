@@ -510,6 +510,7 @@ function AdjustDamage( out DamageInfo DInfo )
 		KillingBlow = true;
 		DInfo.Damage = 2.0 * InitHealth;
 		DInfo.JointName = 'Head';
+		HealthBar.SetPercent(0);
 	}
 	else
 		DInfo.Damage = 0;
@@ -607,8 +608,10 @@ state AaronTempWeak expands AIScriptedState
 Begin:
 Resume:
 Dodged:
+	HealthBar.State = HBS_VulnerableScythe;
 	PlayAnim( 'get_up' );
 	FinishAnim();
+	HealthBar.State = HBS_Invulnerable;
 	GotoState( 'AIFarAttackAnim', 'FinishedAttack' );
 }
 
@@ -656,9 +659,16 @@ state AIJumpAtEnemy
 		JumpLanding = false;
 	}
 
+	function EndState()
+	{
+		Super.EndState();
+		HealthBar.State = HBS_Invulnerable;
+	}
+
 	function bool PlayJumpAttackLanding()
 	{
 		JumpLanding = true;
+		HealthBar.State = HBS_VulnerableScythe;
 		if( WillTrip )
 			return PlayAnim('trip');
 		else
@@ -697,6 +707,7 @@ state AIChainAttack expands AIFarAttackAnim
 	// *** new (state only) functions ***
 
 ChainStuck:
+	HealthBar.State = HBS_VulnerableScythe;
 	TurnOffRepulsor();
 	LoopAnim( 'ChainStuck', [OverrideTarget] true );
 	SetTimer( ChainStuckTimer, false );
@@ -719,6 +730,7 @@ RESUME:
 BEGIN:
 	StopTimer();
 	StopMovement();
+	HealthBar.State = HBS_Invulnerable;
 	TurnOnRepulsor();
 	TurnToward( Enemy, 0 );
 	PlayChainAttack();
@@ -745,6 +757,7 @@ state AIResumeChainAttack
 state AaronBlockScythe expands AIScriptedState
 {
 Begin:
+	HealthBar.SetPercent(0.5);
 	PlayAnim( 'Block' );
 	FinishAnim();
 	BlockedScythe();
@@ -801,6 +814,11 @@ Begin:
 	TurnOnGlow();
 	PlayAnim( 'Awaken' );
 	FinishAnim();
+
+	// Health bar.
+	if( HealthBar == None )
+		HealthBar = class'HealthBar'.static.CreateHealthBar(self, true);
+	HealthBar.State = HBS_Invulnerable;
 
 	GotoState( 'AIAttackPlayer' );
 }

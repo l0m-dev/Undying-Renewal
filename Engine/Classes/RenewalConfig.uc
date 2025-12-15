@@ -31,9 +31,12 @@ var config bool bSaveThumbnails;
 
 var config bool bSlomoSelection;
 
+var config bool bShowBossHealthBars;
+
 // things that are not configurable
 var config bool bShowScryeHint;
 var config bool bShowQuickSelectHint;
+var config bool bUnlockedUltraNightmare;
 
 // for live tweaking/debugging
 var bool bDebug;
@@ -69,7 +72,7 @@ defaultproperties
 	 JournalColor="#ffffff"
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
-	 bSlomoSelection=False
+	 bSlomoSelection=True
 	 bShowScryeHint=True
 	 bShowQuickSelectHint=True
 	 fDebug=1.0

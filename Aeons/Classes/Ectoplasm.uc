@@ -157,6 +157,7 @@ state NormalFire
 
 	function FireEcto()
 	{
+		CalculateAutoAimDir();
 		// log("	Ecto: FireEcto(), 'Misc'");
 		GhelzUse(manaCostPerLevel[localCastingLevel]);
 		// play sound and visual effects

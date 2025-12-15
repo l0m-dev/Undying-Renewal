@@ -1027,7 +1027,7 @@ public:
     BITFIELD bClientDemoRecording:1;
     BITFIELD bClientDemoNetFunc:1;
     BITFIELD bShowDebugInfo:1;
-    INT FREE_VARIABLE GCC_PACK(4);
+    FName LastJointHit GCC_PACK(4);
     class UClass* RenderIteratorClass;
     class URenderIterator* RenderInterface;
     DECLARE_FUNCTION(execMultiply_ColorFloat);
@@ -1722,7 +1722,7 @@ struct AStatLog_eventLogGameSpecial_Parms
 class ENGINE_API AStatLog : public AInfo
 {
 public:
-    INT Context;
+    Fpointer Context;
     BITFIELD bWorld:1 GCC_PACK(4);
     FLOAT TimeStamp GCC_PACK(4);
     FStringNoInit LocalStandard;
@@ -1776,7 +1776,7 @@ class ENGINE_API AStatLogFile : public AStatLog
 {
 public:
     BITFIELD bWatermark:1 GCC_PACK(4);
-    INT LogAr GCC_PACK(4);
+    Fpointer LogAr GCC_PACK(4);
     FStringNoInit StatLogFile;
     FStringNoInit StatLogFinal;
     DECLARE_FUNCTION(execFileLog);

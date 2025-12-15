@@ -299,6 +299,9 @@ function Tick( float deltaTime )
 	if( Mana > ManaMaximum )
 		Mana = ManaMaximum;
 
+	if( HealthBar != none && Health > 0 )
+		HealthBar.SetPercent( Mana / ManaMaximum );
+
 	DrawScaleEffector.SetFade( 1.0 + Mana / ManaMaximum, 1.0 );
 
 	if( (Home != none) && 
@@ -409,6 +412,9 @@ state AIRecharging expands AIWait
 		if( Mana > ManaMaximum )
 			Mana = ManaMaximum;
 
+		if( HealthBar != none )
+			HealthBar.SetPercent( Mana / ManaMaximum );
+
 		DrawScaleEffector.SetFade( 1.0 + Mana / ManaMaximum, 1.0 );
 
 		super.Tick( deltaTime );
@@ -459,11 +465,15 @@ state AIWeakened expands AIWait
 		
 		Mana = ManaWeakenedThreshold;
 		SendClassComm( class'Handmaiden', "weakened", 0 );
+
+		HealthBar.State = HBS_VulnerableScythe;
 	}
 
 	function EndState()
 	{
 		super.EndState();
+
+		HealthBar.State = HBS_Invulnerable;
 	}
 
 	function Bump( actor Other ){}
@@ -520,6 +530,7 @@ state AIWeakened expands AIWait
 				DInfo.Damage = 2.0 * Health; // make sure she dies.
 				DInfo.JointName = 'head';
 				SnuffMyMinions();
+				HealthBar.SetPercent(0);
 				break;
 			case 'recharge':
 				Mana += LastDeltaTime * RechargingRate;
@@ -786,6 +797,31 @@ state AIAttack
 	// *** new (state only) functions ***
 
 } // state AIAttack
+
+//****************************************************************************
+// AIAttackPlayer
+// Attack dispatch state for attacking player.
+//****************************************************************************
+state AIAttackPlayer
+{
+	// *** ignored functions ***
+
+	// *** overridden functions ***
+	function BeginState()
+	{
+		// Health bar.
+		if( HealthBar == None )
+		{
+			HealthBar = class'HealthBar'.static.CreateHealthBar(self, true);
+			HealthBar.InvulnerableColor = MakeRGBA(0, 65, 240, 255);
+		}
+		HealthBar.State = HBS_Invulnerable;
+		Super.BeginState();
+	}
+
+	// *** new (state only) functions ***
+
+} // state AIAttackPlayer
 
 
 //****************************************************************************

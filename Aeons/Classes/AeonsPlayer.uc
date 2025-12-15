@@ -3529,6 +3529,11 @@ simulated state PlayerCutScene
 		bRequestedSkipCutscene = true;
 	}
 
+	exec function Jump( optional float F )
+	{
+		bRequestedSkipCutscene = true;
+	}
+
 	Begin:
 		// added Freeze and LockPos, ignoring bHoldPlayer
 		// what's the point of bHoldPlayer if you can't move during cutscenes anyways?
@@ -3679,12 +3684,12 @@ ignores SeePlayer, HearNoise, Bump;
     {
     }
 
-	/*
 	exec function Jump( optional float F )
 	{
 		//Log("JUmp while in wheel");
+		bJump = 0;
+		SetObject(true);
 	}
-	*/
 
 	exec function Fire(optional float F)
 	{
@@ -3907,6 +3912,7 @@ ignores SeePlayer, HearNoise, Bump;
 			if ( AeonsHUD(myHUD) != None )
 			{
 				// MouseSensitivity is already applied to all of these
+				/*
 				if ( bMouseSmoothing ) 
 				{
 					AeonsHUD(myHUD).aX = SmoothMouseX;
@@ -3917,6 +3923,21 @@ ignores SeePlayer, HearNoise, Bump;
 					AeonsHUD(myHUD).aX = aMouseX;
 					AeonsHUD(myHUD).aY = aMouseY;
 				}
+				*/
+
+				if ( aMouseX == 0.0 && aMouseY == 0.0 )
+				{
+					// make the cursor faster on controller
+					AeonsHUD(myHUD).aX = aTurn * 10.0;
+					AeonsHUD(myHUD).aY = aLookUp * 10.0;
+				}
+				else
+				{
+					AeonsHUD(myHUD).aX = aTurn;
+					AeonsHUD(myHUD).aY = aLookUp;
+				}
+				
+				
 				AeonsHUD(myHUD).WheelMouseInput(DeltaTime);
 			}
 

@@ -12,7 +12,7 @@ class Console extends Object
 //#exec Texture Import File=Textures\Border.pcx
 
 // Internal.
-var native private const int vtblOut;
+var native private const pointer vtblOut;
 
 // Constants.
 const MaxBorder=6;
@@ -152,7 +152,7 @@ enum EInputKey
 /*E4*/	IK_MouseX		,IK_MouseY		,IK_MouseZ		,IK_MouseW		,
 /*E8*/	IK_JoyU			,IK_JoyV		,IK_UnknownEA	,IK_UnknownEB	,
 /*EC*/	IK_MWheelUp		,IK_MWheelDown	,IK_Unknown10E	,UK_Unknown10F  ,
-/*F0*/	IK_UnknownF0	,IK_UnknownF1	,IK_UnknownF2	,IK_UnknownF3	,
+/*F0*/	IK_JoyPovUp     ,IK_JoyPovDown	,IK_JoyPovLeft	,IK_JoyPovRight	,
 /*F4*/	IK_UnknownF4	,IK_UnknownF5	,IK_Attn		,IK_CrSel		,
 /*F8*/	IK_ExSel		,IK_ErEof		,IK_Play		,IK_Zoom		,
 /*FC*/	IK_NoName		,IK_PA1			,IK_OEMClear

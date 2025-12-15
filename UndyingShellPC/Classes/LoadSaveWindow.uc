@@ -74,6 +74,8 @@ var localized string QuickSaveText;
 var localized string SaveText;
 var localized string EmptyText;
 
+var int LastNavSlot;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -205,6 +207,8 @@ function Created()
 	Load.OverTexture = texture'ShellTextures.sload_Load_ov';
 	Load.DisabledTexture = texture'ShellTextures.sload_Load_dn';
 
+	Load.ControllerButton = 0;
+
 // Save Button
 	Save = ShellButton(CreateWindow(class'ShellButton', 10, 10, 10, 10));
 
@@ -224,6 +228,8 @@ function Created()
 	Save.DownTexture = texture'ShellTextures.sload_Save_dn';
 	Save.OverTexture = texture'ShellTextures.sload_Save_ov';
 	Save.DisabledTexture = texture'ShellTextures.sload_Save_dn';
+
+	Save.ControllerButton = 2;
 
 // Delete Button
 	Delete = ShellButton(CreateWindow(class'ShellButton', 10, 10, 10, 10));
@@ -253,6 +259,7 @@ function Created()
 	ScreenShot.Manager = Self;
 	
 	SelectedSlot = -1;
+	LastNavSlot = -1;
 	SaveDelay = -1;
 
 	bDynamicScreenshot = GetPlayerOwner().GetRenewalConfig().bSaveThumbnails;
@@ -366,10 +373,65 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 	switch(Msg)
 	{
 	case WM_KeyDown:
-		if (Key == Root.Console.EInputKey.IK_MWheelUp && !Up.bDisabled)
-			ScrolledUp();
-		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Down.bDisabled)
-			ScrolledDown();
+		switch(Key)
+		{
+		case Root.Console.EInputKey.IK_MWheelUp:
+			if (!Up.bDisabled)
+				ScrolledUp();
+			break;
+		case Root.Console.EInputKey.IK_JoyPovUp:
+		case Root.Console.EInputKey.IK_Up:
+			if (Up.bDisabled)
+			{
+				if (LastNavSlot > 0)
+					SelectSlot(LastNavSlot-1);
+				//else
+				//	ObjectivesButtonPressed(true);
+			}
+			else
+			{
+				if (LastNavSlot == 0)
+				{
+					ScrolledUp();
+					SelectSlot(LastNavSlot);
+				}
+				else
+					SelectSlot(LastNavSlot-1);
+			}
+			break;
+		case Root.Console.EInputKey.IK_MWheelDown:
+			if (!Down.bDisabled)
+				ScrolledDown();
+			break;
+		case Root.Console.EInputKey.IK_JoyPovDown:
+		case Root.Console.EInputKey.IK_Down:
+			if (Down.bDisabled)
+			{
+				if (LastNavSlot < (ArrayCount(SaveGameButtons)-1))
+					SelectSlot(LastNavSlot+1);
+			}
+			else
+			{
+				if (LastNavSlot == (ArrayCount(SaveGameButtons)-1))
+				{
+					ScrolledDown();
+					SelectSlot(LastNavSlot);
+				}
+				else
+					SelectSlot(LastNavSlot+1);
+			}
+			break;
+		case Root.Console.EInputKey.IK_Enter:
+		case Root.Console.EInputKey.IK_Joy1:
+			if (!Load.bDisabled)
+				LoadPressed();
+			break;
+		case Root.Console.EInputKey.IK_Joy3:
+		//case Root.Console.EInputKey.IK_Escape:
+			if (!Save.bDisabled)
+				SavePressed();
+			break;
+		}
 		break;
 	}
 
@@ -413,6 +475,7 @@ function SelectSlot( int Slot )
 		GetPlayerOwner().PlaySound( SelectSound,, 0.25, [Flags]482 );
 	
 	SelectedSlot = Slot + CurrentRow;
+	LastNavSlot = Slot;
 
 /*
 	//fix this will break when E m p t y is localized
@@ -1040,6 +1103,7 @@ function HideWindow()
 	Root.Console.bBlackOut = False;
 
 	SelectedSlot = -1;
+	LastNavSlot = -1;
 }
 
 //----------------------------------------------------------------------------

@@ -349,6 +349,9 @@ var float ScoreTime;
 
 var CutsceneManager CutsceneManager;
 
+var HealthBar CachedHealthBar;
+var float CachedHealthBarTime;
+
 simulated function PostBeginPlay()
 {
 	local AeonsPlayer AP;
@@ -413,6 +416,8 @@ simulated function PostBeginPlay()
 	MySmallFont =	Font(DynamicLoadObject(GetRenewalConfig().SmallFont, class'Font'));
 
 	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+
+	CachedHealthBarTime = 0.1;
 }
 
 simulated function ShowMOTD()
@@ -546,6 +551,29 @@ simulated function DrawSubtitles(Canvas canvas)
 		Canvas.bCenter = false;
 		Canvas.SetPos (Canvas.OrgX, Canvas.OrgY);
 	}
+}
+
+simulated function DrawHealthBars(Canvas canvas)
+{
+	local ScriptedPawn SP;
+
+	if (CachedHealthBarTime < Level.TimeSeconds)
+	{
+		CachedHealthBarTime = Level.TimeSeconds + 2.0;
+
+		CachedHealthBar = None;
+		foreach RadiusActors(class'ScriptedPawn', SP, 4096, Owner.Location)
+		{
+			if (SP.HealthBar != None)
+			{
+				CachedHealthBar = SP.HealthBar;
+				break;
+			}
+		}
+	}
+
+	if (CachedHealthBar != None)
+		CachedHealthBar.Paint(canvas);
 }
 
 // original wheel order
@@ -1665,11 +1693,15 @@ simulated function PostRender( canvas Canvas )
 		DrawSepiaOverlay(Canvas);
 	}
 	
+	// Draw health bars
+	if ( bDrawHUD && GetRenewalConfig().bShowBossHealthBars )
+		DrawHealthBars(Canvas);
+	
 	if ( Level.TimeSeconds < ChatVisibleTime || AeonsConsole(PlayerPawn(Owner).Player.Console).bChatting )
 		DrawChat(Canvas);
 	
 	// Draw the subtitles
-	if (PlayerOwner.bEnableSubtitles)
+	if ( PlayerOwner.bEnableSubtitles )
 		DrawSubtitles (Canvas);
 
 	if ( PlayerOwner.bShowScores && PlayerOwner.PlayerReplicationInfo != None )

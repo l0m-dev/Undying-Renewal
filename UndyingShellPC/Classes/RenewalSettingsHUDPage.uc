@@ -5,6 +5,7 @@ var UWindowCheckbox AutoShowObjectivesCheck;
 var UWindowCheckbox ShowUsedManaCheck;
 //var UWindowHSliderControl HudScaleSlider;
 var UWindowComboControl HudSizeCombo;
+var UWindowCheckbox ShowBossHealthBarsCheck;
 
 var localized string AltHudText;
 var localized string AltHudHelp;
@@ -17,6 +18,8 @@ var localized string HudSizeHelp;
 var localized string HudSizeSmall;
 var localized string HudSizeNormal;
 var localized string HudSizeBig;
+var localized string ShowBossHealthBarsText;
+var localized string ShowBossHealthBarsHelp;
 
 function Created()
 {
@@ -39,6 +42,8 @@ function Created()
 	HudSizeCombo.AddItem(HudSizeSmall, "0.9");
 	HudSizeCombo.AddItem(HudSizeNormal, "1.0");
 	HudSizeCombo.AddItem(HudSizeBig, "1.1");
+
+	ShowBossHealthBarsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', ShowBossHealthBarsText, ShowBossHealthBarsHelp));
 	
 	GetSettings();
 }
@@ -58,6 +63,8 @@ function GetSettings()
 		HudSizeCombo.SetSelectedIndex(0);
 	else
 		HudSizeCombo.SetSelectedIndex(2);
+	
+	ShowBossHealthBarsCheck.bChecked = RenewalConfig.bShowBossHealthBars;
 }
 
 function Notify(UWindowDialogControl C, byte E)
@@ -83,6 +90,9 @@ function Notify(UWindowDialogControl C, byte E)
 		case HudSizeCombo:
 			RenewalConfig.HudScale = float(HudSizeCombo.GetValue2());
 			break;
+		case ShowBossHealthBarsCheck:
+			RenewalConfig.bShowBossHealthBars = ShowBossHealthBarsCheck.bChecked;
+			break;
 		}
 		break;
 	}
@@ -92,4 +102,6 @@ function Notify(UWindowDialogControl C, byte E)
 
 defaultproperties
 {
+     ShowBossHealthBarsText="Show boss health bars"
+     ShowBossHealthBarsHelp="Show boss health bars on the HUD"
 }

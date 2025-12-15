@@ -707,58 +707,64 @@ simulated function bool ClientFire( float Value )
 
 function ForceFire();
 
-function Fire( float Value )
+function Pawn CalculateAutoAimDir()
 {
-	local Pawn P, P2;
-	local Vector FireDir, WpnToPawn;
+    local Pawn P, P2;
+    local Vector FireDir, WpnToPawn, Start, End;
 	local Float DotProd, BigRatio, VecLen, Thresh, Ratio;
-	
-	if (AmmoType.UseAmmo(1))
-	{
-		if (PlayerPawn(Owner).bUsingAutoAim)
-			AutoAimDir = Pawn(Owner).ViewRotation;
 
-		if (!PlayerPawn(Owner).bHaveTarget && PlayerPawn(Owner).bUsingAutoAim)
+    if (PlayerPawn(Owner).bUsingAutoAim)
+		AutoAimDir = Pawn(Owner).ViewRotation;
+
+	if (!PlayerPawn(Owner).bHaveTarget && PlayerPawn(Owner).bUsingAutoAim)
+	{
+		BigRatio = 0.0;
+		FireDir = vector (Pawn(Owner).ViewRotation);
+		Start = Owner.Location + vect(0,0,1) * Pawn(Owner).EyeHeight;
+		ForEach Owner.VisibleActors(class 'Pawn', P, 2048)
 		{
-			BigRatio = 0.0;
-			FireDir = vector (Pawn(Owner).ViewRotation);
-			ForEach RadiusActors(class 'Pawn', P, 2048)
+			if (P != Owner && P.Health > 0.0 && !P.IsA('ScriptedNarrator'))	// Only check live actors.
 			{
-				if (P.Health > 0.0)	// Only check live actors.
+				if (P.JointIndex('Pelvis') >= 0)
+					End = P.JointPlace('Pelvis').Pos;
+				else if (P.JointIndex('Spine2') >= 0)
+					End = P.JointPlace('Spine2').Pos;
+				else
+					End = P.Location;
+				WpnToPawn = End - Start;
+				VecLen = Sqrt (WpnToPawn.X * WpnToPawn.X + WpnToPawn.Y * WpnToPawn.Y + WpnToPawn.Z * WpnToPawn.Z);
+				WpnToPawn = Normal (WpnToPawn);
+				DotProd = FireDir dot WpnToPawn;
+				Thresh = 1.0 - (8.0 / VecLen);
+				Thresh = FMax(Level.Game.AutoAim, Thresh);
+				Ratio = (DotProd - Thresh) / (1.0 - Thresh);
+				
+				if ((DotProd > Thresh) && (Ratio > BigRatio))
 				{
-					if (P.JointIndex('Pelvis') >= 0)
-						WpnToPawn = P.JointPlace('Pelvis').Pos - Pawn(Owner).Location;
-					else
-						WpnToPawn = P.JointPlace('Spine2').Pos - Pawn(Owner).Location;
-					VecLen = Sqrt (WpnToPawn.X * WpnToPawn.X + WpnToPawn.Y * WpnToPawn.Y + WpnToPawn.Z * WpnToPawn.Z);
-					WpnToPawn.Z -= Pawn(Owner).EyeHeight;
-					WpnToPawn = Normal (WpnToPawn);
-					DotProd = FireDir dot WpnToPawn;
-					Thresh = 1.0 - (4.0 / VecLen);
-					if (Thresh < 0.85)
-						Thresh = 0.85;
-					Ratio = (DotProd - Thresh) / (1.0 - Thresh);
-					
-					if ((DotProd > Thresh) && (Ratio > BigRatio))
-					{
-						AutoAimDir = rotator (WpnToPawn);
-						P2 = P;
-						BigRatio = Ratio;
-					}
+					AutoAimDir = rotator (WpnToPawn);
+					P2 = P;
+					BigRatio = Ratio;
 				}
 			}
-			if (P2 != None)
-				P2.WeaponFireNotify(self.class.name, Pawn(Owner));
 		}
-		else
+	}
+
+	return P2;
+}
+
+function Fire( float Value )
+{
+    local Pawn P;
+
+	if (AmmoType.UseAmmo(1))
+	{
+		CalculateAutoAimDir();
+		ForEach RadiusActors(class 'Pawn', P, 2048)
 		{
-			ForEach RadiusActors(class 'Pawn', P, 2048)
+			if ( P != Pawn(Owner) )
 			{
-				if ( P != Pawn(Owner) )
-				{
-					if ( FastTrace(Pawn(Owner).Location, P.Location) )
-						P.WeaponFireNotify(self.class.name, Pawn(Owner));
-				}
+				if ( FastTrace(Pawn(Owner).Location, P.Location) )
+					P.WeaponFireNotify(self.class.name, Pawn(Owner));
 			}
 		}
 		PlayFiring();

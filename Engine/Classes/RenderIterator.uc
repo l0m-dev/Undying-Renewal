@@ -22,7 +22,7 @@ struct ActorNode
 var()			int			MaxItems;
 var				int			Index;
 var transient	PlayerPawn	Observer;
-var native private const int Frame;	// just a generic pointer used for binary compatibility only (FSceneNode*).
+var native private const pointer Frame;	// just a generic pointer used for binary compatibility only (FSceneNode*).
 
 defaultproperties
 {

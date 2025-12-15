@@ -366,11 +366,56 @@ function bool processCastingLevel()
 	return true;
 }
 
+function Pawn CalculateAutoAimDir()
+{
+    local Pawn P, P2;
+    local Vector FireDir, WpnToPawn, Start, End;
+	local Float DotProd, BigRatio, VecLen, Thresh, Ratio;
+
+    if (PlayerPawn(Owner).bUsingAutoAim)
+		AutoAimDir = Pawn(Owner).ViewRotation;
+
+	if (!PlayerPawn(Owner).bHaveTarget && PlayerPawn(Owner).bUsingAutoAim)
+	{
+		BigRatio = 0.0;
+		FireDir = vector (Pawn(Owner).ViewRotation);
+		Start = Owner.Location + vect(0,0,1) * Pawn(Owner).EyeHeight;
+		ForEach Owner.VisibleActors(class 'Pawn', P, 2048)
+		{
+			if (P != Owner && P.Health > 0.0 && !P.IsA('ScriptedNarrator'))	// Only check live actors.
+			{
+				if (P.JointIndex('Pelvis') >= 0)
+					End = P.JointPlace('Pelvis').Pos;
+				else if (P.JointIndex('Spine2') >= 0)
+					End = P.JointPlace('Spine2').Pos;
+				else
+					End = P.Location;
+				WpnToPawn = End - Start;
+				VecLen = Sqrt (WpnToPawn.X * WpnToPawn.X + WpnToPawn.Y * WpnToPawn.Y + WpnToPawn.Z * WpnToPawn.Z);
+				WpnToPawn = Normal (WpnToPawn);
+				DotProd = FireDir dot WpnToPawn;
+				Thresh = 1.0 - (8.0 / VecLen);
+				Thresh = FMax(Level.Game.AutoAim, Thresh);
+				Ratio = (DotProd - Thresh) / (1.0 - Thresh);
+				
+				if ((DotProd > Thresh) && (Ratio > BigRatio))
+				{
+					AutoAimDir = rotator (WpnToPawn);
+					P2 = P;
+					BigRatio = Ratio;
+				}
+			}
+		}
+	}
+
+	return P2;
+}
+
 //if not bSpellUp it causes the weapon hand to come up in preparation for firing
 //then if there's enough mana the spell will fire
 function FireAttSpell( float Value )
 {
-	logTime("Spell: FireAttSpell");
+	//logTime("Spell: FireAttSpell");
     if ( Pawn(Owner).HeadRegion.Zone.bWaterZone && !bWaterFire)
     {
         PlayFireEmpty(); //perhaps a fizzle sound
@@ -383,7 +428,8 @@ function FireAttSpell( float Value )
 	{
 	    if ( Pawn(Owner).UseMana(ManaCostPerLevel[castingLevel]) )
 	    {
-			AddGhelz(ManaCostPerLevel[castingLevel]);
+	        CalculateAutoAimDir();
+	        AddGhelz(ManaCostPerLevel[castingLevel]);
 	        GotoState('NormalFire');
 	        if ( PlayerPawn(Owner) != None )
 	            PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);

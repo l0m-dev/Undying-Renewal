@@ -135,7 +135,10 @@ simulated function name CheckJoint()
 	local Actor A;
 	local name JointName;
 	
-	Dir = Normal(Velocity);
+	//Dir = Normal(Velocity);
+
+	if (LastJointHit != 'None')
+		return LastJointHit;
 	
 	A = Trace(HitLocation, HitNormal, HitJoint, Location, OldLocation, true, true);
 

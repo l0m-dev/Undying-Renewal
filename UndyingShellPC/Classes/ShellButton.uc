@@ -32,6 +32,8 @@ var float ScrollingOffsetX, MaxScrollX, ScrollDir, ScrollDelay;
 var bool bDrawShadow;
 var float ShadowOffset;
 
+var int ControllerButton;
+
 const SCROLL_SPEED = 40.0f;
 const SCROLL_DELAY = 2.0f;
 
@@ -40,6 +42,7 @@ function Created()
 	Super.Created();
 
 	ResetScroll();
+	ControllerButton = -1;
 }
 
 function ResetScroll()
@@ -149,6 +152,9 @@ function Paint(Canvas C, float X, float Y)
 			}
 
 		}
+
+		if(Root.Console.bUsingController && ControllerButton != -1)
+			DrawStretchedTextureSegment( C, WinWidth - 32*Root.ScaleY, 0, 32*Root.ScaleY, 32*Root.ScaleY, 64*ControllerButton, 0, 64, 64, Texture'ControllerButtons' );
 	}
 
 	TextSize(C, Text, W, H);

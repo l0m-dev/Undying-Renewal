@@ -37,6 +37,7 @@ var byte analogkey;	// which key analog is currently emulating
 var () float ShellAnalogThreshold;	// min displacement in shell
 var float EscapeDelay; // delay to keep holding escape from rapildly showing,hiding shell ( or pauing game in cutscene )
 var bool bInitialized;
+var bool bUsingController;
 
 function ResetUWindow()
 {
@@ -65,6 +66,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 			{
 				// SpaceBar
 				case EInputKey.IK_Space:
+				case EInputKey.IK_Joy1:
 					Viewport.Actor.PressedSpaceBar();
 					break;
 				
@@ -74,7 +76,7 @@ event bool KeyEvent( EInputKey Key, EInputAction Action, FLOAT Delta )
 					break;
 
 				case EInputKey.IK_Escape:
-				case EInputKey.IK_Joy16:
+				case EInputKey.IK_Joy15:
 					Viewport.Actor.PressedEscape();
 					if ( bLocked || (EscapeDelay > 0.0) )
 					{
@@ -288,6 +290,9 @@ state UWindow
 				break;
 
 			case EInputKey.IK_Escape:
+			case EInputKey.IK_Joy15:
+			case EInputKey.IK_Joy2:
+				Viewport.Actor.PressedEscape();
 				if (EscapeDelay > 0.0)
 					return true;
 
@@ -327,17 +332,21 @@ state UWindow
 			{
 			case IK_MouseX:
 				MouseX = MouseX + (MouseScale * Delta);
+				bUsingController = false;
 				break;
 			case IK_MouseY:
 				MouseY = MouseY - (MouseScale * Delta);
+				bUsingController = false;
 				break;
 
 			case IK_JoyX:
 				XaxisPSX2 = Delta;
+				bUsingController = true;
 				break;
 
 			case IK_JoyY:
 				YaxisPSX2 = Delta;
+				bUsingController = true;
 				break;
 			}
 		default:

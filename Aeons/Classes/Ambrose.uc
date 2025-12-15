@@ -446,6 +446,9 @@ function Tick( float DeltaTime )
 {
 	super.Tick( DeltaTime );
 
+	if( Health > 0.0 )
+		HealthBar.SetPercent(0.5 + (HoundTimer / default.HoundTimer) / 2.0);
+
 	if( HoundTimer > 0.0 )
 	{
 		HoundTimer -= DeltaTime;
@@ -523,6 +526,11 @@ state AmbroseBossFightStart
 		MyAxe = AmbroseAxe( MyProp[0] );
 		if( MyAxe == none )
 			DebugInfoMessage( ".AmbroseBossFightStart.BeginState() too early to hook up axe." );
+
+		// Health bar.
+		if( HealthBar == None )
+			HealthBar = class'HealthBar'.static.CreateHealthBar(self, true);
+		HealthBar.State = HBS_Invulnerable;
 	}
 
 	function Timer()
@@ -576,6 +584,7 @@ state AmbroseBossFightGiantNormal
 		MeleeRange = DrawScale * default.MeleeRange;
 		DamageRadius = DrawScale * default.DamageRadius;
 		HoundTimer = Default.HoundTimer;
+		HealthBar.State = HBS_Invulnerable;
 	}
 
 Begin:
@@ -639,6 +648,7 @@ state AmbroseBossFightGiantHoundStruggle expands AIScriptedState
 			GhelzStoneGlow.Direction = -1.0;
 			GhelzStoneGlow.Enable('Tick');
 		}
+		HealthBar.InfoIcon = none;
 	}
 
 	function BeginState()
@@ -657,6 +667,7 @@ state AmbroseBossFightGiantHoundStruggle expands AIScriptedState
 			GhelzStoneGlow.Direction = 1.0;
 			GhelzStoneGlow.Enable('Tick');
 		}
+		HealthBar.InfoIcon = Texture'Aeons.Icons.Ghelz_Icon';
 	}
 
 Begin:
@@ -739,6 +750,7 @@ state AmbroseBossFightWeakened expands AIScriptedState
 		case 'scythedouble':
 			DInfo.Damage = 2.0 * InitHealth; // make sure he dies.
 			DInfo.JointName = 'head';
+			HealthBar.SetPercent(0);
 			break;
 		}
 	}
@@ -753,6 +765,7 @@ state AmbroseBossFightWeakened expands AIScriptedState
 		BossFightState = ABF_Weakened;
 		HoundTimer = 0.0;
 		GroundSpeed = Default.GroundSpeed;
+		HealthBar.State = HBS_VulnerableScythe;
 	}
 
 	function Timer()
@@ -774,6 +787,7 @@ state AmbroseBossFightRecoverStone expands AIScriptedState
 		super.BeginState();
 		BossFightState = ABF_Normal;
 		HoundTimer = 0.0;
+		HealthBar.State = HBS_Invulnerable;
 	}
 
 	function Timer()

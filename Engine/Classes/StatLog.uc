@@ -10,7 +10,7 @@ class StatLog extends Info
 	native;
 
 // Internal
-var native private const int Context;
+var native private const pointer Context;
 
 // State
 var bool	bWorld;

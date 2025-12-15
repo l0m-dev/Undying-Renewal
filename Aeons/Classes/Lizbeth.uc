@@ -247,6 +247,7 @@ function PreBeginPlay()
 	FrenzyTime = 0.0;
 	Health = Health + MinimumHealth - (0.2 * Health);
 	OriginalHealth = Health;
+	InitHealth = Health;
 	HealthDelta = 0.2*(OriginalHealth - MinimumHealth);
 	SetLimbTangible( 'cloth', false );
 }
@@ -601,6 +602,11 @@ state LizbethBossFightStart
 		super.BeginState();
 		OriginalHealth = Health;
 		HealthDelta = 0.2*(OriginalHealth - MinimumHealth);
+
+		// Health bar.
+		if( HealthBar == None )
+			HealthBar = class'HealthBar'.static.CreateHealthBar(self, false);
+		HealthBar.State = HBS_ReallyVulnerable;
 	}
 
 Begin:
@@ -620,6 +626,7 @@ state LizbethBossFightNormal
 		super.BeginState();
 		DamageThresholdState = 'LizbethBossFightFrenzy';
 		bCanStrafe = true;
+		HealthBar.State = HBS_ReallyVulnerable;
 	}
 	
 Begin:
@@ -699,6 +706,7 @@ state LizbethBossFightFrenzy expands AIScriptedState
 			PushState( GetStateName(), 'Taunted' );
 			GotoState( 'AIQuickTaunt' );
 		}
+		HealthBar.State = HBS_Invulnerable;
 	}
 
 Taunted:
@@ -846,6 +854,7 @@ Begin:
 	GotoState( 'AIJumpToPoint' );
 
 Jumped:
+	HealthBar.State = HBS_VulnerableScythe;
 	SetTimer( WeakenedTimer, false );	// stay in this state for 12 seconds.
 	LoopAnim( 'Damage_NearDeath', 1.0 );
 }

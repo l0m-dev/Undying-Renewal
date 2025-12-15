@@ -10,6 +10,8 @@ var UWindowCheckbox SlomoSelectionCheck;
 
 var UWindowSmallButton GameplayChangesInfoButton;
 
+var UWindowComboControl DifficultyCombo;
+
 var localized string GameplayChangesText;
 var localized string GameplayChangesHelp;
 var localized string GameplayChangesInfoText;
@@ -26,6 +28,14 @@ var localized string MoreSkippableCutscenesText;
 var localized string MoreSkippableCutscenesHelp;
 var localized string SlomoSelectionText;
 var localized string SlomoSelectionHelp;
+var localized string DifficultyText;
+var localized string DifficultyHelp;
+var localized string DifficultyEasyText;
+var localized string DifficultyMediumText;
+var localized string DifficultyNightmareText;
+var localized string DifficultyUltraNightmareText;
+
+var bool bAddedUltraNightmare;
 
 function Created()
 {
@@ -48,10 +58,18 @@ function Created()
 	DamageScreenShakeScaleSlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', DamageScreenShakeScaleText, DamageScreenShakeScaleHelp));
 	DamageScreenShakeScaleSlider.SetRange(0.0, 1.0, 0.1);
 	DamageScreenShakeScaleSlider.SliderWidth = 90; // scaled in code
-	
-	MoreSkippableCutscenesCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', MoreSkippableCutscenesText, MoreSkippableCutscenesHelp));
 
 	SlomoSelectionCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', SlomoSelectionText, SlomoSelectionHelp));
+
+	DifficultyCombo = UWindowComboControl(AddControl(class'UWindowComboControl', DifficultyText, DifficultyHelp));
+	DifficultyCombo.EditBoxWidth = 90;
+	DifficultyCombo.SetFont(F_Normal);
+	DifficultyCombo.SetEditable(False);
+	DifficultyCombo.AddItem(DifficultyEasyText);
+	DifficultyCombo.AddItem(DifficultyMediumText);
+	DifficultyCombo.AddItem(DifficultyNightmareText);
+
+	MoreSkippableCutscenesCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', MoreSkippableCutscenesText, MoreSkippableCutscenesHelp));
 	
 	GetSettings();
 }
@@ -72,6 +90,8 @@ function BeforePaint(Canvas C, float X, float Y)
 
 function GetSettings()
 {
+	local int Difficulty;
+
 	Super.GetSettings();
 
 	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
@@ -81,6 +101,15 @@ function GetSettings()
 	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
 	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
 	SlomoSelectionCheck.bChecked = RenewalConfig.bSlomoSelection;
+
+	Difficulty = GetPlayerOwner().Level.Game.Difficulty;
+	if (!bAddedUltraNightmare && (RenewalConfig.bUnlockedUltraNightmare || Difficulty >= 3))
+	{
+		DifficultyCombo.AddItem(DifficultyUltraNightmareText);
+		bAddedUltraNightmare = true;
+	}
+
+	DifficultyCombo.SetSelectedIndex(Difficulty);
 }
 
 function Notify(UWindowDialogControl C, byte E)
@@ -119,6 +148,9 @@ function Notify(UWindowDialogControl C, byte E)
 		case SlomoSelectionCheck:
 			RenewalConfig.bSlomoSelection = SlomoSelectionCheck.bChecked;
 			break;
+		case DifficultyCombo:
+			GetPlayerOwner().ConsoleCommand("SetSkill"@DifficultyCombo.GetSelectedIndex());
+			break;
 		}
 		break;
 	}
@@ -128,4 +160,10 @@ function Notify(UWindowDialogControl C, byte E)
 
 defaultproperties
 {
+     DifficultyText="Difficulty"
+     DifficultyHelp="Change difficulty"
+     DifficultyEasyText="Easy"
+     DifficultyMediumText="Medium"
+     DifficultyNightmareText="Nightmare"
+     DifficultyUltraNightmareText="Ultra-Nightmare"
 }

@@ -187,6 +187,7 @@ function FireDefSpell( float Value )
 			SayMagicWords();
 			if (PawnOwner.useMana(manaCostPerLevel[castingLevel]) && !AeonsPlayer(Owner).bDispelActive)
 			{
+				CalculateAutoAimDir();
 				GhelzUse(ManaCostPerLevel[castingLevel]);
 
 				PlayFiring();

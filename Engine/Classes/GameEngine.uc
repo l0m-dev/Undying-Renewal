@@ -10,7 +10,7 @@ Class GameEngine extends Engine
 struct ReplayStruct
 {
 	var string			FileName;
-	var native private const int FileAr;
+	var native private const pointer FileAr;
 	var string			URLStr;
 	var byte			bRecording;
 	var byte			bInReplay;

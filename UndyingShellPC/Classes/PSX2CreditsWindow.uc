@@ -50,6 +50,8 @@ function Created()
 	PCCreditsButton.OverTexture = texture'Book_Left_ov';
 	PCCreditsButton.DisabledTexture = None;
 
+	PCCreditsButton.ControllerButton = 1;
+
 	//--
 	Root.Console.bBlackout = True;
 	Resized();

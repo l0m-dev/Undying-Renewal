@@ -10,8 +10,8 @@ class Player extends Object
 // Player properties.
 
 // Internal.
-var native private const int vfOut;
-var native private const int vfExec;
+var native private const pointer vfOut;
+var native private const pointer vfExec;
 
 // The actor this player controls.
 var transient const playerpawn Actor;

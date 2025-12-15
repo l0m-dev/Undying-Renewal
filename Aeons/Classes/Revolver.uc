@@ -72,6 +72,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 	EyeHeight.z = Pawn(Owner).EyeHeight;
 	// Pawn(Owner).eyeTrace(HitLocation,,4096);
 	
+	log("Using bUsingAutoAim"@PlayerPawn(Owner).bUsingAutoAim@AutoAimDir);
 	if (PlayerPawn(Owner).bUsingAutoAim)
 		GetAxes(AutoAimDir,X,Y,Z);
 	else

@@ -3,6 +3,8 @@
 //=============================================================================
 class ShellComponent extends UWindowWindow;
 
+#exec TEXTURE IMPORT NAME=ControllerButtons FILE=Textures\ControllerButtons.bmp GROUP="Icons" MIPS=OFF
+
 var ManagerWindow	Manager;
 
 var int TextStyle;

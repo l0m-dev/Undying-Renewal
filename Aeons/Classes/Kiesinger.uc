@@ -435,6 +435,16 @@ function PreBeginPlay()
 	{
 		Health = Multiplier * (OriginalHealth - TransitionToAmbushHealth) + TransitionToAmbushHealth;
 	}
+
+	InitHealth = Health;
+
+	// Health bar.
+	if( SubState == K_Fight || SubState == K_Ambush )
+	{
+		HealthBar = class'HealthBar'.static.CreateHealthBar(self, false);
+		if( SubState == K_Ambush )
+			HealthBar.State = HBS_ReallyVulnerable;
+	}
 }
 
 // Play death animation, based on damage type.

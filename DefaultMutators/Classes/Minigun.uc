@@ -90,9 +90,9 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 	EyeHeight.z = Pawn(Owner).EyeHeight;
 	// Pawn(Owner).eyeTrace(HitLocation,,4096);
 	
-	if (PlayerPawn(Owner).bUsingAutoAim)
-		GetAxes(AutoAimDir,X,Y,Z);
-	else
+	//if (PlayerPawn(Owner).bUsingAutoAim)
+	//	GetAxes(AutoAimDir,X,Y,Z);
+	//else
 		GetAxes(Pawn(owner).ViewRotation,X,Y,Z);
 	HitLocation = (Owner.Location + EyeHeight) + X * 4096;
 	

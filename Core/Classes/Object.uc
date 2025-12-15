@@ -7,10 +7,23 @@ class Object
 	noexport;
 
 //=============================================================================
+// Unreal base structures.
+
+struct pointer
+{
+	var native const int Dummy;
+};
+
+//=============================================================================
 // UObject variables.
 
 // Internal variables.
-var native private const int ObjectInternal[6];
+var native private const pointer VfTableObject;
+var native private const pointer Index;
+var native private const pointer HashNext;
+var native private const pointer StateFrame;
+var native private const pointer Linker;
+var native private const pointer LinkerIndex;
 var native const object Outer;
 var native const int ObjectFlags;
 var(Object) native const editconst name Name;

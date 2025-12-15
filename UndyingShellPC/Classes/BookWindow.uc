@@ -73,6 +73,8 @@ var int AmbientSoundID;
 var() Color UnreadColor;
 var() Color ReadColor;
 
+var int LastPressedButton;
+
 //----------------------------------------------------------------------------
 
 function Created()
@@ -320,77 +322,35 @@ function Message(UWindowWindow B, byte E)
 					break;	
 
 				case Buttons[2]:
-
 					PrevPagePressed();
-
-					if ( FRand() < 0.5 )
-						GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn01',SLOT_Misc, [Flags]482  );
-					else
-						GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn02',SLOT_Misc, [Flags]482   );
-					
 					break;
 
 				case Buttons[3]:
-					
 					NextPagePressed();
-
-					if ( FRand() < 0.5 )
-						GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn01',SLOT_Misc, [Flags]482   );
-					else
-						GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn02',SLOT_Misc, [Flags]482   );
-					
 					break;
 
 				case JournalButtons[0]:
-					if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId) != None))
-					{
-						book.CurrentJournalIndex = Book.FirstJournalId;//VisibleJournals[0];
-						book.RefreshPages();
-						RefreshButtons();						
-					}
+					JournalButtonPressed(0);
 					break;
 
 				case JournalButtons[1]:
-					if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId-1) != None)) 
-					{
-						book.CurrentJournalIndex = Book.FirstJournalId-1;
-						book.RefreshPages();
-						RefreshButtons();						
-					}
+					JournalButtonPressed(1);
 					break;
 
 				case JournalButtons[2]:
-					if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId-2) != None))
-					{
-						book.CurrentJournalIndex = Book.FirstJournalId-2;
-						book.RefreshPages();
-						RefreshButtons();						
-					}
+					JournalButtonPressed(2);
 					break;
 
 				case JournalButtons[3]:
-					if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId-3) != None))
-					{
-						book.CurrentJournalIndex = Book.FirstJournalId-3;
-						book.RefreshPages();
-						RefreshButtons();						
-					}
+					JournalButtonPressed(3);
 					break;
 
-				
 				case JournalButtons[4]:
-					if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId-4) != None))
-					{
-						book.CurrentJournalIndex = Book.FirstJournalId-4;
-						book.RefreshPages();
-						RefreshButtons();						
-					}
+					JournalButtonPressed(4);
 					break;
 
 				case ObjectivesButton:
-					book.CurrentJournalIndex = -1;
-					book.RefreshPages();
-					RefreshButtons();
+					ObjectivesButtonPressed();
 					break;
 
 				case BackToGame:
@@ -416,12 +376,93 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 	switch(Msg)
 	{
 	case WM_KeyDown:
-		if (Key == Root.Console.EInputKey.IK_MWheelUp && !Buttons[0].bDisabled)
-			ScrollUp();
-		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Buttons[1].bDisabled)
-			ScrollDown();
+		switch(Key)
+		{
+		case Root.Console.EInputKey.IK_MWheelUp:
+			if (!Buttons[0].bDisabled)
+				ScrollUp();
+			break;
+		case Root.Console.EInputKey.IK_JoyPovUp:
+			if (!Buttons[0].bDisabled)
+			{
+				Buttons[0].bMouseDown = true;
+				Buttons[0].time_count = 0;
+			}
+		case Root.Console.EInputKey.IK_Up:
+			if (Buttons[0].bDisabled)
+			{
+				if (LastPressedButton > 0)
+					JournalButtonPressed(LastPressedButton-1, true);
+				else
+					ObjectivesButtonPressed(true);
+			}
+			else
+			{
+				if (LastPressedButton == 0)
+				{
+					ScrollUp();
+					JournalButtonPressed(LastPressedButton, true);
+				}
+				else
+					JournalButtonPressed(LastPressedButton-1, true);
+			}
+			break;
+		case Root.Console.EInputKey.IK_MWheelDown:
+			if (!Buttons[1].bDisabled)
+				ScrollDown();
+			break;
+		case Root.Console.EInputKey.IK_JoyPovDown:
+			if (!Buttons[1].bDisabled)
+			{
+				Buttons[1].bMouseDown = true;
+				Buttons[1].time_count = 0;
+			}
+		case Root.Console.EInputKey.IK_Down:
+			if (Buttons[1].bDisabled)
+			{
+				if (LastPressedButton < (MAX_VISIBLE_BOOKS-1))
+					JournalButtonPressed(LastPressedButton+1, true);
+			}
+			else
+			{
+				if (LastPressedButton == (MAX_VISIBLE_BOOKS-1))
+				{
+					ScrollDown();
+					JournalButtonPressed(LastPressedButton, true);
+				}
+				else
+					JournalButtonPressed(LastPressedButton+1, true);
+			}
+			break;
+		case Root.Console.EInputKey.IK_Left:
+		case Root.Console.EInputKey.IK_JoyPovLeft:
+			if (Buttons[2].bWindowVisible)
+				PrevPagePressed();
+			break;
+		case Root.Console.EInputKey.IK_Right:
+		case Root.Console.EInputKey.IK_JoyPovRight:
+			if (Buttons[3].bWindowVisible)
+				NextPagePressed();
+			break;
+		}
 		if (KeyName!="" && Alias != "" && instr(Alias, "ShowBook") >= 0)
 			Close();
+		break;
+	case WM_KeyUp:
+		switch(Key)
+		{
+		case Root.Console.EInputKey.IK_JoyPovUp:
+			Buttons[0].bMouseDown = false;
+			JournalButtonPressed(LastPressedButton);
+			break;
+		case Root.Console.EInputKey.IK_JoyPovDown:
+			Buttons[1].bMouseDown = false;
+			JournalButtonPressed(LastPressedButton);
+			break;
+		}
+	case WM_LMouseUp:
+		if (Buttons[0].bMouseDown || Buttons[1].bMouseDown)
+			JournalButtonPressed(LastPressedButton);
 		break;
 	}
 
@@ -470,6 +511,11 @@ function PrevPagePressed()
 	local JournalEntry TempEntry;
 	local int TempCharOffset;
 
+	if ( FRand() < 0.5 )
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn01',SLOT_Misc, [Flags]482   );
+	else
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn02',SLOT_Misc, [Flags]482   );
+
 	if ( Book == None )
 		return;
 
@@ -490,7 +536,12 @@ function PrevPagePressed()
 function NextPagePressed()
 {
 	local JournalEntry TempEntry;
-	
+
+	if ( FRand() < 0.5 )
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn01',SLOT_Misc, [Flags]482   );
+	else
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookPageTurn02',SLOT_Misc, [Flags]482   );
+
 	if ( Book == None )
 		return;
 
@@ -502,6 +553,31 @@ function NextPagePressed()
 	if ( TempEntry.CurrentPage < TempEntry.NumPages - 1 )
 		TempEntry.CurrentPage++;
 
+	book.RefreshPages();
+	RefreshButtons();
+}
+
+function JournalButtonPressed(int i, optional bool bPlaySound)
+{
+	if (bPlaySound)
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookScroll01',SLOT_Misc, [Flags]482   );
+	
+	LastPressedButton = i;
+	if ((book != None)&&(book.GetJournalEntry(Book.FirstJournalId-i) != None))
+	{
+		book.CurrentJournalIndex = Book.FirstJournalId-i;//VisibleJournals[0];
+		book.RefreshPages();
+		RefreshButtons();						
+	}
+}
+
+function ObjectivesButtonPressed(optional bool bPlaySound)
+{
+	if (bPlaySound)
+		GetPlayerOwner().PlaySound( sound'Aeons.I_BookSelect01',SLOT_Misc, [Flags]482   );
+	
+	LastPressedButton = -1;
+	book.CurrentJournalIndex = -1;
 	book.RefreshPages();
 	RefreshButtons();
 }
@@ -684,7 +760,10 @@ function Paint(Canvas C, float X, float Y)
 	if (Book == None)
 		return;
 
-	JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
+	if (Buttons[0].bMouseDown || Buttons[1].bMouseDown)
+		JournalDelta = LastPressedButton;
+	else
+		JournalDelta = Book.FirstJournalId-book.CurrentJournalIndex;
 	
 	if ( (book.CurrentJournalIndex >= 0) && (Book.FirstJournalId >= 0) && (JournalDelta >= 0 && JournalDelta<=(MAX_VISIBLE_BOOKS-1)) ) 
 	{
@@ -772,6 +851,7 @@ function ShowWindow()
 		Book.FirstJournalId = Book.NumJournals-1;
 		Book.RefreshPages();
 		RefreshButtons();
+		JournalButtonPressed(0);
 	}
 	else
 	{

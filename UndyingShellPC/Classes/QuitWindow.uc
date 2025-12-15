@@ -58,6 +58,8 @@ function Created()
 	Yes.DownTexture = texture'ShellTextures.Cntrl_ok_dn'; // unused: quit_yes_dn
 	Yes.OverTexture = texture'ShellTextures.Cntrl_ok_ov'; // unused: quit_yes_ov
 	Yes.DisabledTexture = None;
+
+	Yes.ControllerButton = 0;
 	
 		
 	No = ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
@@ -74,6 +76,8 @@ function Created()
 	No.DownTexture = texture'ShellTextures.Cntrl_cancl_dn'; // unused: quit_no_dn
 	No.OverTexture = texture'ShellTextures.Cntrl_cancl_ov'; // unused: quit_no_ov
 	No.DisabledTexture = None;
+
+	No.ControllerButton = 1;
 
 //--	
 	Root.Console.bBlackout = True;
@@ -117,10 +121,17 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 	switch(Msg)
 	{
 	case WM_KeyDown:
-		if (Key == 89)			// Y key
-			YesPressed();
-		else if (Key == 78)		// N key
-			NoPressed();
+		switch(Key)
+		{
+			case Root.Console.EInputKey.IK_Y:
+			case Root.Console.EInputKey.IK_Joy1:
+				YesPressed();
+				break;
+			case Root.Console.EInputKey.IK_N:
+			case Root.Console.EInputKey.IK_Joy2:
+				NoPressed();
+				break;
+		}
 		break;
 	}
 

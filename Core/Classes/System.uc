@@ -6,7 +6,7 @@ class System extends Subsystem
 	noexport;
 
 // Internal.
-var native private const int ExecVtbl;
+var native private const pointer ExecVtbl;
 
 defaultproperties
 {

@@ -52,10 +52,10 @@ class IPDRV_API AInternetLink : public AInternetInfo
 {
 public:
     BYTE LinkMode;
-    INT Socket;
+    Fpointer Socket;
     INT Port;
-    INT RemoteSocket;
-    INT PrivateResolveInfo;
+    Fpointer RemoteSocket;
+    Fpointer PrivateResolveInfo;
     INT DataPending;
     BYTE ReceiveMode;
     DECLARE_FUNCTION(execGetLocalIP);

@@ -6,11 +6,11 @@ class SkelMesh expands Mesh
 	native
 	noexport;
 
-var native private const int SkelProto;
+var native private const pointer SkelProto;
 var array<byte> Joints;
 var array<byte> JointLocs;
-var native private const int JointVerts_vtableptr;
-var native private const int JointVerts_SavedAr;
+var native private const pointer JointVerts_vtableptr;
+var native private const pointer JointVerts_SavedAr;
 var private native int JointVerts_SavedPos;
 var array<byte> JointVerts;
 var array<byte> Modifiers;

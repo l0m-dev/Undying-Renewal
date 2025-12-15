@@ -39,8 +39,8 @@ var font DebugFont;			 // Fixed-Width font used for stat rendering / debugging
 
 // Internal.
 var const viewport Viewport; // Viewport that owns the canvas.
-var native private const int FramePtr;      // Scene frame pointer.
-var native private const int RenderPtr;	 // Render device pointer, only valid during UGameEngine::Draw
+var native private const pointer FramePtr;      // Scene frame pointer.
+var native private const pointer RenderPtr;	 // Render device pointer, only valid during UGameEngine::Draw
 
 //var float padding; // for some reason you can't have FontScale here, so add padding
 //var float FontScale;

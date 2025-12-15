@@ -725,9 +725,9 @@ function Paint(Canvas C, float X, float Y)
 	//log("mainmenuwindow: paint");
 
 	// main menu always receives Paint messages, even if another window is open
-	// a workaround is to check PrevSiblingWindow, to see if another window is open
+	// a workaround is to check NextSiblingWindow, to see if another window is open
 	// leave the current behavior for now
-	//if (PrevSiblingWindow != None)
+	//if (NextSiblingWindow != None)
 	//	return;
 	
 	Super.Paint(C, X, Y);
@@ -896,4 +896,5 @@ defaultproperties
      BackNames(3)="ShellTextures.Main_3"
      BackNames(4)="ShellTextures.Main_4"
      BackNames(5)="ShellTextures.Main_5"
+     bAllowControllerCursor=True
 }

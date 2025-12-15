@@ -312,6 +312,8 @@ var actor					Marker2;			// TEMP
 var localized string CreatureDeathMessage;
 var(DeathMessage) localized string CreatureDeathVerb;
 
+var HealthBar HealthBar;
+
 replication
 {
 	//reliable if (Role == ROLE_Authority)
@@ -1721,6 +1723,8 @@ simulated function CleanUp()
 		ScryeGlow.Destroy();
 		ScryeGlow = none;
 	}
+
+	HealthBar = none;
 }
 
 // Just died.

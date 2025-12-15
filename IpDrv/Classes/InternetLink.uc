@@ -25,10 +25,10 @@ var enum ELinkMode
 } LinkMode;
 
 // Internal
-var native private const int Socket;
+var native private const pointer Socket;
 var const int Port;
-var native private const int RemoteSocket;
-var native private const int PrivateResolveInfo;
+var native private const pointer RemoteSocket;
+var native private const pointer PrivateResolveInfo;
 var const int DataPending;
 
 // Receive mode.

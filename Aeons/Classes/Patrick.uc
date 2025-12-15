@@ -964,6 +964,11 @@ state DialogScene expands PlayerWalking
 		}
 	}
 
+	exec function Jump( optional float F )
+	{
+		Fire(F);
+	}
+
 Begin:
 	if ( Physics == PHYS_Falling )
 	{

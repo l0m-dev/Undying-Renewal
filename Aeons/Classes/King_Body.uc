@@ -103,12 +103,14 @@ function SetBrainOpen()
 {
 	DebugInfoMessage(".SetBrainOpen()");
 	BrainOpen=true;
+	HealthBar.State = HBS_ReallyVulnerable;
 }
 
 function SetBrainClosed()
 {
 	DebugInfoMessage(".SetBrainClosed()");
 	BrainOpen=false;
+	HealthBar.State = HBS_Vulnerable;
 }
 
 function SpitAcid()
@@ -353,6 +355,10 @@ function PostBeginPlay()
 	{
 		KingMouth.Init( KingLeftMandible, KingRightMandible );
 	}
+
+	// Health bar.
+	HealthBar = class'HealthBar'.static.CreateHealthBar(self, false);
+	HealthBar.State = HBS_Invulnerable;
 }
 
 function bool IsBrainJoint( name Joint )
@@ -599,11 +605,15 @@ state KingVulnerable expands AIScriptedState
 	function BeginState()
 	{
 		DebugBeginState();
+
+		HealthBar.State = HBS_Vulnerable;
 	}
 
 	function EndState()
 	{
 		DebugEndState();
+
+		HealthBar.State = HBS_Vulnerable;
 	}
 
 	function Died( pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo )

@@ -60,6 +60,8 @@ function Created()
 	PSX2CreditsButton.OverTexture = texture'Book_Right_ov';
 	PSX2CreditsButton.DisabledTexture = None;
 
+	PSX2CreditsButton.ControllerButton = 0;
+
 
 
 
@@ -78,6 +80,8 @@ function Created()
 	Back.DownTexture = texture'Book_Left_dn';
 	Back.OverTexture = texture'Book_Left_ov';
 	Back.DisabledTexture = None;
+
+	Back.ControllerButton = 1;
 
 // play "brady's been drinkin' "
 	BradyCheat = ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));
@@ -166,6 +170,26 @@ function Message(UWindowWindow B, byte E)
 			OverEffect(ShellButton(B));
 			break;
 	}
+}
+
+//----------------------------------------------------------------------------
+
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg)
+	{
+	case WM_KeyDown:
+		switch(Key)
+		{
+			case Root.Console.EInputKey.IK_Enter:
+			case Root.Console.EInputKey.IK_Joy1:
+				ShowPSX2Credits();
+				break;
+		}
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
 }
 
 //----------------------------------------------------------------------------

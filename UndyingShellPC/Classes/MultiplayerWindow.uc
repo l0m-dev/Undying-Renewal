@@ -365,4 +365,5 @@ defaultproperties
      BackNames(3)="ShellTextures.Multiplayer_3"
      BackNames(4)="ShellTextures.Multiplayer_4"
      BackNames(5)="ShellTextures.Multiplayer_5"
+     bAllowControllerCursor=True
 }

@@ -68,6 +68,8 @@ var float UltraNightmareTimer;
 var ParticleFX BloodFX;
 var UWindowWindow Confirm;
 
+var bool bControllerViewPressed;
+
 function Created()
 {
 
@@ -248,6 +250,7 @@ function Created()
 	UltraNightmareButton.DownTexture = texture'dfclt_ultra_nightm_ov';
 	UltraNightmareButton.OverTexture = texture'dfclt_ultra_nightm_ov';
 	UltraNightmareButton.bDisabled = true;
+	UltraNightmareButton.bWindowVisible = false;
 
 // Info button	
 	InfoButton = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
@@ -362,6 +365,12 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 			ScrolledUp();
 		if (Key == Root.Console.EInputKey.IK_MWheelDown && !Down.bDisabled)
 			ScrolledDown();
+		if (Key == Root.Console.EInputKey.IK_Joy16)
+			bControllerViewPressed = true;
+		break;
+	case WM_KeyUp:
+		if (Key == Root.Console.EInputKey.IK_Joy16)
+			bControllerViewPressed = false;
 		break;
 	}
 
@@ -404,6 +413,7 @@ function Paint(Canvas C, float X, float Y)
 	local int i, j;
 	local string mName;
 	local vector ParticleLoc;
+	local RenewalConfig RenewalConfig;
 	
 	Super.Paint(C, X, Y);
 
@@ -437,18 +447,24 @@ function Paint(Canvas C, float X, float Y)
 
 	if ( UltraNightmareTimer > 0 )
 	{
-		if ( UltraNightmareButton.MouseIsOver() )
+		if ( UltraNightmareButton.MouseIsOver() || bControllerViewPressed )
 		{
 			UltraNightmareTimer -= LastDelta;
 
 			if ( UltraNightmareTimer < 1.0 )
 			{
+				UltraNightmareButton.bWindowVisible = true;
+
 				C.Style = 5;
 				C.DrawColor.R = 255;
 				C.DrawColor.G = 255;
 				C.DrawColor.B = 255;
 				C.DrawColor.A = byte((1.0 - UltraNightmareTimer) * 255);
 				DrawStretchedTextureSegment( C, UltraNightmareButton.WinLeft, UltraNightmareButton.WinTop, UltraNightmareButton.WinWidth, UltraNightmareButton.WinHeight, UltraNightmareButton.TexCoords.X, UltraNightmareButton.TexCoords.Y, UltraNightmareButton.TexCoords.W, UltraNightmareButton.TexCoords.H, UltraNightmareButton.OverTexture );
+			}
+			else
+			{
+				UltraNightmareButton.bWindowVisible = false;
 			}
 
 			if ( UltraNightmareTimer <= 0 )
@@ -466,6 +482,10 @@ function Paint(Canvas C, float X, float Y)
 					BloodFX.SizeWidth.Base = 64;
 					BloodFX.SizeLength.Base = 64;
 				}
+
+				RenewalConfig = GetPlayerOwner().GetRenewalConfig();
+				RenewalConfig.bUnlockedUltraNightmare = true;
+				RenewalConfig.SaveConfig();
 			}
 		}
 		else
@@ -473,9 +493,9 @@ function Paint(Canvas C, float X, float Y)
 			UltraNightmareTimer = default.UltraNightmareTimer;
 		}
 	}
-	else
+	else if ( BloodFX != None )
 	{
-		if ( UltraNightmareButton.MouseIsOver() )
+		if ( UltraNightmareButton.MouseIsOver() || bControllerViewPressed )
 		{
 			BloodFX.ParticlesPerSec.Base = 4;
 			BloodFX.ParticlesPerSec.Rand = 4;
@@ -827,4 +847,5 @@ defaultproperties
      AboutText="About"
      bShowMutators=True
      UltraNightmareTimer=3.0
+     bAllowControllerCursor=True
 }

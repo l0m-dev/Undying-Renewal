@@ -26,6 +26,10 @@ var UWindowWindow ActiveWindow;
 
 var config int RelaunchedFrom;
 
+var bool bAllowControllerCursor;
+var vector ControllerCursorPos;
+var UWindowWindow ControllerSelectedWindow;
+
 function BeginPlay() 
 {
 	Super.BeginPlay();
@@ -146,6 +150,9 @@ function SetupFonts(optional Canvas C)
 
 function Resized()
 {
+	local int MouseOffsetX;
+	local float InnerWidth, MouseXPosScale;
+
 	Super.Resized();
 	
 	ScaleX = WinWidth / OriginalWidth;
@@ -156,6 +163,20 @@ function Resized()
 
 	if ( Book != None ) 
 		Book.Resized();
+
+	if (Root.WinHeight / Root.WinWidth < 0.75 )
+	{
+		InnerWidth = Root.WinHeight / 0.75;
+		MouseOffsetX = (Root.WinWidth - InnerWidth) / 2;
+		MouseXPosScale = InnerWidth / Root.OriginalWidth;
+	}
+	else
+	{
+		MouseXPosScale = Root.ScaleX;
+	}
+
+	ControllerCursorPos.X = 290*MouseXPosScale + MouseOffsetX;
+	ControllerCursorPos.Y = 250 * Root.ScaleY;
 }
 
 function Tick( float DeltaTime )
@@ -211,9 +232,10 @@ function DrawMouse(Canvas C)
 {
 	local float X, Y;
 	local byte Brightness;
-	local vector Loc;
+	local vector Loc, NewPos;
 	local float lightscale;
 	local float Distance;
+	local UWindowWindow NewControllerWindow;
 
 	if(Console.Viewport.bWindowsMouseAvailable)
 	{
@@ -234,6 +256,35 @@ function DrawMouse(Canvas C)
 			C.Style = 5;
 
 		C.DrawIcon(MouseWindow.Cursor.tex, Root.ScaleY);
+	}
+
+	if ( Root.Console.bUsingController && bAllowControllerCursor )
+	{
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
+		C.DrawColor.A = 255;
+		C.bNoSmooth = True;
+
+		C.Style = 5;
+
+		NewPos = GetNormalizedCursorPos();
+		
+		//C.SetPos(NewPos.X, NewPos.Y);
+		//C.DrawIcon(Texture'UWindow.Icons.MouseHand', Root.ScaleY);
+
+		NewControllerWindow = FindWindowUnder(NewPos.X, NewPos.Y);
+		if ( NewControllerWindow.IsA('ShellComponent') && NewControllerWindow.bWindowVisible && NewControllerWindow != ControllerSelectedWindow )
+		{
+			if ( ControllerSelectedWindow != None )
+				ControllerSelectedWindow.MouseLeave();
+			NewControllerWindow.MouseEnter();
+			ControllerSelectedWindow = NewControllerWindow;
+
+			ControllerSelectedWindow.bMouseDown = True;
+		}
+
+		//MoveMouse(ControllerCursorPos.X * GUIScale + Root.Console.XaxisPSX2 * 0.2, ControllerCursorPos.Y * GUIScale - Root.Console.YaxisPSX2 * 0.25);
 	}
 
 	if ( CursorFX == None )
@@ -300,9 +351,47 @@ function DrawMouse(Canvas C)
 
 }
 
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	if(bAllowControllerCursor)
+	{
+		switch(Msg) {
+		case WM_KeyDown:
+			if(Key == Console.EInputKey.IK_Joy1)
+			{
+				if(ControllerSelectedWindow != None)
+					ControllerSelectedWindow.LMouseDown(X, Y);
+			}
+			break;
+		case WM_KeyUp:
+			if(Key == Console.EInputKey.IK_Joy1)
+			{
+				if(ControllerSelectedWindow != None)
+					ControllerSelectedWindow.LMouseUp(X, Y);
+			}
+			break;
+		}
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
+}
+
 function Texture GetLookAndFeelTexture()
 {
 	Return LookAndFeel.ActiveS;
+}
+
+function vector GetNormalizedCursorPos()
+{
+	local vector Pos, Dir;
+
+	Dir.X = Root.Console.XaxisPSX2;
+	Dir.Y = Root.Console.YaxisPSX2;
+	Dir = Normal(Dir);
+
+	Pos.X = ControllerCursorPos.X * GUIScale + Dir.X * 160.0 * Root.ScaleY;
+	Pos.Y = ControllerCursorPos.Y * GUIScale - Dir.Y * 160.0 * Root.ScaleY;
+	return Pos;
 }
 
 defaultproperties

@@ -876,6 +876,7 @@ function FireAttSpell( float Value )
 				else
 					FailedSpellCast();
 			} else if ( PawnOwner.Mana >= manaCostPerLevel[localCastingLevel] ) {
+				CalculateAutoAimDir();
 				GhelzUse(manaCostPerLevel[castingLevel]);
 				gotoState('NormalFire');
 				if ( Owner.bHidden )

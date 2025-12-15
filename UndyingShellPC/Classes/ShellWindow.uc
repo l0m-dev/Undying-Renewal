@@ -21,6 +21,8 @@ var float LastDelta;
 //var int Answer;
 //var UWindowWindow QuestionWindow;
 
+var bool bAllowControllerCursor;
+
 function Created()
 {
 	local int i;
@@ -40,6 +42,9 @@ function Created()
 		if ( AnimatedBack != None )
 			AnimatedBack.bLoop = true;
 	}
+
+	AeonsRootWindow(Root).bAllowControllerCursor = bAllowControllerCursor;
+	AeonsRootWindow(Root).ControllerSelectedWindow = Self;
 }
 
 function Paint(Canvas C, float X, float Y)
@@ -169,6 +174,14 @@ function Close(optional bool bByParent)
 }
 
 
+function ShowWindow()
+{
+	AeonsRootWindow(Root).bAllowControllerCursor = bAllowControllerCursor;
+	AeonsRootWindow(Root).ControllerSelectedWindow = Self;
+
+	Super.ShowWindow();
+}
+
 function HideWindow()
 {
 	local int i;
@@ -188,6 +201,12 @@ function HideWindow()
 	
 	//fix be smarter about this, use some sort of cache scheme
 	Log("Unloaded Textures for " $ self );
+
+	if ( ShellWindow(PrevSiblingWindow) != None )
+	{
+		AeonsRootWindow(Root).bAllowControllerCursor = ShellWindow(PrevSiblingWindow).bAllowControllerCursor;
+		AeonsRootWindow(Root).ControllerSelectedWindow = PrevSiblingWindow;
+	}
 }
 
 

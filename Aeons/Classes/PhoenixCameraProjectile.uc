@@ -36,10 +36,14 @@ auto state Hover
 
 	function Timer()
 	{
-		if (Player.ViewTarget == self)
-			Player.ViewTarget = none;
 		Destroy();
 	}
+}
+
+function Destroyed()
+{
+	if (Player.ViewTarget == self)
+		Player.ViewTarget = none;
 }
 
 defaultproperties

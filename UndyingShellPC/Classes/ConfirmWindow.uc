@@ -58,6 +58,8 @@ function Created()
 	Yes.DownTexture = texture'ShellTextures.Video_ok_dn';
 	Yes.OverTexture = texture'ShellTextures.Video_ok_ov';
 
+	Yes.ControllerButton = 0;
+
 
 
 	No = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
@@ -75,6 +77,8 @@ function Created()
 	No.UpTexture =   texture'ShellTextures.Video_cancel_up';
 	No.DownTexture = texture'ShellTextures.Video_cancel_dn';
 	No.OverTexture = texture'ShellTextures.Video_cancel_ov';
+
+	No.ControllerButton = 1;
 
 
 //--
@@ -141,6 +145,30 @@ function Message(UWindowWindow B, byte E)
 			OverEffect(ShellButton(B));
 			break;
 	}
+}
+
+//----------------------------------------------------------------------------
+
+function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key) 
+{
+	switch(Msg)
+	{
+	case WM_KeyDown:
+		switch(Key)
+		{
+			case Root.Console.EInputKey.IK_Y:
+			case Root.Console.EInputKey.IK_Joy1:
+				YesPressed();
+				break;
+			case Root.Console.EInputKey.IK_N:
+			case Root.Console.EInputKey.IK_Joy2:
+				NoPressed();
+				break;
+		}
+		break;
+	}
+
+	Super.WindowEvent(Msg, C, X, Y, Key);
 }
 
 //----------------------------------------------------------------------------
