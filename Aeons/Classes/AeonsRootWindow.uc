@@ -278,9 +278,10 @@ function DrawMouse(Canvas C)
 		{
 			if ( ControllerSelectedWindow != None )
 				ControllerSelectedWindow.MouseLeave();
-			NewControllerWindow.MouseEnter();
+			
 			ControllerSelectedWindow = NewControllerWindow;
 
+			ControllerSelectedWindow.MouseEnter();
 			ControllerSelectedWindow.bMouseDown = True;
 		}
 

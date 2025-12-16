@@ -185,6 +185,7 @@ function ShowWindow()
 function HideWindow()
 {
 	local int i;
+	local AeonsRootWindow AeonsRoot;
 
 	Root.Console.bBlackOut = False;
 	
@@ -204,8 +205,13 @@ function HideWindow()
 
 	if ( ShellWindow(PrevSiblingWindow) != None )
 	{
-		AeonsRootWindow(Root).bAllowControllerCursor = ShellWindow(PrevSiblingWindow).bAllowControllerCursor;
-		AeonsRootWindow(Root).ControllerSelectedWindow = PrevSiblingWindow;
+		AeonsRoot = AeonsRootWindow(Root);
+
+		if ( AeonsRoot.ControllerSelectedWindow != None )
+			AeonsRoot.ControllerSelectedWindow.MouseLeave();
+			
+		AeonsRoot.bAllowControllerCursor = ShellWindow(PrevSiblingWindow).bAllowControllerCursor;
+		AeonsRoot.ControllerSelectedWindow = PrevSiblingWindow;
 	}
 }
 

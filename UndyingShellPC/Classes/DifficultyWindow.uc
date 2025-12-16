@@ -68,6 +68,7 @@ var float UltraNightmareTimer;
 var ParticleFX BloodFX;
 var UWindowWindow Confirm;
 
+var bool bCanMouseActivateUltraNightmare;
 var bool bControllerViewPressed;
 
 function Created()
@@ -250,7 +251,6 @@ function Created()
 	UltraNightmareButton.DownTexture = texture'dfclt_ultra_nightm_ov';
 	UltraNightmareButton.OverTexture = texture'dfclt_ultra_nightm_ov';
 	UltraNightmareButton.bDisabled = true;
-	UltraNightmareButton.bWindowVisible = false;
 
 // Info button	
 	InfoButton = ShellButton(CreateWindow(class'ShellButton', 1,1,1,1));
@@ -353,6 +353,9 @@ function Message(UWindowWindow B, byte E)
 		case DE_MouseEnter:
 			OverEffect(ShellButton(B));
 			break;
+		case DE_MouseMove:
+			bCanMouseActivateUltraNightmare = true;
+			break;
 	}
 }
 
@@ -447,24 +450,18 @@ function Paint(Canvas C, float X, float Y)
 
 	if ( UltraNightmareTimer > 0 )
 	{
-		if ( UltraNightmareButton.MouseIsOver() || bControllerViewPressed )
+		if ( (UltraNightmareButton.MouseIsOver() && bCanMouseActivateUltraNightmare) || bControllerViewPressed )
 		{
 			UltraNightmareTimer -= LastDelta;
 
 			if ( UltraNightmareTimer < 1.0 )
 			{
-				UltraNightmareButton.bWindowVisible = true;
-
 				C.Style = 5;
 				C.DrawColor.R = 255;
 				C.DrawColor.G = 255;
 				C.DrawColor.B = 255;
 				C.DrawColor.A = byte((1.0 - UltraNightmareTimer) * 255);
 				DrawStretchedTextureSegment( C, UltraNightmareButton.WinLeft, UltraNightmareButton.WinTop, UltraNightmareButton.WinWidth, UltraNightmareButton.WinHeight, UltraNightmareButton.TexCoords.X, UltraNightmareButton.TexCoords.Y, UltraNightmareButton.TexCoords.W, UltraNightmareButton.TexCoords.H, UltraNightmareButton.OverTexture );
-			}
-			else
-			{
-				UltraNightmareButton.bWindowVisible = false;
 			}
 
 			if ( UltraNightmareTimer <= 0 )
