@@ -3532,6 +3532,7 @@ simulated state PlayerCutScene
 	exec function Jump( optional float F )
 	{
 		bRequestedSkipCutscene = true;
+		bJump = 0;
 	}
 
 	Begin:

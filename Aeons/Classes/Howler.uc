@@ -120,10 +120,10 @@ var bool	bMeleeAttackFail;	// used to hack howler's freezing during near attacks
 
 function PreBeginPlay()
 {
-	if (RGC())
-	{
-		Alertness = 1.0;
-	}
+	//if ( RGC() )
+	//{
+	//	Alertness = 1.0;
+	//}
 	super.PreBeginPlay();
 }
 
@@ -755,10 +755,18 @@ state AIJumpAtEnemy
 			// JumpTo requires ground position
 			EnemyAdjustedLoc = Enemy.Location - vect(0,0,1) * Enemy.CollisionHeight;
 			
-			SavedAirSpeed = AirSpeed;
-			AirSpeed = Region.Zone.ZoneTerminalVelocity; // don't clamp speed to current AirSpeed in CalculateJump
-			JumpTo( EnemyAdjustedLoc );
-			AirSpeed = SavedAirSpeed;
+			if ( Level.Game.Difficulty > 1 )
+			{
+				SavedAirSpeed = AirSpeed;
+				AirSpeed = Region.Zone.ZoneTerminalVelocity; // don't clamp speed to current AirSpeed in CalculateJump
+				JumpTo( EnemyAdjustedLoc );
+				AirSpeed = SavedAirSpeed;
+			}
+			else
+			{
+				JumpTo( EnemyAdjustedLoc );
+			}
+
 			GotoState( , 'JUMPED' );
 		}
 		else
