@@ -17,10 +17,12 @@ var() float Radius;
 var() float EffectLen;
 var bool bHitActor;
 var float age;
+var float HitCooldown;
 
 function Tick(float DeltaTime)
 {
 	age += DeltaTime;
+	HitCooldown -= DeltaTime;
 }
 
 simulated function PostBeginPlay()
@@ -56,7 +58,7 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 
 	if ( (Instigator != Other) || (bCanHitInstigator) )
 	{
-		if ( Role == ROLE_Authority )
+		if ( Role == ROLE_Authority && HitCooldown <= 0.0 )
 		{
 			if ( Other.IsA('AeonsPlayer') )
 			{
@@ -79,6 +81,8 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 			} else {
 				Other.TakeDamage( Instigator, Location, vect(0,0,0), GetDamageInfo('SphereOfCold'));
 			}
+			if ( RGC() )
+				HitCooldown = 0.2;
 		}
 		bHitActor = true;
 		if ( !Other.IsA('Pawn') )

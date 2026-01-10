@@ -144,7 +144,7 @@ function Fire( float Value )
 simulated function PlayFiring()
 {
 	//log("PlayFiring Called within the Revolver");
-	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+	PlayAnim( 'Fire', RefireMult,,,0.0);
 	//if ( Role == ROLE_Authority )
 		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
@@ -199,9 +199,9 @@ function PlayOpen()
 function TweenDown()
 {
     if ( ClipCount<=0 )
-        PlayAnim('DownEmpty',RefireMult);
+        PlayAnim('DownEmpty',1.0);
     else
-        PlayAnim('Down',RefireMult);
+        PlayAnim('Down',1.0);
 
     if ( AeonsPlayer(Owner).bWeaponSound )
     {
@@ -222,7 +222,7 @@ simulated function PlayIdleAnim()
 
 simulated function PlayReloading()
 {
-	PlayAnim('ReloadStart', 1.0 / AeonsPlayer(Owner).refireMultiplier);
+	PlayAnim('ReloadStart', RefireMult);
 }
 
 //=============================================================================
@@ -233,7 +233,7 @@ state NormalFire
 	ignores Fire;
 
 	Begin:
-		sleep(refireRate * AeonsPlayer(Owner).refireMultiplier);
+		sleep(1.0 / RefireMult);
 		FinishAnim();
 		Finish();
 }
@@ -276,7 +276,7 @@ state NewClip
 		// Do we have any bullets to reload?
 		if (numToReload > 0)
 		{
-			PlayAnim('ReloadStart',RefireMult / AeonsPlayer(Owner).refireMultiplier,,,0);
+			PlayAnim('ReloadStart',RefireMult,,,0);
 			FinishAnim();
 		}
 
@@ -297,9 +297,9 @@ state NewClip
 			ClipCount ++;
 
 			if ( bAltAmmo )
-				Sleep( GetSoundDuration(LoadAltShellSound) * AeonsPlayer(Owner).refireMultiplier);
+				Sleep( GetSoundDuration(LoadAltShellSound) / RefireMult);
 			else
-				Sleep( GetSoundDuration(LoadShellSound) * AeonsPlayer(Owner).refireMultiplier);
+				Sleep( GetSoundDuration(LoadShellSound) / RefireMult);
 
 			//FinishSound(snID);
 			//LogTime("Revolver: state NewClip: Finished Sound " $ i);
@@ -311,7 +311,7 @@ state NewClip
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 		else {
 
-			PlayAnim('ReloadEnd',RefireMult/AeonsPlayer(Owner).refireMultiplier,,,0);
+			PlayAnim('ReloadEnd',RefireMult,,,0);
 			FinishAnim();
 
 			if ( AmmoType.AmmoAmount >= ReloadCount )
@@ -351,9 +351,9 @@ state Idle
 		if (Owner != None)
 		{
 			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
-				loopAnim('IdleMove',RefireMult, [TweenTime] TweenFrom('IdleStill', 0.5));
+				loopAnim('IdleMove',1.0, [TweenTime] TweenFrom('IdleStill', 0.5));
 			else
-				loopAnim('IdleStill',RefireMult, [TweenTime] TweenFrom('IdleMove', 0.5));
+				loopAnim('IdleStill',1.0, [TweenTime] TweenFrom('IdleMove', 0.5));
 		}
 	}
 
@@ -366,7 +366,7 @@ state Idle
 
 	FLOURISH:
 		disable('Tick');
-		PlayAnim('Flourish',RefireMult);
+		PlayAnim('Flourish',1.0);
 		PlaySound(FlourishSound);
 		FinishAnim();
 		goto 'Begin';
@@ -456,19 +456,19 @@ state ClientReload
 			if ( bAltAmmo )
 			{
 				PlaySound(LoadAltShellSound, SLOT_Misc, 2.0*AeonsPlayer(Owner).VolumeMultiplier);
-				SetTimer(GetSoundDuration(LoadAltShellSound) * AeonsPlayer(Owner).refireMultiplier,false);
+				SetTimer(GetSoundDuration(LoadAltShellSound) / RefireMult,false);
 			}
 			else
 			{
 				//log("Revolver: state ClientReload: Timer: PlayingSound"); 
 				PlaySound(LoadShellSound, SLOT_Misc, 2.0*AeonsPlayer(Owner).VolumeMultiplier);
-				SetTimer(GetSoundDuration(LoadShellSound) * AeonsPlayer(Owner).refireMultiplier, false);
+				SetTimer(GetSoundDuration(LoadShellSound) / RefireMult, false);
 			}
 
 		}
 		else
 		{
-			PlayAnim('ReloadEnd',1.0/AeonsPlayer(Owner).refireMultiplier,,,0);//fix 1.0 / AeonsPlayer(Owner).refireMultiplier);
+			PlayAnim('ReloadEnd',RefireMult,,,0);//fix RefireMult);
 //			PlaySound(CloseSound, SLOT_None, 4.0* AeonsPlayer(Owner).VolumeMultiplier);
 		}
 	}
@@ -484,7 +484,7 @@ state ClientReload
 			if (AmmoType.AmmoAmount < numToReload )
 				numToReload = AmmoType.AmmoAmount;
 
-			SetTimer(RefireRate * AeonsPlayer(Owner).refireMultiplier, false);//fix RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
+			SetTimer(1.0 / RefireMult, false);//fix 1.0 / RefireMult, false);
 			return;
 		}
 
@@ -515,12 +515,12 @@ state ClientReload
 	ReloadStart:
 		log("Revolver: ClientReload State: Begin...");
 		FinishAnim();
-		Sleep(RefireRate * AeonsPlayer(Owner).refireMultiplier);
+		Sleep(1.0 / RefireMult);
 		GotoState(getStateName(), 'ReloadEnd');
 		
 	ReloadEnd:
 		log("Revolver: ClientReload State: ReloadEnd...");
-		PlayAnim('ReloadEnd',1.0/AeonsPlayer(Owner).refireMultiplier,,,0);
+		PlayAnim('ReloadEnd',RefireMult,,,0);
 		FinishAnim();
 		// Finish();
 */

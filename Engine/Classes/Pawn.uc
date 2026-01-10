@@ -2644,7 +2644,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		
 		//log("Reducing health by = "$actualDamage);
 		Health -= actualDamage;
-		Mana = max( Mana - DInfo.ManaCost, 0 );
+		Mana = FMax( Mana - DInfo.ManaCost, 0.0 );
 
 		if ( Level.NetMode != NM_DedicatedServer && ( InstigatedBy != none ) && InstigatedBy.IsA('PlayerPawn') )
 			PlayerPawn(InstigatedBy).MyHud.LastDamageInflicted = actualDamage;
@@ -2837,10 +2837,10 @@ function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo
 	// WARNING - don't prevent bot suicides - they suicide when really needed
 	if ( Level.Game.BaseMutator.PreventDeath(self, Killer, damageType, HitLocation) )
 	{
-		Health = max(Health, 1); //mutator should set this higher
+		Health = FMax(Health, 1.0); //mutator should set this higher
 		return;
 	}
-	Health = Min(0, Health);
+	Health = FMin(0.0, Health);
 	for ( OtherPawn=Level.PawnList; OtherPawn!=None; OtherPawn=OtherPawn.nextPawn )
 		OtherPawn.Killed(Killer, self, damageType);
 	if ( CarriedDecoration != None )
@@ -2901,10 +2901,10 @@ function PlayerDied(name DyingState, optional name DyingStateLabel, optional paw
 		// WARNING - don't prevent bot suicides - they suicide when really needed
 		if ( Level.Game.BaseMutator.PreventDeath(self, Killer, damageType, HitLocation) )
 		{
-			Health = max(Health, 1); //mutator should set this higher
+			Health = FMax(Health, 1.0); //mutator should set this higher
 			return;
 		}
-		Health = Min(0, Health);
+		Health = FMin(0.0, Health);
 		for ( OtherPawn=Level.PawnList; OtherPawn!=None; OtherPawn=OtherPawn.nextPawn )
 			OtherPawn.Killed(Killer, self, damageType);
 		if ( CarriedDecoration != None )
@@ -3139,7 +3139,7 @@ event PainTimer()
 			//TakeDamage(int(float(FootRegion.Zone.DamagePerSec) * depth), None, Location, vect(0,0,0), FootRegion.Zone.DamageType); 
 		}
 		else if ( Health < Default.Health )
-			Health = Min(Default.Health, Health - depth * FootRegion.Zone.DamagePerSec);
+			Health = FMin(Default.Health, Health - depth * FootRegion.Zone.DamagePerSec);
 
 		if (Health > 0)
 			PainTime = 1.0;

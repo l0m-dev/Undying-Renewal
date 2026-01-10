@@ -382,7 +382,7 @@ function Pawn CalculateAutoAimDir()
 		Start = Owner.Location + vect(0,0,1) * Pawn(Owner).EyeHeight;
 		ForEach Owner.VisibleActors(class 'Pawn', P, 2048)
 		{
-			if (P != Owner && P.Health > 0.0 && !P.IsA('ScriptedNarrator'))	// Only check live actors.
+			if (P != Owner && P.Health > 0.0 && !P.IsA('ScriptedNarrator') && !P.IsA('Sheep'))	// Only check live actors.
 			{
 				if (P.JointIndex('Pelvis') >= 0)
 					End = P.JointPlace('Pelvis').Pos;

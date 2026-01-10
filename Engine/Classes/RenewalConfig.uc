@@ -44,14 +44,6 @@ var bool bDebug2;
 var float fDebug;
 var float fDebug2;
 
-simulated function PostBeginPlay()
-{
-	// creates config file if there is none
-	SaveConfig();
-	
-	Super.PostBeginPlay();
-}
-
 defaultproperties
 {
      bGameplayChanges=True

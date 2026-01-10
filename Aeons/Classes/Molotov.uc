@@ -120,7 +120,7 @@ state SwitchWeaponMesh
 
 
 	Begin:
-		PlayAnim('Down',RefireMult);
+		PlayAnim('Down',1.0);
 		PlaySound(IdleSounds[Rand(2)]);
 		FinishAnim();
 		ClearAnims();
@@ -130,7 +130,7 @@ state SwitchWeaponMesh
 			if ( AltAmmoMesh != none )
 				Mesh = AltAmmoMesh;
 
-		PlayAnim('Select',RefireMult);
+		PlayAnim('Select',1.0);
 		FinishAnim();
 		gotoState('NewClip');
 }
@@ -203,9 +203,9 @@ state Idle
 		if (Firing <= 0 && Owner != None)
 		{
 			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
-				LoopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+				LoopAnim('MoveIdle', 1.0, [TweenTime] TweenFrom('StillIdle', 0.5));
 			else
-				LoopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+				LoopAnim('StillIdle', 1.0, [TweenTime] TweenFrom('MoveIdle', 0.5));
 		}
 
 		Global.Tick(DeltaTime);

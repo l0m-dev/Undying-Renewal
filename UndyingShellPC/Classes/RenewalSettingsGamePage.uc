@@ -94,16 +94,16 @@ function GetSettings()
 
 	Super.GetSettings();
 
-	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
-	GoreCheck.bChecked = RenewalConfig.bGore;
-	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
-	LimitHealthCheck.bChecked = RenewalConfig.bLimitHealth;
-	DamageScreenShakeScaleSlider.SetValue(RenewalConfig.DamageScreenShakeScale);
-	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
-	SlomoSelectionCheck.bChecked = RenewalConfig.bSlomoSelection;
+	GameplayChangesCheck.bChecked = class'RenewalConfig'.default.bGameplayChanges;
+	GoreCheck.bChecked = class'RenewalConfig'.default.bGore;
+	AutoUseHealthVialsCheck.bChecked = class'RenewalConfig'.default.bAutoUseHealthVials;
+	LimitHealthCheck.bChecked = class'RenewalConfig'.default.bLimitHealth;
+	DamageScreenShakeScaleSlider.SetValue(class'RenewalConfig'.default.DamageScreenShakeScale);
+	MoreSkippableCutscenesCheck.bChecked = class'RenewalConfig'.default.bMoreSkippableCutscenes;
+	SlomoSelectionCheck.bChecked = class'RenewalConfig'.default.bSlomoSelection;
 
 	Difficulty = GetPlayerOwner().Level.Game.Difficulty;
-	if (!bAddedUltraNightmare && (RenewalConfig.bUnlockedUltraNightmare || Difficulty >= 3))
+	if (!bAddedUltraNightmare && (class'RenewalConfig'.default.bUnlockedUltraNightmare || Difficulty >= 3))
 	{
 		DifficultyCombo.AddItem(DifficultyUltraNightmareText);
 		bAddedUltraNightmare = true;
@@ -114,8 +114,6 @@ function GetSettings()
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
-
 	if(C == GameplayChangesInfoButton && E == DE_Click)
 	{
 		class'StatLog'.static.BrowseRelativeLocalURL("../Renewal gameplay changes.pdf");
@@ -128,25 +126,25 @@ function Notify(UWindowDialogControl C, byte E)
 		switch(C)
 		{
 		case GameplayChangesCheck:
-			RenewalConfig.bGameplayChanges = GameplayChangesCheck.bChecked;
+			class'RenewalConfig'.default.bGameplayChanges = GameplayChangesCheck.bChecked;
 			break;
 		case GoreCheck:
-			RenewalConfig.bGore = GoreCheck.bChecked;
+			class'RenewalConfig'.default.bGore = GoreCheck.bChecked;
 			break;
 		case AutoUseHealthVialsCheck:
-			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
+			class'RenewalConfig'.default.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
 			break;
 		case LimitHealthCheck:
-			RenewalConfig.bLimitHealth = LimitHealthCheck.bChecked;
+			class'RenewalConfig'.default.bLimitHealth = LimitHealthCheck.bChecked;
 			break;
 		case DamageScreenShakeScaleSlider:
-			RenewalConfig.DamageScreenShakeScale = DamageScreenShakeScaleSlider.GetValue();
+			class'RenewalConfig'.default.DamageScreenShakeScale = DamageScreenShakeScaleSlider.GetValue();
 			break;
 		case MoreSkippableCutscenesCheck:
-			RenewalConfig.bMoreSkippableCutscenes = MoreSkippableCutscenesCheck.bChecked;
+			class'RenewalConfig'.default.bMoreSkippableCutscenes = MoreSkippableCutscenesCheck.bChecked;
 			break;
 		case SlomoSelectionCheck:
-			RenewalConfig.bSlomoSelection = SlomoSelectionCheck.bChecked;
+			class'RenewalConfig'.default.bSlomoSelection = SlomoSelectionCheck.bChecked;
 			break;
 		case DifficultyCombo:
 			GetPlayerOwner().ConsoleCommand("SetSkill"@DifficultyCombo.GetSelectedIndex());

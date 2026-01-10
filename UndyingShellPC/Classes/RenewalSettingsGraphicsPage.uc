@@ -71,9 +71,9 @@ function GetSettings()
 
 	Super.GetSettings();
 
-	AnimatedMenuCheck.bChecked = RenewalConfig.bAnimatedMenu;
+	AnimatedMenuCheck.bChecked = class'RenewalConfig'.default.bAnimatedMenu;
 
-	SaveThumbnailsCheck.bChecked = RenewalConfig.bSaveThumbnails;
+	SaveThumbnailsCheck.bChecked = class'RenewalConfig'.default.bSaveThumbnails;
 
 	if (AntiAliasCombo != None)
 	{
@@ -108,20 +108,19 @@ function GetSettings()
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
 	switch(E)
 	{
 	case DE_Change:
 		switch(C)
 		{
 		case AnimatedMenuCheck:
-			RenewalConfig.bAnimatedMenu = AnimatedMenuCheck.bChecked;
+			class'RenewalConfig'.default.bAnimatedMenu = AnimatedMenuCheck.bChecked;
 			break;
 		case SaveThumbnailsCheck:
-			RenewalConfig.bSaveThumbnails = SaveThumbnailsCheck.bChecked;
+			class'RenewalConfig'.default.bSaveThumbnails = SaveThumbnailsCheck.bChecked;
 			break;
 		case AntiAliasCombo:
-			//RenewalConfig.HudScale = float(AntiAliasCombo.GetValue2());
+			//class'RenewalConfig'.default.HudScale = float(AntiAliasCombo.GetValue2());
 			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice AntialiasMode "$ AntiAliasCombo.GetValue2());
 			//GetPlayerOwner().ConsoleCommand("flush");
 			break;

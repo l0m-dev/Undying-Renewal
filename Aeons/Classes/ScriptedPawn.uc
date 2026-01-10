@@ -399,7 +399,7 @@ function Tick( float DeltaTime )
 // Sent during actor initialization.
 function PreBeginPlay()
 {
-	if (RGC())
+	if ( RGC() && !IsA('ScriptedNarrator') )
 	{
 		TurnAnimRate = 1.0 + float(Level.Game.Difficulty);
 		RotationRate.Yaw = FMin(RotationRate.Yaw + 10000.0 * Level.Game.Difficulty, 65535.0);
@@ -1724,7 +1724,11 @@ simulated function CleanUp()
 		ScryeGlow = none;
 	}
 
-	HealthBar = none;
+	if ( HealthBar != none )
+	{
+		HealthBar.Owner = none;
+		HealthBar = none;
+	}
 }
 
 // Just died.
@@ -3374,12 +3378,12 @@ function vector CalculateJump( vector ThisLoc )
 	else
 	{
 		// Jump upward.
-		ZVelocity = Min( MaxJumpZ, -FallVelocity );
+		ZVelocity = FMin( MaxJumpZ, -FallVelocity );
 	}
 	jVect = Normal(dVect);
 	dVect.Z = 0.0;
 	xySpeed = ( VSize(dVect) / ( FallTime + LiftTime ) );
-	xySpeed = Min( xySpeed, AirSpeed );
+	xySpeed = FMin( xySpeed, AirSpeed );
 	DebugInfoMessage( ".CalculateJump(), xySpeed is " $ xySpeed );
 	DesiredSpeed = xySpeed / GroundSpeed;
 	jVect = jVect * xySpeed;

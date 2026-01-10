@@ -411,11 +411,9 @@ simulated function PostBeginPlay()
 	DigitInfo.Offset[9] = 225;
 	DigitInfo.Width[9] = 21;
 
-	MyLargeFont =	Font(DynamicLoadObject(GetRenewalConfig().LargeFont,class'Font'));
-	MyMediumFont =	Font(DynamicLoadObject(GetRenewalConfig().MediumFont,class'Font'));
-	MySmallFont =	Font(DynamicLoadObject(GetRenewalConfig().SmallFont, class'Font'));
-
-	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+	MyLargeFont =	Font(DynamicLoadObject(class'RenewalConfig'.default.LargeFont,class'Font'));
+	MyMediumFont =	Font(DynamicLoadObject(class'RenewalConfig'.default.MediumFont,class'Font'));
+	MySmallFont =	Font(DynamicLoadObject(class'RenewalConfig'.default.SmallFont, class'Font'));
 
 	CachedHealthBarTime = 0.1;
 }
@@ -770,9 +768,9 @@ simulated function HUDSetup(canvas canvas)
 
 simulated function SetupHUDVariables( canvas Canvas )
 {
-	HudScale = GetRenewalConfig().HudScale;
+	HudScale = class'RenewalConfig'.default.HudScale;
 	ClampedHudScale = FMax(HudScale, 1.0);
-	bAltHud = GetRenewalConfig().bAltHud;
+	bAltHud = class'RenewalConfig'.default.bAltHud;
 	
 	// used throughout AeonsHUD to scale currentres with respect to 800x600
 	//
@@ -825,6 +823,7 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 	local vector HitLocation;
 	local float CrosshairScale;
 	local AeonsPlayer AP;
+	local Invoke Invoke;
 
 	AP = AeonsPlayer(PlayerOwner);
 
@@ -857,16 +856,9 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 					}
 				}
 
-				if (PlayerOwner.AttSpell != none)
-				{
-					if (PlayerOwner.AttSpell.IsA('Invoke') && (VSize(Pawn(Owner).Location - A.Location) <= 256.0))
-					{
-						if (ScriptedPawn(A).CanBeInvoked()) //if ( (ScriptedPawn(A).Health <= 0) || A.IsA('DecayedSaint') )
-						{
-							Canvas.DrawColor = PlayerOwner.CrossHairInvokeColor;
-						}
-					}
-				}
+				Invoke = Invoke(PlayerOwner.AttSpell);
+				if ( Invoke != none && Invoke.CheckInvoke() != none )
+					Canvas.DrawColor = PlayerOwner.CrossHairInvokeColor;
 			}
 		}
 	}
@@ -1276,8 +1268,9 @@ simulated function PostRender( canvas Canvas )
 	local bool bDrawHUD, bGameEnded;
 	local float WeaponX;
 	local AeonsPlayer AP;
+	local float ExecutionTime;
 
-	if (PlayerOwner == none) // todo: added PlayerOwner check here and now remove redundant PlayerOwner checks below
+	if (PlayerOwner == none)
 		return;
 
 	AP = AeonsPlayer(PlayerOwner);
@@ -1292,10 +1285,10 @@ simulated function PostRender( canvas Canvas )
 	if ( IsLetterBoxed() )
 		bDrawHud = false;
 
-	if ( PlayerOwner != None && PlayerOwner.Level.bLoadBootShellPSX2 && GetPlatform() == PLATFORM_PSX2 )
+	if ( PlayerOwner.Level.bLoadBootShellPSX2 && GetPlatform() == PLATFORM_PSX2 )
 		bDrawHud = false;
 
-	if ( PlayerOwner != None && PlayerOwner.GetStateName() == 'GameEnded' )
+	if ( PlayerOwner.GetStateName() == 'GameEnded' )
 	{
 		bGameEnded = true;
 		bDrawHud = false;
@@ -1335,6 +1328,7 @@ simulated function PostRender( canvas Canvas )
 		// --BURT
 
 		// Draw debug Cutscene Info
+		CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
 		if( CutsceneManager != None )
 		{
 			MP = CutsceneManager.MasterCamPoint;
@@ -1394,45 +1388,42 @@ simulated function PostRender( canvas Canvas )
 		}
 	
 	
-		if ( PlayerOwner != None )
+		if ( PlayerOwner.bShowMenu )
 		{
-			if ( PlayerOwner.bShowMenu )
-			{
-				DisplayMenu(Canvas);
-				return;
-			}
+			DisplayMenu(Canvas);
+			return;
+		}
 
-	//			if ( (PlayerOwner.bDrawCrosshair) && ( PlayerOwner.Weapon != None ) && ( !PlayerOwner.Weapon.bOwnsCrossHair ) )
-	//				 DrawCrossHair(Canvas, HalfClipX + PlayerOwner.crossHairOffsetX, HalfClipY + PlayerOwner.crossHairOffsetY, PlayerOwner.crossHairScale);
-			
-			if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) && PlayerTarget.Health > 0 )
+		//if ( (PlayerOwner.bDrawCrosshair) && ( PlayerOwner.Weapon != None ) && ( !PlayerOwner.Weapon.bOwnsCrossHair ) )
+		//	DrawCrossHair(Canvas, HalfClipX + PlayerOwner.crossHairOffsetX, HalfClipY + PlayerOwner.crossHairOffsetY, PlayerOwner.crossHairScale);
+		
+		if ( !PlayerOwner.bBehindView && (PlayerOwner.Weapon != None) && (Level.LevelAction == LEVACT_None) && PlayerTarget.Health > 0 )
+		{
+			PlayerOwner.Weapon.PostRender(Canvas);
+			if ( !PlayerOwner.Weapon.bOwnsCrossHair )
 			{
-				PlayerOwner.Weapon.PostRender(Canvas);
-				if ( !PlayerOwner.Weapon.bOwnsCrossHair )
+				if ( AP != None )
 				{
-					if ( AP != None )
-					{
-						if ( !AP.bSelectObject )
-							DrawCrossHair(Canvas, HalfClipX + AP.crossHairOffsetX, HalfClipY + AP.crossHairOffsetY, AP.crossHairScale);
-					}
-					else
-					{
-						DrawCrossHair(Canvas, HalfClipX, HalfClipY, 1.0);
-					}
+					if ( !AP.bSelectObject && (AP.bRenderWeapon || AP.GetStateName() != 'DialogScene') )
+						DrawCrossHair(Canvas, HalfClipX + AP.crossHairOffsetX, HalfClipY + AP.crossHairOffsetY, AP.crossHairScale);
+				}
+				else
+				{
+					DrawCrossHair(Canvas, HalfClipX, HalfClipY, 1.0);
 				}
 			}
-	
-			if ( !PlayerOwner.bBehindView && (PlayerOwner.AttSpell != None) && (Level.LevelAction == LEVACT_None) )
-				PlayerOwner.AttSpell.PostRender(Canvas);
-	
-			// km no defensive spells anymore
-			if ( !PlayerOwner.bBehindView && (PlayerOwner.DefSpell != None) && (Level.LevelAction == LEVACT_None) )
-				PlayerOwner.DefSpell.PostRender(Canvas);
-	
-			
-			//if ( PlayerPawn(Owner).ProgressTimeOut > Level.TimeSeconds )
-			//	DisplayProgressMessage(Canvas);
 		}
+
+		if ( !PlayerOwner.bBehindView && (PlayerOwner.AttSpell != None) && (Level.LevelAction == LEVACT_None) )
+			PlayerOwner.AttSpell.PostRender(Canvas);
+
+		// km no defensive spells anymore
+		if ( !PlayerOwner.bBehindView && (PlayerOwner.DefSpell != None) && (Level.LevelAction == LEVACT_None) )
+			PlayerOwner.DefSpell.PostRender(Canvas);
+
+		
+		//if ( PlayerPawn(Owner).ProgressTimeOut > Level.TimeSeconds )
+		//	DisplayProgressMessage(Canvas);
 	
 		DrawDebugInfo(Canvas);
 	
@@ -1487,7 +1478,7 @@ simulated function PostRender( canvas Canvas )
 			DrawFlightMana(Canvas);
 			DrawCenterPiece(Canvas);
 			
-			if (GetRenewalConfig().bShowUsedMana)
+			if (class'RenewalConfig'.default.bShowUsedMana)
 			{
 				if (bAltHud)
 				{
@@ -1694,7 +1685,7 @@ simulated function PostRender( canvas Canvas )
 	}
 	
 	// Draw health bars
-	if ( bDrawHUD && GetRenewalConfig().bShowBossHealthBars )
+	if ( bDrawHUD && class'RenewalConfig'.default.bShowBossHealthBars )
 		DrawHealthBars(Canvas);
 	
 	if ( Level.TimeSeconds < ChatVisibleTime || AeonsConsole(PlayerPawn(Owner).Player.Console).bChatting )
@@ -3476,6 +3467,7 @@ simulated function DrawInventoryItem(Canvas Canvas, int X, int Y)
 					
 					Canvas.Style = ERenderStyle.STY_Normal;
 
+					break;
 				}
 			}			
 		}
@@ -5279,6 +5271,16 @@ simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, i
 		}
 	}
 
+	if (WheelSelection != None && InventoryGroup >= 100)
+	{
+		if (WheelSelection.IsA('Ammo'))
+			InvCount = Ammo(WheelSelection).AmmoAmount;
+		else if (Pickup(WheelSelection).numCopies > 0)
+			InvCount = Pickup(WheelSelection).numCopies + 1;
+		else
+			InvCount = 1;
+	}
+
 	if (( iState == 1 )&&(HUDMode == 1))
 	{
 		Canvas.SetPos( X - 128*Scale/2.0, Y - 128*Scale/2.0 );
@@ -5395,7 +5397,7 @@ simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, i
 
 		if (InventoryGroup >= 100)
 		{
-			if (WheelSelection.bActiveToggle && !WheelSelection.bActive)
+			if ((WheelSelection.bActiveToggle && !WheelSelection.bActive) || InvCount <= 0)
 			{
 				Canvas.DrawColor.r = 128;
 				Canvas.DrawColor.g = 128;

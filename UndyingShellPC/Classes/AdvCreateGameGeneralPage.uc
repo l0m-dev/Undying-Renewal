@@ -79,33 +79,32 @@ function GetSettings()
 {
 	Super.GetSettings();
 
-	GameplayChangesCheck.bChecked = RenewalConfig.bGameplayChanges;
-	AutoUseHealthVialsCheck.bChecked = RenewalConfig.bAutoUseHealthVials;
-	LimitHealthCheck.bChecked = RenewalConfig.bLimitHealth;
-	MoreSkippableCutscenesCheck.bChecked = RenewalConfig.bMoreSkippableCutscenes;
+	GameplayChangesCheck.bChecked = class'RenewalConfig'.default.bGameplayChanges;
+	AutoUseHealthVialsCheck.bChecked = class'RenewalConfig'.default.bAutoUseHealthVials;
+	LimitHealthCheck.bChecked = class'RenewalConfig'.default.bLimitHealth;
+	MoreSkippableCutscenesCheck.bChecked = class'RenewalConfig'.default.bMoreSkippableCutscenes;
 
 	MapCombo.SetSelectedIndex(Max(MapCombo.FindItemIndex(class'CreateGameWindow'.default.Map, True), 0));
 }
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
 	switch(E)
 	{
 	case DE_Change:
 		switch(C)
 		{
 		case GameplayChangesCheck:
-			RenewalConfig.bGameplayChanges = GameplayChangesCheck.bChecked;
+			class'RenewalConfig'.default.bGameplayChanges = GameplayChangesCheck.bChecked;
 			break;
 		case AutoUseHealthVialsCheck:
-			RenewalConfig.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
+			class'RenewalConfig'.default.bAutoUseHealthVials = AutoUseHealthVialsCheck.bChecked;
 			break;
 		case LimitHealthCheck:
-			RenewalConfig.bLimitHealth = LimitHealthCheck.bChecked;
+			class'RenewalConfig'.default.bLimitHealth = LimitHealthCheck.bChecked;
 			break;
 		case MoreSkippableCutscenesCheck:
-			RenewalConfig.bMoreSkippableCutscenes = MoreSkippableCutscenesCheck.bChecked;
+			class'RenewalConfig'.default.bMoreSkippableCutscenes = MoreSkippableCutscenesCheck.bChecked;
 			break;
         case GameCombo:
 			class'CreateGameWindow'.default.GameType = Games[GameCombo.GetSelectedIndex()];

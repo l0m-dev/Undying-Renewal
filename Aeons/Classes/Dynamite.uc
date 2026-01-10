@@ -420,10 +420,10 @@ state Idle
 			if ( (VSize(PlayerPawn(Owner).Velocity) > 200) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
 			{
 				if (AnimSequence != 'IdleMove')
-					LoopAnim('IdleMove',RefireMult);
+					LoopAnim('IdleMove',1.0);
 			} else {
 				if (AnimSequence != 'IdleStill')
-					LoopAnim('IdleStill',RefireMult);
+					LoopAnim('IdleStill',1.0);
 			}
 		} else {
 			// log("bDropping is true", 'Misc');

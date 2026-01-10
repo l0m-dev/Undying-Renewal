@@ -1744,23 +1744,18 @@ simulated final function bool IsLocalActor()
 	return false;
 }
 
-simulated function RenewalConfig GetRenewalConfig()
-{
-	return Level.GetRenewalConfig();
-} 
-
-function bool RGC()
+final function bool RGC()
 {
 	if (Level.NetMode != NM_Standalone)
 	{
 		return true;
 	}
-	return GetRenewalConfig().bGameplayChanges;
+	return class'RenewalConfig'.default.bGameplayChanges;
 }
 
-function bool RGORE()
+final function bool RGORE()
 {
-	return GetRenewalConfig().bGore;
+	return class'RenewalConfig'.default.bGore;
 }
 
 //////////////////////////////////////////////////////////////////////////////

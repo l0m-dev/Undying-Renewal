@@ -35,7 +35,7 @@ var() Mesh AltAmmoMesh;
 
 var() float HeadShotMult;	// Damage Multiplier for a head shot
 var() name ThirdPersonJointName;
-var float RefireMult;
+var travel float RefireMult;
 
 //weapon new multiplayer variables
 var bool bCanClientFire;
@@ -218,11 +218,11 @@ simulated function ClientReloadWeapon(int CurrentClipCount)
 		
 		if (ClipCount == ReloadCount)
 		{
-			PlayAnim('ReloadEnd',RefireMult/AeonsPlayer(Owner).refireMultiplier,,,0);
+			PlayAnim('ReloadEnd',RefireMult,,,0);
 		}
 		else
 		{
-			PlayAnim('ReloadStart',RefireMult / AeonsPlayer(Owner).refireMultiplier,,,0);
+			PlayAnim('ReloadStart',RefireMult,,,0);
 		}
 		if ( Role < ROLE_Authority )
 		{
@@ -458,6 +458,13 @@ state Active
 		bForceFire = true;
 	}
 
+	function BeginState()
+	{
+		//LogActor("AeonsWeapon: state Active: BeginState");
+		Super.BeginState();
+		RefireMult = 1.0 / AeonsPlayer(Owner).refireMultiplier;
+	}
+
 	function EndState()
 	{
 		//LogActor("AeonsWeapon: state Active: EndState");
@@ -636,6 +643,7 @@ State DownWeapon
 		
 		Super.BeginState();
 		bCanClientFire = false;
+		RefireMult = 1.0;
 	}
 
 	function EndState()
@@ -702,7 +710,7 @@ State ClientIdle
 function BeginPlay()
 {
 	Super.BeginPlay();
-	RefireMult = 1.0;
+	//RefireMult = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -806,7 +814,7 @@ simulated function PlayFiring()
 {
 	//LogActor("AeonsWeapon: PlayFiring");
 	// just play the anim - the animation drives the rest of the weapon functionality
-	playAnim('Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier);//,1.0,,,0);
+	playAnim('Fire', RefireMult);//,1.0,,,0);
 }
 
 //----------------------------------------------------------------------------
@@ -1150,4 +1158,5 @@ defaultproperties
      AmbientGlow=0
      bNoSmooth=False
      Mass=25
+     RefireMult=1.0
 }

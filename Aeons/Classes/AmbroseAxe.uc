@@ -11,7 +11,7 @@ function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, 
 	log( ".TakeDamage() called on AmbroseAxe joint " $ DInfo.JointName $ " damage = " $ DInfo.Damage $ ", type = " $ DInfo.DamageType $ ", Health = " $ Health $ "." );
 	if( DInfo.JointName == 'axe_4' && DInfo.DamageType != 'fall' && DInfo.DamageType != 'hardfall' && DInfo.DamageType != 'drown' )
 	{
-		Health = Max( 5, Health - DInfo.Damage );
+		Health = FMax( 5.0, Health - DInfo.Damage );
 		if( (Ambrose(PawnOwner) != none) && (Health < 10) )
 			Ambrose(PawnOwner).StoneHit();
 	}

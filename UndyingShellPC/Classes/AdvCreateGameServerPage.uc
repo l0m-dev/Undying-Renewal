@@ -82,7 +82,6 @@ function GetSettings()
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
 	switch(E)
 	{
 	case DE_Change:

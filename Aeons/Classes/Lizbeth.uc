@@ -470,7 +470,7 @@ function AdjustDamage( out DamageInfo DInfo )
 {
 	super.AdjustDamage( DInfo );
 
-	DInfo.Damage = Min( DInfo.Damage, Max( 0.0, Health - MinimumHealth ) );
+	DInfo.Damage = FMin( DInfo.Damage, FMax( 0.0, Health - MinimumHealth ) );
 
 	if( Health <= DamageThreshold )
 	{
@@ -773,7 +773,7 @@ state LizbethBossFightWeakened expands AIScriptedState
 
 	function Timer()
 	{
-		OriginalHealth = Max(2*HealthDelta + MinimumHealth, OriginalHealth - HealthDelta);
+		OriginalHealth = FMax(2*HealthDelta + MinimumHealth, OriginalHealth - HealthDelta);
 		Health = OriginalHealth;	// Lizbeth is restored.
 		GotoState( 'LizbethBossFightNormal' );
 	}

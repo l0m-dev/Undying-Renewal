@@ -389,22 +389,17 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 				Buttons[0].time_count = 0;
 			}
 		case Root.Console.EInputKey.IK_Up:
-			if (Buttons[0].bDisabled)
-			{
-				if (LastPressedButton > 0)
-					JournalButtonPressed(LastPressedButton-1, true);
-				else
-					ObjectivesButtonPressed(true);
-			}
+			if (LastPressedButton > 0)
+				JournalButtonPressed(LastPressedButton-1, true);
 			else
 			{
-				if (LastPressedButton == 0)
+				if (Buttons[0].bDisabled)
+					ObjectivesButtonPressed(true);
+				else
 				{
 					ScrollUp();
 					JournalButtonPressed(LastPressedButton, true);
 				}
-				else
-					JournalButtonPressed(LastPressedButton-1, true);
 			}
 			break;
 		case Root.Console.EInputKey.IK_MWheelDown:
@@ -418,20 +413,12 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 				Buttons[1].time_count = 0;
 			}
 		case Root.Console.EInputKey.IK_Down:
-			if (Buttons[1].bDisabled)
+			if (LastPressedButton < (MAX_VISIBLE_BOOKS-1))
+				JournalButtonPressed(LastPressedButton+1, true);
+			else if (!Buttons[1].bDisabled)
 			{
-				if (LastPressedButton < (MAX_VISIBLE_BOOKS-1))
-					JournalButtonPressed(LastPressedButton+1, true);
-			}
-			else
-			{
-				if (LastPressedButton == (MAX_VISIBLE_BOOKS-1))
-				{
-					ScrollDown();
-					JournalButtonPressed(LastPressedButton, true);
-				}
-				else
-					JournalButtonPressed(LastPressedButton+1, true);
+				ScrollDown();
+				JournalButtonPressed(LastPressedButton, true);
 			}
 			break;
 		case Root.Console.EInputKey.IK_Left:

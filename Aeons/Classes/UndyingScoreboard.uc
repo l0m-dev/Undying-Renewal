@@ -18,9 +18,9 @@ var float ScaleX, ScaleY;
 function PostBeginPlay()
 {
 	Super.PostBeginPlay();
-	SmallestFont = Font(DynamicLoadObject(GetRenewalConfig().SmallFont,class'Font'));
-	SmallFont = Font(DynamicLoadObject(GetRenewalConfig().MediumFont,class'Font'));
-	BigFont = Font(DynamicLoadObject(GetRenewalConfig().MediumFont,class'Font'));
+	SmallestFont = Font(DynamicLoadObject(class'RenewalConfig'.default.SmallFont,class'Font'));
+	SmallFont = Font(DynamicLoadObject(class'RenewalConfig'.default.MediumFont,class'Font'));
+	BigFont = Font(DynamicLoadObject(class'RenewalConfig'.default.MediumFont,class'Font'));
 	HugeFont = BigFont;
 }
 

@@ -8,6 +8,9 @@ class ManaWell expands Items;
 
 var() int CapacityIncrease;
 
+// left for backwards compatibility
+auto state Pickup {}
+
 function PickupFunction(Pawn Other)
 {
 	Super.PickupFunction(Other);

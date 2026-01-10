@@ -525,7 +525,7 @@ event PreBeginPlay()
 	//EMod.setBase(self);
 	bAllowSpellSelectionHUD = true;
 
-	bShowScryeHint = GetRenewalConfig().bShowScryeHint;
+	bShowScryeHint = class'RenewalConfig'.default.bShowScryeHint;
 
 	//TypingIndicator = spawn(class 'TypingIndicator',self,,Location + vect(0,0,128));
 	//TypingIndicator.setBase(self);
@@ -2472,6 +2472,20 @@ function TweenToSwimming(float tweentime)
 	speedMultiplier = mult;
 }
 
+function SetRefireMultiplier(float mult)
+{
+	local AeonsWeapon AWep;
+
+	refireMultiplier = mult;
+
+	//if( Weapon != None )
+	//	Weapon.RefireRate = Weapon.default.RefireRate / mult;
+
+	AWep = AeonsWeapon(Weapon);
+	if( AWep != None )
+		AWep.RefireMult = 1.0 / refireMultiplier;
+}
+
 exec function bhop()
 {
 	if( !bCheatsEnabled )
@@ -3457,7 +3471,7 @@ simulated state PlayerCutScene
 			// If a cutscene is active and only the client state changed, the client will eventually go back to the PlayerCutScene state
 			// Make sure SetupCutsceneForPlayer is called on the client
 			CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
-			if (CutsceneManager != None && CutsceneManager.IsCutsceneActive())
+			if (CutsceneManager.IsCutsceneActive())
 				CutsceneManager.SetupCutsceneForPlayer(self);
 		}
 	}
@@ -3960,7 +3974,7 @@ ignores SeePlayer, HearNoise, Bump;
 		if ( AeonsHUD(myHUD) != None )
             AeonsHUD(myHUD).InitSelectMode();
 
-		if ( !bModifiedTimeDilationForSelectObject && Level.NetMode == NM_Standalone && GetRenewalConfig().bSlomoSelection )
+		if ( !bModifiedTimeDilationForSelectObject && Level.NetMode == NM_Standalone && class'RenewalConfig'.default.bSlomoSelection )
 		{
 			bModifiedTimeDilationForSelectObject = true;
 			SavedTimeDilation = Level.TimeDilation;
@@ -8426,7 +8440,7 @@ function AddObjective( int ObjectiveNumber )
 	if ( FreeSlot >= 0 ) 
 	{
 		Objectives[FreeSlot] = ObjectiveNumber;
-		if ( AeonsHUD(myHud) != None && GetRenewalConfig().bAutoShowObjectives ) 
+		if ( AeonsHUD(myHud) != None && class'RenewalConfig'.default.bAutoShowObjectives ) 
 		{
 			AeonsHUD(myHud).DisplayObjectives();
 		}
@@ -8679,8 +8693,8 @@ simulated function ClientUpdateForecast()
 
 function DisableScryeHint()
 {
-	GetRenewalConfig().bShowScryeHint = false;
-	GetRenewalConfig().SaveConfig();
+	class'RenewalConfig'.default.bShowScryeHint = false;
+	class'RenewalConfig'.static.StaticSaveConfig();
 	bShowScryeHint = false;
 }
 
@@ -8744,8 +8758,8 @@ function bool ShowSelectItemHint(string Line1)
 		ShowInventoryMessage(Line1, KeyName, 6.0);
 	}
 
-	GetRenewalConfig().bShowQuickSelectHint = false;
-	GetRenewalConfig().SaveConfig();
+	class'RenewalConfig'.default.bShowQuickSelectHint = false;
+	class'RenewalConfig'.static.StaticSaveConfig();
 
 	return bFoundKey;
 }

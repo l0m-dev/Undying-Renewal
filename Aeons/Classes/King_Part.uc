@@ -45,7 +45,7 @@ function AcidicSkin( float DeltaTime )
 
 function Touch( actor Other )
 {
-	if( Other.IsA('PlayerPawn') )
+	if( Other.IsA('PlayerPawn') && !bCollideSkeleton )
 	{
 		DebugInfoMessage(" Touching actor " $ Other.name);
 		TouchingActor = Other;
@@ -66,7 +66,7 @@ function UnTouch( actor Other )
 
 function Attach( actor Other )
 {
-	if( Other.IsA('PlayerPawn') )
+	if( Other.IsA('PlayerPawn') && !bCollideSkeleton )
 	{
 		DebugInfoMessage(" Touching actor " $ Other.name);
 		TouchingActor = Other;

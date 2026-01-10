@@ -2085,7 +2085,7 @@ public:
     TArray<class UClass*> PreloadClasses;
     BITFIELD bLoadBootShellPSX2:1 GCC_PACK(4);
     class AGameReplicationInfo* GRI GCC_PACK(4);
-    class ARenewalConfig* RenewalConfig;
+    class AActor* CutsceneManager;
     DECLARE_FUNCTION(execGetAddressURL);
     DECLARE_FUNCTION(execGetLocalURL);
     DECLARE_FUNCTION(execGetTotalWind);

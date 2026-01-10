@@ -191,7 +191,7 @@ function Fire( float Value )
 simulated function PlayFiring()
 {
 	// log("PlayFiring Called within the Speargun");
-	PlayAnim( 'Fire', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+	PlayAnim( 'Fire', RefireMult,,,0.0);
 	if (Level.NetMode == NM_Client) // this is a bit earlier than what it should be, leave it for now, needed because FireWeapon is not called on client for some reason
 		PlaySound(FireSound, SLOT_Misc, 4.0);	
 //	if ( Role == ROLE_Authority )
@@ -213,12 +213,18 @@ state NewClip
 
 	function BeginState()
 	{
+		if (!RGC())
+			RefireMult = 1.0; 
+
 		PlayerPawn(Owner).bReloading = true;
 		ClientReloadWeapon(ClipCount);
 	}
 
 	function EndState()
 	{
+		if (!RGC())
+			RefireMult = 1.0 / AeonsPlayer(Owner).refireMultiplier;
+		
 		PlayerPawn(Owner).bReloading = false;
 	}
 
@@ -244,11 +250,11 @@ state NewClip
 
 		if (AmmoType.AmmoAmount > 0)
 		{
-			PlayAnim('DownEmpty', RefireMult / AeonsPlayer(Owner).refireMultiplier);
+			PlayAnim('DownEmpty', RefireMult);
 			FinishAnim();
 			PlaySound(InsertSound,, 0.5);
-			sleep(reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier));
-			//logactorstate("sleeping for "$ reloadTime * (1.0 / RefireMult * AeonsPlayer(Owner).refireMultiplier) $" seconds");		
+			sleep(reloadTime / RefireMult);
+			//logactorstate("sleeping for "$ reloadTime / RefireMult $" seconds");		
 		}		
 		
 	    // Owner.PlaySound(Misc2Sound, SLOT_None,2.0);
@@ -260,7 +266,7 @@ state NewClip
 		if ( (AmmoType != None) && (AmmoType.AmmoAmount<=0) && !PlayerPawn(Owner).bNeverAutoSwitch ) 
 			Pawn(Owner).SwitchToBestWeapon();  //Goto Weapon that has Ammo
 		else {
-			PlayAnim('ReLoadEnd', RefireMult / AeonsPlayer(Owner).refireMultiplier);
+			PlayAnim('ReLoadEnd', RefireMult);
 			FinishAnim();
 			// Log("Speargun: state NewClip; FinishAnim is done with " $AnimSequence);
 		}
@@ -298,9 +304,9 @@ state Idle
 		if (Owner != None)
 		{
 			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
-				loopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+				loopAnim('MoveIdle', 1.0, [TweenTime] TweenFrom('StillIdle', 0.5));
 			else
-				loopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+				loopAnim('StillIdle', 1.0, [TweenTime] TweenFrom('MoveIdle', 0.5));
 		}
 	}
 
@@ -321,7 +327,7 @@ state Idle
 
 	FLOURISH:
 		disable('Tick');
-		PlayAnim('Twirl', RefireMult);
+		PlayAnim('Twirl', 1.0);
 		FinishAnim();
 		goto 'Begin';
 		
@@ -357,7 +363,7 @@ function Tick(float DeltaTime)
 simulated function PlayReloading()
 {
 	//Log("Speargun: PlayReloading");
-	PlayAnim('DownEmpty',1.0 / AeonsPlayer(Owner).refireMultiplier,,,0);//, RefireMult);
+	PlayAnim('DownEmpty',RefireMult,,,0);//, RefireMult);
 }
 
 
@@ -417,7 +423,7 @@ state ClientReload
 	simulated function Timer()
 	{
 		//Log("Speargun: state ClientReload: Timer");
-		PlayAnim('ReloadEnd',1.0 / AeonsPlayer(Owner).refireMultiplier,,,0);
+		PlayAnim('ReloadEnd',RefireMult,,,0);
 	}
 
 	function bool PutDown()
@@ -441,9 +447,9 @@ state ClientReload
 		{
 			//Log("Speargun: state ClientReload: setting timer to " $ RefireRate * AeonsPlayer(Owner).refireMultiplier );
 			//rb new
-			//logactorstate("Setting Timer to " $ reloadTime * 1.0 * RefireMult);
-			SetTimer(reloadTime * 1.0 * RefireMult * AeonsPlayer(Owner).refireMultiplier, false);
-			//SetTimer(RefireRate * AeonsPlayer(Owner).refireMultiplier, false);
+			//logactorstate("Setting Timer to " $ reloadTime / RefireMult);
+			SetTimer(reloadTime / RefireMult, false);
+			//SetTimer(1.0 / RefireMult, false);
 			return;
 		}
 
@@ -476,7 +482,7 @@ state ClientReload
 	ReloadStart:
 		log("ClientReload State: Begin...");
 		FinishAnim();
-		Sleep(RefireRate * AeonsPlayer(Owner).refireMultiplier);
+		Sleep(1.0 / RefireMult);
 		GotoState(getStateName(), 'ReloadEnd');
 		
 	ReloadEnd:

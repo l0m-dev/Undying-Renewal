@@ -134,7 +134,6 @@ function UpdateBethany()
 
 function CleanUp()
 {
-
 	if( RechargeBolt != none )
 	{
 		RechargeBolt.Destroy();
@@ -343,8 +342,6 @@ function Tick( float deltaTime )
 		}
 		else
 		{
-			RechargeBolt.Destroy();
-			RechargeBolt = none;
 			EndRecharge();
 		}
 	}
@@ -429,6 +426,7 @@ function EndRecharge()
 	{
 		GotoState( 'AIAttackPlayer' );
 	}
+	CleanUp();
 }
 
 state AICastRecharge
@@ -446,7 +444,6 @@ state AICastRecharge
 	{
 		if( Other == pBethany )
 		{
-			CleanUp();
 			EndRecharge();
 		}
 		super.Killed( Killer, Other, damageType );

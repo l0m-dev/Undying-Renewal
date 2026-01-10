@@ -29,8 +29,6 @@ var(DeathMessage) localized string HackedMessage;
 var localized string GlobalNameChange;
 var localized string NoNameChange;
 
-var CutsceneManager CutsceneManager;
-
 // left for compatibility with family grave
 function int ReduceDamage( int Damage, name DamageType, pawn injured, pawn instigatedBy )
 {
@@ -64,21 +62,27 @@ function int ReduceDamage(int Damage, name DamageType, pawn injured, pawn instig
 }
 */
 
-function PreBeginPlay()
-{
-	Super.PreBeginPlay();
-
-	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
-}
-
 function CutsceneManagerPlayerLogin(PlayerPawn Player, bool bCutSceneStartSpot)
 {
-	CutsceneManager.PlayerLogin(Player, bCutSceneStartSpot);
+	local CutsceneManager CutsceneManager;
+
+	if ( bCutSceneStartSpot )
+		CutsceneManager = class'CutsceneManager'.static.CreateCutsceneManager(Level);
+	else
+		CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+
+	if ( CutsceneManager != None )
+		CutsceneManager.PlayerLogin(Player, bCutSceneStartSpot);
 }
 
 function CutsceneManagerPlayerLogout(PlayerPawn Player)
 {
-	CutsceneManager.PlayerLogout(Player);
+	local CutsceneManager CutsceneManager;
+	
+	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+
+	if ( CutsceneManager != None )
+		CutsceneManager.PlayerLogout(Player);
 }
 
 exec function AdminSay(string Msg)

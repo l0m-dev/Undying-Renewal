@@ -52,46 +52,45 @@ function GetSettings()
 {
 	Super.GetSettings();
 
-	AltHudCheck.bChecked = RenewalConfig.bAltHud;
-	AutoShowObjectivesCheck.bChecked = RenewalConfig.bAutoShowObjectives;
-	ShowUsedManaCheck.bChecked = RenewalConfig.bShowUsedMana;
-	//HudScaleSlider.SetValue(RenewalConfig.HudScale);
+	AltHudCheck.bChecked = class'RenewalConfig'.default.bAltHud;
+	AutoShowObjectivesCheck.bChecked = class'RenewalConfig'.default.bAutoShowObjectives;
+	ShowUsedManaCheck.bChecked = class'RenewalConfig'.default.bShowUsedMana;
+	//HudScaleSlider.SetValue(class'RenewalConfig'.default.HudScale);
 
-	if (RenewalConfig.HudScale == 1.0)
+	if (class'RenewalConfig'.default.HudScale == 1.0)
 		HudSizeCombo.SetSelectedIndex(1);
-	else if (RenewalConfig.HudScale < 1.0)
+	else if (class'RenewalConfig'.default.HudScale < 1.0)
 		HudSizeCombo.SetSelectedIndex(0);
 	else
 		HudSizeCombo.SetSelectedIndex(2);
 	
-	ShowBossHealthBarsCheck.bChecked = RenewalConfig.bShowBossHealthBars;
+	ShowBossHealthBarsCheck.bChecked = class'RenewalConfig'.default.bShowBossHealthBars;
 }
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
 	switch(E)
 	{
 	case DE_Change:
 		switch(C)
 		{
 		case AltHudCheck:
-			RenewalConfig.bAltHud = AltHudCheck.bChecked;
+			class'RenewalConfig'.default.bAltHud = AltHudCheck.bChecked;
 			break;
 		case AutoShowObjectivesCheck:
-			RenewalConfig.bAutoShowObjectives = AutoShowObjectivesCheck.bChecked;
+			class'RenewalConfig'.default.bAutoShowObjectives = AutoShowObjectivesCheck.bChecked;
 			break;
 		case ShowUsedManaCheck:
-			RenewalConfig.bShowUsedMana = ShowUsedManaCheck.bChecked;
+			class'RenewalConfig'.default.bShowUsedMana = ShowUsedManaCheck.bChecked;
 			break;
 		//case HudScaleSlider:
-		//	RenewalConfig.HudScale = HudScaleSlider.GetValue();
+		//	class'RenewalConfig'.default.HudScale = HudScaleSlider.GetValue();
 		//	break;
 		case HudSizeCombo:
-			RenewalConfig.HudScale = float(HudSizeCombo.GetValue2());
+			class'RenewalConfig'.default.HudScale = float(HudSizeCombo.GetValue2());
 			break;
 		case ShowBossHealthBarsCheck:
-			RenewalConfig.bShowBossHealthBars = ShowBossHealthBarsCheck.bChecked;
+			class'RenewalConfig'.default.bShowBossHealthBars = ShowBossHealthBarsCheck.bChecked;
 			break;
 		}
 		break;

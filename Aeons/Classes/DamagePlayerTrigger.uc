@@ -79,7 +79,7 @@ function PostBeginPlay()
 }
 
 // simulate bTimedTick, but fixed
-// this is already fixed in EngineRenewal, and we could just use bTimedTick
+// TODO: Remove. This is already fixed in EngineRenewal, and we could just use bTimedTick
 // keep this for a little while
 function Tick( float DeltaTime )
 {

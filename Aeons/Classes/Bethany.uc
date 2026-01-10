@@ -85,7 +85,7 @@ function Killed( pawn Killer, pawn Other, name damageType )
 {
 	if( Other.IsA( 'Handmaiden' ) )
 	{
-		LogStack();
+		//LogStack();
 		DebugInfoMessage(".Killed() A Handmaiden has been killed.");
 		HandmaidensKilled++;
 	}
@@ -276,7 +276,7 @@ function PlayFarAttack()
 function GotoInitState()
 {
 	DebugInfoMessage( ".GotoInitState()" );
-	LogStack();
+	//LogStack();
 	GotoState( 'AIHuntPlayer' );
 }
 
@@ -644,7 +644,7 @@ state AIFarAttackAnim
 
 	function PlayWait()
 	{
-		LogStack();
+		//LogStack();
 	}
 	// *** new (state only) functions ***
 

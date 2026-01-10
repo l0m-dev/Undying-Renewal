@@ -77,7 +77,7 @@ state HoundAnim
 	
 	Begin:
 		Owner.PlaySound(SpawnHoundSound);
-		PlayAnim('Hound',RefireMult);
+		PlayAnim('Hound',1.0);
 		FinishAnim();
 		GotoState('Idle');
 }
@@ -209,7 +209,10 @@ state NormalFire
 	
 	Begin:
 		// log("Play Fire Animation");
-		PlayAnim('Fire', 1 / AeonsPlayer(Owner).refireMultiplier);
+		if (RGC())
+			PlayAnim('Fire', RefireMult);
+		else
+			PlayAnim('Fire');
 		FinishAnim();
 		chargeCount=0;
 		bCanClientFire=true;
@@ -295,7 +298,7 @@ state Idle
 
 	FLOURISH:
 		disable('Tick');
-		PlayAnim('Hound',RefireMult);
+		PlayAnim('Hound',1.0);
 		FinishAnim();
 		goto 'Begin';
 

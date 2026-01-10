@@ -43,8 +43,7 @@ function Created()
 			AnimatedBack.bLoop = true;
 	}
 
-	AeonsRootWindow(Root).bAllowControllerCursor = bAllowControllerCursor;
-	AeonsRootWindow(Root).ControllerSelectedWindow = Self;
+	AeonsRootWindow(Root).SetControllerWindow(Self, bAllowControllerCursor);
 }
 
 function Paint(Canvas C, float X, float Y)
@@ -95,7 +94,7 @@ function Paint(Canvas C, float X, float Y)
 
 	DrawStretchedTextureSegment( C, WinLeft, WinTop, WinWidth, WinHeight, 0, 0, 256, 256, texture'Engine.BlackTexture' );
 
-	bAnimatedMenu = GetPlayerOwner().GetRenewalConfig().bAnimatedMenu && AnimatedBack != None;
+	bAnimatedMenu = class'RenewalConfig'.default.bAnimatedMenu && AnimatedBack != None;
 
 	// brighten it?
 	//C.DrawColor.R = 255;
@@ -176,8 +175,7 @@ function Close(optional bool bByParent)
 
 function ShowWindow()
 {
-	AeonsRootWindow(Root).bAllowControllerCursor = bAllowControllerCursor;
-	AeonsRootWindow(Root).ControllerSelectedWindow = Self;
+	AeonsRootWindow(Root).SetControllerWindow(Self, bAllowControllerCursor);
 
 	Super.ShowWindow();
 }
@@ -185,7 +183,7 @@ function ShowWindow()
 function HideWindow()
 {
 	local int i;
-	local AeonsRootWindow AeonsRoot;
+	local ShellWindow NewControllerWindow;
 
 	Root.Console.bBlackOut = False;
 	
@@ -203,15 +201,10 @@ function HideWindow()
 	//fix be smarter about this, use some sort of cache scheme
 	Log("Unloaded Textures for " $ self );
 
-	if ( ShellWindow(PrevSiblingWindow) != None )
+	NewControllerWindow = ShellWindow(PrevSiblingWindow);
+	if ( NewControllerWindow != None )
 	{
-		AeonsRoot = AeonsRootWindow(Root);
-
-		if ( AeonsRoot.ControllerSelectedWindow != None )
-			AeonsRoot.ControllerSelectedWindow.MouseLeave();
-			
-		AeonsRoot.bAllowControllerCursor = ShellWindow(PrevSiblingWindow).bAllowControllerCursor;
-		AeonsRoot.ControllerSelectedWindow = PrevSiblingWindow;
+		AeonsRootWindow(Root).SetControllerWindow( NewControllerWindow, NewControllerWindow.bAllowControllerCursor );
 	}
 }
 

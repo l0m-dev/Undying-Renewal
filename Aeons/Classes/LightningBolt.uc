@@ -598,7 +598,7 @@ simulated function Destroyed()
 simulated state Release
 {
 Begin:
-	CleanUp();
+	Destroy();
 }
 
 defaultproperties

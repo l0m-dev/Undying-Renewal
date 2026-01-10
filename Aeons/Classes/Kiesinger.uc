@@ -242,7 +242,7 @@ function int Dispel( optional bool bCheck )
 
 function ShieldAdjustDamage( out DamageInfo DInfo )
 {
-	DInfo.Damage = Max(0, DInfo.Damage - ShieldHitPoints);
+	DInfo.Damage = FMax(0.0, DInfo.Damage - ShieldHitPoints);
 	ShieldHitPoints = ShieldHitPoints - DInfo.Damage;
 	if( ShieldHitPoints <= 0 )
 		DestroyShield();

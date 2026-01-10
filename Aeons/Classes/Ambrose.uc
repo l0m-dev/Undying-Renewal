@@ -407,6 +407,14 @@ function vector WorldBitePoint()
 {
 	return WorldLocation( HoundBitePoint );
 }
+
+function bool NearStrikeValid( actor Victim, int DamageNum )
+{
+	if ( RGC() )
+		return LocationStrikeValid( Victim, MyProp[0].JointPlace( 'axe_4' ).pos, DamageRadius );
+
+	return Super.NearStrikeValid( Victim, DamageNum );
+}
 	
 function PlayLocomotion( vector dVector )
 {
@@ -446,7 +454,7 @@ function Tick( float DeltaTime )
 {
 	super.Tick( DeltaTime );
 
-	if( Health > 0.0 )
+	if( HealthBar != None && Health > 0.0 )
 		HealthBar.SetPercent(0.5 + (HoundTimer / default.HoundTimer) / 2.0);
 
 	if( HoundTimer > 0.0 )
@@ -618,6 +626,7 @@ state AmbroseBossFightGiantStartHound expands AIScriptedState
 		
 Begin:
 	SetTimer( 0.5, false );
+	WaitForLanding();
 	StopMovement();
 	PlayAnim( 'taunt_axeGIANT' );
 

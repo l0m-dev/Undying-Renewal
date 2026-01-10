@@ -152,7 +152,7 @@ function setupCamera()
 {
 	local CutsceneManager CutsceneManager;
 	
-	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+	CutsceneManager = class'CutsceneManager'.static.CreateCutsceneManager(Level);
 	CutsceneManager.SetMasterCamPoint(MasterPoint);
 	CutsceneManager.StartCutscene(Player, false, Event);
 }

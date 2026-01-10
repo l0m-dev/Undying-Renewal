@@ -99,12 +99,8 @@ function Tick( float deltaTime )
 
 function PreBeginPlay()
 {
-	if (RGC())
-	{
-		DrawScale = 1.2;
-		MeleeRange = default.MeleeRange * 1.1;
+	if( RGC() )
 		MeleeInfo[0].Damage = default.MeleeInfo[0].Damage * 0.65; 
-	}
 	super.PreBeginPlay();
 	OutOfWater = true;
 	DelayTimer = 0.0;

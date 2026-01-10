@@ -2,7 +2,7 @@ class UMenuRenewalBasePage extends UMenuPageWindow;
 
 var int ControlOffset;
 
-var RenewalConfig RenewalConfig;
+var transient RenewalConfig RenewalConfig; // TODO: Remove. Unused, left temporarily for backwards compatibility.
 
 struct ControlInfo
 {
@@ -54,10 +54,7 @@ static final function bool LocalizationExists(String SectionName, String KeyName
 	return resultStr != notFoundStr;
 }
 
-function GetSettings()
-{
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig();
-}
+function GetSettings();
 
 function WindowShown()
 {
@@ -78,8 +75,7 @@ function Notify(UWindowDialogControl C, byte E)
 			ParentWindow.ToolTip("");
 		break;
 	}
-	if (RenewalConfig != None)
-		RenewalConfig.SaveConfig();
+	class'RenewalConfig'.static.StaticSaveConfig();
 	Super.Notify(C, E);
 }
 

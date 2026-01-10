@@ -18,7 +18,8 @@ function attachSmoke(actor Other)
 
 function detachSmoke()
 {
-	cp.ShutDownFX();
+	if (cp != none)
+		cp.ShutDownFX();
 }
 
 // ===================================================================================
@@ -30,6 +31,8 @@ state Activated
 	{
 		if (Owner.IsA('ScriptedPawn'))
 			gotoState('SPActivated');
+		else
+			bActive = true;
 	}
 
 	function Tick(float deltaTime)
@@ -44,7 +47,6 @@ state Activated
 
 	Begin:
 		attachSmoke(Pawn(Owner));
-		bActive = true;
 		playSound(EffectSound);
 		AeonsPlayer(Owner).Haste(0.1);
 		setTimer(EffectLen, false);
@@ -79,6 +81,11 @@ state SPDeactivated
 // ===================================================================================
 state SPActivated
 {
+	function BeginState()
+	{
+		bActive = true;
+	}
+
 	function Timer()
 	{
 		gotoState('SPDeactivated');
@@ -93,7 +100,6 @@ state SPActivated
 
 	Begin:
 		attachSmoke(Pawn(Owner));
-		bActive = true;
 		OriginalGroundSpeed = Pawn(Owner).groundSpeed;
 		OriginalAirSpeed = Pawn(Owner).AirSpeed;
 		Pawn(Owner).groundspeed = Pawn(Owner).groundSpeed * 0.5;

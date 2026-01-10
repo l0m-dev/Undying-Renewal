@@ -416,7 +416,6 @@ function Paint(Canvas C, float X, float Y)
 	local int i, j;
 	local string mName;
 	local vector ParticleLoc;
-	local RenewalConfig RenewalConfig;
 	
 	Super.Paint(C, X, Y);
 
@@ -480,9 +479,8 @@ function Paint(Canvas C, float X, float Y)
 					BloodFX.SizeLength.Base = 64;
 				}
 
-				RenewalConfig = GetPlayerOwner().GetRenewalConfig();
-				RenewalConfig.bUnlockedUltraNightmare = true;
-				RenewalConfig.SaveConfig();
+				class'RenewalConfig'.default.bUnlockedUltraNightmare = true;
+				class'RenewalConfig'.static.StaticSaveConfig();
 			}
 		}
 		else

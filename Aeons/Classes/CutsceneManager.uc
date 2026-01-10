@@ -2,7 +2,7 @@
 // CutsceneManager.
 // handles cutscenes
 //=============================================================================
-class CutsceneManager expands Invisible;
+class CutsceneManager expands Invisible transient;
 
 /*
 	Handles:
@@ -244,7 +244,7 @@ function SkipCutscene()
 	{
 		CamProj.EndIt();
 	}
-	else if (GetRenewalConfig().bMoreSkippableCutscenes)
+	else if (class'RenewalConfig'.default.bMoreSkippableCutscenes)
 	{
 		ForEach AllActors(class 'CameraProjectile', Cam)
 		{
@@ -424,17 +424,29 @@ simulated function FindLocalPlayer()
 }
 
 // Ensures that there are no duplicates and helps with backwards compatibility by spawning CutsceneManager when needed
-simulated static final function CutsceneManager GetCutsceneManager(LevelInfo Level)
+simulated static final function CutsceneManager CreateCutsceneManager(LevelInfo Level)
 {
 	local CutsceneManager CutsceneManager;
+
+	CutsceneManager = CutsceneManager(Level.CutsceneManager);
+	if (CutsceneManager != None)
+		return CutsceneManager;
 
 	foreach Level.AllActors(class'CutsceneManager', CutsceneManager)
 		break;
 
 	if (CutsceneManager == None && Level.NetMode != NM_Client)
+	{
 		CutsceneManager = Level.Spawn(class'CutsceneManager');
+		Level.CutsceneManager = CutsceneManager;
+	}
 	
 	return CutsceneManager;
+}
+
+simulated static final function CutsceneManager GetCutsceneManager(LevelInfo Level)
+{
+	return CutsceneManager(Level.CutsceneManager);
 } 
 
 defaultproperties

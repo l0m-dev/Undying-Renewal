@@ -35,7 +35,7 @@ Begin:
 	bActive = true;
 	AeonsPlayer(Owner).bSlothActive = true;
 	AeonsPlayer(Owner).Haste ( SpeedScalar );
-	AeonsPlayer(Owner).refireMultiplier = 1.0/RefireScalar;
+	AeonsPlayer(Owner).SetRefireMultiplier ( 1.0/RefireScalar );
 	speedMultiplier = SpeedScalar;
 
 	SetTimer( EffectDuration, false );
@@ -47,7 +47,7 @@ Begin:
 	bActive = false;
 	AeonsPlayer(Owner).bSlothActive = false;
 	AeonsPlayer(Owner).Haste( 1.0 );
-	AeonsPlayer(Owner).refireMultiplier = 1.0;
+	AeonsPlayer(Owner).SetRefireMultiplier( 1.0 );
 	speedMultiplier = 1.0;
 
 	GotoState( 'Idle' );

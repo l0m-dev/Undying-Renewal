@@ -98,9 +98,9 @@ simulated function PlayFiring()
 simulated function PlayIdleAnim()
 {
 	if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) )
-		loopAnim('IdleMove',RefireMult, [TweenTime] 0.0);
+		loopAnim('IdleMove',1.0, [TweenTime] 0.0);
 	else
-		loopAnim('IdleStill',RefireMult, [TweenTime] 0.0);
+		loopAnim('IdleStill',1.0, [TweenTime] 0.0);
 }
 simulated function SmallExplosion()
 {
@@ -239,7 +239,7 @@ state Finishing
 		{
 			PlayAnim('');
 			sleep(0);
-			loopAnim('IdleStill',RefireMult); // todo: check speed for IdleMove
+			loopAnim('IdleStill',1.0); // todo: check speed for IdleMove
 			sleep(0.5);
 			GotoState('Idle');
 		}
@@ -384,9 +384,9 @@ state Idle
 		if (Owner != None)
 		{
 			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone )
-				loopAnim('IdleMove',RefireMult, [TweenTime] TweenFrom('IdleStill', 0.5));
+				loopAnim('IdleMove',1.0, [TweenTime] TweenFrom('IdleStill', 0.5));
 			else
-				loopAnim('IdleStill',RefireMult, [TweenTime] TweenFrom('IdleMove', 0.5));
+				loopAnim('IdleStill',1.0, [TweenTime] TweenFrom('IdleMove', 0.5));
 		}
 	}
 

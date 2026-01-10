@@ -125,16 +125,16 @@ function SetupFonts(optional Canvas C)
 {
 	local Font LargeFont, MedFont, SmallFont;
 	
-	LargeFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().LargeFont, class'Font'));
-	MedFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().MediumFont, class'Font'));
-	SmallFont = Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SmallFont, class'Font'));
+	LargeFont = Font(DynamicLoadObject(class'RenewalConfig'.default.LargeFont, class'Font'));
+	MedFont = Font(DynamicLoadObject(class'RenewalConfig'.default.MediumFont, class'Font'));
+	SmallFont = Font(DynamicLoadObject(class'RenewalConfig'.default.SmallFont, class'Font'));
 	
 	Fonts[F_Normal] = 	SmallFont;
 	Fonts[F_Bold] = 	SmallFont;
 	Fonts[F_Large] =	LargeFont;
 	Fonts[F_LargeBold]= LargeFont;
 	Fonts[4] =			MedFont;
-	Fonts[5] =			Font(DynamicLoadObject(GetPlayerOwner().GetRenewalConfig().SaveNameFont, class'Font'));
+	Fonts[5] =			Font(DynamicLoadObject(class'RenewalConfig'.default.SaveNameFont, class'Font'));
 
 	Fonts[6] =			Font(DynamicLoadObject("UWindowFonts.Tahoma10", class'Font'));
 	Fonts[7] =			Font(DynamicLoadObject("UWindowFonts.UTFont12", class'Font'));
@@ -276,10 +276,7 @@ function DrawMouse(Canvas C)
 		NewControllerWindow = FindWindowUnder(NewPos.X, NewPos.Y);
 		if ( NewControllerWindow.IsA('ShellComponent') && NewControllerWindow.bWindowVisible && NewControllerWindow != ControllerSelectedWindow )
 		{
-			if ( ControllerSelectedWindow != None )
-				ControllerSelectedWindow.MouseLeave();
-			
-			ControllerSelectedWindow = NewControllerWindow;
+			SetControllerWindow(NewControllerWindow, true);
 
 			ControllerSelectedWindow.MouseEnter();
 			ControllerSelectedWindow.bMouseDown = True;
@@ -393,6 +390,15 @@ function vector GetNormalizedCursorPos()
 	Pos.X = ControllerCursorPos.X * GUIScale + Dir.X * 160.0 * Root.ScaleY;
 	Pos.Y = ControllerCursorPos.Y * GUIScale - Dir.Y * 160.0 * Root.ScaleY;
 	return Pos;
+}
+
+function SetControllerWindow(UWindowWindow NewControllerWindow, bool bNewAllowControllerCursor)
+{
+	if ( ControllerSelectedWindow != None )
+		ControllerSelectedWindow.MouseLeave();
+		
+	bAllowControllerCursor = bNewAllowControllerCursor;
+	ControllerSelectedWindow = NewControllerWindow;
 }
 
 defaultproperties

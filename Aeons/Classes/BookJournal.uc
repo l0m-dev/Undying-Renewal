@@ -220,7 +220,7 @@ simulated function PreBeginPlay()
 	//TextFont = Font(DynamicLoadObject("Aeons.DauphinFont", class'Font'));
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin_Book_pad", class'Font'));
 	//TextFont = Font(DynamicLoadObject("Aeons.Dauphin16_pad", class'Font'));
-	TextFont = Font(DynamicLoadObject(GetRenewalConfig().JournalFont, class'Font'));
+	TextFont = Font(DynamicLoadObject(class'RenewalConfig'.default.JournalFont, class'Font'));
 	
 	Textures[0].NotifyActor = Self;
 	Textures[1].NotifyActor = Self;

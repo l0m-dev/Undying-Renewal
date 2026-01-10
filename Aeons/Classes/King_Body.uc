@@ -505,6 +505,8 @@ function PlayDying( name damage, vector HitLocation, DamageInfo DInfo )
 
 function Destroyed()
 {
+	Super.Destroyed();
+	
 	if( KingMouth != none )
 		KingMouth.Destroy();
 	if( KingLeftArm != none )

@@ -105,7 +105,7 @@ function Created()
 		
 		SaveGameButtons[i].TextStyle = 2;
 		
-		TextColor = GetPlayerOwner().ParseColor(GetPlayerOwner().GetRenewalConfig().SaveNameColor);
+		TextColor = GetPlayerOwner().ParseColor(class'RenewalConfig'.default.SaveNameColor);
 		
 		/*
 		if (GetPlayerOwner().Player.Console.bEnglish)
@@ -262,14 +262,14 @@ function Created()
 	LastNavSlot = -1;
 	SaveDelay = -1;
 
-	bDynamicScreenshot = GetPlayerOwner().GetRenewalConfig().bSaveThumbnails;
-
-	UpdateScreenshot(true);
+	bDynamicScreenshot = class'RenewalConfig'.default.bSaveThumbnails;
 
 	UpdateButtons();
 
 	if (GetPlayerOwner().Level.NetMode != NM_Standalone)
 		GetPlayerOwner().GetSaveGameListMultiplayer();
+
+	UpdateScreenshot(); // SelectSlot(0);
 
 	Root.Console.bBlackout = True;
 
@@ -381,22 +381,12 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 			break;
 		case Root.Console.EInputKey.IK_JoyPovUp:
 		case Root.Console.EInputKey.IK_Up:
-			if (Up.bDisabled)
+			if (LastNavSlot > 0)
+				SelectSlot(LastNavSlot-1);
+			else if (!Up.bDisabled)
 			{
-				if (LastNavSlot > 0)
-					SelectSlot(LastNavSlot-1);
-				//else
-				//	ObjectivesButtonPressed(true);
-			}
-			else
-			{
-				if (LastNavSlot == 0)
-				{
-					ScrolledUp();
-					SelectSlot(LastNavSlot);
-				}
-				else
-					SelectSlot(LastNavSlot-1);
+				ScrolledUp();
+				SelectSlot(LastNavSlot);
 			}
 			break;
 		case Root.Console.EInputKey.IK_MWheelDown:
@@ -405,20 +395,12 @@ function WindowEvent(WinMessage Msg, Canvas C, float X, float Y, int Key)
 			break;
 		case Root.Console.EInputKey.IK_JoyPovDown:
 		case Root.Console.EInputKey.IK_Down:
-			if (Down.bDisabled)
+			if (LastNavSlot < (ArrayCount(SaveGameButtons)-1))
+				SelectSlot(LastNavSlot+1);
+			else if (!Down.bDisabled)
 			{
-				if (LastNavSlot < (ArrayCount(SaveGameButtons)-1))
-					SelectSlot(LastNavSlot+1);
-			}
-			else
-			{
-				if (LastNavSlot == (ArrayCount(SaveGameButtons)-1))
-				{
-					ScrolledDown();
-					SelectSlot(LastNavSlot);
-				}
-				else
-					SelectSlot(LastNavSlot+1);
+				ScrolledDown();
+				SelectSlot(LastNavSlot);
 			}
 			break;
 		case Root.Console.EInputKey.IK_Enter:
@@ -499,7 +481,7 @@ function SelectSlot( int Slot )
 		Save.bDisabled = true;
 */
 
-	UpdateScreenshot(false);
+	UpdateScreenshot();
 	
 
 /*
@@ -613,10 +595,10 @@ function DoDelete()
 	if (SelectedSlot >= 0)
 	{
 		GetPlayerOwner().ConsoleCommand("admin DeleteGame " $ Slots[SelectedSlot]);
-		UpdateScreenshot(true);
 		UpdateButtons();
 		if (GetPlayerOwner().Level.NetMode != NM_Standalone)
 			GetPlayerOwner().GetSaveGameListMultiplayer();
+		UpdateScreenshot();
 	}
 	else
 		Log("LoadSaveWindow: DoDelete: invalid slot " $ SelectedSlot);
@@ -714,12 +696,12 @@ function BeforePaint(Canvas C, float X, float Y)
 			Load.bDisabled = true;
 		}
 		// else if it's a quicksave
-		else if ( Slots[SelectedSlot] == 0 && GetPlayerOwner().Level.NetMode == NM_Standalone )
-		{
-			Delete.bDisabled = false;
-			Save.bDisabled = true;
-			Load.bDisabled = false;
-		}
+		//else if ( Slots[SelectedSlot] == 0 && GetPlayerOwner().Level.NetMode == NM_Standalone )
+		//{
+		//	Delete.bDisabled = false;
+		//	Save.bDisabled = true;
+		//	Load.bDisabled = false;
+		//}
 		else
 		{
 			Delete.bDisabled = false;
@@ -904,7 +886,7 @@ function MapNametoScreenShot(string MapName)
 
 }
 
-function UpdateScreenshot(bool bClear)
+function UpdateScreenshot()
 {
 	local bool bMultiplayer;
 	local texture NewTex;
@@ -917,7 +899,7 @@ function UpdateScreenshot(bool bClear)
 		bDynamicScreenshotLoaded = false;
 	}
 
-	if (bClear)
+	if (SelectedSlot < 0 || Slots[SelectedSlot] < 0)
 	{
 		ScreenShot.T = Texture(DynamicLoadObject("Screens.Generic", class'texture'));;//Dynamic texture'Black';//Screenshot3';
 		ScreenShot.R = NewRegion(0,0,116,88);//Dynamic 256,256);
@@ -1045,14 +1027,14 @@ function ShowWindow()
 {
 	Super.ShowWindow();
 
-	bDynamicScreenshot = GetPlayerOwner().GetRenewalConfig().bSaveThumbnails;
-
-	UpdateScreenshot(true);
+	bDynamicScreenshot = class'RenewalConfig'.default.bSaveThumbnails;
 
 	UpdateButtons();
 
 	if (GetPlayerOwner().Level.NetMode != NM_Standalone)
 		GetPlayerOwner().GetSaveGameListMultiplayer();
+
+	UpdateScreenshot();
 }
 
 //----------------------------------------------------------------------------
@@ -1102,8 +1084,8 @@ function HideWindow()
 
 	Root.Console.bBlackOut = False;
 
-	SelectedSlot = -1;
-	LastNavSlot = -1;
+	//SelectedSlot = -1;
+	//LastNavSlot = -1;
 }
 
 //----------------------------------------------------------------------------

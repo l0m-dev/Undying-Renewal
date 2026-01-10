@@ -2900,7 +2900,7 @@ ignores EnemyNotVisible;
 				//log(class$" reached home base - turn and fight");
 				Aggressiveness += 0.2;
 				if ( !bMoraleBoosted )
-					health = Min(default.health, health+20);
+					health = FMin(default.health, health+20);
 				MakeNoise(1.0);
 				GotoState('Attacking');
 			}
@@ -2913,7 +2913,7 @@ ignores EnemyNotVisible;
 				MakeNoise(1.0);
 			aggressiveness += 0.2;
 			if ( !bMoraleBoosted )
-				health = Min(default.health, health+5);
+				health = FMin(default.health, health+5);
 			GotoState('Retreating', 'TurnAtHome');
 		}
 		bMoraleBoosted = true;	

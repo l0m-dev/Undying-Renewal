@@ -950,7 +950,7 @@ state DialogScene expands PlayerWalking
 			{
 				// hack, LockPlayerTrigger doesn't use letterbox for the first aaron cutscene
 				// we don't want players to skip it
-				if (SP.Script != none && myHud.bLetterBox && GetRenewalConfig().bMoreSkippableCutscenes)
+				if (SP.Script != none && myHud.bLetterBox && class'RenewalConfig'.default.bMoreSkippableCutscenes)
 					SP.Script.bClickThrough = true;
 				
 				if (SP.Script != none && SP.Script.bClickThrough)

@@ -362,10 +362,10 @@ simulated function PlayFiring()
 		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fScythe = 1.0;
 	
 	if ( bBerserk ) {
-		PlayAnim( 'Fire_Slow', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+		PlayAnim( 'Fire_Slow', RefireMult,,,0.0);
 		PlaySound(WindUpSound);
 	} else
-		PlayAnim( 'Fire_Normal', 1.0 / AeonsPlayer(Owner).refireMultiplier,,,0.0);
+		PlayAnim( 'Fire_Normal', RefireMult,,,0.0);
 }
 
 //----------------------------------------------------------------------------
@@ -394,9 +394,9 @@ state NormalFire
 		FinishAnim();
 
 		if ( (VSize(PlayerPawn(Owner).Velocity) > 300) && (!PlayerPawn(Owner).Region.Zone.bWaterZone) && (AeonsPlayer(Owner).GetStateName() != 'PlayerFlying'))
-			LoopAnim('MoveIdle', RefireMult, [TweenTime] 0.0);
+			LoopAnim('MoveIdle', 1.0, [TweenTime] 0.0);
 		else
-			LoopAnim('StillIdle', RefireMult, [TweenTime] 0.0);
+			LoopAnim('StillIdle', 1.0, [TweenTime] 0.0);
 
 		//log ("...Scythe: FinishAnim() completed ... sleeping for "$(refireRate * (1.0 / RefireMult)), 'Misc');
 		Sleep(refireRate * (1.0 / RefireMult));
@@ -666,7 +666,7 @@ function MeleeAttack(float Range)
 		{
 			// we now know that the creature is going to die
 			if( RGC() )
-				healthTaken = 0.5 * Min(Other.Health, OldHealthTakenThreshold);
+				healthTaken = 0.5 * FMin(Other.Health, OldHealthTakenThreshold);
 			if ( SP != None && SP.bHackable )
 				HackLimb(SP, DInfo.JointName, SlashDir);
 		}
@@ -863,13 +863,13 @@ state Idle
 		}
 
 		//if ( AnimSequence != 'SelfDamage')
-			//LoopAnim('StrayCycle',RefireMult);
+			//LoopAnim('StrayCycle',1.0);
 		if (Owner != None)
 		{
 			if ( VSize(Owner.Velocity) > 300 && !Owner.Region.Zone.bWaterZone && Owner.GetStateName() != 'PlayerFlying' )
-				loopAnim('MoveIdle', RefireMult, [TweenTime] TweenFrom('StillIdle', 0.5));
+				loopAnim('MoveIdle', 1.0, [TweenTime] TweenFrom('StillIdle', 0.5));
 			else
-				loopAnim('StillIdle', RefireMult, [TweenTime] TweenFrom('MoveIdle', 0.5));
+				loopAnim('StillIdle', 1.0, [TweenTime] TweenFrom('MoveIdle', 0.5));
 		}
 	}
 
@@ -1104,10 +1104,10 @@ state BloodThirst
 		}
 
 		//if ( AnimSequence != 'SelfDamage')
-			//LoopAnim('StrayCycle',RefireMult);
+			//LoopAnim('StrayCycle',1.0);
 
 		if (!bThirstyFiring)
-			LoopAnim('StrayCycle',RefireMult);
+			LoopAnim('StrayCycle',1.0);
 	}
 	
 	function Timer()

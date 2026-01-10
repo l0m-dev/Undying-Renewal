@@ -11,7 +11,7 @@ class LevelInfo extends ZoneInfo
 	native
 	config(user);
 
-// removed nativereplication to replicate bAllowFlight and GRI
+// removed nativereplication to replicate bAllowFlight, GRI, and CutsceneManager
 
 // Textures.
 //#exec Texture Import File=Textures\DefaultTexture.pcx
@@ -157,8 +157,8 @@ var() bool bLoadBootShellPSX2;
 // GameReplicationInfo
 var GameReplicationInfo GRI;
 
-// Settings
-var RenewalConfig RenewalConfig;
+// Cutscene Manager
+var Actor CutsceneManager;
 
 //-----------------------------------------------------------------------------
 // Functions.
@@ -188,7 +188,7 @@ native simulated function string GetAddressURL();
 replication
 {
 	reliable if( Role==ROLE_Authority )
-		Pauser, TimeDilation, bNoCheating, bAllowFOV, bAllowFlight, GRI;
+		Pauser, TimeDilation, bNoCheating, bAllowFOV, bAllowFlight, GRI, CutsceneManager;
 }
 
 //
@@ -252,15 +252,6 @@ simulated function RemoveDecal()
 {
 	if (DMan != None)
 		DMan.NumDecals --;
-}
-
-simulated function RenewalConfig GetRenewalConfig()
-{
-	// RenewalConfig is transient to keep backwards compatibility so spawn it if it's None
-	// don't spawn anything on Login, StartCutscene does that and it duplicates inventory when loading a save (not fixing this for speedrunning purposes)
-	if (RenewalConfig == None)
-		RenewalConfig = Spawn(class'RenewalConfig');
-	return RenewalConfig;
 }
 
 defaultproperties

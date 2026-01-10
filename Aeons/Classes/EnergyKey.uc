@@ -19,6 +19,9 @@ simulated function PostBeginPlay()
 	}
 }
 
+// left for backwards compatibility
+auto state Pickup {}
+
 function PickupFunction(Pawn Other)
 {
 	Super.PickupFunction(Other);

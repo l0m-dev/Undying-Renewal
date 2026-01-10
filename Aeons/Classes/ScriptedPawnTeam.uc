@@ -157,7 +157,7 @@ function MemberKilled( pawn killed )
 			}
 		}
 	}
-	Strength = max( 0.0, Strength - MemberContribution );
+	Strength = FMax( 0.0, Strength - MemberContribution );
 }
 
 // add a ScriptedPawn to the team (only team leader can do this)

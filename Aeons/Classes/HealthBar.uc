@@ -27,6 +27,18 @@ var EHealthBarState State;
 
 var color VulnerableColor, VulnerableScytheColor, InvulnerableColor, BackgroundColor;
 
+const NoSmoothOffset = 2; // needed if we don't use bNoSmooth
+
+/*
+replication
+{
+	unreliable if (Role == ROLE_Authority)
+		Percent, State, InfoIcon;
+	unreliable if (Role == ROLE_Authority && bNetInitial)
+		Owner, VulnerableColor, VulnerableScytheColor, InvulnerableColor, BackgroundColor;
+}
+*/
+
 static final function HealthBar CreateHealthBar(Pawn Owner, bool bManual)
 {
 	local HealthBar HealthBar;
@@ -73,7 +85,10 @@ function Paint(Canvas C)
 	local float TextW, TextH;
 	local float P1, P2;
 
-	if (!bManual)
+	if (Owner == none)
+		return;
+
+	if (!bManual /*&& Role == ROLE_Authority*/)
 		Percent = FClamp(Owner.Health / MaxHealth, 0, 1);
 
 	DeltaTime = FClamp(Owner.Level.TimeSeconds - LastTimeSeconds, 0.001, 0.05);
@@ -112,10 +127,9 @@ function Paint(Canvas C)
 	C.DrawColor = BackgroundColor;
 
 	//C.bNoSmooth = true;
-	const Offset = 2; // needed if we don't use bNoSmooth
 	
-	C.DrawTileClipped(Texture'HealthBar', W*0.5, H, 2, 2, 215-Offset, 34);
-	C.DrawTileClipped(Texture'HealthBar', W*0.5, H, 5+Offset, 42, 215-Offset, 34);
+	C.DrawTileClipped(Texture'HealthBar', W*0.5, H, 2, 2, 215-NoSmoothOffset, 34);
+	C.DrawTileClipped(Texture'HealthBar', W*0.5, H, 5+NoSmoothOffset, 42, 215-NoSmoothOffset, 34);
 
 	// Draw the health
 	C.SetPos(0, 0);
@@ -138,8 +152,8 @@ function Paint(Canvas C)
 	P1 = FMin(DisplayPercent, 0.5);
 	P2 = DisplayPercent - P1;
 
-	C.DrawTileClipped(Texture'HealthBar', W*P1, H, 2, 2, 215*P1*2-Offset, 34);
-	C.DrawTileClipped(Texture'HealthBar', W*P2, H, 5+Offset, 42, 215*P2*2-Offset, 34);
+	C.DrawTileClipped(Texture'HealthBar', W*P1, H, 2, 2, 215*P1*2-NoSmoothOffset, 34);
+	C.DrawTileClipped(Texture'HealthBar', W*P2, H, 5+NoSmoothOffset, 42, 215*P2*2-NoSmoothOffset, 34);
 
 	// Draw scythe icon
 	if (State == HBS_VulnerableScythe)

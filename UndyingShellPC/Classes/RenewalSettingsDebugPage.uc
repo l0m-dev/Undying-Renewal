@@ -56,16 +56,16 @@ function GetSettings()
 {
 	Super.GetSettings();
 
-	DebugCheck.bChecked = RenewalConfig.bDebug;
-	Debug2Check.bChecked = RenewalConfig.bDebug2;
-	DebugSlider.Value = RenewalConfig.fDebug;
-	Debug2Slider.Value = RenewalConfig.fDebug2;
-	DebugEditBox.SetValue(TrimFloat(RenewalConfig.fDebug, 2));
-	Debug2EditBox.SetValue(TrimFloat(RenewalConfig.fDebug2, 2));
+	DebugCheck.bChecked = class'RenewalConfig'.default.bDebug;
+	Debug2Check.bChecked = class'RenewalConfig'.default.bDebug2;
+	DebugSlider.Value = class'RenewalConfig'.default.fDebug;
+	Debug2Slider.Value = class'RenewalConfig'.default.fDebug2;
+	DebugEditBox.SetValue(TrimFloat(class'RenewalConfig'.default.fDebug, 2));
+	Debug2EditBox.SetValue(TrimFloat(class'RenewalConfig'.default.fDebug2, 2));
 
-	//if (RenewalConfig.HudScale == 1.0)
+	//if (class'RenewalConfig'.default.HudScale == 1.0)
 	//	HudSizeCombo.SetSelectedIndex(1);
-	//else if (RenewalConfig.HudScale < 1.0)
+	//else if (class'RenewalConfig'.default.HudScale < 1.0)
 	//	HudSizeCombo.SetSelectedIndex(0);
 	//else
 	//	HudSizeCombo.SetSelectedIndex(2);
@@ -73,8 +73,6 @@ function GetSettings()
 
 function Notify(UWindowDialogControl C, byte E)
 {
-	RenewalConfig = GetPlayerOwner().GetRenewalConfig(); // don't cache this, otherwise changes only apply on map change
-	
 	switch(E)
 	{
 	//DE_EnterPressed
@@ -82,31 +80,31 @@ function Notify(UWindowDialogControl C, byte E)
 		switch(C)
 		{
 		case DebugCheck:
-			RenewalConfig.bDebug = DebugCheck.bChecked;
+			class'RenewalConfig'.default.bDebug = DebugCheck.bChecked;
 			break;
 		case Debug2Check:
-			RenewalConfig.bDebug2 = Debug2Check.bChecked;
+			class'RenewalConfig'.default.bDebug2 = Debug2Check.bChecked;
 			break;
 		case DebugSlider:
-			RenewalConfig.fDebug = DebugSlider.GetValue();
-			DebugEditBox.SetValue(TrimFloat(RenewalConfig.fDebug, 2));
+			class'RenewalConfig'.default.fDebug = DebugSlider.GetValue();
+			DebugEditBox.SetValue(TrimFloat(class'RenewalConfig'.default.fDebug, 2));
 			break;
 		case Debug2Slider:
-			RenewalConfig.fDebug2 = Debug2Slider.GetValue();
-			Debug2EditBox.SetValue(TrimFloat(RenewalConfig.fDebug2, 2));
+			class'RenewalConfig'.default.fDebug2 = Debug2Slider.GetValue();
+			Debug2EditBox.SetValue(TrimFloat(class'RenewalConfig'.default.fDebug2, 2));
 			break;
 		case DebugEditBox:
-			RenewalConfig.fDebug = float(DebugEditBox.GetValue());
-			DebugSlider.Value = RenewalConfig.fDebug;
-			//DebugSlider.SetValue(RenewalConfig.fDebug, True);
+			class'RenewalConfig'.default.fDebug = float(DebugEditBox.GetValue());
+			DebugSlider.Value = class'RenewalConfig'.default.fDebug;
+			//DebugSlider.SetValue(class'RenewalConfig'.default.fDebug, True);
 			break;
 		case Debug2EditBox:
-			RenewalConfig.fDebug2 = float(Debug2EditBox.GetValue());
-			Debug2Slider.Value = RenewalConfig.fDebug2;
-			//Debug2Slider.SetValue(RenewalConfig.fDebug2, True);
+			class'RenewalConfig'.default.fDebug2 = float(Debug2EditBox.GetValue());
+			Debug2Slider.Value = class'RenewalConfig'.default.fDebug2;
+			//Debug2Slider.SetValue(class'RenewalConfig'.default.fDebug2, True);
 			break;
 		//case HudSizeCombo:
-		//	RenewalConfig.HudScale = float(HudSizeCombo.GetValue2());
+		//	class'RenewalConfig'.default.HudScale = float(HudSizeCombo.GetValue2());
 		//	break;
 		}
 		break;

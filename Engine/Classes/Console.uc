@@ -562,7 +562,7 @@ event PostRender( canvas C )
 	}
 	
 	if ( C.LargeFont == Font'Engine.LargeFont')
-		C.LargeFont = Font(DynamicLoadObject(Viewport.Actor.GetRenewalConfig().LargeFont, class'Font'));
+		C.LargeFont = Font(DynamicLoadObject(class'RenewalConfig'.default.LargeFont, class'Font'));
 	
 	// call overridable "level action" rendering code to draw the "big message"
 	DrawLevelAction( C );

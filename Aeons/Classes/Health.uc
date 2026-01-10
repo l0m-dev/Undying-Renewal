@@ -115,7 +115,7 @@ function PickupFunction(Pawn Other)
 
 function bool HandlePickupQuery( inventory Item )
 {
-	if ( item.IsA('Health') && Health(item).bHealthVial && GetRenewalConfig().bAutoUseHealthVials )
+	if ( item.IsA('Health') && Health(item).bHealthVial && class'RenewalConfig'.default.bAutoUseHealthVials )
 	{
 		// don't do anything extra
 		// return false to say picking up wasn't handled by this function
@@ -137,7 +137,7 @@ auto state Pickup
 		if ( AP != None )
 		{
 			// health vial check
-			if (bHealthVial && GetRenewalConfig().bAutoUseHealthVials)
+			if (bHealthVial && class'RenewalConfig'.default.bAutoUseHealthVials)
 			{
 				if (HealthModifier(AP.HealthMod).ProjectedHealthTarget >= 100)
 					return false;
@@ -150,7 +150,7 @@ auto state Pickup
 			if (Inv != None)
 				HealthPacks = Pickup(Inv).numCopies + 1;
 			
-			if (GetRenewalConfig().bLimitHealth && (
+			if (class'RenewalConfig'.default.bLimitHealth && (
 				(Level.Game.Difficulty == 0 && HealthPacks >= 15) ||
 				(Level.Game.Difficulty == 1 && HealthPacks >= 10) ||
 				(Level.Game.Difficulty == 2 && HealthPacks >= 5) ||
@@ -180,7 +180,7 @@ auto state Pickup
 			if (bActivatable && Pawn(Other).SelectedItem==None) 
 				Pawn(Other).SelectedItem=Copy;
 			if (bActivatable && bAutoActivate && Pawn(Other).bAutoActivate) Copy.Activate();
-			if (AP == None || !GetRenewalConfig().bShowQuickSelectHint || !AP.ShowSelectItemHint(PickupMessage))
+			if (AP == None || !class'RenewalConfig'.default.bShowQuickSelectHint || !AP.ShowSelectItemHint(PickupMessage))
 			{
 				// hint was not shown
 				if ( PickupMessageClass == None )
@@ -193,7 +193,7 @@ auto state Pickup
 
 			if (AP != None)
 			{
-				if ((Level.Game.Difficulty == 0 && HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65) || (bHealthVial && GetRenewalConfig().bAutoUseHealthVials))
+				if ((Level.Game.Difficulty == 0 && HealthModifier(AP.HealthMod).ProjectedHealthTarget <= 65) || (bHealthVial && class'RenewalConfig'.default.bAutoUseHealthVials))
 				{
 					// Picking up health when I really need it.
 					Copy.Activate();

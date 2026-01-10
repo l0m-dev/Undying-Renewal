@@ -48,7 +48,7 @@ simulated function PreBeginPlay()
 	bFirstTick = true;
 	TScale = 1.0;
 
-	CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
+	CutsceneManager = class'CutsceneManager'.static.CreateCutsceneManager(Level);
 }
 
 simulated function FindPlayer()
