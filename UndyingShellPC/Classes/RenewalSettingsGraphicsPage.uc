@@ -128,10 +128,10 @@ function Notify(UWindowDialogControl C, byte E)
 			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice LightMode "$ LightModeCombo.GetValue2());
 			break;
 		case HdrCheck:
-			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice Hdr "$ HdrCheck.bChecked);
+			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice Hdr "$ byte(HdrCheck.bChecked));
 			break;
 		case PrecachingCheck:
-			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice UsePrecache "$ PrecachingCheck.bChecked);
+			GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.GameRenderDevice UsePrecache "$ byte(PrecachingCheck.bChecked));
 			break;
 		}
 		break;

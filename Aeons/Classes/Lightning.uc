@@ -664,7 +664,8 @@ state Holding
 						DmgRem -= hp * DmgTime;
 						Di = GetDamageInfo('Electrical');
 						Di.Damage = hp;
-						A.TakeDamage( PlayerPawn(Owner), HitLocation, vect(0,0,0), Di);
+						if ( A.AcceptDamage(Di) )
+							A.TakeDamage( PlayerPawn(Owner), HitLocation, vect(0,0,0), Di);
 						if ( Pawn(A) != none )
 						{
 							Pawn(A).PlayDamageMethodImpact('Bullet', HitLocation, -Vector(Pawn(Owner).ViewRotation));
@@ -694,10 +695,11 @@ state Holding
 							pFX.SetLocation(End);
 							pFX.SetRotation(Rotator(vect(0,0,1)));
 						}
+						Di = GetDamageInfo();
 						ForEach RadiusActors(class 'Actor',A, 256, End)
 						{
-							if (A.Region.Zone.bWaterZone)
-								A.TakeDamage(Pawn(Owner), End, vect(0,0,0), GetDamageInfo());
+							if (A.Region.Zone.bWaterZone && A.AcceptDamage(Di))
+								A.TakeDamage(Pawn(Owner), End, vect(0,0,0), Di);
 						}
 						// spawn(class 'DebugLocationMarker',,,End);
 					} else if (pFX != none) {
@@ -765,7 +767,8 @@ state Holding
 						DmgRem -= hp * DmgTime;
 						Di = GetDamageInfo('Electrical');
 						Di.Damage = hp;
-						LitPawn.TakeDamage( PlayerPawn(Owner), HitLocation, vect(0,0,0), Di);
+						if ( LitPawn.AcceptDamage(Di) )
+							LitPawn.TakeDamage( PlayerPawn(Owner), HitLocation, vect(0,0,0), Di);
 						LitPawn.PlayDamageMethodImpact('Bullet', HitLocation, -Vector(Pawn(Owner).ViewRotation));
 						if ( LitPawn.IsA('Pawn') )
 							spawn(class 'BloodPuffFX',,,end);

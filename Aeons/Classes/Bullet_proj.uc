@@ -16,6 +16,11 @@ simulated function PreBeginPlay()
 		bInWater = true;
 	}
 	maxWallHits	= 2;
+	if (RGC())
+	{
+		Speed = 10000;
+		default.Speed = Speed;
+	}
 	super.PreBeginPlay();
 }
 
@@ -71,11 +76,13 @@ auto state Flying
 
 	simulated function ProcessTouch (Actor Other, Vector HitLocation)
 	{
-		
+		local DamageInfo DInfo;
+
 		if ( (Other != instigator) || (bCanHitInstigator) )
 		{
+			DInfo = GetDamageInfo();
 			if ( Role == ROLE_Authority )
-				Other.ProjectileHit(Instigator, HitLocation, MomentumTransfer * Normal(Velocity), self, GetDamageInfo());
+				Other.ProjectileHit(Instigator, HitLocation, MomentumTransfer * Normal(Velocity), self, DInfo);
 
 			if ( Other.IsA('Pawn') )
 			{

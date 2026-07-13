@@ -15,6 +15,9 @@ simulated function PreBeginPlay()
 	A = Spawn( class'ScryeSoldierHalo', self,, Location );
 	if ( A == none )
 		DebugInfoMessage( ".PreBeginPlay(), unable to spawn halo." );
+
+     // RGC()? this is a small bugfix
+	bAcceptDamage = false;
 }
 
 function PlaySoundAlerted()

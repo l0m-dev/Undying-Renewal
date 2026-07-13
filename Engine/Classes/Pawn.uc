@@ -1356,7 +1356,7 @@ function TossWeapon()
 }	
 
 // The player/bot wants to select next item
-exec function NextItem()
+exec function NextItem(optional bool bNoPing)
 {
 	local Inventory Inv;
 
@@ -2535,6 +2535,13 @@ function DamageInfo AdjustDamageByLocation (DamageInfo DInfo)
 
 function PlayDamageEffect(vector HitLocation, vector Momentum, DamageInfo DInfo);
 
+function bool AcceptDamage( DamageInfo DInfo )
+{
+	if ( (bAcceptDamage && !DInfo.bMagical) || (bAcceptMagicDamage && DInfo.bMagical) )
+		return true;
+	else return false;
+}
+
 function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, DamageInfo DInfo)
 {
 	local float actualDamage;
@@ -2620,7 +2627,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		}
 
 //		log( "DInfo.ImpactForce is " $ DInfo.ImpactForce );
-		if ( VSize(DInfo.ImpactForce) > 0.5 )
+		if ( VSize(DInfo.ImpactForce) > 0.5 && actualDamage > 0 )
 		{
 			if ( JointPlace(DInfo.JointName).pos.z > JointPlace(JointName(0)).pos.z )
 				AddDynamic (DInfo.JointName, HitLocation, DInfo.ImpactForce,0.15);

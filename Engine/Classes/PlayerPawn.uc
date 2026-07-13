@@ -2500,7 +2500,7 @@ exec function Arm(class<Weapon> NewWeaponClass )
 }
 	
 // The player wants to select previous item
-exec function PrevItem()
+exec function PrevItem(optional bool bNoPing)
 {
 	local Inventory Inv, LastItem;
 
@@ -2648,7 +2648,7 @@ function DoJump( optional float F )
 
 		if ( (Level.Game != None) && (Level.Game.Difficulty > 0) )
 			MakePlayerNoise(0.5 * Level.Game.Difficulty);
-		PlayInAir();
+		PlayJump();
 		if ( bCountJumps && (Role == ROLE_Authority) && (Inventory != None) )
 			Inventory.OwnerJumped();
 		Velocity.Z = JumpZ * JumpMult;
@@ -5793,7 +5793,7 @@ defaultproperties
      InvokeColor=(R=100,G=100,B=255,A=255)
      CrossHairColor=(R=201,G=47,A=255)
      LitCrossHairColor=(G=255,A=255)
-     CrossHairAlpha=0.5
+     CrossHairAlpha=1.0
      CrossHairInvokeColor=(R=100,G=100,B=255,A=255)
      bRenderSelf=True
      CrouchCollisionHeight=32

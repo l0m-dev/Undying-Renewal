@@ -60,17 +60,20 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 	{
 		if ( Role == ROLE_Authority && HitCooldown <= 0.0 )
 		{
+			DInfo = GetDamageInfo('SphereOfCold');
+
 			if ( Other.IsA('AeonsPlayer') )
 			{
-				Other.TakeDamage( Instigator, Location, vect(0,0,0), GetDamageInfo('SphereOfCold'));
+				if ( Other.AcceptDamage(DInfo) )
+					Other.TakeDamage( Instigator, Location, vect(0,0,0), DInfo);
 				SphereOfColdModifier(AeonsPlayer(Other).SPhereOfColdMod).EffectLen = EffectLen;
 				AeonsPlayer(Other).SPhereOfColdMod.gotoState('Activated');
 				Pawn(Other).OnFire(false);
 				PlaySound(PawnImpactSound);
 			} else  if ( Other.IsA('ScriptedPawn') ) {
-				DInfo = GetDamageInfo('SphereOfCold');
 				// log("Hit "$other.name$" delivering damage = "$Dinfo.Damage, 'Misc');
-				Other.TakeDamage( Instigator, Location, vect(0,0,0), GetDamageInfo('SphereOfCold'));
+				if ( Other.AcceptDamage(DInfo) )
+					Other.TakeDamage( Instigator, Location, vect(0,0,0), DInfo);
 				if ( !ScriptedPawn(Other).SPhereOfColdMod.bActive )
 				{
 					SphereOfColdModifier(ScriptedPawn(Other).SPhereOfColdMod).EffectLen = EffectLen;
@@ -79,7 +82,8 @@ simulated function ProcessTouch (Actor Other, Vector HitLocation)
 				}
 				PlaySound(PawnImpactSound);
 			} else {
-				Other.TakeDamage( Instigator, Location, vect(0,0,0), GetDamageInfo('SphereOfCold'));
+				if ( Other.AcceptDamage(DInfo) )
+					Other.TakeDamage( Instigator, Location, vect(0,0,0), DInfo);
 			}
 			if ( RGC() )
 				HitCooldown = 0.2;

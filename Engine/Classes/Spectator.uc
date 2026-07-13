@@ -126,11 +126,11 @@ exec function SwitchWeapon (byte F )
 {
 }
 
-exec function NextItem()
+exec function NextItem(optional bool bNoPing)
 {
 }
 
-exec function PrevItem()
+exec function PrevItem(optional bool bNoPing)
 {
 }
 

@@ -20,6 +20,11 @@ simulated function PreBeginPlay()
 		bInWater = true;
 	}
 	maxWallHits	= 2;
+	if (RGC())
+	{
+		Speed = 10000;
+		default.Speed = Speed;
+	}
 	super.PreBeginPlay();
 }
 

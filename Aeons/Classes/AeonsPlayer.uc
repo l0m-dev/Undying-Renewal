@@ -2533,7 +2533,7 @@ function bool CheckSelect( float DeltaTime )
 			else if ( SelectMode == SM_Item && bSelectItem == 0 )
 			{
 				bTryingSelect = false;
-				NextItem();
+				NextItem(true);
 //				Log("CheckSelect: NextItem(), Timer had "$SelectTimer$" left");
 				return false; //don't force calling fn to return
 			}
@@ -3948,8 +3948,11 @@ ignores SeePlayer, HearNoise, Bump;
 				}
 				else
 				{
-					AeonsHUD(myHUD).aX = aTurn;
-					AeonsHUD(myHUD).aY = aLookUp;
+					// use SmoothMouseX and SmoothMouseY or aMouseX and aMouseY
+					// SmoothMouseX is the same as aTurn and SmoothMouseY is the same as aLookUp, aMouseX and aMouseY are slightly different
+					// SmoothMouseY and aMouseY are not affected by bInvertMouse like aLookUp
+					AeonsHUD(myHUD).aX = SmoothMouseX;
+					AeonsHUD(myHUD).aY = SmoothMouseY;
 				}
 				
 				
@@ -6263,16 +6266,18 @@ exec function WeaponSounds()
 	ClientMessage("Weapon sounds are "$str);
 }
 
-exec function NextItem()
+exec function NextItem(optional bool bNoPing)
 {
-	InvDisplayMan.Ping();
-	super.NextItem();
+	if (!bNoPing)
+		InvDisplayMan.Ping();
+	super.NextItem(bNoPing);
 }
 
-exec function PrevItem()
+exec function PrevItem(optional bool bNoPing)
 {
-	InvDisplayMan.Ping();
-	super.PrevItem();
+	if (!bNoPing)
+		InvDisplayMan.Ping();
+	super.PrevItem(bNoPing);
 }
 
 exec function ChooseItem(name ClassName)

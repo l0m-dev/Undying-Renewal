@@ -193,8 +193,8 @@ function HideWindow()
 	{
 		if ( Back[i] != None )
 		{
+			// unload all Mips' DataArrays, don't set Back[i] to None because we still want to keep this texture
 			GetPlayerOwner().UnloadTexture( Back[i] );
-			Back[i] = None;
 		}
 	}
 	

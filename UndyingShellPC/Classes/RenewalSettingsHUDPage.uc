@@ -7,6 +7,11 @@ var UWindowCheckbox ShowUsedManaCheck;
 var UWindowComboControl HudSizeCombo;
 var UWindowCheckbox ShowBossHealthBarsCheck;
 
+var RenewalColorPicker CrosshairColorPicker;
+var RenewalColorPicker LitCrosshairColorPicker;
+var RenewalColorPicker InvokeCrosshairColorPicker;
+//var UWindowHSliderControl CrosshairOpacitySlider;
+
 var localized string AltHudText;
 var localized string AltHudHelp;
 var localized string AutoShowObjectivesText;
@@ -20,6 +25,15 @@ var localized string HudSizeNormal;
 var localized string HudSizeBig;
 var localized string ShowBossHealthBarsText;
 var localized string ShowBossHealthBarsHelp;
+
+var localized string CrosshairColorText;
+var localized string CrosshairColorHelp;
+var localized string LitCrosshairColorText;
+var localized string LitCrosshairColorHelp;
+var localized string InvokeCrosshairColorText;
+var localized string InvokeCrosshairColorHelp;
+var localized string CrosshairOpacityText;
+var localized string CrosshairOpacityHelp;
 
 function Created()
 {
@@ -44,6 +58,15 @@ function Created()
 	HudSizeCombo.AddItem(HudSizeBig, "1.1");
 
 	ShowBossHealthBarsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', ShowBossHealthBarsText, ShowBossHealthBarsHelp));
+
+	CrosshairColorPicker = RenewalColorPicker(AddControl(class'RenewalColorPicker', CrosshairColorText, CrosshairColorHelp));
+	LitCrosshairColorPicker = RenewalColorPicker(AddControl(class'RenewalColorPicker', LitCrosshairColorText, LitCrosshairColorHelp));
+	InvokeCrosshairColorPicker = RenewalColorPicker(AddControl(class'RenewalColorPicker', InvokeCrosshairColorText, InvokeCrosshairColorHelp));
+
+	// can't add this yet since default opacity is 0.5
+	//CrosshairOpacitySlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', CrosshairOpacityText, CrosshairOpacityHelp));
+	//CrosshairOpacitySlider.SetRange(0.0, 1.0, 0.05);
+	//CrosshairOpacitySlider.SliderWidth = 130;
 	
 	GetSettings();
 }
@@ -65,6 +88,12 @@ function GetSettings()
 		HudSizeCombo.SetSelectedIndex(2);
 	
 	ShowBossHealthBarsCheck.bChecked = class'RenewalConfig'.default.bShowBossHealthBars;
+
+	CrosshairColorPicker.SetColor(GetPlayerOwner().CrossHairColor);
+	LitCrosshairColorPicker.SetColor(GetPlayerOwner().LitCrossHairColor);
+	InvokeCrosshairColorPicker.SetColor(GetPlayerOwner().CrossHairInvokeColor);
+
+	//CrosshairOpacitySlider.SetValue(GetPlayerOwner().CrossHairAlpha);
 }
 
 function Notify(UWindowDialogControl C, byte E)
@@ -92,6 +121,24 @@ function Notify(UWindowDialogControl C, byte E)
 		case ShowBossHealthBarsCheck:
 			class'RenewalConfig'.default.bShowBossHealthBars = ShowBossHealthBarsCheck.bChecked;
 			break;
+		case CrosshairColorPicker:
+			GetPlayerOwner().default.CrossHairColor = CrosshairColorPicker.PickedColor;
+			GetPlayerOwner().CrossHairColor = CrosshairColorPicker.PickedColor;
+			GetPlayerOwner().SaveConfig();
+		case LitCrosshairColorPicker:
+			GetPlayerOwner().default.LitCrossHairColor = LitCrosshairColorPicker.PickedColor;
+			GetPlayerOwner().LitCrossHairColor = LitCrosshairColorPicker.PickedColor;
+			GetPlayerOwner().SaveConfig();
+		case InvokeCrosshairColorPicker:
+			GetPlayerOwner().default.CrossHairInvokeColor = InvokeCrosshairColorPicker.PickedColor;
+			GetPlayerOwner().CrossHairInvokeColor = InvokeCrosshairColorPicker.PickedColor;
+			GetPlayerOwner().SaveConfig();
+			break;
+		//case CrosshairOpacitySlider:
+		//	GetPlayerOwner().default.CrossHairAlpha = CrosshairOpacitySlider.GetValue();
+		//	GetPlayerOwner().CrossHairAlpha = CrosshairOpacitySlider.GetValue();
+		//	GetPlayerOwner().SaveConfig();
+		//	break;
 		}
 		break;
 	}
@@ -103,4 +150,12 @@ defaultproperties
 {
      ShowBossHealthBarsText="Show boss health bars"
      ShowBossHealthBarsHelp="Show boss health bars on the HUD"
+     CrosshairColorText="Crosshair color"
+     CrosshairColorHelp="Default crosshair color"
+     LitCrosshairColorText="Lit crosshair color"
+     LitCrosshairColorHelp="Crosshair color when aiming at an enemy"
+     InvokeCrosshairColorText="Invoke crosshair color"
+     InvokeCrosshairColorHelp="Crosshair color when aiming at an enemy with invoke"
+     CrosshairOpacityText="Crosshair opacity"
+     CrosshairOpacityHelp="Crosshair opacity"
 }

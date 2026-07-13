@@ -401,8 +401,8 @@ function SaveChanges()
 	}
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager TextureDetail "$detail);
 
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager ActorShadows " $ Checkboxes[0].bChecked );
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Decals " $ Checkboxes[1].bChecked );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager ActorShadows " $ byte(Checkboxes[0].bChecked) );
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager Decals " $ byte(Checkboxes[1].bChecked) );
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager MinDesiredFrameRate " $ MinFrameRateSlider.Value );
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.ViewportManager MinQuality " $ MinQualitySlider.Value );
 	GetPlayerOwner().ConsoleCommand("FLUSH");

@@ -163,9 +163,9 @@ function UsedUp()
 	if ( Pawn(Owner) != None )
 	{
 		bActivatable = false;
-		Pawn(Owner).NextItem();
+		Pawn(Owner).NextItem(true);
 		if (Pawn(Owner).SelectedItem == Self) {
-			Pawn(Owner).NextItem();	
+			Pawn(Owner).NextItem(true);	
 			if (Pawn(Owner).SelectedItem == Self) Pawn(Owner).SelectedItem=None;
 		}
 		if (Level.Game.LocalLog != None)

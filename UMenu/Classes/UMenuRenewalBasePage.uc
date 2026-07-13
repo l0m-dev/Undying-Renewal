@@ -124,7 +124,7 @@ function BeforePaint(Canvas C, float X, float Y)
 		Control = Controls[i].Control;
 		Control.WinLeft = ControlPadding;
 		Control.WinTop = Controls[i].WinTop * Root.ScaleY;
-		Control.SetSize(SizeX, 1);
+		Control.WinWidth = SizeX;
 		//Control.WinTop = ControlOffset;
 		//ControlOffset += 20 * Root.ScaleY;
 	}

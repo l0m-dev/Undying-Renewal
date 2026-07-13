@@ -141,10 +141,26 @@ function Fire( float Value )
 
 
 //----------------------------------------------------------------------------
+simulated function FireWeapon()
+{
+	// ignore the call coming from the animation notify
+	if ( RGC() )
+		return;
+
+	Super.FireWeapon();
+}
+
+
+//----------------------------------------------------------------------------
 simulated function PlayFiring()
 {
 	//log("PlayFiring Called within the Revolver");
 	PlayAnim( 'Fire', RefireMult,,,0.0);
+
+	// call FireWeapon now, without waiting for the animation notify to call it
+	if ( RGC() )
+		Super.FireWeapon();
+
 	//if ( Role == ROLE_Authority )
 		ClipCount--;
 //	PlayOwnedSound(FireSound, SLOT_Misc, 4.0);	
@@ -258,6 +274,21 @@ state NewClip
 		PlayerPawn(Owner).bReloading = false;
 	}
 
+	function float GetReloadSleepTime()
+	{
+		if ( bAltAmmo )
+		{
+			// LoadShellSound duration is 0.2, LoadAltShellSound duration is 0.461
+			// For now, just halve the time for the LoadAltShellSound duration instead of adding a LoadAltShellQuickSound
+			if ( RGC() )
+				return GetSoundDuration(LoadAltShellSound) / RefireMult * 0.5;
+			else
+				return GetSoundDuration(LoadAltShellSound) / RefireMult;
+		}
+
+		return GetSoundDuration(LoadShellSound) / RefireMult;
+	}
+
 	Begin:
 		if (Level.TimeSeconds < 0.5)
 		{
@@ -296,10 +327,7 @@ state NewClip
 
 			ClipCount ++;
 
-			if ( bAltAmmo )
-				Sleep( GetSoundDuration(LoadAltShellSound) / RefireMult);
-			else
-				Sleep( GetSoundDuration(LoadShellSound) / RefireMult);
+			Sleep( GetReloadSleepTime() );
 
 			//FinishSound(snID);
 			//LogTime("Revolver: state NewClip: Finished Sound " $ i);

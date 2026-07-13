@@ -665,8 +665,8 @@ function UndoChanges()
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice BackgroundVolume "$ OrigBackgroundVolume );
 	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice VoiceVolume "$ OrigVoiceVolume );
 
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ OrigbUse3DHardware);
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ !OrigbHighSoundQuality);
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ byte(OrigbUse3DHardware));
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ byte(!OrigbHighSoundQuality));
 	GetPlayerOwner().bEnableSubtitles = OrigbEnableSubtitles;
 	
 	GetPlayerOwner().SaveConfig();
@@ -678,8 +678,8 @@ function SaveChanges()
 {
 	//GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice SoundVolume "$ SoundVolume );
 	
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ bUse3DHardware);
-	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ !bHighSoundQuality);
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice Use3dHardware " $ byte(bUse3DHardware));
+	GetPlayerOwner().ConsoleCommand("set ini:Engine.Engine.AudioDevice LowSoundQuality " $ byte(!bHighSoundQuality));
 
 	GetPlayerOwner().SaveConfig();
 }

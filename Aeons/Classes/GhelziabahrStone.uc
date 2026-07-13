@@ -194,7 +194,10 @@ simulated function FireWeapon()
 		PlayFireSoundServer();
 	}
 	AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
-	MeleeAttack(256);
+	if (RGC())
+		MeleeAttack(288);
+	else
+		MeleeAttack(256);
 	bMuzzleFlash ++;
 
 	if (Level.NetMode != NM_Client)

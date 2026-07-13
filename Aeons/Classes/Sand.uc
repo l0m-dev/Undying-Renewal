@@ -19,7 +19,7 @@ state Activated
 		Super.Activate();
 		if ( numCopies < 0 )
 		{
-			SelectNext();
+			Pawn(Owner).NextItem(true);
 			// Pawn(Owner).DeleteInventory(self);
 		}
 	}

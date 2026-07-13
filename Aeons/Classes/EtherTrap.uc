@@ -36,7 +36,7 @@ state Activated
 				numcopies--;
 				if ( numCopies < 0 )
 				{
-					SelectNext();
+					Pawn(Owner).NextItem(true);
 					Pawn(Owner).DeleteInventory(self);
 				}
 			} else {
@@ -47,7 +47,7 @@ state Activated
 		Super.Activate();
 		if ( numCopies < 0 )
 		{
-			SelectNext();
+			Pawn(Owner).NextItem(true);
 			Pawn(Owner).DeleteInventory(self);
 		}
 		gotoState('Deactivated');

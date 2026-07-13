@@ -40,7 +40,8 @@ function AcidicSkin( float DeltaTime )
 	DInfo.DamageType = 'acid';
 	DInfo.Damage = AcidicSkinDamage * DeltaTime;
 
-	TouchingActor.TakeDamage( self, TouchingActor.Location, vect(0,0,0), DInfo ); 
+	if( TouchingActor.AcceptDamage(DInfo) )
+		TouchingActor.TakeDamage( self, TouchingActor.Location, vect(0,0,0), DInfo ); 
 }
 
 function Touch( actor Other )

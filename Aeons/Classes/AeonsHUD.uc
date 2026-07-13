@@ -316,12 +316,13 @@ var localized string ConnectionProblemMessage;
 const OSMClientMessage = true;
 
 // 80 comes from 64 + 16
-const WSI_Bottom = 80; // Weapon, Spells, Items bottom offset, old value is 72, undying original is 80,
-					   // but some things like spell icon, book icon and mana icon were 72
-const WSI_Right = 80;
-const WSI_Top = 16;
+var int WSI_Bottom; // Weapon, Spells, Items bottom offset, old value is 72, undying original is 80,
+					// but some things like spell icon, book icon and mana icon were 72
 var int WSI_Left;
 var int WSI_Padding;
+
+const WSI_Right = 80;
+const WSI_Top = 16;
 
 // Message Struct
 Struct MessageStruct
@@ -749,6 +750,12 @@ simulated function CreateMenu()
 
 }
 
+// left for backwards compatibility with mods (DarkSide: Caves)
+simulated function DrawOffensiveSpellAmplitude(Canvas Canvas, int X, int Y)
+{
+	DrawSpellAmplitude(Canvas, PlayerOwner.AttSpell, X, Y);
+}
+
 simulated function HUDSetup(canvas canvas)
 {
 	// moved to PostRender from PreRender because PostRender is called before PreRender after a cutscene
@@ -784,11 +791,13 @@ simulated function SetupHUDVariables( canvas Canvas )
 	if (bAltHud)
 	{
 		WSI_Padding = 4;
+		WSI_Bottom = 76;
 		WSI_Left = 8; // needs to be smaller since health icon is smaller than 64
 	}
 	else
 	{
 		WSI_Padding = 16;
+		WSI_Bottom = 80;
 		WSI_Left = 16;
 	}
 
@@ -863,7 +872,10 @@ simulated function DrawCrossHair( canvas Canvas, int StartX, int StartY, float S
 		}
 	}
 	
-	Canvas.DrawColor.a = 255 * PlayerPawn(Owner).CrossHairAlpha;
+	//Canvas.DrawColor.r = Canvas.DrawColor.r * PlayerPawn(Owner).CrossHairAlpha;
+	//Canvas.DrawColor.g = Canvas.DrawColor.g * PlayerPawn(Owner).CrossHairAlpha;
+	//Canvas.DrawColor.b = Canvas.DrawColor.b * PlayerPawn(Owner).CrossHairAlpha;
+	//Canvas.DrawColor.a = 255 * PlayerPawn(Owner).CrossHairAlpha;
 	
 	if ( HudMode == 0 ) 
 		return;
@@ -1457,38 +1469,12 @@ simulated function PostRender( canvas Canvas )
 	
 		if ( PlayerTarget.Health > 0 || !PlayerOwner.bShowScores ) // don't show health if dead and scoreboard is visible
 		{
-			if (bAltHud)
-			{
-				DrawHealth(Canvas, (64+WSI_Padding+WSI_Left)*ScaleY, Canvas.ClipY - 64*Scale);
-				DrawMana(Canvas, (128+60+WSI_Left+WSI_Padding*3)*ScaleY, Canvas.ClipY - 64*Scale);
-			}
-			else
-			{
-				DrawHealth(Canvas, HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY, true); // was 68 in renewal
-				DrawMana(Canvas, HalfClipX + (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
-			}
-		
-			if (Level.bDebugMessaging)
-				DrawManaInfo(Canvas);		// mana maintenence values
-		
 			// Stealth Icons have been cut from the game 11/19/2000
 			if (AP != None && AP.bDrawStealth)
 				DrawStealthIcons(Canvas);
 		
 			DrawFlightMana(Canvas);
 			DrawCenterPiece(Canvas);
-			
-			if (class'RenewalConfig'.default.bShowUsedMana)
-			{
-				if (bAltHud)
-				{
-					DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
-				}
-				else
-				{
-					DrawUsedMana(Canvas, HalfClipX + 26*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
-				}
-			}
 		}
 		
 		if ( bShowArrow )
@@ -1587,8 +1573,8 @@ simulated function PostRender( canvas Canvas )
 				Canvas.DrawColor.B = 0;
 			}
 	
-			//Canvas.DrawText((""$FrameTime), false);
-			Canvas.DrawText((""$FPS), false);
+			//Canvas.DrawText(FrameTime, false);
+			Canvas.DrawText(FPS, false);
 	
 			Canvas.DrawColor.R = 255;
 			Canvas.DrawColor.G = 255;
@@ -1836,7 +1822,7 @@ simulated function DrawInvCount(Canvas Canvas, int X, int Y)
 			Canvas.DrawColor.G = 128;
 			Canvas.DrawColor.B = 255;
 
-			Canvas.DrawText( (""$(Pickup(Inv).numCopies + 1)), false);
+			Canvas.DrawText( (Pickup(Inv).numCopies + 1), false);
 			
 		}
 		
@@ -1858,7 +1844,7 @@ simulated function DrawReplayMessage(Canvas Canvas)
 
 	Canvas.SetPos( 1 , Canvas.ClipY - 48 );
 	
-	Canvas.DrawText(""$ReplayMessage, false);
+	Canvas.DrawText(ReplayMessage, false);
 
 	Canvas.DrawColor.R = 255;
 	Canvas.DrawColor.G = 255;
@@ -1914,7 +1900,7 @@ simulated function DrawBuildInfo(Canvas Canvas)
 	Canvas.DrawColor.B = 100;
 	
 	Canvas.SetPos( 1 , (Canvas.ClipY - 12*ScaleY));
-	Canvas.DrawText(""$VersionMessage, false);
+	Canvas.DrawText(VersionMessage, false);
 	
 	Canvas.DrawColor.R = 255;
 	Canvas.DrawColor.G = 255;
@@ -2386,7 +2372,7 @@ simulated function DrawActiveSpells(Canvas canvas)
 
 			//rb we need to add NumWards to AeonsPlayer so the modifier can adjust that
 			//Canvas.SetPos( OffsetX, 8 );
-			//Canvas.DrawText(""$WardModifier(Player.WardMod).numWards, false);
+			//Canvas.DrawText(WardModifier(Player.WardMod).numWards, false);
 		}
 
 		if ( (Player.ScryeMod != None) && (Player.ScryeMod.bActive) )
@@ -2420,7 +2406,7 @@ simulated function DrawActiveSpells(Canvas canvas)
 				Canvas.SetPos( OffsetX, 8*Scale );
 				Canvas.DrawTile( Icons[17], 32*Scale, 32*Scale, 0, 0, 64, 64 );
 				Canvas.SetPos( OffsetX, 8*Scale );
-				Canvas.DrawText(""$ShieldModifier(Player.ShieldMod).shieldHealth, false);
+				Canvas.DrawText(ShieldModifier(Player.ShieldMod).shieldHealth, false);
 				OffsetX -= (32 + 8)*Scale;
 			}
 		}
@@ -2744,7 +2730,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			return;
 			
 		if ( PlayerPawn(Owner).selectedItem == none )
-			PlayerPawn(Owner).Inventory.SelectNext();
+			PlayerPawn(Owner).NextItem(true);
 
 		// must change window if on PSX2
 		if ( GetPlatform() == PLATFORM_PSX2 )
@@ -2814,18 +2800,6 @@ simulated function DrawHeldItems(Canvas Canvas)
 		if ( CheckLuckSeven(Inv) )
 			LuckySevenItems[6] = Inv;
 
-		// again, draw text differently if on PSX2
-		if ( GetPlatform() == PLATFORM_PSX2 )
-		{
-			Canvas.Style = 1;
-			Canvas.Font = Canvas.MedFont;
-		}
-		else
-		{
-			Canvas.Style = 3;
-			Canvas.Font = Canvas.SmallFont;
-		}
-
 		for (i=0; i<7; i++)
 		{
 			// one last time, position text differently on PSX2
@@ -2885,13 +2859,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			}
 			else
 			{
-				if (Inv.IsA('Ammo'))
-					InvCount = Ammo(Inv).AmmoAmount;
-				else if (Pickup(Inv).numCopies > 0)
-					InvCount = Pickup(Inv).numCopies + 1;
-				else
-					InvCount = 0;
-
+				InvCount = GetInventoryDisplayCount(Inv);
 				InvName = ""$Inv.ItemName;
 				if (InvCount > 0)
 				{
@@ -2899,7 +2867,20 @@ simulated function DrawHeldItems(Canvas Canvas)
 					InvName = InvName$InvCount;
 				}
 			}
-			Canvas.DrawText( (""$InvName), false);
+
+			// again, draw text differently if on PSX2
+			if ( GetPlatform() == PLATFORM_PSX2 )
+			{
+				Canvas.Style = 1;
+				Canvas.Font = Canvas.MedFont;
+			}
+			else
+			{
+				Canvas.Style = 3;
+				Canvas.Font = Canvas.SmallFont;
+			}
+
+			Canvas.DrawText( InvName, false);
 		}
 		Canvas.DrawColor.R = 255;
 		Canvas.DrawColor.G = 255;
@@ -3426,50 +3407,69 @@ simulated function DrawSelectHighlightPSX2(Canvas Canvas, int X, int Y)
 simulated function DrawInventoryItem(Canvas Canvas, int X, int Y)
 {
 	local inventory Inv;
+	local int InvCount;
 
 	if (Owner == none)
 		return;
 
 	if (HudMode == 1)
 	{
-		if ( Owner.Inventory!=None ) 
-		{
-			for ( Inv=Owner.Inventory; Inv!=None; Inv=Inv.Inventory )
-			{
-				//Log("InventoryGroup = " $ Inv.InventoryGroup $ " bActive = " $ Inv.bActive );
-				//fix just a note that Inventory contains everything.
-				//fix so our lists of attspell, defspell, weapon are duplicates
-				if ( (Inv == PlayerPawn(Owner).selectedItem) && (Inv.InventoryGroup >= 100))
-				{
-					Canvas.Style = ERenderStyle.STY_Alphablend;
-					// km Canvas.Style = ERenderStyle.STY_Masked;
-			
-					if (!Inv.bActiveToggle || Inv.bActive)
-					{
-						Canvas.DrawColor.r = 255;
-						Canvas.DrawColor.g = 255;
-						Canvas.DrawColor.b = 255;	
-					} 
-					else 
-					{
-						Canvas.DrawColor.r = 128;
-						Canvas.DrawColor.g = 128;
-						Canvas.DrawColor.b = 128;	
-					}
-			
-					Canvas.SetPos( X, Y );
-	
-					Canvas.DrawIcon(Inv.Icon, Scale);
-					
-					Canvas.DrawColor.r = 255;
-					Canvas.DrawColor.g = 255;
-					Canvas.DrawColor.b = 255;	
-					
-					Canvas.Style = ERenderStyle.STY_Normal;
+		Inv = PlayerPawn(Owner).selectedItem;
 
-					break;
-				}
-			}			
+		//Log("InventoryGroup = " $ Inv.InventoryGroup $ " bActive = " $ Inv.bActive );
+		//fix just a note that Inventory contains everything.
+		//fix so our lists of attspell, defspell, weapon are duplicates
+		if ( (Inv != None) && (Inv.InventoryGroup >= 100) ) // && (Inv.ItemType == ITEM_Inventory)
+		{
+			Canvas.Style = ERenderStyle.STY_Alphablend;
+			// km Canvas.Style = ERenderStyle.STY_Masked;
+	
+			if (!Inv.bActiveToggle || Inv.bActive)
+			{
+				Canvas.DrawColor.r = 255;
+				Canvas.DrawColor.g = 255;
+				Canvas.DrawColor.b = 255;	
+			} 
+			else 
+			{
+				Canvas.DrawColor.r = 128;
+				Canvas.DrawColor.g = 128;
+				Canvas.DrawColor.b = 128;	
+			}
+	
+			Canvas.SetPos( X, Y );
+
+			Canvas.DrawIcon(Inv.Icon, Scale);
+
+			InvCount = GetInventoryDisplayCount(Inv);
+			if (InvCount > 0)
+			{
+				//DrawInvCount(Canvas, Canvas.CurX, Canvas.CurY);
+
+				Canvas.Style = ERenderStyle.STY_Normal;
+				//Canvas.bNoSmooth = false;
+				Canvas.Font = Canvas.SmallFont;
+
+				//DrawAmmo(Canvas, WeaponX + 2*ScaleX, Canvas.ClipY-WSI_Bottom*ScaleY - 8*ScaleY/HudScale);
+				
+				//if (bAltHud)
+					Canvas.SetPos( X + 2*ScaleX, Y - 8*ScaleY/HudScale );
+				//else
+				//	Canvas.SetPos( Canvas.CurX + 2*ScaleX, Canvas.CurY - 8*ScaleY/HudScale );
+			
+				Canvas.DrawColor.R = 200;
+				Canvas.DrawColor.G = 200;
+				Canvas.DrawColor.B = 255;
+
+				//DrawNumber(Canvas, X, Y, , false, 0.5);
+				Canvas.DrawText(InvCount, false);
+			}
+
+			Canvas.DrawColor.r = 255;
+			Canvas.DrawColor.g = 255;
+			Canvas.DrawColor.b = 255;	
+			
+			Canvas.Style = ERenderStyle.STY_Normal;		
 		}
 	}
 }
@@ -3530,7 +3530,7 @@ simulated function DrawGhelzUse( canvas Canvas, int X, int Y )
 
 simulated function DrawCenterpiece( canvas Canvas )
 {
-	local float ManaX;
+	local float ManaX, ManaY;
 	if ( HudMode == 0 ) 
 		return;
 
@@ -3542,28 +3542,53 @@ simulated function DrawCenterpiece( canvas Canvas )
 	Canvas.bNoSmooth = false;
 
 	if (bAltHud)
-		Canvas.SetPos(WSI_Left*ScaleY, Canvas.ClipY - 62*ScaleY);
+		Canvas.SetPos(WSI_Left*ScaleY, Canvas.ClipY - 70*ScaleY);
 	else
-		Canvas.SetPos( HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 62*ScaleY); // was 68
+		Canvas.SetPos( HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
+	Canvas.DrawTileClipped( Texture'Health', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
+
+	if (bAltHud)
+		DrawHealth(Canvas, (64+WSI_Padding+WSI_Left)*ScaleY, Canvas.ClipY - 70*Scale);
+	else
+		DrawHealth(Canvas, HalfClipX - (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY, true);
 
 	ManaX = HalfClipX + 19 * ScaleY;
+	ManaY = 62*ScaleY;
 	if (bAltHud)
+	{
 		ManaX = (128 + WSI_Left + WSI_Padding*2)*ScaleY;
+		ManaY = 68*ScaleY;
+	}
 	
 	// glow on mana icon - shows when you don't have enough mana
 	if (AeonsPlayer(PlayerOwner) != None && Level.TimeSeconds < AeonsPlayer(PlayerOwner).NoManaFlashTime)
 	{
-		Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY);
+		Canvas.SetPos( ManaX, Canvas.ClipY - ManaY);
 		Canvas.Style = ERenderStyle.STY_Translucent;
 		Canvas.DrawTileClipped( Texture'Mana_Icon_Glow', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 	}
 
-	Canvas.SetPos( ManaX, Canvas.ClipY - 62*ScaleY); // was 66 in old renewal, 62 in undying
+	Canvas.SetPos( ManaX, Canvas.ClipY - ManaY);
 	Canvas.Style = ERenderStyle.STY_AlphaBlend;
-	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 60*ScaleY, 0, 0, 64, 60);
+	Canvas.DrawTileClipped( Texture'Mana_Icon', 64*ScaleY, 64*ScaleY, 0, 0, 64, 64);
 	Canvas.Style = ERenderStyle.STY_Normal;
+
+	if (bAltHud)
+		DrawMana(Canvas, (128+60+WSI_Left+WSI_Padding*3)*ScaleY, Canvas.ClipY - 70*Scale);
+	else
+		DrawMana(Canvas, HalfClipX + (64+19)*ScaleY, Canvas.ClipY - 64*ScaleY);
+
+	if (class'RenewalConfig'.default.bShowUsedMana)
+	{
+		if (bAltHud)
+			DrawUsedMana(Canvas, 120*ScaleX + 64*ScaleY, Canvas.ClipY - 102*ScaleY);
+		else
+			DrawUsedMana(Canvas, HalfClipX + 26*ScaleX + 64*ScaleY, Canvas.ClipY - 96*ScaleY);
+	}
+
+	if (Level.bDebugMessaging)
+		DrawManaInfo(Canvas);		// mana maintenence values
 }
 
 
@@ -5177,14 +5202,8 @@ simulated function DrawAllItems(Canvas Canvas)
 		}
 		else
 		{
-			if (Inv.IsA('Ammo'))
-				InvCount = Ammo(Inv).AmmoAmount;
-			else if (Pickup(Inv).numCopies > 0)
-				InvCount = Pickup(Inv).numCopies + 1;
-			else
-				InvCount = 0;
-
-			InvName = ""$Inv.ItemName;
+			InvCount = GetInventoryDisplayCount(Inv);
+			InvName = Inv.ItemName;
 			if (InvCount > 0)
 			{
 				InvName = InvName$": ";
@@ -5192,7 +5211,7 @@ simulated function DrawAllItems(Canvas Canvas)
 			}
 		}
 		
-		Canvas.DrawText( (""$InvName), false);
+		Canvas.DrawText( InvName, false);
 	}
 	LastDrawnItemsCount = i;
 }
@@ -5273,12 +5292,7 @@ simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, i
 
 	if (WheelSelection != None && InventoryGroup >= 100)
 	{
-		if (WheelSelection.IsA('Ammo'))
-			InvCount = Ammo(WheelSelection).AmmoAmount;
-		else if (Pickup(WheelSelection).numCopies > 0)
-			InvCount = Pickup(WheelSelection).numCopies + 1;
-		else
-			InvCount = 1;
+		InvCount = GetInventoryDisplayCount(WheelSelection);
 	}
 
 	if (( iState == 1 )&&(HUDMode == 1))
@@ -5462,14 +5476,9 @@ simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, i
 	// draw items count
 	if (WheelSelection != none && InventoryGroup >= 100)
 	{
-		if (WheelSelection.IsA('Ammo'))
-			InvCount = Ammo(WheelSelection).AmmoAmount;
-		else if (Pickup(WheelSelection).numCopies > 0)
-			InvCount = Pickup(WheelSelection).numCopies + 1;
-		else
-			InvCount = 1;
+		InvCount = GetInventoryDisplayCount(WheelSelection);
 		
-		//InvName = ""$WheelSelection.ItemName;
+		//InvName = WheelSelection.ItemName;
 		//if (InvCount > 0)
 		//{
 			//InvName = InvName$": ";
@@ -5490,6 +5499,27 @@ simulated function DrawWheelIcon( Canvas Canvas, int InventoryGroup, int Slot, i
 	Canvas.DrawColor.g = 255;
 	Canvas.DrawColor.b = 255;
 	Canvas.DrawColor.a = 255;
+}
+
+static final function int GetInventoryDisplayCount(Inventory Inv)
+{
+	local Ammo Ammo;
+	local Pickup Pickup;
+
+	Ammo = Ammo(Inv);
+	if (Ammo != None)
+		return Ammo.AmmoAmount;
+
+	Pickup = Pickup(Inv);
+	if (Pickup != None)
+	{
+		if (Pickup.bCanHaveMultipleCopies)
+			return Pickup.numCopies + 1;
+		else
+			return 0;
+	}
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////

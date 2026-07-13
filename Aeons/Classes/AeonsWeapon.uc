@@ -954,6 +954,7 @@ function ProcessTraceHit(Actor Other, Vector HitLocation, Vector HitNormal, Vect
 {
     local vector realLoc;
     local sound RicoCur; // "current" ricochet sound
+	local DamageInfo DInfo;
     
     // Need a new muzzle flash  
     //realLoc = Owner.Location + CalcDrawOffset();
@@ -961,7 +962,9 @@ function ProcessTraceHit(Actor Other, Vector HitLocation, Vector HitNormal, Vect
 
     if ((Other != self) && (Other != Owner) && (Other != None) ) 
     {
-        Other.TakeDamage(Pawn(Owner), HitLocation, MomentumTransfer*X, getDamageInfo());
+		DInfo = getDamageInfo();
+		if ( Other.AcceptDamage(DInfo) )
+        	Other.TakeDamage(Pawn(Owner), HitLocation, MomentumTransfer*X, DInfo);
 
         if ( !Other.IsA('Pawn') && !Other.IsA('Carcass') )
         {

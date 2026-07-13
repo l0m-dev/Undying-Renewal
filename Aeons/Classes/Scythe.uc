@@ -998,7 +998,8 @@ state Mad
 			DInfo.JointName = 'head';
 						
 			DInfo.Damage *= 0.5;
-			Owner.TakeDamage(Pawn(Owner), hitloc, hitloc, DInfo);
+			if ( Owner.AcceptDamage(DInfo) )
+				Owner.TakeDamage(Pawn(Owner), hitloc, hitloc, DInfo);
 			PlaySound(PawnImpactSound,,4.0,,1024, RandRange(0.8,1.2));
 			MakeNoise(1.0, 1280);
 		}

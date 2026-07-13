@@ -714,6 +714,7 @@ function TakeFallDamage( float ZVel )
 {
 	local DamageInfo	DInfo;
 
+	// TODO: check AcceptDamage()?
 	if ( ZVel < -1400.0 )		// long fall landing
 	{
 		DInfo = getDamageInfo( 'hardfall' );
@@ -7726,9 +7727,22 @@ state AIJumpAtEnemy
 	{
 		DebugBeginState();
 		if ( ( Enemy == none ) && !IsInvoked() )
-			GotoState( 'AIJumpAtPlayer' );
+		{
+			// Old: GotoState( 'AIJumpAtPlayer' );
+			
+			ClearOrdersIf( 'AIJumpAtPlayer' );
+			SetEnemy( FindPlayer() );
+			if ( Enemy != none )
+			{
+				CheckHatedEnemy( Enemy );
+				PushState( 'AIAttackPlayer', 'BEGIN' );
+			}
+		}
 		ClearOrdersIf( GetStateName() );
 		StopTimer();
+
+		if ( Enemy == none )
+			PopState();
 	}
 
 	function CheckEnemySwitch( pawn Other )
@@ -7815,9 +7829,17 @@ state AIJumpAtPlayer
 
 BEGIN:
 	SetEnemy( FindPlayer() );
-	CheckHatedEnemy( Enemy );
-	PushState( 'AIAttackPlayer', 'BEGIN' );
-	GotoState( 'AIJumpAtEnemy' );
+	if ( Enemy != none )
+	{
+		CheckHatedEnemy( Enemy );
+		PushState( 'AIAttackPlayer', 'BEGIN' );
+		GotoState( 'AIJumpAtEnemy' );
+	}
+	else
+	{
+		PopState();
+	}
+	
 } // state AIJumpAtPlayer
 
 

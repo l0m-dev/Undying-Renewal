@@ -1530,12 +1530,13 @@ function HurtRadius( float DamageRadius, name DamageName, float Momentum, vector
 			}
 
 			DInfo.Damage = SourceDamage * damageScale;
-			Victims.TakeDamage (
-				Instigator,
-				HurtLocation,
-				(damageScale * Momentum * dir),
-				DInfo
-			);
+			if ( Victims.AcceptDamage(DInfo) )
+				Victims.TakeDamage (
+					Instigator,
+					HurtLocation,
+					(damageScale * Momentum * dir),
+					DInfo
+				);
 		} 
 	}
 	bHurtEntry = false;

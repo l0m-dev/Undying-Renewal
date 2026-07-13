@@ -10,7 +10,8 @@ event TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, Dam
 	if( Owner != none )
 	{
 		DInfo.JointName = Joint;
-		Owner.TakeDamage( EventInstigator, HitLocation, Momentum, DInfo );
+		if( Owner.AcceptDamage(DInfo) )
+			Owner.TakeDamage( EventInstigator, HitLocation, Momentum, DInfo );
 	}
 }
 
