@@ -279,20 +279,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 
 	//Log("AddDefaultInventory");
 
-	PlayerPawn.JumpZ = PlayerPawn.Default.JumpZ * PlayerJumpZScaling();
-
-	if( PlayerPawn.IsA('Spectator') )
-		return;
-
-	if( PlayerPawn(PlayerPawn).GetEntryLevelSafe() == PlayerPawn.Level )
-	{
-		// limit tampering with the entry level (like spawning things)
-		PlayerPawn(PlayerPawn).bCheatsEnabled = false;
-
-		// don't give default inventory to prevent things like activating scrye and the ambient sound staying permanently
-		return;
-	}
-
 	// ****************************************************
 	// NEEDAEONS -DEFAULT WEAPON IS NOT ASSIGNED
 
@@ -470,8 +456,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 		newWeapon.WeaponSet(PlayerPawn);
 	}
 	*/
-
-	BaseMutator.ModifyPlayer(PlayerPawn);
 }
 
 function PlayWinMessage(PlayerPawn Player, bool bWinner)

@@ -59,7 +59,8 @@ function HitWall( vector hitNormal, actor hitWall, byte textureID )
 function Bump( actor Other )
 {
 	DebugInfoMessage(".Bump()ed " $ Other.name );
-	Explode();
+	if ( Other != Instigator )
+		Explode();
 }
 
 function bool FlankEnemy()
@@ -157,7 +158,8 @@ state AICharge
 	function Bump( actor Other )
 	{
 		DebugInfoMessage(".Bump()ed " $ Other.name );
-		Explode();
+		if ( Other != Instigator )
+			Explode();
 	}
 
 	// *** new (state only) functions ***
@@ -182,7 +184,8 @@ state AINearAttack
 	function Bump( actor Other )
 	{
 		DebugInfoMessage(".Bump()ed " $ Other.name );
-		Explode();
+		if ( Other != Instigator )
+			Explode();
 	}
 
 	// overridden functions

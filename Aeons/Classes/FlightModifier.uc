@@ -41,8 +41,11 @@ state Active
 		// Die while flying?
 		if ( Pawn(Owner).Health <= 0 )
 		{
-			Owner.SetPhysics(PHYS_Falling);
-			Owner.GotoState('PlayerWalking');
+			if ( Owner.GetStateName() == 'PlayerFlying' )
+			{
+				Owner.SetPhysics(PHYS_Falling);
+				Owner.GotoState('PlayerWalking');
+			}
 			GotoState('Idle');
 			return;
 		}

@@ -36,10 +36,7 @@ function activate()
 	}
 	super.Activate();
 	if ( numCopies < 0 )
-	{
-		Pawn(Owner).NextItem(true);
 		Pawn(Owner).DeleteInventory(self);
-	}
 }
 
 // lifted from WoT - need to optimize and rework

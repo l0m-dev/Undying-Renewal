@@ -17,11 +17,8 @@ state Activated
 	
 		PlaySound(ActivateSound);
 		Super.Activate();
-		if ( numCopies < 0 )
-		{
-			Pawn(Owner).NextItem(true);
+		// if ( numCopies < 0 )
 			// Pawn(Owner).DeleteInventory(self);
-		}
 	}
 
 	Begin:

@@ -1090,10 +1090,36 @@ event AcceptInventory(pawn PlayerPawn)
 
 	local inventory inv;
 
-	// Initialize the inventory.
-	AddDefaultInventory( PlayerPawn );
+	// Initialize the player.
+	SetupPlayer( PlayerPawn );
 
 	log( "All inventory from" @ PlayerPawn.PlayerReplicationInfo.PlayerName @ "is accepted" );
+}
+
+//
+// Perform initial setup for the newly accepted player.
+//
+function SetupPlayer( pawn PlayerPawn )
+{
+	PlayerPawn.JumpZ = PlayerPawn.Default.JumpZ * PlayerJumpZScaling();
+	 
+	if( PlayerPawn.IsA('Spectator') )
+		return;
+
+	if( PlayerPawn(PlayerPawn).GetEntryLevelSafe() == PlayerPawn.Level )
+	{
+		// limit tampering with the entry level (like spawning things)
+		PlayerPawn(PlayerPawn).bCheatsEnabled = false;
+
+		// don't give default inventory to prevent things like activating scrye and the ambient sound staying permanently
+		return;
+	}
+
+	// Initialize the inventory if we are not loading a save.
+	if( !(string(Level.Outer) ~= "Current") ) // !(XLevel.URL.Map ~= string(Level.Outer))
+		AddDefaultInventory(PlayerPawn);
+	
+	BaseMutator.ModifyPlayer(PlayerPawn);
 }
 
 //
@@ -1103,11 +1129,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 {
 	local Weapon newWeapon;
 	local class<Weapon> WeapClass;
-
-	PlayerPawn.JumpZ = PlayerPawn.Default.JumpZ * PlayerJumpZScaling();
-	 
-	if( PlayerPawn.IsA('Spectator') )
-		return;
 
 	// Spawn default weapon.
 	WeapClass = BaseMutator.MutatedDefaultWeapon();
@@ -1125,7 +1146,6 @@ function AddDefaultInventory( pawn PlayerPawn )
 			newWeapon.WeaponSet(PlayerPawn);
 		}
 	}
-	BaseMutator.ModifyPlayer(PlayerPawn);
 }
 
 
@@ -1206,7 +1226,7 @@ function bool RestartPlayer( pawn aPlayer )
 		aPlayer.ClientSetLocation( startSpot.Location, startSpot.Rotation );
 		aPlayer.bHidden = false;
 		aPlayer.DamageScaling = aPlayer.Default.DamageScaling;
-		AddDefaultInventory(aPlayer);
+		SetupPlayer(aPlayer);
 	}
 	else
 		log(startspot$" Player start not useable!!!");

@@ -294,8 +294,7 @@ function bool AddBot()
 	// broadcast a welcome message.
 	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
-	//AddDefaultInventory( NewBot );
-	AcceptInventory(NewBot);
+	SetupPlayer( NewBot );
 	NumBots++;
 
 	NewBot.PlayerReplicationInfo.bIsABot = True;
@@ -497,7 +496,7 @@ function AcceptInventory(pawn PlayerPawn)
 		PlayerPawn.Inventory.Destroy();
 	PlayerPawn.Weapon = None;
 	PlayerPawn.SelectedItem = None;
-	AddDefaultInventory( PlayerPawn );
+	SetupPlayer( PlayerPawn );
 	PlayerPawn.ConsoleCommand("SetupInv");
 }
 

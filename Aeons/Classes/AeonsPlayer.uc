@@ -2138,7 +2138,8 @@ function PlayDying(name DamageType, vector HitLoc, DamageInfo DInfo)
 	{
 		log( "AeonsPlayer.PlayDying(), damage is " $ DamageType );
 	
-		PlayDyingSound();
+		if ( DamageType != 'none' || DInfo.Deliverer != none )
+			PlayDyingSound();
 				
 		if ( FRand() < 0.15 )
 		{
@@ -2533,7 +2534,7 @@ function bool CheckSelect( float DeltaTime )
 			else if ( SelectMode == SM_Item && bSelectItem == 0 )
 			{
 				bTryingSelect = false;
-				NextItem(true);
+				NextItem();
 //				Log("CheckSelect: NextItem(), Timer had "$SelectTimer$" left");
 				return false; //don't force calling fn to return
 			}
@@ -6266,18 +6267,16 @@ exec function WeaponSounds()
 	ClientMessage("Weapon sounds are "$str);
 }
 
-exec function NextItem(optional bool bNoPing)
+exec function NextItem()
 {
-	if (!bNoPing)
-		InvDisplayMan.Ping();
-	super.NextItem(bNoPing);
+	InvDisplayMan.Ping();
+	super.NextItem();
 }
 
-exec function PrevItem(optional bool bNoPing)
+exec function PrevItem()
 {
-	if (!bNoPing)
-		InvDisplayMan.Ping();
-	super.PrevItem(bNoPing);
+	InvDisplayMan.Ping();
+	super.PrevItem();
 }
 
 exec function ChooseItem(name ClassName)

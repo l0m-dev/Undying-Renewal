@@ -65,10 +65,7 @@ state Activated
 			GameStateModifier(AeonsPlayer(Owner).GameStateMod).fDynamite = 1.0;
 			
 			if ( numCopies < 0 )
-			{
-				Pawn(Owner).NextItem(true);
 				Pawn(Owner).DeleteInventory(self);
-			}
 		}
 		GotoState('');
 	}

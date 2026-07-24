@@ -94,7 +94,7 @@ simulated function PostBeginPlay()
 		maxSkips = 4;
 	numSkips = 0;
 
-	// TODO: fix
+	// TODO: fix molotov bouncing in multiplayer
 	if ( Level.NetMode != NM_Standalone )
 		maxSkips = 0;
 }

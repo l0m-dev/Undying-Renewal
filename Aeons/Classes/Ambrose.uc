@@ -526,6 +526,8 @@ state AmbroseBossFightStart
 {
 	function BeginState()
 	{
+		local GhelziabahrStone aStone;
+
 		BossFightState = ABF_Normal;
 		HoundTimer = 0.0;
 		SetEnemy( FindPlayer() );
@@ -539,6 +541,15 @@ state AmbroseBossFightStart
 		if( HealthBar == None )
 			HealthBar = class'HealthBar'.static.CreateHealthBar(self, true);
 		HealthBar.State = HBS_Invulnerable;
+
+		foreach AllActors( class'GhelziabahrStone', aStone )
+		{
+			if( PlayerPawn(aStone.Owner) != None )
+				aStone.Destroy();
+		}
+
+		if( GhelzStone == None )
+			GhelzStone = Spawn(class'Aeons.GhelziabahrStone');
 	}
 
 	function Timer()
@@ -548,12 +559,14 @@ state AmbroseBossFightStart
 	}
 
 Begin:
+	/*
 	SetTimer( 3.0, false );
 	while( GhelzStone == none )
 	{
 		InitGhelzStone();
 		Sleep(0.1);
 	}
+	*/
 
 HaveStone:
 	DebugInfoMessage( ".AmbroseBossFightStart found Ghelziabahr stone." );

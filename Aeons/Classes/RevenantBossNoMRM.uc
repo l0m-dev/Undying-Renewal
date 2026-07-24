@@ -1,8 +1,8 @@
 class RevenantBossNoMRM expands RevenantNoMRM;
 
-function PreBeginPlay()
+function StartLevel()
 {
-	super.PreBeginPlay();
+	super.StartLevel();
 
 	DestroyLimb( 'head' );
 	ReplicateDestroyLimb( self, 'head' );

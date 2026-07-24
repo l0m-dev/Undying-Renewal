@@ -35,10 +35,7 @@ state Activated
 			{
 				numcopies--;
 				if ( numCopies < 0 )
-				{
-					Pawn(Owner).NextItem(true);
 					Pawn(Owner).DeleteInventory(self);
-				}
 			} else {
 				AeonsPlayer(Owner).ScreenMessage(FailMessage, 3.0);
 			}
@@ -46,10 +43,7 @@ state Activated
 	
 		Super.Activate();
 		if ( numCopies < 0 )
-		{
-			Pawn(Owner).NextItem(true);
 			Pawn(Owner).DeleteInventory(self);
-		}
 		gotoState('Deactivated');
 	}	
 	

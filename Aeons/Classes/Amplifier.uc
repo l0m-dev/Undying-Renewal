@@ -118,10 +118,7 @@ state Activated
 		{
 			Super.Activate();
 			if ( numCopies < 0 )
-			{
-				Pawn(Owner).NextItem(true);
 				Pawn(Owner).DeleteInventory(self);
-			}
 			gotoState('Deactivated');
 		}
 	}
@@ -146,10 +143,7 @@ state Holding
 		str = (""$PlayerPawnOwner.AttSpell.ItemName$" "$AmpString);
 		AeonsPlayer(Owner).ScreenMessage(str, 3.0);
 		if ( numCopies < 0 )
-		{
-			Pawn(Owner).NextItem(true);
 			Pawn(Owner).DeleteInventory(self);
-		}
 		gotoState('Deactivated');
 }
 

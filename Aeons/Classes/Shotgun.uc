@@ -452,7 +452,7 @@ state NewClip
 			//FinishSound(sndID);
 			ClipCount++;
 			
-			if (RefireMult < 0.6 && ClipCount < ReloadCount)
+			if (RefireMult > 1.7 && ClipCount < ReloadCount)
 				ClipCount++;
 		}
 		

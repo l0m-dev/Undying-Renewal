@@ -2500,7 +2500,7 @@ exec function Arm(class<Weapon> NewWeaponClass )
 }
 	
 // The player wants to select previous item
-exec function PrevItem(optional bool bNoPing)
+exec function PrevItem()
 {
 	local Inventory Inv, LastItem;
 

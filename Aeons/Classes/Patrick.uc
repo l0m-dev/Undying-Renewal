@@ -1165,7 +1165,7 @@ state FadingDeath expands Dying
 // ========================================================================
 state InstantFadingDeath expands Dying
 {
-	ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneChange, ZoneChange, SwitchWeapon, Falling, PainTimer, FireAttSpell, FireDefSpell, QuickSave, ShowBook;
+	ignores SeePlayer, HearNoise, KilledBy, Bump, HitWall, HeadZoneChange, FootZoneChange, ZoneChange, SwitchWeapon, Falling, PainTimer, FireAttSpell, FireDefSpell, QuickSave, ShowBook, ActivateItem;
 
 	function BeginState()
 	{

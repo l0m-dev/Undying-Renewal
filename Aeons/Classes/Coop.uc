@@ -323,8 +323,7 @@ function bool AddBot()
 	// broadcast a welcome message.
 	BroadcastMessage( NewBot.PlayerReplicationInfo.PlayerName$EnteredMessage, true );
 
-	//AddDefaultInventory( NewBot );
-	AcceptInventory(NewBot);
+	SetupPlayer( NewBot );
 	NumBots++;
 
 	NewBot.PlayerReplicationInfo.bIsABot = True;
@@ -425,10 +424,7 @@ applicable weapon/item as current).
 */
 function AcceptInventory(pawn PlayerPawn)
 {
-	//PlayerPawn.Weapon = None;
-	//PlayerPawn.SelectedItem = None;
-	AddDefaultInventory( PlayerPawn );
-	//PlayerPawn.ConsoleCommand("SetupInv");
+	SetupPlayer( PlayerPawn );
 }
 
 //
@@ -441,11 +437,7 @@ function AddDefaultInventory(pawn PlayerPawn)
 
 	Super.AddDefaultInventory(PlayerPawn);
 
-	if (PlayerPawn.IsA('Spectator'))
-		return;
-
 	AP = AeonsPlayer(PlayerPawn);
-
 	if (AP != None)
 	{
 		if (AP.FindInventoryType(class'Aeons.CoopTranslocator') == none)

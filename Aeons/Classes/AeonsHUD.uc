@@ -2730,7 +2730,7 @@ simulated function DrawHeldItems(Canvas Canvas)
 			return;
 			
 		if ( PlayerPawn(Owner).selectedItem == none )
-			PlayerPawn(Owner).NextItem(true);
+			PlayerPawn(Owner).NextItem();
 
 		// must change window if on PSX2
 		if ( GetPlatform() == PLATFORM_PSX2 )

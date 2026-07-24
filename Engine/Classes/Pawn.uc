@@ -1356,7 +1356,7 @@ function TossWeapon()
 }	
 
 // The player/bot wants to select next item
-exec function NextItem(optional bool bNoPing)
+exec function NextItem()
 {
 	local Inventory Inv;
 
@@ -1495,26 +1495,6 @@ function bool DeleteInventory( inventory Item )
 	local int Count;
 	local bool bFound;
 
-	if ( Item == Weapon )
-	{
-		Weapon = None;
-		bFound = true;
-	}
-	if ( Item == AttSpell )
-	{
-		AttSpell = None;
-		bFound = true;
-	}
-	if ( Item == DefSpell )
-	{
-		DefSpell = None;
-		bFound = true;
-	}
-	if ( Item == SelectedItem )
-	{
-		SelectedItem = None;
-		bFound = true;
-	}
 	for( Link = Self; Link!=None; Link=Link.Inventory )
 	{
 		if( Link.Inventory == Item )
@@ -1530,6 +1510,36 @@ function bool DeleteInventory( inventory Item )
 			if ( Count > 1000 )
 				break;
 		}
+	}
+	if ( Item == Weapon )
+	{
+		Weapon = None;
+		SwitchToBestWeapon();
+		bFound = true;
+	}
+	if ( Item == AttSpell )
+	{
+		AttSpell = None;
+		bFound = true;
+	}
+	if ( Item == DefSpell )
+	{
+		DefSpell = None;
+		bFound = true;
+	}
+	if ( Item == SelectedItem )
+	{
+		// try to find another item to select
+		if ( SelectedItem.Inventory != None )
+		{
+			SelectedItem = SelectedItem.Inventory.SelectNext(); 
+			if ( SelectedItem == None )
+				SelectedItem = Inventory.SelectNext();
+		}
+		else
+			SelectedItem = Inventory.SelectNext();
+
+		bFound = true;
 	}
 	Item.SetOwner(None);
 	return bFound;

@@ -48,7 +48,7 @@ function Tick(float DeltaTime)
 	}
 
 	// another hack to call a function on tick for the player server side
-	// make a new ticker actor?
+	// TODO: make a new ticker actor?
 	Player.DoEyeTrace();
 
 	// another hack to enter dying state

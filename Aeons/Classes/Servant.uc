@@ -129,6 +129,12 @@ state AIBumpAvoid
 		}
 	}
 
+	function Trigger( actor Other, pawn EventInstigator )
+	{
+		// stop ignoring the function here or in the parent state to fix Trigger not working
+		Global.Trigger( Other, EventInstigator );
+	}
+
 	// *** new (state only) functions ***
 	function bool ClearAhead()
 	{

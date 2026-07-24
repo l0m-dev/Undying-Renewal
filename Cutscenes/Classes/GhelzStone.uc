@@ -23,7 +23,7 @@ function PostBeginPlay()
 	}
 	else
 	{
-		// temp hack to avoid replication
+		// TODO: temp hack to avoid replication
 		// only needed because this class is spawned
 		// so we can't use bNoDelete
 		// instead make a subclass and set bNoDelete=False there

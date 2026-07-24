@@ -33,10 +33,7 @@ state Activated
 		}
 
 		if ( numCopies < 0 )
-		{
-			Pawn(Owner).NextItem(true);
 			Pawn(Owner).DeleteInventory(self);
-		}
 		Super.Activate();
 	}
 	Begin:

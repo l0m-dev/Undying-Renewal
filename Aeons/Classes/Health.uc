@@ -233,10 +233,7 @@ state Activated
 	
 		Super.Activate();
 		if ( numCopies < 0 )
-		{
-			Pawn(Owner).NextItem(true);
 			Pawn(Owner).DeleteInventory(self);
-		}
 	}
 
 	function BeginState()
