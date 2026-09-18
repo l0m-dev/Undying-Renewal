@@ -4,6 +4,7 @@ var UWindowCheckbox GameplayChangesCheck;
 var UWindowCheckbox GoreCheck;
 var UWindowCheckbox AutoUseHealthVialsCheck;
 var UWindowCheckbox LimitHealthCheck;
+var UWindowCheckbox NewDamageFeedbackCheck;
 var UWindowHSliderControl DamageScreenShakeScaleSlider;
 var UWindowCheckbox MoreSkippableCutscenesCheck;
 var UWindowCheckbox SlomoSelectionCheck;
@@ -22,6 +23,8 @@ var localized string AutoUseHealthVialsText;
 var localized string AutoUseHealthVialsHelp;
 var localized string LimitHealthText;
 var localized string LimitHealthHelp;
+var localized string NewDamageFeedbackText;
+var localized string NewDamageFeedbackHelp;
 var localized string DamageScreenShakeScaleText;
 var localized string DamageScreenShakeScaleHelp;
 var localized string MoreSkippableCutscenesText;
@@ -54,6 +57,8 @@ function Created()
 	AutoUseHealthVialsCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', AutoUseHealthVialsText, AutoUseHealthVialsHelp));
 
 	LimitHealthCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', LimitHealthText, LimitHealthHelp));
+
+	NewDamageFeedbackCheck = UWindowCheckbox(AddControl(class'UWindowCheckbox', NewDamageFeedbackText, NewDamageFeedbackHelp));
 
 	DamageScreenShakeScaleSlider = UWindowHSliderControl(AddControl(class'UWindowHSliderControl', DamageScreenShakeScaleText, DamageScreenShakeScaleHelp));
 	DamageScreenShakeScaleSlider.SetRange(0.0, 1.0, 0.1);
@@ -98,6 +103,7 @@ function GetSettings()
 	GoreCheck.bChecked = class'RenewalConfig'.default.bGore;
 	AutoUseHealthVialsCheck.bChecked = class'RenewalConfig'.default.bAutoUseHealthVials;
 	LimitHealthCheck.bChecked = class'RenewalConfig'.default.bLimitHealth;
+	NewDamageFeedbackCheck.bChecked = class'RenewalConfig'.default.bNewDamageFeedback;
 	DamageScreenShakeScaleSlider.SetValue(class'RenewalConfig'.default.DamageScreenShakeScale);
 	MoreSkippableCutscenesCheck.bChecked = class'RenewalConfig'.default.bMoreSkippableCutscenes;
 	SlomoSelectionCheck.bChecked = class'RenewalConfig'.default.bSlomoSelection;
@@ -137,6 +143,9 @@ function Notify(UWindowDialogControl C, byte E)
 		case LimitHealthCheck:
 			class'RenewalConfig'.default.bLimitHealth = LimitHealthCheck.bChecked;
 			break;
+		case NewDamageFeedbackCheck:
+			class'RenewalConfig'.default.bNewDamageFeedback = NewDamageFeedbackCheck.bChecked;
+			break;
 		case DamageScreenShakeScaleSlider:
 			class'RenewalConfig'.default.DamageScreenShakeScale = DamageScreenShakeScaleSlider.GetValue();
 			break;
@@ -164,4 +173,6 @@ defaultproperties
      DifficultyMediumText="Medium"
      DifficultyNightmareText="Nightmare"
      DifficultyUltraNightmareText="Ultra-Nightmare"
+     NewDamageFeedbackText="New damage feedback system"
+     NewDamageFeedbackHelp="Enables new directional damage feedback system"
 }

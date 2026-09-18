@@ -136,8 +136,8 @@ enum EInputKey
     IK_RightMouse           =2,
     IK_Cancel               =3,
     IK_MiddleMouse          =4,
-    IK_Unknown05            =5,
-    IK_Unknown06            =6,
+    IK_Mouse4               =5,
+    IK_Mouse5               =6,
     IK_Unknown07            =7,
     IK_Backspace            =8,
     IK_Tab                  =9,
@@ -3465,6 +3465,7 @@ public:
     FLOAT LastClientTimestamp;
     FVector LastClientLocation;
     BITFIELD bDisableMovementBuffering:1 GCC_PACK(4);
+    BITFIELD bCanCrouchInAir:1;
     DECLARE_FUNCTION(execGUIExit);
     DECLARE_FUNCTION(execGUIEnter);
     DECLARE_FUNCTION(execRunActuator);

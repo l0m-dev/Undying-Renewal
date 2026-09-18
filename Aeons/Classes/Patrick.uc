@@ -36,6 +36,7 @@ function UWindowWindow CreateWindow(string ClassName, float Width, float Height,
 	local UWindowWindow Window;
 	local UWindowRootWindow Root;
 	local WindowConsole wconsole;
+	local float CanvasWidth, CanvasHeight;
 
 	wconsole = WindowConsole(Player.Console);
 
@@ -44,7 +45,34 @@ function UWindowWindow CreateWindow(string ClassName, float Width, float Height,
 
 	Root = wconsole.Root;
 
-	Width *= Root.ScaleY;
+	if (AeonsHUD(myHud) != None)
+	{
+		CanvasWidth = AeonsHUD(myHud).CanvasWidth;
+		CanvasHeight = AeonsHUD(myHud).CanvasHeight;
+
+		if (CanvasWidth != wconsole.OldClipX || CanvasHeight != wconsole.OldClipY)
+		{
+			wconsole.OldClipX = CanvasWidth;
+			wconsole.OldClipY = CanvasHeight;
+			
+			Root.WinTop = 0;
+			Root.WinLeft = 0;
+			Root.WinWidth = CanvasWidth / Root.GUIScale;
+			Root.WinHeight = CanvasHeight / Root.GUIScale;
+
+			Root.RealWidth = CanvasWidth;
+			Root.RealHeight = CanvasHeight;
+
+			Root.ClippingRegion.X = 0;
+			Root.ClippingRegion.Y = 0;
+			Root.ClippingRegion.W = Root.WinWidth;
+			Root.ClippingRegion.H = Root.WinHeight;
+
+			Root.Resized();
+		}
+	}
+
+	Width *= Root.ScaleY; // AeonsHUD(myHud).ScaleY
 	Height *= Root.ScaleY;
 
 	wconsole.bQuickKeyEnable = True;
@@ -430,7 +458,7 @@ exec function Jab()
 	if ( Pawn(A) != none )
 	{
 		JointName = Pawn(A).JointName(HitJoint);
-		Pawn(A).AddDynamic (JointName, HitLocation, Vector(ViewRotation) * 2024,0.01);
+		Pawn(A).AddDynamic (JointName, HitLocation, Vector(ViewRotation) * 2024,0.15);
 	}
 }
 

@@ -468,7 +468,7 @@ function bool CheckScytheHeadshot(name JointName)
 {
 	switch ( JointName )
 	{
-		case 'Hair':
+		case 'Hair': // TODO: wrong joint name?
 		case 'Hair1':
 		case 'Hair2':
 		case 'Hair3':
@@ -553,7 +553,7 @@ function MeleeAttack(float Range)
 		// log( "" $ name $ " registered valid hit on " $ Other.name $ ", joint " $ JointName $ ".", 'Misc');
 			
 		bSpawnWounds = false;
-		bHeadShot = CheckScytheHeadshot(JointName);
+		bHeadShot = CheckScytheHeadshot(JointName); // Other.IsHeadShotJoint(JointName);
 		if (bHeadShot)
 			JointName = 'Head';
 

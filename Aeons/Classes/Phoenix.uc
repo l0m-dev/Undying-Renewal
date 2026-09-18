@@ -135,7 +135,7 @@ simulated function FireWeapon()
 	}
 
 	PawnOwner = Pawn(Owner);
-	// GhelzUse(manaCostPerLevel[castingLevel]);
+	// GhelzUse(GetManaCost(castingLevel));
 	PlayFiring();
 
 	if ( Owner.bHidden )
@@ -171,7 +171,7 @@ function Fire( float Value )
 			GotoState('NormalFire');
 
 			/*
-			// GhelzUse(manaCostPerLevel[castingLevel]);
+			// GhelzUse(GetManaCost(castingLevel));
 			PlayFiring();
 
 			if ( Owner.bHidden )

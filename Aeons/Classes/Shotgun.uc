@@ -212,10 +212,12 @@ function FireStuff()
 	local vector barrelPlace;
 	local vector HitLocation;
 	
+	/*
 	if ( PlayerPawn(Owner) != None )
 	{
 		PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
 	}
+	*/
 
 	bPointing=True;
 	PlayFiring();

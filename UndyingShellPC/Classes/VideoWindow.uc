@@ -47,7 +47,7 @@ var UWindowWindow AdvVideo;
 
 var ShellButton Advanced;
 var ShellButton Resolutions[5]; // resolutions currently displayed in the scrollable list
-var string ResolutionList[31]; // complete list of available resolutions
+var string ResolutionList[29]; // complete list of available resolutions
 var int CurrentRow; // current row in scrollable resolution list
 var ShellButton OK;
 var ShellButton Cancel;
@@ -169,37 +169,35 @@ function Created()
 		Resolutions[i].Font = 4;
 	}
 
-	ResolutionList[ 0] = "640x360";	
-	ResolutionList[ 1] = "640x480";
-	ResolutionList[ 2] = "848x480";
-	ResolutionList[ 3] = "800x600";
-	ResolutionList[ 4] = "1024x600";
-	ResolutionList[ 5] = "1024x768";
-	ResolutionList[ 6] = "1152x864";
-	ResolutionList[ 7] = "1280x720";
-	ResolutionList[ 8] = "1280x800";
-	ResolutionList[ 9] = "1366x768";
-	ResolutionList[10] = "1280x960";
-	ResolutionList[11] = "1440x900";
-	ResolutionList[12] = "1280x1024";
-	ResolutionList[13] = "1600x900";
-	ResolutionList[14] = "1680x1050";
-	ResolutionList[15] = "1600x1200";
-	ResolutionList[16] = "1440x1080";
-	ResolutionList[17] = "1920x1080";
-	ResolutionList[18] = "1920x1200";
-	ResolutionList[19] = "1920x1440";
-	ResolutionList[20] = "2560x1080";
-	ResolutionList[21] = "2048x1536";
-	ResolutionList[22] = "2560x1440";
-	ResolutionList[23] = "2560x1600";
-	ResolutionList[24] = "2560x1920";
-	ResolutionList[25] = "3440x1440";
-	ResolutionList[26] = "2732x2048";
-	ResolutionList[27] = "3200x1800";
-	ResolutionList[28] = "2800x2100";
-	ResolutionList[29] = "3200x2400";
-	ResolutionList[30] = "3840x2160";
+	ResolutionList[ 0] = "640x480";
+	ResolutionList[ 1] = "800x600";
+	ResolutionList[ 2] = "1024x600";
+	ResolutionList[ 3] = "1024x768";
+	ResolutionList[ 4] = "1152x864";
+	ResolutionList[ 5] = "1280x720";
+	ResolutionList[ 6] = "1280x800";
+	ResolutionList[ 7] = "1366x768";
+	ResolutionList[ 8] = "1280x960";
+	ResolutionList[ 9] = "1440x900";
+	ResolutionList[10] = "1280x1024";
+	ResolutionList[11] = "1600x900";
+	ResolutionList[12] = "1680x1050";
+	ResolutionList[13] = "1600x1200";
+	ResolutionList[14] = "1440x1080";
+	ResolutionList[15] = "1920x1080";
+	ResolutionList[16] = "1920x1200";
+	ResolutionList[17] = "1920x1440";
+	ResolutionList[18] = "2560x1080";
+	ResolutionList[19] = "2048x1536";
+	ResolutionList[20] = "2560x1440";
+	ResolutionList[21] = "2560x1600";
+	ResolutionList[22] = "2560x1920";
+	ResolutionList[23] = "3440x1440";
+	ResolutionList[24] = "2732x2048";
+	ResolutionList[25] = "3200x1800";
+	ResolutionList[26] = "2800x2100";
+	ResolutionList[27] = "3200x2400";
+	ResolutionList[28] = "3840x2160";
 	
 // Resolution scroll buttons
 	Up =	ShellButton(CreateWindow(class'ShellButton', 10,10,10,10));

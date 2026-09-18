@@ -143,6 +143,14 @@ state AIRunScript
 		}
 	}
 
+	function NextAction()
+	{
+		// ensure the hat is on the head
+		if ( MyProp[0].Base == self && JointName(MyProp[0].BaseJoint) == 'r_hand1' )
+			HatToHead();
+		Super.NextAction();
+	}
+
 	// *** new (state only) functions ***
 
 } // state AIRunScript

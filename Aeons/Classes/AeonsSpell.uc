@@ -174,7 +174,7 @@ simulated function FireCantrip()
 simulated function bool ClientFire( float Value )
 {
 	//logTime("AeonsSpell: ClientFire: ... bCanClientFire = "$bCanClientFire);
-	if ( bCanClientFire && ((Role == ROLE_Authority) || (Pawn(Owner).Mana >= ManaCostPerLevel[castingLevel])) )
+	if ( bCanClientFire && ((Role == ROLE_Authority) || (Pawn(Owner).Mana >= GetManaCost(castingLevel))) )
 	{
 /*		if ( (PlayerPawn(Owner) != None) 
 			&& ((Level.NetMode == NM_Standalone) || PlayerPawn(Owner).Player.IsA('ViewPort')) )

@@ -1266,11 +1266,10 @@ simulated function DrawRicochet(canvas Canvas)
 		RicochetArrows[i].bHidden = false;
 		RicochetArrows[i].SetLocation(HitLocation);
 		RicochetArrows[i].SetRotation(Rotator(ShotNormal));
+
+		//native(480) final function DrawPortal( int X, int Y, int Width, int Height, actor CamActor, vector CamLocation, rotator CamRotation, optional int FOV, optional bool ClearZ );
+		//Canvas.DrawPortal(i*300*Scale, 200*Scale, 300*Scale, 200*Scale, RicochetArrows[i], RicochetArrows[i].Location, RicochetArrows[i].Rotation, 45, true );
 	}
-	
-	//native(480) final function DrawPortal( int X, int Y, int Width, int Height, actor CamActor, vector CamLocation, rotator CamRotation, optional int FOV, optional bool ClearZ );
-	///if (!RicochetArrows[0].bHidden)
-	//	Canvas.DrawPortal(Pawn(Owner).Health, 480, Pawn(Owner).Health, 480, RicochetArrows[0], RicochetArrows[0].Location, RicochetArrows[0].Rotation, 90, true );
 }
 
 simulated function PostRender( canvas Canvas )
@@ -1380,7 +1379,7 @@ simulated function PostRender( canvas Canvas )
 				{
 					DrawScryeOverlay(Canvas);
 
-					if (PlayerTarget.ScryeTimer == 0 )
+					//if (PlayerTarget.ScryeTimer == 0 )
 						DrawShieldOverlay(Canvas);
 				
 					if (PlayerTarget.ShalasMod != none)
@@ -1719,7 +1718,7 @@ simulated function UpdateSplats(float DeltaTime)
 			Splats[i].X += Splats[i].VelX * DeltaTime;
 			Splats[i].Y += Splats[i].VelY * DeltaTime;		
 
-			if ( Splats[i].Y >= CanvasHeight )
+			if ( Splats[i].Y >= OriginalHeight )
 				Splats[i].Timer = 0;
 
 			Splats[i].Timer -= DeltaTime;
@@ -1735,6 +1734,10 @@ simulated function DrawSplats(Canvas Canvas)
 	local int i;
 	local int StretchY;
 	local string TextureName;
+	local float ScaleSplatX;
+
+	// Scale Splats[i].X from [0, OriginalWidth - 128] to [0, OriginalWidth - 128*(ScaleY/ScaleX)]
+	ScaleSplatX = (OriginalWidth * ScaleX - 128.0 * ScaleY) / (OriginalWidth - 128.0);
 
 	for ( i=0; i<ArrayCount(Splats); i++ )
 	{
@@ -1753,7 +1756,7 @@ simulated function DrawSplats(Canvas Canvas)
 			else
 				StretchY = 0;
 
-			Canvas.SetPos(Splats[i].X, Splats[i].Y - StretchY );
+			Canvas.SetPos(Splats[i].X*ScaleSplatX, (Splats[i].Y - StretchY) * ScaleY );
 
 			Canvas.DrawColor.r = 255;
 			Canvas.DrawColor.g = 255;
@@ -4527,16 +4530,45 @@ simulated function DrawDigit(canvas Canvas, int iDigit, optional float DigitScal
 }
 
 
-simulated function AddSplat(byte count, vector HitLocation)
+simulated function AddSplat(byte count, vector HitLocation, vector Momentum)
 {
 	local int i;
 	local int found;
 	local int iPercent;
 	local bool bNeedsBigSplat;
+	local vector HitDir, X, Y, Z;
+	local float RangeX, RangeY, Spread, CloudMin, CloudMax, CloudX, CloudY;
+	local bool bFullyRandom;
 
 	//fix
 	if ( PlayerPawn(Owner).GoreLevel == 0.0 ) 
 		return;
+
+	bFullyRandom = Momentum == vect(0,0,0) || !class'RenewalConfig'.default.bNewDamageFeedback;
+
+	RangeX = OriginalWidth - 128.0;
+	RangeY = OriginalHeight - 128.0;
+
+	if ( !bFullyRandom )
+	{
+		Spread = FClamp(0.15 * Sqrt(count), 0.1, 1.0);
+
+		if ( Spread == 1.0 )
+			bFullyRandom = true;
+		else
+		{
+			//HitDir = Normal(HitLocation-Location);
+			HitDir = Normal(Momentum);
+
+			GetAxes(Pawn(Owner).ViewRotation, X, Y, Z);
+
+			CloudMin = Spread * 0.5;
+			CloudMax = 1.0 - CloudMin;
+
+			CloudX = FClamp((-(HitDir Dot Y) + 1.0) * 0.5, CloudMin, CloudMax);
+			CloudY = FClamp(((HitDir Dot Z) + 1.0) * 0.5, CloudMin, CloudMax);
+		}
+	}
 
 	found = 0;
 	
@@ -4545,9 +4577,21 @@ simulated function AddSplat(byte count, vector HitLocation)
 		if ( Splats[i].Timer == 0 )
 		{
 			found++;
-			
-			Splats[i].X = FRand() * (CanvasWidth - 128.0); 
-			Splats[i].Y = FRand() * (CanvasHeight - 128.0 - 64.0);  // - 64.0 = sliding room
+
+			// original
+			//Splats[i].X = FRand() * (CanvasWidth - 128.0); 
+			//Splats[i].Y = FRand() * (CanvasHeight - 128.0 - 64.0);  // - 64.0 = sliding room
+
+			if ( bFullyRandom )
+			{
+				Splats[i].X = FRand() * RangeX;
+				Splats[i].Y = FRand() * RangeY;
+			}
+			else
+			{
+				Splats[i].X = (CloudX + (FRand() - 0.5) * Spread) * RangeX;
+				Splats[i].Y = (CloudY + (FRand() - 0.5) * Spread) * RangeY;
+			}
 			
 			Splats[i].Timer=(FRand())+1.5;
 
@@ -4818,6 +4862,7 @@ simulated function DrawShieldOverlay(Canvas Canvas)
 	local float ShieldPercent; 
 	local int i;
 	local int X, Y;
+	local float CrackSize;
 
 	AP = AeonsPlayer(PlayerOwner);
 	
@@ -4847,18 +4892,19 @@ simulated function DrawShieldOverlay(Canvas Canvas)
 	Canvas.DrawColor.G = 255;
 	Canvas.DrawColor.B = 255;
 	
+	CrackSize = 128 * 1.2*Scale;
 	for (i=0; i<8; i++)
 	{
 		if ( ShieldModifier(AP.ShieldMod).CrackStr[i] > 0 )
 		{
-			X = Canvas.ClipX * ShieldModifier(AP.ShieldMod).CrackLocations[i].x;
-			Y = Canvas.ClipY * ShieldModifier(AP.ShieldMod).CrackLocations[i].y;
+			X = (Canvas.ClipX-CrackSize) * ShieldModifier(AP.ShieldMod).CrackLocations[i].x;
+			Y = (Canvas.ClipY-CrackSize) * ShieldModifier(AP.ShieldMod).CrackLocations[i].y;
 			Canvas.SetPos(X, Y);
 
 			Canvas.DrawColor.R = 100 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
 			Canvas.DrawColor.G = 100 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
 			Canvas.DrawColor.B = 128 * (ShieldModifier(AP.ShieldMod).CrackStr[i] / ShieldModifier(AP.ShieldMod).InitialCrackStr[i]);
-			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(AP.ShieldMod).CrackID[i]], 128 * 1.2, 128 * 1.2, 0, 0, 128, 128);
+			Canvas.DrawTileClipped( ShieldCracks[ShieldModifier(AP.ShieldMod).CrackID[i]], CrackSize, CrackSize, 0, 0, 128, 128);
 		}
 	}
 

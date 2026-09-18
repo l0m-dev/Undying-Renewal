@@ -185,24 +185,8 @@ function bool TriggerSwitchToMelee()
 function DamageInfo AdjustDamageByLocation ( DamageInfo DInfo )
 {
 	DInfo = super.AdjustDamageByLocation( DInfo );
-	switch ( DInfo.JointName )
-	{
-		// Head shots
-		case 'Neck':
-		case 'Head':
-		case 'Hair1':
-		case 'Hair2':
-		case 'Hair3':
-		case 'Hair4':
-		case 'Hair5':
-		case 'L_Ear':
-		case 'R_Ear':
-		case 'Jaw':
-		case 'Mouth':
-			if ( DInfo.DamageType == 'spear' )
-				DInfo.Damage = Health * 10;
-			break;
-	}
+	if( DInfo.DamageType == 'spear' && IsHeadShotJoint( DInfo.JointName ) )
+		DInfo.Damage = Health * 10;
 	return DInfo;
 }
 

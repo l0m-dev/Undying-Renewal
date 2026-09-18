@@ -299,7 +299,7 @@ function DoLightningBoltOfGodsOnKing( King_Part Other )
 		}
 	}
 
-	if ( (HitTexture.name == 'S_SkyZone') && 
+	if ( ((Flags & 0x80) != 0) && 
 		 ((Other.IsA('King_Body') && King_Body(Other).IsBrainJoint(HitJointName)) ||
 		  Other.IsA('King_Mouth') ||
 		  Other.IsA('King_L_Mandible') ||
@@ -393,28 +393,28 @@ state stuck
 
 			// try 4 more times
 			// RGC()? this just makes lbg more consistent
-			if ( HitTexture.name != 'S_SkyZone' )
+			if ( (Flags & 0x80) != 0 )
 			{
 				End = Start + vect(-64,0,65536);
 				HitTexture = TraceTexture(End, start + vect(-64,0,0), Flags);
 			}
-			if ( HitTexture.name != 'S_SkyZone' )
+			if ( (Flags & 0x80) != 0 )
 			{
 				End = Start + vect(64,0,65536);
 				HitTexture = TraceTexture(End, start + vect(64,0,0), Flags);
 			}
-			if ( HitTexture.name != 'S_SkyZone' )
+			if ( (Flags & 0x80) != 0 )
 			{
 				End = Start + vect(0,-64,65536);
 				HitTexture = TraceTexture(End, start + vect(0,-64,0), Flags);
 			}
-			if ( HitTexture.name != 'S_SkyZone' )
+			if ( (Flags & 0x80) != 0 )
 			{
 				End = Start + vect(0,64,65536);
 				HitTexture = TraceTexture(End, start + vect(0,64,0), Flags);
 			}
 
-			if ( HitTexture.name == 'S_SkyZone' )
+			if ( (Flags & 0x80) != 0 )
 			{
 				Trace(HitLocation, HitNormal, HitJoint, End, Start, false);
 				

@@ -23,6 +23,16 @@ var bool bPushSoundPlaying;
 var() sound DestroySound[3];
 var int SoundID;
 
+event PostBeginPlay()
+{
+	if( bStatic && (RemoteRole != ROLE_None) )
+	{
+		if( NetUpdateFrequency == 100 )
+			NetUpdateFrequency = 5;
+		NetPriority *= 0.5;
+	}
+}
+
 simulated function FollowHolder(Actor Other);
 
 function Drop(vector newVel);

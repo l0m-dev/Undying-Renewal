@@ -55,26 +55,6 @@ simulated function name CheckJoint()
 	return 'None';
 }
 
-simulated function bool CheckHeadShotJoint(name JointName)
-{
-	switch (JointName)
-	{
-		case 'Neck':
-		case 'Head':
-		case 'Hair1':
-		case 'Hair2':
-		case 'Hair3':
-		case 'Hair4':
-		case 'Hair5':
-		case 'L_Ear':
-		case 'R_Ear':
-		case 'Jaw':
-		case 'Mouth':
-			return true;
-	}
-	return false;
-}
-
 /*
 simulated function bool CheckHeadShot()
 {

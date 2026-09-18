@@ -54,7 +54,7 @@ state Active
 		if ( Owner.GetStateName() != 'PlayerFlying')
 		{
 			if ( ( AeonsPlayer(Owner).JumpHeldTime >= 0.2 ) &&
-					( !AeonsPlayer(Owner).InCrouch() ) &&
+					( AeonsPlayer(Owner).bCanCrouchInAir || !AeonsPlayer(Owner).InCrouch() ) &&
 					!AeonsPlayer(Owner).Region.Zone.bWaterZone &&
 					!AeonsPlayer(Owner).IsInCutsceneState() &&
 					( Fuel >= 30 ) )

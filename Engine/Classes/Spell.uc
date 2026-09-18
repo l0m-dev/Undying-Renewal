@@ -426,10 +426,10 @@ function FireAttSpell( float Value )
     } 
 	else if ( ProcessCastingLevel() ) 
 	{
-	    if ( Pawn(Owner).UseMana(ManaCostPerLevel[castingLevel]) )
+	    if ( Pawn(Owner).UseMana(GetManaCost(castingLevel)) )
 	    {
 	        CalculateAutoAimDir();
-	        AddGhelz(ManaCostPerLevel[castingLevel]);
+	        AddGhelz(GetManaCost(castingLevel));
 	        GotoState('NormalFire');
 	        if ( PlayerPawn(Owner) != None )
 	            PlayerPawn(Owner).ShakeView(ShakeTime, ShakeMag, ShakeVert);
@@ -471,7 +471,7 @@ function FireDefSpell( float Value ){}
         BringUp();
     }
     else
-    if ( Pawn(Owner).UseMana(ManaCostPerLevel[castingLevel]) )
+    if ( Pawn(Owner).UseMana(GetManaCost(castingLevel)) )
     {
         GotoState('NormalFire');
         if ( PlayerPawn(Owner) != None )
@@ -755,6 +755,11 @@ simulated function PlayIdleAnim()
 function PlayFireEmpty()
 {
     //only put sounds here not anims
+}
+
+simulated function int GetManaCost(int level)
+{
+	return manaCostPerLevel[level];
 }
 
 defaultproperties

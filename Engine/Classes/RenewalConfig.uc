@@ -22,6 +22,7 @@ var config string JournalFont;
 var config string SaveNameColor;
 var config string JournalColor;
 
+var config bool bNewDamageFeedback;
 var config float DamageScreenShakeScale;
 
 var config bool bMoreSkippableCutscenes;
@@ -62,6 +63,7 @@ defaultproperties
 	 JournalFont="AeonsFonts.Dauphin16_Skinny"
 	 SaveNameColor="#ffffff"
 	 JournalColor="#ffffff"
+	 bNewDamageFeedback=True
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
 	 bSlomoSelection=True

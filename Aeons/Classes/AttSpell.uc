@@ -183,10 +183,7 @@ function FireAttSpell( float Value )
 		{
 			if (bPCL)
 			{
-				cost = manaCostPerLevel[castingLevel];
-
-				if ( Self.IsA('Scrye') && AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-					cost = 0;
+				cost = GetManaCost(castingLevel);
 
 				if ( cost <= PawnOwner.Mana )
 				{
@@ -195,7 +192,7 @@ function FireAttSpell( float Value )
 					{
 						CalculateAutoAimDir();
 						bFiring = true;
-						GhelzUse(manaCostPerLevel[castingLevel]);
+						GhelzUse(cost);
 						PlayFiring();
 						//Disable('FireAttSpell');
 						

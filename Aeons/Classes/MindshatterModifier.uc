@@ -140,12 +140,15 @@ state Deactivated
 		local bool bFov, bRoll, bcrossX, bCrossY, bCrossScale;
 		local vector shake;
 		local float x, scale;
+		local float deltaScale;
+		
+		deltaScale = deltaTime * 60.0;
 		
 		// Fov
 		/*
 		if ( !bFOV )
 		{
-			if (abs (PlayerPawn(Owner).desiredFOV - DefaultFOV) < 2.0)
+			if (abs (PlayerPawn(Owner).desiredFOV - DefaultFOV) < 2.0 * deltaScale)
 			{
 				PlayerPawn(Owner).DefaultFOV = DefaultFOV;
 				PlayerPawn(Owner).DesiredFOV = DefaultFOV;
@@ -153,9 +156,9 @@ state Deactivated
 				bFOV = true;
 			} else {
 				if ( PlayerPawn(Owner).desiredFOV < DefaultFOV )
-					PlayerPawn(Owner).desiredFOV += 0.5;
+					PlayerPawn(Owner).desiredFOV += 0.5 * deltaScale;
 				else
-					PlayerPawn(Owner).desiredFOV -= 0.5;
+					PlayerPawn(Owner).desiredFOV -= 0.5 * deltaScale;
 			}
 		}
 */
@@ -168,54 +171,54 @@ state Deactivated
 				bRoll = true;
 			} else {
 				if ( AeonsPlayer(Owner).ViewRotation.Roll > 0 )
-					AeonsPlayer(Owner).ViewRotation.Roll -= 1;
+					AeonsPlayer(Owner).ViewRotation.Roll -= 1 * deltaScale;
 				else
-					AeonsPlayer(Owner).ViewRotation.Roll += 1;
+					AeonsPlayer(Owner).ViewRotation.Roll += 1 * deltaScale;
 			}
 		}
 
 		// CrossHair X
 		if ( !bCrossX )
 		{
-			if (abs(AeonsPlayer(Owner).crosshairOffsetX) < 3)
+			if (abs(AeonsPlayer(Owner).crosshairOffsetX) < 3 * deltaScale)
 			{
 				AeonsPlayer(Owner).crosshairOffsetX = 0;
 				bCrossX = true;
 			} else {
 				if (AeonsPlayer(Owner).crosshairOffsetX > 0)
-					AeonsPlayer(Owner).crosshairOffsetX -= 3;
+					AeonsPlayer(Owner).crosshairOffsetX -= 3 * deltaScale;
 				else
-					AeonsPlayer(Owner).crosshairOffsetX += 3;
+					AeonsPlayer(Owner).crosshairOffsetX += 3 * deltaScale;
 			}
 		}
 
 		// CrossHair Y
 		if ( !bCrossY )
 		{
-			if (abs (AeonsPlayer(Owner).crosshairOffsetY) < 3)
+			if (abs (AeonsPlayer(Owner).crosshairOffsetY) < 3 * deltaScale)
 			{
 				AeonsPlayer(Owner).crosshairOffsetY = 0;
 				bCrossY = true;
 			} else {
 				if (AeonsPlayer(Owner).crosshairOffsetY > 0)
-					AeonsPlayer(Owner).crosshairOffsetY -= 3;
+					AeonsPlayer(Owner).crosshairOffsetY -= 3 * deltaScale;
 				else
-					AeonsPlayer(Owner).crosshairOffsetY += 3;
+					AeonsPlayer(Owner).crosshairOffsetY += 3 * deltaScale;
 			}
 		}
 
 		// CrossHair Scale
 		if ( !bCrossScale )
 		{
-			if (abs(AeonsPlayer(Owner).crosshairScale - 1) < 0.5)
+			if (abs(AeonsPlayer(Owner).crosshairScale - 1) < 0.5 * deltaScale)
 			{
 				AeonsPlayer(Owner).crosshairScale = 1;
 				bCrossScale = true;
 			} else {
 				if (AeonsPlayer(Owner).crosshairScale > 1)
-					AeonsPlayer(Owner).crosshairScale -= 0.1;
+					AeonsPlayer(Owner).crosshairScale -= 0.1 * deltaScale;
 				else
-					AeonsPlayer(Owner).crosshairScale += 0.1;
+					AeonsPlayer(Owner).crosshairScale += 0.1 * deltaScale;
 			}
 		}
 		
@@ -294,6 +297,7 @@ state Activated
 		local float x, scale;
 		local float targetFOV;
 		local float fovMod;
+		local float deltaScale;
 
 		if (PlayerPawn(Owner).Health <= 0)
 		{
@@ -308,12 +312,13 @@ state Activated
 		}
 		if (Level.NetMode == NM_DedicatedServer)
 			return;
+		deltaScale = deltaTime * 60.0;
 		v = vSize(owner.velocity);		// get the velocity of the character
-		inc += 0.02;
-		inc2 += 0.05;
-		inc3 += 0.065;
-		inc4 += 0.125;
-		inc5 += 0.025;
+		inc += 0.02 * deltaScale;
+		inc2 += 0.05 * deltaScale;
+		inc3 += 0.065 * deltaScale;
+		inc4 += 0.125 * deltaScale;
+		inc5 += 0.025 * deltaScale;
 
 		pitch = ModPitchStrength[castingLevel]; // * abs(cos(inc));
 		// FOV /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -325,9 +330,9 @@ state Activated
 			TargetFOV = DefaultFOV;
 
 		if ( PlayerPawn(Owner).DesiredFOV < TargetFOV )
-			TargetFOV = PlayerPawn(Owner).DesiredFOV + 0.5;
+			TargetFOV = PlayerPawn(Owner).DesiredFOV + 0.5 * deltaScale;
 		else
-			TargetFOV = PlayerPawn(Owner).DesiredFOV - 0.5;
+			TargetFOV = PlayerPawn(Owner).DesiredFOV - 0.5 * deltaScale;
 
 		PlayerPawn(Owner).DesiredFOV = TargetFOV;
 

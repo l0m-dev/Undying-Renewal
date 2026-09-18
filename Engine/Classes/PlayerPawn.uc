@@ -278,6 +278,8 @@ var transient vector LastClientLocation;
 var() globalconfig bool bDisableMovementBuffering;
 const SmoothAdjustLocationTime = 0.35f;
 
+var bool bCanCrouchInAir;
+
 replication
 {
 	// Things the server should send to the client.
@@ -391,6 +393,16 @@ function EnableSaveGame();
 exec function Ping()
 {
 	ClientMessage("Current ping is"@PlayerReplicationInfo.Ping);
+}
+
+event Actor HeldPropRequest(int idx)
+{
+	if (idx == 0)
+	{
+		return Weapon;
+	}
+
+	return none;
 }
 
 function ClientWeaponEvent(name EventType)
@@ -2620,7 +2632,7 @@ function DoJump( optional float F )
 
 	if ( CarriedDecoration != None )
 		return;
-	if ( !InCrouch() && (Physics == PHYS_Walking) )
+	if ( (bCanCrouchInAir || !InCrouch()) && (Physics == PHYS_Walking) )
 	{
 		// don't bother tracing unless we have a FootSoundClass
 		if ( FootSoundClass != None ) 
@@ -3799,6 +3811,8 @@ event PreBeginPlay()
 	
 		//IconsofShame = spawn(class'StatManager', self);
 	}	
+
+	bCanCrouchInAir = RGC();
 
 	Super.PreBeginPlay();
 }

@@ -69,7 +69,7 @@ function Projectile ProjectileFire(class<projectile> ProjClass, float ProjSpeed,
 	// spawn the projectile
 	m = Spawn(class 'Mindshatter_proj',Pawn(Owner),, FireLoc, Rotator( PlayerPawn(Owner).EyeTraceLoc - FireLoc ));
 	m.castingLevel = castingLevel;
-	m.manaCost = manaCostPerLevel[castingLevel];
+	m.manaCost = GetManaCost(castingLevel);
 
 	// Test PlayActuator here!!
 	PlayActuator (PlayerPawn (Owner), EActEffects.ACTFX_FadeOut, 0.8f);

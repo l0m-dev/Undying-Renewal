@@ -238,9 +238,9 @@ function PreBeginPlay()
 {
 	if ( RGC() )
 	{
-		FrenzyGroundSpeed = 600;
-		DamageRadius = 160;
-		MeleeRange = 130;
+		FrenzyGroundSpeed = 500;
+		DamageRadius = 140;
+		MeleeRange = 110;
 		ReactToDamageThreshold = 10;
 	}
 	super.PreBeginPlay();

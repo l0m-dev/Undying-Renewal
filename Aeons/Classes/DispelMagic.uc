@@ -43,15 +43,12 @@ function FireAttSpell( float Value )
 	{
 		if (bPCL)
 		{
-			cost = manaCostPerLevel[castingLevel];
-
-			if ( AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
-				cost = 0;
+			cost = GetManaCost(castingLevel);
 
 			SayMagicWords();
 			if ( !AeonsPlayer(Owner).bDispelActive )
 			{
-				//GhelzUse(manaCostPerLevel[castingLevel]);
+				//GhelzUse(cost);
 				PlayFiring();
 				
 				if ( Owner.bHidden )
@@ -83,7 +80,7 @@ state NormalFire
 
 		GameStateModifier(AeonsPlayer(Owner).GameStateMod).fDispel = 1.0;
 
-		GhelzUse(manaCostPerLevel[castingLevel]);
+		GhelzUse(GetManaCost(castingLevel));
 		
 		// Generate the effect
 		spawn (class 'DispelCastFX',,,Owner.Location + vect(0,0,1) * PawnOwner.EyeHeight + vect(0,0,-12) );
@@ -102,8 +99,8 @@ state NormalFire
 				if ( OtherLevel >= 0 )
 				{
 					DispelCost = DispelManaCost(CastingLevel, OtherLevel);
-					log("DispelMagic.A = "$A.name, 'Misc');
-					log("DispelMagic.DispelCost = "$DispelCost$" ManaBag = "$MAnaBag, 'Misc');
+					//log("DispelMagic.A = "$A.name, 'Misc');
+					//log("DispelMagic.DispelCost = "$DispelCost$" ManaBag = "$MAnaBag, 'Misc');
 					if ( DispelCost <= ManaBag )
 					{
 						ManaBag -= DispelCost;

@@ -1494,12 +1494,14 @@ function bool DeleteInventory( inventory Item )
 	local actor Link;
 	local int Count;
 	local bool bFound;
+	local inventory NextItem;
 
 	for( Link = Self; Link!=None; Link=Link.Inventory )
 	{
 		if( Link.Inventory == Item )
 		{
-			Link.Inventory = Item.Inventory;
+			NextItem = Item.Inventory;
+			Link.Inventory = NextItem;
 			Item.Inventory = None;
 			bFound = true;
 			break;
@@ -1530,15 +1532,11 @@ function bool DeleteInventory( inventory Item )
 	if ( Item == SelectedItem )
 	{
 		// try to find another item to select
-		if ( SelectedItem.Inventory != None )
-		{
-			SelectedItem = SelectedItem.Inventory.SelectNext(); 
-			if ( SelectedItem == None )
-				SelectedItem = Inventory.SelectNext();
-		}
-		else
+		SelectedItem = None;
+		if ( NextItem != None )
+			SelectedItem = NextItem.SelectNext();
+		if ( SelectedItem == None )
 			SelectedItem = Inventory.SelectNext();
-
 		bFound = true;
 	}
 	Item.SetOwner(None);
@@ -2459,10 +2457,24 @@ function PlayDeathHit(float Damage, vector HitLocation, name damageType, vector 
 {
 }
 
-// adjust damage amount, based on JointName
-function DamageInfo AdjustDamageByLocation (DamageInfo DInfo)
+function bool IsHeadShotJoint(name JointName, optional bool bIncludeExtraJoints)
 {
-	switch( DInfo.JointName )
+	if( bIncludeExtraJoints )
+	{
+		switch( JointName )
+		{
+			case 'Spine3':
+			case 'R_Ear1':
+			case 'R_Ear2':
+			case 'R_Ear3':
+			case 'L_Ear1':
+			case 'L_Ear2':
+			case 'L_Ear3':
+				return true;
+		}
+	}
+
+	switch( JointName )
 	{
 		// Head shots
 		// case 'Spine3':
@@ -2485,9 +2497,23 @@ function DamageInfo AdjustDamageByLocation (DamageInfo DInfo)
 		case 'R_Ear':
 		case 'Jaw':
 		case 'Mouth':
-			DInfo.Damage *= 3.0;
-			break;
+			return true;
+	}
 
+	return false;
+}
+
+// adjust damage amount, based on JointName
+function DamageInfo AdjustDamageByLocation (DamageInfo DInfo)
+{
+	if( IsHeadShotJoint(DInfo.JointName) )
+	{
+		DInfo.Damage *= 3.0;
+		return DInfo;
+	}
+
+	switch( DInfo.JointName )
+	{
 		// Torso
 		case 'Pelvis':
 		case 'Spine1':
@@ -2543,7 +2569,7 @@ function DamageInfo AdjustDamageByLocation (DamageInfo DInfo)
 // Take Damage
 // ==================================================================================
 
-function PlayDamageEffect(vector HitLocation, vector Momentum, DamageInfo DInfo);
+function PlayDamageEffect(float Damage, vector HitLocation, float Strength, vector Momentum);
 
 function bool AcceptDamage( DamageInfo DInfo )
 {
@@ -2643,20 +2669,6 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 				AddDynamic (DInfo.JointName, HitLocation, DInfo.ImpactForce,0.15);
 		}
 
-		if (bIsPlayer)
-		{
-			PlayDamageEffect(HitLocation, Momentum, DInfo);
-
-			// Handle Actuator feedback
-			if (actualDamage <= 10)
-				PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_LightShake, 0.3f);
-			else if (actualDamage <= 20)
-				PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_NormalShake, 0.4f);
-			else
-				PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_HardShake, 0.5f);
-		}
-
-
 		ActualDamage *= DInfo.DamageMultiplier;
 		
 		//log("Reducing health by = "$actualDamage);
@@ -2674,6 +2686,19 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 			if ( (instigatedBy != None) && (instigatedBy != Self) )
 				damageAttitudeTo(instigatedBy);
 			PlayHit(actualDamage, hitLocation, DInfo.damageType, Momentum);
+
+			if (bIsPlayer)
+			{
+				PlayDamageEffect(actualDamage, HitLocation, DInfo.EffectStrength, Momentum);
+
+				// Handle Actuator feedback
+				if (actualDamage <= 10)
+					PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_LightShake, 0.3f);
+				else if (actualDamage <= 20)
+					PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_NormalShake, 0.4f);
+				else
+					PlayActuator (PlayerPawn(Self), EActEffects.ACTFX_HardShake, 0.5f);
+			}
 		} 
 		else if ( !bAlreadyDead ) 
 		{
@@ -2757,7 +2782,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 		}
 		MakeNoise(1.0);		
 	
-		if ( bIsPlayer )
+		if ( bIsPlayer && ActualDamage > 0 )
 		{
 			switch ( DInfo.DamageType )
 			{
@@ -2773,7 +2798,7 @@ function TakeDamage( Pawn InstigatedBy, vector HitLocation, vector Momentum, Dam
 			}
 
 			if ( bSplatterHUD )
-				SplatterHUD(ActualDamage, HitLocation);
+				SplatterHUD(ActualDamage, HitLocation, Momentum);
 		}
 	}
 }
@@ -2803,7 +2828,7 @@ function bool CanStartSK();
 
 //----------------------------------------------------------------------------
 
-simulated function SplatterHUD(int ActualDamage, Vector HitLocation);
+simulated function SplatterHUD(int ActualDamage, Vector HitLocation, Vector Momentum);
 
 //----------------------------------------------------------------------------
 

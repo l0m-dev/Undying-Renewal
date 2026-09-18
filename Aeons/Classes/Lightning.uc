@@ -496,7 +496,7 @@ state NormalFire
 		PlayAnim('Lightning_start');
 		FinishAnim();
 
-		if ( PawnOwner.useMana(manaCostPerLevel[localCastingLevel]) )
+		if ( PawnOwner.useMana(GetManaCost(localCastingLevel)) )
 		{
 			PawnOwner.PlaySound(FireSound);
 			if ( PlayerPawn(Owner).bFireAttSpell == 0 || !RGC() || Level.NetMode != NM_Standalone ) // disable online for now
@@ -878,9 +878,9 @@ function FireAttSpell( float Value )
 					ChargeSpear();
 				else
 					FailedSpellCast();
-			} else if ( PawnOwner.Mana >= manaCostPerLevel[localCastingLevel] ) {
+			} else if ( PawnOwner.Mana >= GetManaCost(localCastingLevel) ) {
 				CalculateAutoAimDir();
-				GhelzUse(manaCostPerLevel[castingLevel]);
+				GhelzUse(GetManaCost(localCastingLevel));
 				gotoState('NormalFire');
 				if ( Owner.bHidden )
 					CheckVisibility();

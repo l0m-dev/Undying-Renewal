@@ -42,12 +42,20 @@ state NormalFire
 		AeonsPlayer(owner).ScryeMod.gotoState('Activated');
 		AeonsPlayer(owner).ScryeMod.castingLevel = localCastingLevel;
 		AeonsPlayer(owner).ClientSetScryeModActive(true, localCastingLevel);
-		GhelzUse(ManaCostPerLevel[castingLevel]);
+		//GhelzUse(GetManaCost(localCastingLevel));
 		FinishAnim();
 		// Sleep(RefireRate);
 		Finish();
 		bFiring = false;
 		GotoState('Idle');
+}
+
+simulated function int GetManaCost(int level)
+{
+	if ( AeonsPlayer(Owner).Weapon != None && AeonsPlayer(Owner).Weapon.IsA('GhelziabahrStone') )
+		return 0;
+
+	return Super.GetManaCost(level);
 }
 
 defaultproperties

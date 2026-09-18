@@ -627,7 +627,7 @@ enum EInputAction
 enum EInputKey
 {
 /*00*/	IK_None			,IK_LeftMouse	,IK_RightMouse	,IK_Cancel		,
-/*04*/	IK_MiddleMouse	,IK_Unknown05	,IK_Unknown06	,IK_Unknown07	,
+/*04*/	IK_MiddleMouse	,IK_Mouse4		,IK_Mouse5		,IK_Unknown07	,
 /*08*/	IK_Backspace	,IK_Tab         ,IK_Unknown0A	,IK_Unknown0B	,
 /*0C*/	IK_Unknown0C	,IK_Enter	    ,IK_Unknown0E	,IK_Unknown0F	,
 /*10*/	IK_Shift		,IK_Ctrl	    ,IK_Alt			,IK_Pause       ,

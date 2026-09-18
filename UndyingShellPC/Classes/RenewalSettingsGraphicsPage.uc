@@ -40,6 +40,7 @@ function Created()
 		AntiAliasCombo.AddItem("None",		"Off");
 		AntiAliasCombo.AddItem("MSAA 2x",	"MSAA_2x");
 		AntiAliasCombo.AddItem("MSAA 4x",	"MSAA_4x");
+		AntiAliasCombo.AddItem("MSAA 8x",	"MSAA_8x");
 	}
 	
 	if (DoesRenderDevicePropertyExist('LightMode'))
@@ -83,6 +84,8 @@ function GetSettings()
 			AntiAliasCombo.SetSelectedIndex(1);
 		else if (AntiAliasString ~= "MSAA_4x")
 			AntiAliasCombo.SetSelectedIndex(2);
+		else if (AntiAliasString ~= "MSAA_8x")
+			AntiAliasCombo.SetSelectedIndex(3);
 		else
 			AntiAliasCombo.SetSelectedIndex(0);
 	}

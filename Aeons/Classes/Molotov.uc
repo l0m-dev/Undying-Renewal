@@ -51,7 +51,10 @@ simulated function PlayFiring()
 		fuseFX.SetBase(self,'fuse_5','root');
 	}
 
-	playAnim('Fire',RefireMult,,,0);
+	if ( RGC() )
+		playAnim('Fire',RefireMult*2,,,0);
+	else
+		playAnim('Fire',RefireMult,,,0);
 	PlaySound(IdleSounds[Rand(2)]);
 }
 

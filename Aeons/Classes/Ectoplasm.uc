@@ -159,7 +159,7 @@ state NormalFire
 	{
 		CalculateAutoAimDir();
 		// log("	Ecto: FireEcto(), 'Misc'");
-		GhelzUse(manaCostPerLevel[localCastingLevel]);
+		GhelzUse(GetManaCost(localCastingLevel));
 		// play sound and visual effects
 		PlayFiring();
 		// create the projectile
@@ -208,7 +208,7 @@ state NormalFire
 
 		if ( (PlayerPawn(owner).bFireAttSpell == 0) && bStillFiring ) {
 			GotoState('');
-		} else if ( ProcessCastingLevel() && Pawn(Owner).useMana(manaCostPerLevel[localCastingLevel]) && !AeonsPlayer(Owner).bDispelActive ) {
+		} else if ( ProcessCastingLevel() && Pawn(Owner).useMana(GetManaCost(localCastingLevel)) && !AeonsPlayer(Owner).bDispelActive ) {
 			//log("Ecto: NormalFire:Timer -- used mana... calling FireEcto()", 'Misc');
 			FireEcto();	
 		} else {
@@ -253,7 +253,7 @@ state NormalFire
 		
 		bStillFiring = false;
 		// Fire the first shot - this avoids the delay in firing
-		if ( ProcessCastingLevel() && Pawn(Owner).useMana(manaCostPerLevel[localCastingLevel]) && (!AeonsPlayer(Owner).DispelMod.isInState('Dispel')) )
+		if ( ProcessCastingLevel() && Pawn(Owner).useMana(GetManaCost(localCastingLevel)) && (!AeonsPlayer(Owner).DispelMod.isInState('Dispel')) )
 		{
 			//log("Ecto: NormalFire:Begin -- used mana... calling FireEcto()", 'Misc');
 			FireEcto();
@@ -332,7 +332,7 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 	ecto = Spawn(class 'Ectoplasm_proj',PlayerPawn(Owner),, handPlace.pos + vector(Pawn(Owner).ViewRotation) * 32, AdjustedAim);
 	ecto.castingLevel = localCastingLevel;
 	ecto.speed = (ecto.speedPerLevel[localCastingLevel] * RandRange(0.9, 1.3));
-	ecto.manaCost = manaCostPerLevel[castingLevel];
+	ecto.manaCost = GetManaCost(localCastingLevel);
 	// TraceFire(0.0, HitLocation);
 	
 	ecto.seekLocation = HitLocation;
@@ -377,7 +377,7 @@ simulated function Projectile ProjectileFire(class<projectile> ProjClass, float 
 	
 	ecto.castingLevel = localCastingLevel;
 	ecto.speed = (ecto.speedPerLevel[localCastingLevel] * RandRange(0.9, 1.3));
-	ecto.manaCost = manaCostPerLevel[castingLevel];
+	ecto.manaCost = GetManaCost(localCastingLevel); // RGC()? was GetManaCost(castingLevel)
 
 	// ecto.seekLocation = Player.EyeTraceLoc;
 	ecto.InitialDir = Vector(Dir);
@@ -411,10 +411,10 @@ function FireAttSpell( float Value )
 	} else {
 		if (bPCL)
 		{
-			if (PlayerPawn(Owner).Mana > manaCostPerLevel[localCastingLevel])
+			if (PlayerPawn(Owner).Mana > GetManaCost(localCastingLevel))
 			{
 				SayMagicWords();
-				// if ( PawnOwner.useMana(manaCostPerLevel[LocalCastingLevel]) && (!AeonsPlayer(Owner).DispelMod.isInState('Dispel')) )
+				// if ( PawnOwner.useMana(GetManaCost(localCastingLevel)) && (!AeonsPlayer(Owner).DispelMod.isInState('Dispel')) )
 				if ( !AeonsPlayer(Owner).DispelMod.isInState('Dispel') )
 				{
 					// log("Ectoplasm:Use Mana passed .........."$n, 'Spell');

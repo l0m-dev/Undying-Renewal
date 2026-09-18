@@ -130,7 +130,7 @@ simulated function Skull_proj genSkull(int nS)
 	local Pawn PawnOwner;
 	local texture HitTexture;
 	
-	AeonsPlayer(Owner).UseMana(manaCostPerLevel[localCastingLevel]);
+	AeonsPlayer(Owner).UseMana(GetManaCost(localCastingLevel));
 
 	PawnOwner = Pawn(Owner);
 
@@ -300,7 +300,7 @@ state NormalFire
 		{
 			if ( CheckGenSkull() )
 			{
-				if ( AeonsPlayer(owner).Mana >manaCostPerLevel[localCastingLevel] && !AeonsPlayer(Owner).bDispelActive )
+				if ( AeonsPlayer(owner).Mana > GetManaCost(localCastingLevel) && !AeonsPlayer(Owner).bDispelActive )
 				{
 					if ( NumSkulls == 0 )
 						PlayAnim('SkullStorm_Start',2,,,0);
@@ -311,7 +311,7 @@ state NormalFire
 					SummonedSkulls[NumSkulls] = GenSkull(NumSkulls);
 					if (Level.NetMode != NM_Standalone )
 						ClientGenSkull(NumSkulls);
-					GhelzUse(manaCostPerLevel[CastingLevel]);
+					GhelzUse(GetManaCost(localCastingLevel));
 					AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 					
 					/*

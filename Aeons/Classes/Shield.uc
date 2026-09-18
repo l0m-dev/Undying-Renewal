@@ -20,6 +20,18 @@ simulated function PreBeginPlay()
 	super.PreBeginPlay();
 }
 
+function FireAttSpell( float Value )
+{
+	// Prevent shield from instantly breaking if low on mana, RGC()?
+	if ( AeonsPlayer(owner).mana <= GetManaCost(castingLevel) + 2 )
+	{
+		FailedSpellCast();
+		return;
+	}
+
+	Super.FireAttSpell(Value);
+}
+
 state NormalFire
 {
 	ignores FireAttSpell;

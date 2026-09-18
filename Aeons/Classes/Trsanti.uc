@@ -62,7 +62,7 @@ function PreBeginPlay()
 		MeleeSwitchDistance = 250.0;
 		RangedSwitchDistance = 400.0;
 
-		if ( FRand() < (0.25 * Level.Game.Difficulty) )
+		if ( Level.Game.Difficulty >= 2 && FRand() < (0.25 * Level.Game.Difficulty) )
 			bTakeHeadShot = true;
 	}
 }
@@ -796,6 +796,7 @@ BEGIN:
 	}
 	if ( ClearShot( WeaponLoc(), EnemyAimSpot() ) != none )
 		PopState();
+	// TODO: move headshot selection here or on PreWeaponFire
 	FireWeapon();
 	if ( RGC() )
 		SetTimer( 1.0 + FRand() * 2.0, false );

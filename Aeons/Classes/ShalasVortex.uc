@@ -20,7 +20,7 @@ state NormalFire
 		AeonsPlayer(owner).ShalasMod.castingLevel = localCastingLevel;
 		FinishAnim();
 
-		// AeonsPlayer(owner).useMana(manaCostPerLevel[castingLevel]);
+		// AeonsPlayer(owner).useMana(GetManaCost(castingLevel));
 
 		//sleep(RefireRate);
 		//Finish();

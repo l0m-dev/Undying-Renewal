@@ -2415,7 +2415,10 @@ function DamageInfo getDamageInfo( optional name DamageType )
 	{
 		case 'NearAttack':
 			DInfo.Damage = MeleeInfo[0].Damage;
-			DInfo.EffectStrength = FClamp( MeleeInfo[0].EffectStrength * OutEffectScalar, 0.0, 1.0 );
+			if ( class'RenewalConfig'.default.bNewDamageFeedback )
+				DInfo.EffectStrength = FClamp( MeleeInfo[0].EffectStrength, 0.0, 1.0 );
+			else
+				DInfo.EffectStrength = FClamp( MeleeInfo[0].EffectStrength * OutEffectScalar, 0.0, 1.0 );
 			break;
 		case 'fall':
 			DInfo.Damage = InitHealth * FallDamageScalar;
@@ -11684,7 +11687,8 @@ state Dying
 
 	function StartTimer()
 	{
-		SetTimer( FadeOutDelay, false );
+		if ( !bIsBoss )
+			SetTimer( FadeOutDelay, false );
 	}
 
 	// Called when the creature is really dying (no longer invokable).
@@ -11842,7 +11846,8 @@ state StuckToWall
 
 	function StartTimer()
 	{
-		SetTimer( FadeOutDelay, false );
+		if ( !bIsBoss )
+			SetTimer( FadeOutDelay, false );
 	}
 
 	// Called when the creature is really dying (no longer invokable).
@@ -12270,11 +12275,13 @@ state AIRunScript
 		P = FindPlayer();
 		if ( P != None && P.IsA('PlayerPawn') && !PlayerPawn(P).bAllowMove )
 		{
-			SetCollision( false, false, false );
+			if ( bCollideActors || bBlockActors || bBlockPlayers )
+				SetCollision( false, false, false );
 		}
 		else
 		{
-			SetCollision( InitCollideActors, InitBlockActors, InitBlockPlayers );
+			if ( bCollideActors != InitCollideActors || bBlockActors != InitBlockActors || bBlockPlayers != InitBlockPlayers )
+				SetCollision( InitCollideActors, InitBlockActors, InitBlockPlayers );
 		}
 	}
 

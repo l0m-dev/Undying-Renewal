@@ -445,12 +445,7 @@ function PlayDying( name damage, vector HitLocation, DamageInfo DInfo )
 			GetAxes( Rotation, X, Y, Z );
 			DP = X dot Normal(DVect);
 
-			bHeadShot = ( DInfo.JointName == 'neck' ) || ( DInfo.JointName == 'head' ) || ( DInfo.JointName == 'spine3' ) ||
-						( DInfo.JointName == 'hair1' ) || ( DInfo.JointName == 'hair2' ) || ( DInfo.JointName == 'hair3' ) || ( DInfo.JointName == 'hair4' ) || ( DInfo.JointName == 'hair5' ) ||
-						( DInfo.JointName == 'l_ear' ) || ( DInfo.JointName == 'r_ear' ) ||
-						( DInfo.JointName == 'r_ear1' ) || ( DInfo.JointName == 'r_ear2' ) || ( DInfo.JointName == 'r_ear3' ) ||
-						( DInfo.JointName == 'l_ear1' ) || ( DInfo.JointName == 'l_ear2' ) || ( DInfo.JointName == 'l_ear3' ) ||
-						( DInfo.JointName == 'jaw' ) || ( DInfo.JointName == 'mouth' );
+			bHeadShot = IsHeadShotJoint( DInfo.JointName, true );
 
 			if ( bHeadShot )
 			{

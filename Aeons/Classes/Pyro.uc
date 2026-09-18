@@ -25,7 +25,7 @@ state NormalFire
 			AeonsPlayer(Owner).MakePlayerNoise(3.0, 1280*3);
 		}
 		
-		PawnOwner.useMana(manaCostPerLevel[localCastingLevel]);
+		PawnOwner.useMana(GetManaCost(localCastingLevel));
 	}
 
 	Begin:
@@ -45,6 +45,7 @@ defaultproperties
      manaCostPerLevel(2)=40
      manaCostPerLevel(3)=30
      manaCostPerLevel(4)=20
+     manaCostPerLevel(5)=20
      ItemType=SPELL_Offensive
      InventoryGroup=20
      PickupMessage="Pyro"

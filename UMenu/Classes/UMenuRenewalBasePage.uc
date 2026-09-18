@@ -103,7 +103,7 @@ function Resized()
 
 function BeforePaint(Canvas C, float X, float Y)
 {
-	local int CenterPos, ControlPadding, ScrollBarWidth;
+	local int ControlPadding, ScrollBarWidth;
 	local int i;
 	local UWindowDialogControl Control;
 	local float SizeX;
@@ -113,10 +113,9 @@ function BeforePaint(Canvas C, float X, float Y)
 	//ControlOffset = 10 * Root.ScaleY;
 
 	if (bHasScrollBar && UWindowScrollingDialogClient(ParentWindow).bShowVertSB)
-		ScrollBarWidth = LookAndFeel.Size_ScrollbarWidth;
+		ScrollBarWidth = LookAndFeel.Size_ScrollbarWidth * Root.ScaleY;
 	
-	ControlPadding = 16;
-	CenterPos = WinWidth/2 + ControlPadding;
+	ControlPadding = 16 * Root.ScaleY;
 	SizeX = WinWidth-(ControlPadding*2+ScrollBarWidth);
 	
 	for (i = 0; i < NumControls; i++)
@@ -125,8 +124,6 @@ function BeforePaint(Canvas C, float X, float Y)
 		Control.WinLeft = ControlPadding;
 		Control.WinTop = Controls[i].WinTop * Root.ScaleY;
 		Control.WinWidth = SizeX;
-		//Control.WinTop = ControlOffset;
-		//ControlOffset += 20 * Root.ScaleY;
 	}
 }
 

@@ -17,6 +17,11 @@ var int i;
 
 var int ShieldHealthPerLevel[6];
 var float OverlayStrPerLevel[6];
+var int ShieldTimePerLevel[6];
+
+var travel int MaxShieldHealth;
+var travel float MaxOverlayStr;
+var travel int ManaMaint;
 
 /*----------------------------------------------------------------------------
 	Replication
@@ -34,14 +39,26 @@ replication
 
 function PreBeginPlay()
 {
+	local int i;
+
 	if (RGC())
 	{
-		ShieldHealthPerLevel[0] = 15;
-		ShieldHealthPerLevel[1] = 25;
-		ShieldHealthPerLevel[2] = 35;
-		ShieldHealthPerLevel[3] = 45;
-		ShieldHealthPerLevel[4] = 55;
-		ShieldHealthPerLevel[5] = 65;
+		ShieldHealthPerLevel[0] = 20;
+		ShieldHealthPerLevel[1] = 30;
+		ShieldHealthPerLevel[2] = 40;
+		ShieldHealthPerLevel[3] = 50;
+		ShieldHealthPerLevel[4] = 60;
+		ShieldHealthPerLevel[5] = 70;
+
+		ShieldTimePerLevel[0] = 20;
+		ShieldTimePerLevel[1] = 30;
+		ShieldTimePerLevel[2] = 40;
+		ShieldTimePerLevel[3] = 60;
+		ShieldTimePerLevel[4] = 90;
+		ShieldTimePerLevel[5] = 120;
+
+		for (i=0; i<6; i++)
+			OverlayStrPerLevel[i] = FMin(float(ShieldTimePerLevel[i]) / 100.0, 1.0);
 	}
 	Super.PreBeginPlay();
 
@@ -54,10 +71,36 @@ function PreBeginPlay()
 
 //----------------------------------------------------------------------------
 
-simulated function AddCrack(float Str)
+simulated function AddCrack(float Str, vector HitLocation, vector Momentum)
 {
 	local int i;
 	local vector Loc;
+	local vector HitDir, X, Y, Z;
+	local float Spread, CloudMin, CloudMax, CloudX, CloudY;
+	local bool bFullyRandom;
+
+	bFullyRandom = Momentum == vect(0,0,0) || !class'RenewalConfig'.default.bNewDamageFeedback;
+
+	if ( !bFullyRandom )
+	{
+		Spread = FClamp(0.25 * Sqrt(Str), 0.1, 1.0);
+
+		if ( Spread == 1.0 )
+			bFullyRandom = true;
+		else
+		{
+			//HitDir = Normal(HitLocation-Location);
+			HitDir = Normal(Momentum);
+
+			GetAxes(Pawn(Owner).ViewRotation, X, Y, Z);
+
+			CloudMin = Spread * 0.5;
+			CloudMax = 1.0 - CloudMin;
+
+			CloudX = FClamp((-(HitDir Dot Y) + 1.0) * 0.5, CloudMin, CloudMax);
+			CloudY = FClamp(((HitDir Dot Z) + 1.0) * 0.5, CloudMin, CloudMax);
+		}
+	}
 	
 	for (i=0; i<8; i++)
 	{
@@ -65,8 +108,16 @@ simulated function AddCrack(float Str)
 		{
 			CrackStr[i] = Str;
 			InitialCrackStr[i] = Str;
-			Loc.x = RandRange(0.15,0.65);
-			Loc.y = RandRange(0.15,0.65);
+			if (bFullyRandom)
+			{
+				Loc.x = RandRange(0.15,0.8);
+				Loc.y = RandRange(0.15,0.8);
+			}
+			else
+			{
+				Loc.x = CloudX + (FRand() - 0.5) * Spread;
+				Loc.y = CloudY + (FRand() - 0.5) * Spread;
+			}
 			CrackLocations[i] = Loc;
 			CrackID[i] = rand(3);
 			break;
@@ -74,9 +125,9 @@ simulated function AddCrack(float Str)
 	}
 }
 
-simulated function ClientAddCrack(float Str)
+simulated function ClientAddCrack(float Str, vector HitLocation, vector Momentum)
 {
-	AddCrack(Str);
+	AddCrack(Str, HitLocation, Momentum);
 }
 
 //----------------------------------------------------------------------------
@@ -89,7 +140,16 @@ function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, 
 	if (bActive)
 		if (shieldHealth <= DInfo.Damage)
 		{
-			NewDInfo.Damage = (DInfo.Damage - shieldHealth);
+			// bugfix
+			if (RGC())
+			{
+				NewDInfo = DInfo;
+
+				// Absorb damage in multiples of 10, so even 1 health shield can absorb 10 damage
+				NewDInfo.Damage = FMax(0, DInfo.Damage - (shieldHealth/10+1)*10);
+			}
+			else
+				NewDInfo.Damage = (DInfo.Damage - shieldHealth);
 			// log("Shield taking damage: "$Damage);
 			// log("Shield passing on damage to the player: "$iDamage);
 			Owner.PlaySound(EffectSound);
@@ -100,9 +160,9 @@ function TakeDamage( Pawn EventInstigator, vector HitLocation, vector Momentum, 
 			gotoState('Deactivated');
 		} else {
 			// log("Shield taking damage: "$Damage);
-			AddCrack(1.0);
+			AddCrack(1.0, HitLocation, Momentum);
 			shieldHealth -= DInfo.Damage;
-			OverlayStr = shieldHealth * 0.01;
+			OverlayStr = float(shieldHealth) / MaxShieldHealth * MaxOverlayStr;
 			Owner.PlaySound(EffectSound);
 		}
 }
@@ -127,8 +187,8 @@ state Activated
 	{
 		shieldHealth -= 1.0;
 
-		OverlayStr = shieldHealth * 0.01;
-		if ((shieldHealth <= 0) || ( AeonsPlayer(owner).mana <= 5 ))
+		OverlayStr = float(shieldHealth) / MaxShieldHealth * MaxOverlayStr;
+		if (shieldHealth <= 0)
 			gotoState('Deactivated');
 	}
 
@@ -141,6 +201,9 @@ state Activated
 			CrackStr[i] -= (deltaTime/10.0);
 			CrackStr[i] = FClamp(CrackStr[i], 0, InitialCrackStr[i]);
 		}
+
+		if (AeonsPlayer(owner).mana <= 2) // RGC()? reduced 5 to 2, and moved check from Timer To Tick
+			gotoState('Deactivated');
 	}
 
 	Begin:
@@ -155,7 +218,8 @@ state Activated
 			Disable('Tick');
 			if ( !bHUDEffect )
 			{
-				ManaModifier(AeonsPlayer(Owner).ManaMod).manaMaint += 2;
+				ManaMaint = 2; // TODO: might want to increase this for ultra-nightmare
+				ManaModifier(AeonsPlayer(Owner).ManaMod).manaMaint += ManaMaint;
 				ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 				Owner.PlaySound(ActivateSound);
 				// PlayerPawn(Owner).ClientAdjustGlow( str, col );
@@ -178,8 +242,10 @@ state Activated
 			shieldMesh = spawn(class 'Shield3rdPerson',Pawn(Owner),,Owner.Location + (Vector(PlayerPawn(Owner).ViewRotation) * 16), PlayerPawn(Owner).ViewRotation );
 
 		if ( castingLevel < 6 ) {
-			shieldHealth = ShieldHealthPerLevel[castingLevel];
-			OverlayStr = OverlayStrPerLevel[castingLevel];
+			MaxShieldHealth = ShieldHealthPerLevel[castingLevel];
+			shieldHealth = MaxShieldHealth;
+			MaxOverlayStr = OverlayStrPerLevel[castingLevel];
+			OverlayStr = MaxOverlayStr;
 		} else {
 			log("CastingLevel is invalid!!!");
 			gotoState('Deactivated');	// bail out
@@ -190,7 +256,7 @@ state Activated
 			CrackStr[i] = 0;
 
 		Enable('Tick');
-		SetTimer(1.0, true);
+		SetTimer(float(ShieldTimePerLevel[castingLevel]) / MaxShieldHealth, true);
 		Stop;
 
 	AlreadyActive:
@@ -199,8 +265,8 @@ state Activated
 
 		adjLoc = Pawn(Owner).location;
 		adjLoc.z -= 48;
-		OverlayStr = shieldHealth * 0.01;
-		setTimer(1.0, true);
+		OverlayStr = float(shieldHealth) / MaxShieldHealth * MaxOverlayStr;
+		setTimer(float(ShieldTimePerLevel[castingLevel]) / MaxShieldHealth, true);
 		Enable('Tick');
 }
 
@@ -223,7 +289,7 @@ state Deactivated
 		bActive = false;
 		if ( bHUDEffect )
 		{
-			ManaModifier(AeonsPlayer(Owner).ManaMod).manaMaint -= 2;
+			ManaModifier(AeonsPlayer(Owner).ManaMod).manaMaint -= ManaMaint;
 			ManaModifier(AeonsPlayer(Owner).ManaMod).updateManaTimer();
 
 			// create shield breaking effect
@@ -268,5 +334,11 @@ defaultproperties
      OverlayStrPerLevel(3)=0.6
      OverlayStrPerLevel(4)=1.0
      OverlayStrPerLevel(5)=1.0
+     ShieldTimePerLevel(0)=15
+     ShieldTimePerLevel(1)=30
+     ShieldTimePerLevel(2)=45
+     ShieldTimePerLevel(3)=60
+     ShieldTimePerLevel(4)=100
+     ShieldTimePerLevel(5)=125
      RemoteRole=ROLE_SimulatedProxy
 }

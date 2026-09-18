@@ -112,6 +112,9 @@ var PlayerModifier	SlothMod;			// Slowing modifier
 var PlayerModifier	SlimeMod;			// Slime modifier
 var OnScreenMessageModifier OSMMod;		// OnScreen Message Modifier
 
+var float ShakeRollFrac;
+var float ShakeRollMax;
+
 // Game Events	-------------------------------------------------------------------------------
 
 var travel bool bLizbethDead;
@@ -928,12 +931,119 @@ simulated function EnableSaveGame()
 		Level.bDontAllowSavegame = false;
 }
 
-function PlayDamageEffect(vector HitLocation, vector Momentum, DamageInfo DInfo)
+// framerate independent version of PlayerPawn ViewShake
+function ViewShake(float DeltaTime)
 {
-	if (PlayerDamageMod != none)
+	local PlayerDamageModifier DamageMod;
+	local float ShakeTime;
+	local int Step;
+
+	DamageMod = PlayerDamageModifier(PlayerDamageMod);
+	if ( DamageMod != None )
+		DamageMod.RemoveViewOffset();
+
+	if (shaketimer > 0.0) //shake view
 	{
-		PlayerDamageModifier(PlayerDamageMod).TakeHit(DInfo.EffectStrength);
+		ShakeTime = FMin(0.1, FMin(DeltaTime, shaketimer));
+		shaketimer -= DeltaTime;
+		if ( verttimer == 0 )
+		{
+			verttimer = 0.1;
+			ShakeVert = -1.1 * maxshake;
+			ShakeRollMax = 0;
+		}
+		else
+		{
+			verttimer -= DeltaTime;
+			if ( verttimer < 0 )
+			{
+				verttimer += 0.2 * FRand();
+				shakeVert = (2 * FRand() - 1) * maxshake;
+			}
+		}
+
+		if ( ShakeRollMax <= 0 )
+			ShakeRollMax = FMin(0.5 + FRand(), 1.3) * shakemag;
+
+		ShakeRollFrac += 10 * shakemag * ShakeTime;
+		Step = int(ShakeRollFrac);
+		ShakeRollFrac -= Step;
+
+		ViewRotation.Roll = ViewRotation.Roll & 65535;
+		if (bShakeDir)
+		{
+			ViewRotation.Roll = (ViewRotation.Roll + Step) & 65535;
+			if ( (ViewRotation.Roll < 32768) && (ViewRotation.Roll >= ShakeRollMax) )
+			{
+				ViewRotation.Roll = ShakeRollMax;
+				bShakeDir = false;
+				ShakeRollMax = 0;
+			}
+			else if ( FRand() < 1.0 - Exp(-3.0 * DeltaTime) )
+			{
+				bShakeDir = false;
+				ShakeRollMax = 0;
+			}
+		}
+		else
+		{
+			ViewRotation.Roll = (ViewRotation.Roll - Step) & 65535;
+			if ( (ViewRotation.Roll > 32768) && (ViewRotation.Roll <= 65536 - ShakeRollMax) )
+			{
+				ViewRotation.Roll = 65536 - ShakeRollMax;
+				bShakeDir = true;
+				ShakeRollMax = 0;
+			}
+			else if ( FRand() < 1.0 - Exp(-3.0 * DeltaTime) )
+			{
+				bShakeDir = true;
+				ShakeRollMax = 0;
+			}
+		}
 	}
+	else
+	{
+		ShakeVert = 0;
+		ShakeRollMax = 0;
+		ShakeRollFrac = 0;
+		ViewRotation.Roll = ViewRotation.Roll & 65535;
+		if (ViewRotation.Roll < 32768)
+		{
+			if ( ViewRotation.Roll > 500 )
+				ViewRotation.Roll = Max(500, ViewRotation.Roll * Exp(-10.0 * DeltaTime));
+			else if ( ViewRotation.Roll > 0 )
+				ViewRotation.Roll = Max(0, ViewRotation.Roll - 5000.0 * DeltaTime);
+		}
+		else
+		{
+			// stock Max(500,Roll) is always Roll here, so it could get stuck near 65535
+			if ( ViewRotation.Roll < 65036 )
+				ViewRotation.Roll = Min(65036, 65536 - (65536 - ViewRotation.Roll) * Exp(-10.0 * DeltaTime));
+			else
+				ViewRotation.Roll = Min(65536, ViewRotation.Roll + 5000.0 * DeltaTime);
+			if ( ViewRotation.Roll > 65534 )
+				ViewRotation.Roll = 0;
+		}
+	}
+
+	if ( DamageMod != None )
+		DamageMod.ApplyViewOffset(DeltaTime);
+}
+
+function PlayDamageEffect(float Damage, vector HitLocation, float Strength, vector Momentum)
+{
+	if ( class'RenewalConfig'.default.bNewDamageFeedback )
+	{
+		if ( PlayerDamageMod != None )
+			PlayerDamageModifier(PlayerDamageMod).TakeHitNew(Damage, HitLocation, Strength, Momentum);
+		return;
+	}
+
+	Damage *= class'RenewalConfig'.default.DamageScreenShakeScale;
+	ShakeView(0.15 + 0.005 * Damage, Damage * 30, 0.3 * Damage);
+
+	if ( PlayerDamageMod != None )
+		PlayerDamageModifier(PlayerDamageMod).TakeHit(Strength);
 }
 
 function ProjectileHit(Pawn Instigator, vector HitLocation, vector Momentum, projectile proj, DamageInfo DInfo)
@@ -1042,14 +1152,14 @@ function TakeDamage( Pawn instigatedBy, Vector hitlocation, Vector momentum, Dam
 
 		if ( Level.Game.Difficulty >= 3 )
 		{
-			// start at 50% damage blocking, add 10% per level
+			// take some of the absorbed damage, start at 50% damage blocking, add 10% per level
 			DInfo.Damage = AbsorbedDamage * (5 - ShieldModifier.castingLevel) / 10.0;
 			if ( AcceptDamage(DInfo) )
-				Super.TakeDamage(instigatedBy, HitLocation, Momentum, DInfo);
+				Super.TakeDamage(instigatedBy, hitlocation, momentum, DInfo);
 		}
 
 		if ( RemoteRole == ROLE_AutonomousProxy && ShieldModifier.shieldHealth > 0 )
-			ShieldModifier.ClientAddCrack(1.0);
+			ShieldModifier.ClientAddCrack(1.0, hitlocation, momentum);
 	}
 	else
 	{
@@ -1897,7 +2007,7 @@ function AdjustCrouch( float delta )
 		{
 			if ( bIsCrouching )
 			{
-				GroundSpeed = default.GroundSpeed * CrouchSpeedScale;
+				GroundSpeed = default.GroundSpeed * (1.0 - (1.0 - CrouchSpeedScale) * CrouchTime); // RGC()? don't instantly apply CrouchSpeedScale
 		//		log( Role $ " IS crouching, Physics is " $ Physics $ ", CollisionHeight is " $ CollisionHeight $ ", EyeHeight is " $ BaseEyeHeight $ ", aUp is " $ aUp );
 				if ( CrouchTime < 1.0 )
 				{
@@ -2029,7 +2139,7 @@ function PlayHit(float Damage, vector HitLocation, name damageType, vector Momen
 	else 
 		ClientFlash( -0.017 * rnd, rnd * vect(24, 4, 4));
 
-	ShakeView(0.15 + 0.005 * Damage, Damage * 30, 0.3 * Damage); 
+	//ShakeView(0.15 + 0.005 * Damage, Damage * 30, 0.3 * Damage); // moved to PlayDamageEffect
 	PlayTakeHitSound(Damage, damageType, 1);
 																									//dodge ?
 	bServerGuessWeapon = ( ((Weapon != None) && Weapon.bPointing) || (GetAnimGroup(AnimSequence) == 'Dodge') );
@@ -3197,7 +3307,7 @@ ignores SeePlayer, HearNoise, Bump;
 		if ( bPressedJump )
 			DoJump();
 
-		if ( Physics == PHYS_Walking || bIsClimbing )
+		if ( Physics == PHYS_Walking || bIsClimbing || (bCanCrouchInAir && Physics == PHYS_Falling) )
 		{
 			// check crouch
 			if ( !bIsCrouching )
@@ -3206,7 +3316,7 @@ ignores SeePlayer, HearNoise, Bump;
 				{
 					// change from standing to crouching
 					bIsCrouching = true;
-					if ( NewVSize < 0.05 )
+					if ( NewVSize < 0.05 && (Physics == PHYS_Walking || bIsClimbing) )
 						PlayLocomotion( vect(0,0,0) );
 				}
 			}
@@ -3216,20 +3326,23 @@ ignores SeePlayer, HearNoise, Bump;
 				bIsCrouching = false;
 			}
 
-			if ( ( NewVSize > 0.05 ) )	//&& ( OldVSize < 0.05 ) )
+			if ( Physics == PHYS_Walking || bIsClimbing )
 			{
-				// movement just started
-				lRot = Rotation;
-				lRot.Pitch = 0;
-				lRot.Roll = 0;
+				if ( ( NewVSize > 0.05 ) )	//&& ( OldVSize < 0.05 ) )
+				{
+					// movement just started
+					lRot = Rotation;
+					lRot.Pitch = 0;
+					lRot.Roll = 0;
 
-				lRot = rotator(Acceleration) - lRot;
-				PlayLocomotion( vector(lRot) );
-			}
-			else if ( ( NewVSize < 0.05 ) && ( OldVSize > 0.05 ) )
-			{
-				// movement just stopped
-				PlayLocomotion( vect(0,0,0) );
+					lRot = rotator(Acceleration) - lRot;
+					PlayLocomotion( vector(lRot) );
+				}
+				else if ( ( NewVSize < 0.05 ) && ( OldVSize > 0.05 ) )
+				{
+					// movement just stopped
+					PlayLocomotion( vect(0,0,0) );
+				}
 			}
 /*
 			if ( !bIsCrouching )
@@ -3589,6 +3702,29 @@ ignores SeePlayer, HearNoise, Bump;
 //		log( Role $ " in ProcessMove(), aUp is " $ aUp );
 
 		Acceleration = Normal(NewAccel) * AirSpeed;
+
+		if ( bCanCrouchInAir )
+		{
+			if ( Physics == PHYS_Flying )
+			{
+				// check crouch
+				if ( !bIsCrouching )
+				{
+					if ( bDuck != 0 )
+					{
+						// change from standing to crouching
+						bIsCrouching = true;
+					}
+				}
+				else if ( bDuck == 0 )
+				{
+					// change from crouching to standing
+					bIsCrouching = false;
+				}
+			}
+			AdjustCrouch( DeltaTime );
+		}
+
 		MoveSmooth(Acceleration * DeltaTime);
 	}
 	
@@ -5802,11 +5938,11 @@ function vwe()
 
 //----------------------------------------------------------------------------
 
-simulated function SplatterHUD(int ActualDamage, Vector HitLocation)
+simulated function SplatterHUD(int ActualDamage, Vector HitLocation, Vector Momentum)
 {
 	if ( (MyHUD != None) && (AeonsHUD(myHUD) != None) )
 	{
-		AeonsHud(MyHUD).AddSplat(ActualDamage/4+1, HitLocation);		
+		AeonsHud(MyHUD).AddSplat(ActualDamage/4+1, HitLocation, Momentum);		
 	}
 }
 
@@ -5814,7 +5950,7 @@ simulated function SplatterHUD(int ActualDamage, Vector HitLocation)
 
 exec function TestBlood( int HitPoints ) 
 {
-	SplatterHUD( HitPoints, Location );
+	SplatterHUD( HitPoints, Location, vect(0,0,0) );
 }
 
 //----------------------------------------------------------------------------
@@ -6733,11 +6869,17 @@ exec function NextDefSpell()
 	DefSpell = PendingDefSpell;
 }
 
-exec function PDP()
+exec function PDP(float Strength)
 {
 	if (PlayerDamageMod != none)
 	{
-		PlayerDamageModifier(PlayerDamageMod).TakeHit(FRand());
+		if (Strength == 0)
+			Strength = FRand();
+
+		if (class'RenewalConfig'.default.bNewDamageFeedback)
+			PlayerDamageModifier(PlayerDamageMod).TakeHitNew(0, Location + 100 * VRand(), Strength, vect(0,0,0));
+		else
+			PlayerDamageModifier(PlayerDamageMod).TakeHit(Strength);
 	}
 }
 

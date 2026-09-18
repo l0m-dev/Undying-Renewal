@@ -113,7 +113,10 @@ function FireAttSpell( float Value )
 							break;
 
 						case 1:
-							FinalManaCost = TargetPawn.default.Health;
+							if ( RGC() )
+								FinalManaCost = TargetPawn.default.Health * 0.75;
+							else
+								FinalManaCost = TargetPawn.default.Health;
 							break;
 
 						case 2:
@@ -257,7 +260,8 @@ defaultproperties
      PlayerViewOffset=(X=-6,Y=6,Z=-2.5)
      PlayerViewMesh=SkelMesh'Aeons.Meshes.SpellHand_m'
      PlayerViewScale=0.1
-     MinTickTime=0.05
+     bTimedTick=True
+     MinTickTime=0.016
      Texture=Texture'Aeons.System.SpellIcon'
      Mesh=SkelMesh'Aeons.Meshes.SpellHand_m'
 }
