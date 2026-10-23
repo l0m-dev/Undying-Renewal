@@ -38,6 +38,7 @@ var config bool bShowBossHealthBars;
 var config bool bShowScryeHint;
 var config bool bShowQuickSelectHint;
 var config bool bUnlockedUltraNightmare;
+var config bool bShowBossHealthBarsHint;
 
 // for live tweaking/debugging
 var bool bDebug;
@@ -67,8 +68,10 @@ defaultproperties
 	 DamageScreenShakeScale=1.0
 	 bMoreSkippableCutscenes=False
 	 bSlomoSelection=True
+	 bShowBossHealthBars=True
 	 bShowScryeHint=True
 	 bShowQuickSelectHint=True
+	 bShowBossHealthBarsHint=True
 	 fDebug=1.0
 	 fDebug2=1.0
      bAlwaysRelevant=True

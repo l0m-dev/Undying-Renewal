@@ -266,7 +266,7 @@ state UWindow
 		case IST_Press:
 			switch (k)
 			{
-			case EInputKey.IK_F9:	// Screenshot
+			//case EInputKey.IK_F9:	// Screenshot
 			case EInputKey.IK_F10:	// Cancel
 				return Global.KeyEvent(Key, Action, Delta);
 				break;

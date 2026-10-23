@@ -120,6 +120,7 @@ function Notify(UWindowDialogControl C, byte E)
 			break;
 		case ShowBossHealthBarsCheck:
 			class'RenewalConfig'.default.bShowBossHealthBars = ShowBossHealthBarsCheck.bChecked;
+			class'RenewalConfig'.default.bShowBossHealthBarsHint = false;
 			break;
 		case CrosshairColorPicker:
 			GetPlayerOwner().default.CrossHairColor = CrosshairColorPicker.PickedColor;

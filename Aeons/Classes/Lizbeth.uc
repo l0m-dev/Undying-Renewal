@@ -710,7 +710,7 @@ state LizbethBossFightFrenzy expands AIScriptedState
 	}
 
 Taunted:
-	if( RGC() )
+	if( RGC() && Level.Game.Difficulty >= 2 )
 		SpawnHowler();
 Damaged:
 Resume:

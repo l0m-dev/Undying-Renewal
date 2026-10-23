@@ -668,6 +668,12 @@ auto state AISpawn
 		DrawScale = 0.05;
 	}
 
+	function EndState()
+	{
+		DebugEndState();
+		DrawScale = 1.0;
+	}
+
 	function Tick( float DeltaTime )
 	{
 		super.Tick( DeltaTime );

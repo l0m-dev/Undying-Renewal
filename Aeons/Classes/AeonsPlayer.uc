@@ -446,6 +446,9 @@ var bool bModifiedTimeDilationForSelectObject;
 
 const SELECT_OBJECT_TIME_DILATION = 0.2;
 
+var transient int DeathsToBossesSinceGameStart; // transient, only default is used
+var localized string BossHealthBarsHint;
+
 replication
 {
 	// Variables the server should send to the client.
@@ -6536,6 +6539,12 @@ function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo
 	if( Speargun(Weapon) != None )
 		Speargun(Weapon).bZoomedIn = false;
 	spawn(class 'CarnageDecal',,,Location, rotator(vect(0,0,1)));
+	if( ScriptedPawn(Killer) != None && ScriptedPawn(Killer).bIsBoss )
+	{
+		default.DeathsToBossesSinceGameStart++;
+		if( !class'RenewalConfig'.default.bShowBossHealthBars && class'RenewalConfig'.default.bShowBossHealthBarsHint && (default.DeathsToBossesSinceGameStart % 3) == 0 )
+			ScreenMessage(BossHealthBarsHint, 8.0);
+	}
 	Super.Died(Killer, damageType, HitLocation, DInfo);	
 }
 
@@ -8978,4 +8987,5 @@ defaultproperties
      CollisionRadius=32
      CollisionHeight=64
      SelectItemHint="Hold [%key] to select items"
+     BossHealthBarsHint="Hint: Enable Boss Health Bars in Renewal Settings from the main menu"
 }

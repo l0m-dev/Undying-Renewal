@@ -577,6 +577,7 @@ function bool CanPerformSK( pawn P )
 			SK_WorldLoc = GetGotoPoint( P.Location + ( SK_PlayerOffset.X * X ) + ( SK_PlayerOffset.Y * Y ) + ( SK_PlayerOffset.Z * Z ) );
 		DVect = P.Location - SK_WorldLoc;
 		DVect.Z = Abs(DVect.Z) - Abs(P.CollisionHeight - CollisionHeight);
+		// TODO: APawn::Reachable inside CanPathToPoint returns 0 for Physics == PHYS_Falling
 		if ( CanPathToPoint( SK_WorldLoc ) &&
 			 ( VSize( DVect ) < VSize( SK_PlayerOffset ) * 1.25 ) )
 			return true;

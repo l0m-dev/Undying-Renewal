@@ -416,6 +416,12 @@ function PreBeginPlay()
 {
 	local float OriginalHealth, Multiplier;
 
+	if( SubState == K_Ambush && RGC() )
+	{
+		// health is set to 200 in the editor, prevent Skull Storm from doing too much damage
+		ConcussiveScalar = 0.5;
+	}
+
 	OriginalHealth = Health;
 	super.PreBeginPlay();
 

@@ -1321,22 +1321,6 @@ simulated function PostRender( canvas Canvas )
 			Canvas.SetPos(0,Canvas.ClipY - YDelta);
 			Canvas.DrawTile( Texture'UWindow.BlackTexture', Canvas.ClipX, YDelta, 0, 0, 32, 32);
 		}
-		
-		// BURT: FIX 1
-		// force draw on screen messages during cutscenes
-		if (AP != none)
-		{
-			if (AP.OSMMod != none)
-			{
-				AP.OSMMod.RenderOverlays(Canvas);
-			}
-			else if (AP.OverlayActor != none &&
-					AP.OverlayActor.IsA('OnScreenMessage'))
-			{
-				AP.OverlayActor.RenderOverlays(Canvas);		
-			}
-		}
-		// --BURT
 
 		// Draw debug Cutscene Info
 		CutsceneManager = class'CutsceneManager'.static.GetCutsceneManager(Level);
@@ -1675,6 +1659,20 @@ simulated function PostRender( canvas Canvas )
 	
 	if ( Level.TimeSeconds < ChatVisibleTime || AeonsConsole(PlayerPawn(Owner).Player.Console).bChatting )
 		DrawChat(Canvas);
+
+	// Force draw on screen messages when engine doesn't call RenderOverlays
+	if (AP != none && (AP.bBehindView || AP.ViewTarget != none))
+	{
+		if (AP.OSMMod != none)
+		{
+			AP.OSMMod.RenderOverlays(Canvas);
+		}
+		else if (AP.OverlayActor != none &&
+				AP.OverlayActor.IsA('OnScreenMessage'))
+		{
+			AP.OverlayActor.RenderOverlays(Canvas);		
+		}
+	}
 	
 	// Draw the subtitles
 	if ( PlayerOwner.bEnableSubtitles )
