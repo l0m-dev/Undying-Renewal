@@ -6536,16 +6536,23 @@ exec function RenderWeapon()
 
 function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo)
 {
+	spawn(class 'CarnageDecal',,,Location, rotator(vect(0,0,1)));
+	Super.Died(Killer, damageType, HitLocation, DInfo);	
+}
+
+function PlayerDied(name DyingState, optional name DyingStateLabel, optional pawn Killer, optional name damageType, optional vector HitLocation, optional DamageInfo DInfo)
+{
 	if( Speargun(Weapon) != None )
 		Speargun(Weapon).bZoomedIn = false;
-	spawn(class 'CarnageDecal',,,Location, rotator(vect(0,0,1)));
+
 	if( ScriptedPawn(Killer) != None && ScriptedPawn(Killer).bIsBoss )
 	{
 		default.DeathsToBossesSinceGameStart++;
 		if( !class'RenewalConfig'.default.bShowBossHealthBars && class'RenewalConfig'.default.bShowBossHealthBarsHint && (default.DeathsToBossesSinceGameStart % 3) == 0 )
 			ScreenMessage(BossHealthBarsHint, 8.0);
 	}
-	Super.Died(Killer, damageType, HitLocation, DInfo);	
+
+	Super.PlayerDied(DyingState, DyingStateLabel, Killer, damageType, HitLocation, DInfo);	
 }
 
 // PrevDefSpell()

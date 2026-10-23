@@ -4016,9 +4016,14 @@ function Landed(vector HitNormal)
 
 function Died(pawn Killer, name damageType, vector HitLocation, DamageInfo DInfo)
 {
+	Super.Died(Killer, damageType, HitLocation, DInfo);
+}
+
+function PlayerDied(name DyingState, optional name DyingStateLabel, optional pawn Killer, optional name damageType, optional vector HitLocation, optional DamageInfo DInfo)
+{
 	StopZoom();
 
-	Super.Died(Killer, damageType, HitLocation, DInfo);
+	Super.PlayerDied(DyingState, DyingStateLabel, Killer, damageType, HitLocation, DInfo);	
 }
 
 function eAttitude AttitudeTo(Pawn Other)
